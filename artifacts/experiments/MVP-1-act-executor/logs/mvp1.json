@@ -1,0 +1,296 @@
+{
+  "experiment": "MVP-1-act-executor",
+  "date": "2026-09-12",
+  "workstation": "W2",
+  "hostname": "LAPTOP-SRCINK2B",
+  "node": "v26.4.0",
+  "chromium": {
+    "executable": "chrome.exe",
+    "fromChromePathEnv": true
+  },
+  "authorisation": "both pages served from 127.0.0.1 by this harness; mode A is the repository's own QG-02 fixture (unmodified on disk); mode B is the MVP-0 canvas fixture generated locally from fabricated strings; no external site contacted; no real data, no real PII, no credential, no security control bypassed",
+  "executorContract": {
+    "executableActions": [
+      "click"
+    ],
+    "refusedActions": [
+      "type",
+      "scroll",
+      "select",
+      "wait",
+      "zoom_request",
+      "confirm",
+      "done"
+    ],
+    "confirmationGrantPathExists": false,
+    "browserAuthority": "PageActionBridge.clickAtCssPoint — one method"
+  },
+  "detector": "NOT LOADED. ACT consumes element-graph nodes; a detector candidate is not one.",
+  "findings": [
+    "NodeId is positional within a snapshot: deleting an element shifts later ids, so a claim's id can resolve to a DIFFERENT element (demo E). Safety comes from the role and name checks, not from the id, and TARGET_MISSING therefore fires only when nothing can rebind (demo E2).",
+    "A detector candidate is not an ElementNode, so a vision-only target cannot be validated or acted on at all today (demo J): on the canvas page the DOM exposes 0 actionable nodes, so the loop has nothing to hand ACT regardless of what the detector grounded.",
+    "ACT clicks a coordinate. Nothing yet proves the validated element is the TOPMOST element at that point, so an overlay placed after observation would receive the click. Hit-testing is a bridge-level gap."
+  ],
+  "demos": [
+    {
+      "demo": "A click a validated textbox",
+      "intent": "a fresh, visible, enabled, routine control is clicked and the page reacts",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 4,
+      "plan": "click #phone (role textbox, name Phone)",
+      "validateDecision": "ALLOW",
+      "validateReason": null,
+      "actStatus": "EXECUTED",
+      "actCause": null,
+      "actUnsupportedCause": null,
+      "bridgeCalls": 1,
+      "bridgePoint": {
+        "x": 550,
+        "y": 276
+      },
+      "pageClicks": {
+        "phone": 1
+      },
+      "activeElementId": "phone",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "B stale frame",
+      "intent": "a claim from an earlier frame must not execute against a newer one",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 4,
+      "plan": "click #phone with the PREVIOUS frame's claim",
+      "validateDecision": "RE_OBSERVE",
+      "validateReason": "FRAME_MISMATCH",
+      "actStatus": "REJECTED",
+      "actCause": "NOT_VALIDATED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "C target moved",
+      "intent": "a control that moved further than the tolerance is refused on geometry alone",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 4,
+      "plan": "click #cancel after it moved 60 CSS px",
+      "validateDecision": "RE_OBSERVE",
+      "validateReason": "MOVED_BEYOND_TOLERANCE",
+      "actStatus": "REJECTED",
+      "actCause": "NOT_VALIDATED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "D name changed in place",
+      "intent": "a benign control replaced by a destructive one must not be clicked",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 4,
+      "plan": "click #cancel after its name became \"Delete my account\"",
+      "validateDecision": "RE_OBSERVE",
+      "validateReason": "NAME_CHANGED",
+      "actStatus": "REJECTED",
+      "actCause": "NOT_VALIDATED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "E target removed (id rebinds)",
+      "intent": "a removed target is refused on identity after its id rebound to a neighbour",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 5,
+      "actionableNodes": 3,
+      "plan": "click #cancel after it was removed",
+      "validateDecision": "RE_OBSERVE",
+      "validateReason": "NAME_CHANGED",
+      "actStatus": "REJECTED",
+      "actCause": "NOT_VALIDATED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "E2 last target removed",
+      "intent": "with no later element to rebind to, the lookup itself fails",
+      "viewport": {
+        "width": 1024,
+        "height": 1600
+      },
+      "mode": "mode-a",
+      "measuredElements": 5,
+      "actionableNodes": 5,
+      "plan": "click #footer-link after it was removed",
+      "validateDecision": "RE_OBSERVE",
+      "validateReason": "TARGET_MISSING",
+      "actStatus": "REJECTED",
+      "actCause": "NOT_VALIDATED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "F submit: confirmation tier",
+      "intent": "a perfectly fresh submit button is refused because no human can confirm it",
+      "viewport": {
+        "width": 1024,
+        "height": 1600
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 6,
+      "plan": "click #submit (role button, name Submit), fully visible",
+      "validateDecision": "ALLOW",
+      "validateReason": null,
+      "actStatus": "REJECTED",
+      "actCause": "HUMAN_CONFIRMATION_REQUIRED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "G link: unknown destination",
+      "intent": "a link is refused because the graph cannot say whether it leaves this origin",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 4,
+      "plan": "click #help-link (role link)",
+      "validateDecision": "ALLOW",
+      "validateReason": null,
+      "actStatus": "REJECTED",
+      "actCause": "HUMAN_CONFIRMATION_REQUIRED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "H submit off screen",
+      "intent": "an element below the fold has no pixel claim, so it cannot be acted on",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 4,
+      "plan": "#submit is OFFSCREEN; a stale claim is constructed as a planner would hold it",
+      "validateDecision": "RE_OBSERVE",
+      "validateReason": "NOT_VISIBLE",
+      "actStatus": "REJECTED",
+      "actCause": "NOT_VALIDATED",
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "I type is unsupported",
+      "intent": "typing is refused rather than approximated, and the field stays empty",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-a",
+      "measuredElements": 6,
+      "actionableNodes": 4,
+      "plan": "type into #phone (a tel field)",
+      "validateDecision": "ALLOW",
+      "validateReason": null,
+      "actStatus": "UNSUPPORTED_ACTION",
+      "actCause": "CLEARANCE_PIPELINE_ABSENT",
+      "actUnsupportedCause": "CLEARANCE_PIPELINE_ABSENT",
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": "",
+      "href": "http://127.0.0.1:8982/mode-a"
+    },
+    {
+      "demo": "J canvas page has no targets",
+      "intent": "a vision-only candidate is not an element-graph node, so no action can be validated",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "mode": "mode-b",
+      "measuredElements": 0,
+      "actionableNodes": 0,
+      "plan": "no claim can be constructed: the DOM exposes no actionable node",
+      "validateDecision": "NOT_REACHED",
+      "validateReason": null,
+      "actStatus": "NOT_CALLED",
+      "actCause": null,
+      "actUnsupportedCause": null,
+      "bridgeCalls": 0,
+      "bridgePoint": null,
+      "pageClicks": {},
+      "activeElementId": "BODY",
+      "phoneValue": null,
+      "href": "http://127.0.0.1:8982/mode-b"
+    }
+  ],
+  "assertionFailures": [],
+  "verdict": "PASS"
+}
