@@ -1,0 +1,153 @@
+{
+  "what": "getBoundingClientRect() for every element of tests/browser/qg02/fixture/form.html",
+  "why": "the source of truth for the fixture rects used by packages/agent/test/actOnMvpFixture.test.ts and packages/agent/test/guardedActOnMvpFixture.test.ts. Recorded as data because the previous citation (MVP-1 logs/mvp1.json) never contained rects, and an unverifiable citation is how wrong numbers survive.",
+  "workstation": 1,
+  "hostname": "LAPTOP-6E14K34L",
+  "recordedAt": "2026-09-13",
+  "chromiumVersion": "151.0.7922.34",
+  "viewport": {
+    "width": 1024,
+    "height": 768
+  },
+  "devicePixelRatio": 1,
+  "compatMode": "CSS1Compat",
+  "documentElement": {
+    "clientWidth": 1024,
+    "clientHeight": 768
+  },
+  "scroll": {
+    "x": 0,
+    "y": 0
+  },
+  "authorisation": "local fixture served from 127.0.0.1, read and never modified; no external host, no credential, no real data; the detector was not loaded",
+  "elements": [
+    {
+      "selector": "#masthead",
+      "tag": "HEADER",
+      "role": "generic",
+      "name": "Seva \u00e2\u20ac\u201d Application Portal",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 48
+      },
+      "centre": {
+        "x": 512,
+        "y": 24
+      }
+    },
+    {
+      "selector": "#phone-label",
+      "tag": "LABEL",
+      "role": "label",
+      "name": "Phone",
+      "rect": {
+        "x": 400,
+        "y": 220,
+        "w": 300,
+        "h": 20
+      },
+      "centre": {
+        "x": 550,
+        "y": 230
+      }
+    },
+    {
+      "selector": "#phone",
+      "tag": "INPUT",
+      "role": "textbox",
+      "name": "Phone",
+      "rect": {
+        "x": 400,
+        "y": 260,
+        "w": 300,
+        "h": 32
+      },
+      "centre": {
+        "x": 550,
+        "y": 276
+      }
+    },
+    {
+      "selector": "#help-link",
+      "tag": "A",
+      "role": "link",
+      "name": "What number should I use?",
+      "rect": {
+        "x": 400,
+        "y": 310,
+        "w": 160,
+        "h": 18
+      },
+      "centre": {
+        "x": 480,
+        "y": 319
+      }
+    },
+    {
+      "selector": "#cancel",
+      "tag": "BUTTON",
+      "role": "button",
+      "name": "Cancel",
+      "rect": {
+        "x": 620,
+        "y": 360,
+        "w": 120,
+        "h": 40
+      },
+      "centre": {
+        "x": 680,
+        "y": 380
+      }
+    },
+    {
+      "selector": "#dynamic",
+      "tag": "DIV",
+      "role": "generic",
+      "name": "Queue position: 0",
+      "rect": {
+        "x": 400,
+        "y": 430,
+        "w": 300,
+        "h": 60
+      },
+      "centre": {
+        "x": 550,
+        "y": 460
+      }
+    },
+    {
+      "selector": "#submit",
+      "tag": "BUTTON",
+      "role": "button",
+      "name": "Submit",
+      "rect": {
+        "x": 400,
+        "y": 1180,
+        "w": 120,
+        "h": 40
+      },
+      "centre": {
+        "x": 460,
+        "y": 1200
+      }
+    },
+    {
+      "selector": "#footer-link",
+      "tag": "A",
+      "role": "link",
+      "name": "Privacy policy",
+      "rect": {
+        "x": 400,
+        "y": 1400,
+        "w": 200,
+        "h": 18
+      },
+      "centre": {
+        "x": 500,
+        "y": 1409
+      }
+    }
+  ]
+}

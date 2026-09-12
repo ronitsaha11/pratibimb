@@ -3,8 +3,16 @@
  *
  * The browser run lives in `artifacts/experiments/MVP-1-act-executor/` and needs Chromium. This
  * is its CI-runnable counterpart: the numbers below are the rects a real Chromium measured on
- * `tests/browser/qg02/fixture/form.html` at 1024x768 (`logs/mvp1.json`), fed through the real
+ * `tests/browser/qg02/fixture/form.html` at 1024x768, DPR 1, fed through the real
  * `buildElementGraph`. Same page, same classification, no browser, no timing.
+ *
+ * MEASURED, and the citation is checkable — which the previous one was not. These rects were
+ * wrong from the first commit and cited `logs/mvp1.json` as their source; that log records click
+ * points and a viewport, and has never contained a single rect. An unverifiable citation is how
+ * wrong numbers survive, so the measurement is now recorded as data:
+ * `artifacts/experiments/MVP-2-hit-test-verify-result/logs/fixture-geometry.json`
+ * (Chromium 151.0.7922.34, workstation 1, 2026-09-13). `guardedActOnMvpFixture.test.ts` uses the
+ * same values, and the two files must not drift apart again.
  *
  * It is **not** an end-to-end agent test. There is no executor in the product (the bridge is an
  * interface, and there is no `manifest.json` to host a content script), no SANITIZE, no VERIFY,
@@ -47,12 +55,12 @@ const geometry: CaptureGeometry = {
  */
 const fixture = (over: Partial<DomMeasurement>[] = []): DomMeasurement[] => {
   const base: DomMeasurement[] = [
-    { selector: "#phone-label", role: "label", name: "Phone", rect: { x: 32, y: 232, w: 960, h: 18 }, cssHidden: false, enabled: true, parentIndex: -1 },
-    { selector: "#phone", role: "textbox", name: "Phone", rect: { x: 430, y: 260, w: 240, h: 32 }, cssHidden: false, enabled: true, parentIndex: -1 },
-    { selector: "#help-link", role: "link", name: "What number should I use?", rect: { x: 32, y: 310, w: 220, h: 18 }, cssHidden: false, enabled: true, parentIndex: -1 },
-    { selector: "#cancel", role: "button", name: "Cancel", rect: { x: 32, y: 360, w: 96, h: 40 }, cssHidden: false, enabled: true, parentIndex: -1 },
-    { selector: "#submit", role: "button", name: "Submit", rect: { x: 32, y: 1180, w: 96, h: 40 }, cssHidden: false, enabled: true, parentIndex: -1 },
-    { selector: "#footer-link", role: "link", name: "Privacy policy", rect: { x: 32, y: 1400, w: 120, h: 18 }, cssHidden: false, enabled: true, parentIndex: -1 },
+    { selector: "#phone-label", role: "label", name: "Phone", rect: { x: 400, y: 220, w: 300, h: 20 }, cssHidden: false, enabled: true, parentIndex: -1 },
+    { selector: "#phone", role: "textbox", name: "Phone", rect: { x: 400, y: 260, w: 300, h: 32 }, cssHidden: false, enabled: true, parentIndex: -1 },
+    { selector: "#help-link", role: "link", name: "What number should I use?", rect: { x: 400, y: 310, w: 160, h: 18 }, cssHidden: false, enabled: true, parentIndex: -1 },
+    { selector: "#cancel", role: "button", name: "Cancel", rect: { x: 620, y: 360, w: 120, h: 40 }, cssHidden: false, enabled: true, parentIndex: -1 },
+    { selector: "#submit", role: "button", name: "Submit", rect: { x: 400, y: 1180, w: 120, h: 40 }, cssHidden: false, enabled: true, parentIndex: -1 },
+    { selector: "#footer-link", role: "link", name: "Privacy policy", rect: { x: 400, y: 1400, w: 200, h: 18 }, cssHidden: false, enabled: true, parentIndex: -1 },
   ];
   return base.map((m, i) => ({ ...m, ...(over[i] ?? {}) }));
 };
@@ -110,7 +118,7 @@ describe("VALIDATE -> ACT on the controlled MVP fixture's real geometry", () => 
   it("C — refuses Cancel after it moved 60 CSS px within the same frame", async () => {
     const before = graph();
     const plan = claim(before, "#cancel");
-    const after = graph([{}, {}, {}, { rect: { x: 32, y: 420, w: 96, h: 40 } }]);
+    const after = graph([{}, {}, {}, { rect: { x: 620, y: 420, w: 120, h: 40 } }]);
     const b = new Bridge();
     const { decision, result } = await validateAndAct(after, { kind: "click", target: plan }, b);
     if (decision.decision === "RE_OBSERVE") expect(decision.reason).toBe("MOVED_BEYOND_TOLERANCE");
@@ -172,7 +180,7 @@ describe("VALIDATE -> ACT on the controlled MVP fixture's real geometry", () => 
       role: "button",
       name: "Submit",
       frameId: g.frameId,
-      viewportBox: { x: 32, y: 1180, w: 96, h: 40 } as TargetClaim["viewportBox"],
+      viewportBox: { x: 400, y: 1180, w: 120, h: 40 } as TargetClaim["viewportBox"],
     };
     const b = new Bridge();
     const { decision, result } = await validateAndAct(g, { kind: "click", target: stale }, b);
