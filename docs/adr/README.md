@@ -10,7 +10,7 @@
 
 ## Recorded ADRs
 
-**Count: 2 approved and implemented, 2 proposed.**
+**Count: 2 approved and implemented, 5 proposed.**
 
 | ID | Title | Status | Date | Supersedes |
 |---|---|---|---|---|
@@ -20,6 +20,7 @@
 | [ADR-0004](ADR-0004-wa-source-authorisation-and-item11-bar.md) | W-A source authorisation (D5) and the item-11 acceptance bar (D2) | **PROPOSED — both decisions PENDING the owner** | 2026-09-12 | — |
 | [ADR-0005](ADR-0005-action-freshness-validation.md) | VALIDATE + REFRESH — the action-freshness boundary | **PROPOSED — implemented; the two numeric tolerances PENDING the owner** | 2026-09-12 | — |
 | [ADR-0006](ADR-0006-act-browser-action-executor.md) | ACT - the browser-action executor (click only; VALIDATE-gated) | **PROPOSED - implemented; the confirmation-tier screen PENDING the owner** | 2026-09-12 | - |
+| [ADR-0007](ADR-0007-hit-test-agreement-and-verify-result.md) | HIT-TEST AGREEMENT and VERIFY RESULT | **PROPOSED — implemented; the IoU tolerance PENDING the owner. Depends on ADR-0006 / PR #60** | 2026-09-13 | — |
 
 > **ADR-0001 covers issues #17 and #5 in one decision**, because S-02a-2a-4 measured that
 > the CSP directive and the `connect-src` egress pin live in the same manifest and constrain
