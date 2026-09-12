@@ -164,18 +164,62 @@ export const PROPOSED_FRESHNESS_TOLERANCE: FreshnessTolerance = {
   minBoxIou: 0.8,
 };
 
+/**
+ * The attestation a decision carries to prove THIS function produced it.
+ *
+ * `AllowedAction` is a plain interface, so `{ decision: "ALLOW", ... }` type-checks and is
+ * otherwise indistinguishable from a validated decision — which is exactly what a deserialised
+ * plan, or a test fixture that leaks into production code, looks like. The symbol is
+ * module-private and never exported, so nothing outside this file can stamp it and nothing
+ * arriving through `JSON.parse` or a message port can carry it.
+ *
+ * Its limit, stated rather than overclaimed: this is a same-realm integrity check, not a
+ * capability. In-process code can reach the symbol reflectively if it sets out to. It makes
+ * accidental bypass impossible and deliberate bypass unwritable by mistake. See ADR-0006 §1a.
+ */
+const VALIDATED_BY_FRESHNESS = Symbol("pratibimb.freshness.attested");
+
+/** Stamp a decision as this validator's own, non-enumerably, and freeze it. */
+const attest = <T extends object>(decision: T): T => {
+  Object.defineProperty(decision, VALIDATED_BY_FRESHNESS, { value: true, enumerable: false });
+  return Object.freeze(decision);
+};
+
+/**
+ * Whether a decision was produced by `validateActionFreshness` itself.
+ *
+ * The executor (ACT) calls this before it will touch a page. A structurally perfect `ALLOW`
+ * that this function did not produce returns `false`.
+ */
+export const bearsFreshnessAttestation = (d: FreshnessDecision): boolean =>
+  (d as unknown as Record<symbol, unknown>)[VALIDATED_BY_FRESHNESS] === true;
+
 /** What `ALLOW` hands back: the CURRENT state, never the claimed state. */
 export interface AllowedAction {
   readonly decision: "ALLOW";
   readonly kind: ActionKind;
   /** Present for targeted actions, absent for `wait` / `done`. */
   readonly node?: ElementNode;
+  /**
+   * The frame this decision is valid for.
+   *
+   * Required by ACT: a decision validated against frame A says nothing about an executor
+   * pointed at frame B, and without this the decision could not state which frame it meant.
+   */
+  readonly frameId?: FrameId;
   /** The box to act on. The current one — acting on the claimed box is the bug this prevents. */
   readonly viewportBox?: CssBox;
   /** Measured centre displacement since the claim, in CSS px. */
   readonly movedCssPx?: number;
   /** Measured IoU between the claimed and current boxes. */
   readonly boxIou?: number;
+  /**
+   * The caller's intended point, echoed back only because it passed check 12.
+   *
+   * Echoed so an executor need not re-accept a coordinate from the caller: the point that
+   * passed validation is the only point it may use, and it arrives from the validator.
+   */
+  readonly point?: CssPoint;
 }
 
 export interface ReObserve {
@@ -186,11 +230,12 @@ export interface ReObserve {
 
 export type FreshnessDecision = AllowedAction | ReObserve;
 
-const reObserve = (reason: RejectionReason, detail: string): ReObserve => ({
-  decision: "RE_OBSERVE",
-  reason,
-  detail,
-});
+const reObserve = (reason: RejectionReason, detail: string): ReObserve =>
+  attest({
+    decision: "RE_OBSERVE" as const,
+    reason,
+    detail,
+  });
 
 const finite = (...xs: readonly number[]): boolean => xs.every((x) => Number.isFinite(x));
 const centre = (b: CssBox): { x: number; y: number } => ({ x: b.x + b.w / 2, y: b.y + b.h / 2 });
@@ -248,7 +293,7 @@ export function validateActionFreshness(
     if (action.target) {
       return reObserve("MALFORMED_CLAIM", `"${kind}" takes no target, but one was supplied.`);
     }
-    return { decision: "ALLOW", kind };
+    return attest({ decision: "ALLOW" as const, kind });
   }
   const claim = action.target;
   if (!claim) return reObserve("MALFORMED_CLAIM", `"${kind}" requires a target claim, and none was supplied.`);
@@ -350,14 +395,16 @@ export function validateActionFreshness(
 
   // The box handed back is the ACTABLE one: for a clipped element, the part a caller may
   // legitimately click, never the full box whose centre may be off screen.
-  return {
-    decision: "ALLOW",
+  return attest({
+    decision: "ALLOW" as const,
     kind,
     node,
+    frameId: graph.frameId,
     viewportBox: actable,
     movedCssPx: moved,
     boxIou: overlap,
-  };
+    ...(action.point ? { point: action.point } : {}),
+  });
 }
 
 /**
