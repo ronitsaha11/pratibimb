@@ -196,7 +196,15 @@ try {
         for (let p = 0; p < PASSES; p++) {
           const r = await probe({ op: "pass", tabId: identity.tabId, frameId: identity.frameId, cssWidth, inkRects: [], controlRects: [] });
           const detections = r.summary.redaction.detail?.detections ?? [];
-          passes.push({ route: r.summary.route, capture: r.summary.capture, detectorRan: r.summary.redaction.detector.ran, detectorCode: r.summary.redaction.detector.code ?? null, failClosed: r.summary.redaction.failClosed, detections });
+          // J7 follow-up: the SHA-256 of the RGBA buffer TR-01 actually inferred on, recorded per pass so a
+          // G4 failure can be attributed — identical frame with differing boxes is runtime non-determinism;
+          // differing frame is capture variation. The digest is NOT computed here and NOT recomputed from
+          // anything: the service worker never receives frame pixels (`serviceWorkerSawNoPixels` is a gate),
+          // so it is taken in the realm that holds the frame — `probe/tr01.ts`'s `onMaskPlanned`, which runs
+          // after both detectors have read the buffer and before the mask overwrites a byte — and only the
+          // hex string crosses the boundary. The probe already computed it on every pass and this harness
+          // discarded it. `null` when no mask was planned: recorded, not omitted.
+          passes.push({ route: r.summary.route, capture: { ...r.summary.capture, frameSha256: r.rawRgbaSha256 ?? null }, detectorRan: r.summary.redaction.detector.ran, detectorCode: r.summary.redaction.detector.code ?? null, failClosed: r.summary.redaction.failClosed, detections });
         }
         const first = passes[0];
         // Detections are in CAPTURE px; the held-out truth is in the image's own px, which is CSS px here
