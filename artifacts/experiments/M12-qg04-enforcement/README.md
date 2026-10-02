@@ -184,3 +184,39 @@ npm test
   `artifacts/experiments/M8.2-qg03-visual-text-feasibility/models/fixtures/screenshots/`.
 - The M10/M11 evidence emitters now need `EGRESS_EVIDENCE_PROBE=1` at build time. Forward pointers sit
   in the E4 and G-mv3-host READMEs.
+
+---
+
+## Amendment 2026-10-02 — J7 characterised on W2 (B5 still OPEN)
+
+The owner accepted F-M13-1 as a documented residual (M13 §"Owner decision required", option (a)) and
+authorised the J7 characterisation. It was run on **W2**, with a real human toolbar click per window,
+using `run-stream-re1.mjs` unmodified.
+
+**Record:** [`logs/w2-cft-stream-re1.json`](logs/w2-cft-stream-re1.json) ·
+**Analysis:** [`logs/w2-j7-stream-determinism.md`](logs/w2-j7-stream-determinism.md)
+
+**W1's records are unchanged.** This amendment adds W2's; it revises no W1 result.
+
+| | W1 (`w1-cft-stream-re1.json`) | **W2** (`w2-cft-stream-re1.json`) |
+|---|---|---|
+| G1 zero exposed sensitive glyphs | pass | **24/24 pass — 0 of 1,224 exposed** |
+| G2 over-mask within budget | pass | **24/24 pass**, max 0.3755 |
+| G3 no blanket box | pass | **24/24 pass**, max 0.0504 |
+| G4 deterministic across passes | **failed in 2 of 4 windows** (F-M12-2) | **failed in 1 of 24 observations** — DPR 1.0 / H1 |
+| `scaleToCss` observed | 1 | **1** at all four device scales |
+| Verdict | J7 OPEN | **J7 OPEN** |
+
+**The structural finding reproduces:** the product capture route caps the stream to CSS size, so a frame
+with `scaleToCss ≠ 1` — the condition J7's own text names — **is not produced by this route** at any
+device scale. Requested scale changes `devicePixelRatio` (1 / 1.25 / 1.5 / 2, all browser-reported) but
+not the stream geometry, which was 1280×720 throughout.
+
+**The G4 failure is narrow and structured:** at DPR 1.0 on H1, passes 2 and 3 are identical and pass 1
+differs, in one box's width by 1.2519 px, with score shifts up to 0.00624. That is two to three orders
+of magnitude larger than this machine's measured ORT float noise (2.19e-06 … 1.59e-05), so a
+first-frame capture settle is the more consistent explanation — but **this is an INFERENCE and cannot be
+promoted**, because the evidence schema records no per-pass frame digest. That gap is itself a finding.
+
+**Nothing was tuned.** No threshold, detector, preprocessing, crop geometry, privacy or scoring change
+was made, and no observation was discarded, re-run or replaced.

@@ -50,3 +50,19 @@ How to treat F-M13-1 (ADR-0013 §9):
 - **(b)** fund a measured spike of a non-CSP control, e.g. `declarativeNetRequest` scoped to the
   extension as initiator, which needs a new permission and its own ADR;
 - **(c)** keep M13 stopped.
+
+---
+
+## Amendment 2026-10-02 — the owner decision, and J7's status
+
+The owner chose **(a)**: accept extension-realm top-level navigation as a documented residual and
+continue to J7. **F-M13-1 remains OPEN**; no CSP directive was changed and no permission was added.
+
+**J7 (Parts E–N) has now been RUN, on W2**, and is **OPEN** — `G4 deterministicAcrossPasses` failed in
+1 of 24 observations (DPR 1.0 / H1); G1, G2 and G3 passed 24/24. The record and analysis live with the
+harness that produced them:
+`../M12-qg04-enforcement/logs/w2-cft-stream-re1.json` and
+`../M12-qg04-enforcement/logs/w2-j7-stream-determinism.md`.
+
+The line above — "J7 (Parts E–N) · **NOT RUN**, pending the owner" — described unit 1 and is left as
+written. This amendment supersedes it.
