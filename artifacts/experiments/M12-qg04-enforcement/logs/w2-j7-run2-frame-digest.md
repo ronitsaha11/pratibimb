@@ -147,3 +147,45 @@ product route (`routeIdenticalToProduct: true`), differing only by the pinned co
 Nothing was tuned. No detector threshold, preprocessing step, crop geometry, model weight, privacy
 rule, CSP or permission changed for this run; the only change was that the harness stopped discarding
 a digest the probe already produced. Run 1's record is byte-identical to its pre-change state.
+
+---
+
+## Correction 2026-10-02 — the mechanism, not the classification
+
+§3 above describes the run-1 anomaly as "capture variation on the **first frame after stream
+start**", and says it "sits on the **first pass after stream start**, which is where a frame from a
+different moment of page paint would land". **That mechanism statement is wrong and is corrected
+here.** The text above is left exactly as written; this section supersedes it.
+
+**What the implementation does.** Every formal pass is a complete, independent capture lifecycle:
+
+- `tests/browser/extension/run-stream-re1.mjs:196` issues one `op: "pass"` per pass;
+- that reaches `perceive()` (`apps/extension/probe/tr01.ts:518` → `apps/extension/host-lib/perception-realm.ts`);
+- inside it (`perception-realm.ts:689`–`708`) a **fresh `getUserMedia` stream is opened**,
+  `ImageCapture.grabFrame()` takes **exactly one frame**, and `track.stop()` closes the track —
+  *"One frame, then the tab stops being captured."*
+- a **new handle is minted per capture** (`apps/extension/host-lib/capture-authority.ts:256`, where
+  the `issued` set refuses a reused handle).
+
+So **there is no privileged pass-1 stream frame.** All three passes are the first — and only — frame
+of their own fresh stream. Pass 2 and pass 3 are not "later frames of a settled stream"; they are
+separate streams, each grabbed at its own moment.
+
+**What follows.** The run-1 anomaly landing on pass 1 is a position in the record, not a property of
+the mechanism: any pass could exhibit it, because every pass is structurally identical. The
+"first-frame settle" reading also implies a remedy that would not work — warming up before pass 1
+cannot stabilise passes 2 and 3, which re-open the stream regardless.
+
+**The classification is unchanged and remains an INFERENCE.** Capture variation rather than
+inference non-determinism is still what the evidence favours, for the reason given in §2: a
+bit-identical frame produced a bit-identical box set in 24 of 24 cells. What changes is only the
+mechanism attached to it — "a freshly opened tab stream's single grabbed frame need not be the same
+compositor output every time", not "the first frame of a run is unsettled". No new evidence has been
+taken, so nothing here is promoted to FACT.
+
+**Also recorded for completeness.** W1's formal run failed G4 at DPR 1.25 (H4) and DPR 1.5 (H3)
+(F-M12-2, `../decision.md:31`), not at DPR 1.0/H1. Across the three formal runs the failing cell
+differs every time and 3 of 72 cells failed, so run 2's 24/24 is consistent with a sporadic
+low-rate event and is **not** evidence that the phenomenon has gone. W1's record predates
+`laterPassBoxes`, so whether its two failures shared run 1's pass-structure is **UNKNOWN** and
+cannot be recovered from it.
