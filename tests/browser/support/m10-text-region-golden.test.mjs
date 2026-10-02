@@ -36,11 +36,29 @@ import { TEXT_REGION_LABEL, createTextRegionDetector, dbPostprocess, frameId, pr
 
 import { DB_POSTPROCESS as SCREENED_DB, dbPostprocess as screenedDbPostprocess } from "./text-detector-screening.mjs";
 import { baselineWorkstation, fixturesDir, FIXTURE_NAMES, hasBaseline, loadBaseline } from "./m82-baseline.mjs";
+import { WorkstationError } from "./workstation.mjs";
 
 const ROOT = new URL("../../../", import.meta.url);
 const M82 = new URL("artifacts/experiments/M8.2-qg03-visual-text-feasibility/", ROOT);
-const WS = baselineWorkstation();
-const FIX = pathToFileURL(fixturesDir(WS) + "/");
+/**
+ * The real-frame layer needs a workstation. The synthetic layer below does NOT, and must still run on
+ * a machine that has none - CI is exactly that machine, and resolving at module scope used to fail the
+ * whole file to load, taking the machine-independent layer with it.
+ *
+ * An unknown host therefore disables the real layer instead. It does NOT fall back to a workstation:
+ * without one there is no `models/fixtures/<WS>/` to read, so `loadBaseline` is never reached and
+ * nothing is compared against a borrowed baseline. Only `WorkstationError` is caught - any other
+ * failure still throws, and the fail-closed rule for writing evidence is untouched.
+ */
+let WS = null;
+let wsRefusal = null;
+try {
+  WS = baselineWorkstation();
+} catch (e) {
+  if (!(e instanceof WorkstationError)) throw e;
+  wsRefusal = e.message;
+}
+const FIX = WS ? pathToFileURL(fixturesDir(WS) + "/") : null;
 const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 const bytesOf = (f32) => Buffer.from(f32.buffer, f32.byteOffset, f32.byteLength);
 
@@ -174,10 +192,10 @@ describe("synthetic golden: product == screened", () => {
 
 // ── 2. real M8.1 frames and maps — when the fixtures exist ─────────────────────────────────────
 const NAMES = FIXTURE_NAMES;
-const haveFixtures = NAMES.every((n) => existsSync(new URL(`screenshots/${n}.png`, FIX)) && existsSync(new URL(`TR-01/native-${n}.f32`, FIX)));
+const haveFixtures = WS !== null && NAMES.every((n) => existsSync(new URL(`screenshots/${n}.png`, FIX)) && existsSync(new URL(`TR-01/native-${n}.f32`, FIX)));
 const baseline = haveFixtures ? loadBaseline("TR-01", WS) : null;
 
-describe.skipIf(!haveFixtures)(`real golden (frozen frames, ${WS.id} baseline): product == screened, end to end`, () => {
+describe.skipIf(!haveFixtures)(`real golden (frozen frames, ${WS?.id ?? "no workstation"} baseline): product == screened, end to end`, () => {
   const ref = haveFixtures ? JSON.parse(readFileSync(new URL("TR-01/native-reference.json", FIX), "utf8")) : null;
 
   for (const name of NAMES) {
@@ -229,6 +247,8 @@ describe("the real layer is not silently absent", () => {
     // A skipped real layer must be visible in the record rather than read as a pass.
     expect(typeof haveFixtures).toBe("boolean");
     if (haveFixtures) expect(hasBaseline("TR-01", WS)).toBe(true);
-    if (!haveFixtures) console.warn(`m10 golden: M8.2 fixtures absent for ${WS.id} — the real-frame layer was SKIPPED`);
+    // An unknown machine must say so, and must not be mistaken for a machine whose fixtures are absent.
+    if (!WS) expect(typeof wsRefusal).toBe("string");
+    if (!haveFixtures) console.warn(`m10 golden: ${WS ? `M8.2 fixtures absent for ${WS.id}` : `no trusted workstation — ${wsRefusal}`} — the real-frame layer was SKIPPED`);
   });
 });

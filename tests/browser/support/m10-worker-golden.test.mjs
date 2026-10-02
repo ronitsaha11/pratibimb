@@ -31,20 +31,38 @@ import { createTextRegionDetector, frameId, TR01 } from "@pratibimb/perception";
 import { createTr01WorkerCore } from "../../../apps/extension/host-lib/tr01-worker-core.ts";
 import { decodePng } from "./png-decode.mjs";
 import { baselineWorkstation, fixturesDir, FIXTURE_NAMES, hasBaseline, loadBaseline } from "./m82-baseline.mjs";
+import { WorkstationError } from "./workstation.mjs";
 import { dbPostprocess as screenedDbPostprocess } from "./text-detector-screening.mjs";
 
-const WS = baselineWorkstation();
-const FIX = pathToFileURL(fixturesDir(WS) + "/");
+/**
+ * The real-frame layer needs a workstation. The synthetic layer below does NOT, and must still run on
+ * a machine that has none - CI is exactly that machine, and resolving at module scope used to fail the
+ * whole file to load, taking the machine-independent layer with it.
+ *
+ * An unknown host therefore disables the real layer instead. It does NOT fall back to a workstation:
+ * without one there is no `models/fixtures/<WS>/` to read, so `loadBaseline` is never reached and
+ * nothing is compared against a borrowed baseline. Only `WorkstationError` is caught - any other
+ * failure still throws, and the fail-closed rule for writing evidence is untouched.
+ */
+let WS = null;
+let wsRefusal = null;
+try {
+  WS = baselineWorkstation();
+} catch (e) {
+  if (!(e instanceof WorkstationError)) throw e;
+  wsRefusal = e.message;
+}
+const FIX = WS ? pathToFileURL(fixturesDir(WS) + "/") : null;
 const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 const bytesOf = (f32) => Buffer.from(f32.buffer, f32.byteOffset, f32.byteLength);
 
 const NAMES = FIXTURE_NAMES;
 // A fixture set with no baseline for this machine is NOT silently skipped as "absent": it is a
 // different and more serious condition, and `loadBaseline` says so loudly when the layer runs.
-const haveFixtures = NAMES.every((n) => existsSync(new URL(`screenshots/${n}.png`, FIX)) && existsSync(new URL(`TR-01/native-${n}.f32`, FIX)));
+const haveFixtures = WS !== null && NAMES.every((n) => existsSync(new URL(`screenshots/${n}.png`, FIX)) && existsSync(new URL(`TR-01/native-${n}.f32`, FIX)));
 const baseline = haveFixtures ? loadBaseline("TR-01", WS) : null;
 
-describe.skipIf(!haveFixtures)(`worker core == M10.1 product detector == screened (real frames, ${WS.id} baseline)`, () => {
+describe.skipIf(!haveFixtures)(`worker core == M10.1 product detector == screened (real frames, ${WS?.id ?? "no workstation"} baseline)`, () => {
   for (const name of NAMES) {
     it(`${name}: same tensor, same boxes, same scores`, async () => {
       const img = decodePng(readFileSync(new URL(`screenshots/${name}.png`, FIX)));
@@ -95,6 +113,8 @@ describe("the worker golden layer is not silently absent", () => {
     expect(typeof haveFixtures).toBe("boolean");
     // A machine with fixtures but no baseline must not reach the layer at all.
     if (haveFixtures) expect(hasBaseline("TR-01", WS)).toBe(true);
-    if (!haveFixtures) console.warn(`m10 worker golden: M8.2 fixtures absent for ${WS.id} — the real-frame layer was SKIPPED`);
+    // An unknown machine must say so, and must not be mistaken for a machine whose fixtures are absent.
+    if (!WS) expect(typeof wsRefusal).toBe("string");
+    if (!haveFixtures) console.warn(`m10 worker golden: ${WS ? `M8.2 fixtures absent for ${WS.id}` : `no trusted workstation — ${wsRefusal}`} — the real-frame layer was SKIPPED`);
   });
 });
