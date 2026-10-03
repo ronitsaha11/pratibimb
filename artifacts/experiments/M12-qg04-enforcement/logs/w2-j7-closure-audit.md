@@ -354,3 +354,51 @@ Read-only. No detector, model, threshold, preprocessing, crop geometry, capture 
 touched, and no gate definition was changed. No existing record was modified: all prior evidence is
 byte-identical and the earlier analyses are appended to, never rewritten. Every requirement quoted
 above is cited to its file and line.
+
+---
+
+## Correction 2026-10-03 — reading A is not a formal G4 PASS
+
+§1 of this audit records, in the reading-A table, "Under reading A, G4 is satisfied — **FACT**,
+conditional on reading A governing", and the matrix at §6 carries "Reading A: 40 inferences on two
+fixed inputs byte-identical". **That overstates it.** The text above is left as written; this section
+supersedes those two entries.
+
+The formal G4 requirement is a conjunction of every clause in Criterion 6 and the RE-1 pre-registration
+— same **fixture**, same **build**, same **machine**, **two consecutive / two complete runs**,
+**identical region counts and identical boxes**, **≥ 5 inferences per input**, **byte-identical** — read
+together with `docs/perception/redaction-evaluation.md` §4: "Every gate must hold on **every** image."
+
+### Clause by clause, against the evidence that exists
+
+Comparing `w2-cft-capture-determinism-run2.json` and `w2-cft-capture-determinism-run3.json` as the two
+runs:
+
+| clause | satisfied? | evidence |
+|---|---|---|
+| same fixture | **yes** | `heldOutPngSha256` identical in both records |
+| same build | **yes** | `build.productRoute`, `build.evidenceRoute` and `tr01Sha256` all identical |
+| same machine | **yes** | W2, same host, same browser binary |
+| two consecutive / complete runs | **yes** | two separate sessions, separate launches, separate human gestures |
+| identical region counts and boxes across the two runs | **yes** | retained real frame 11 vs 11, byte-identical; frozen fixture 11 vs 11, byte-identical |
+| ≥ 5 inferences per input | **yes** | 10 per input per run |
+| byte-identical | **yes** | `distinctDetectionSets: 1` in every phase of both runs |
+| **every gate must hold on every image** | **NO** | measured for **H1 only**, at DPR 1.0. H2–H6 are **UNTESTED** under this protocol |
+
+### The corrected status
+
+1. **INFERENCE DETERMINISM = ESTABLISHED.** FACT. Deterministic over identical real captured bytes,
+   deterministic over the frozen fixture, every identical-digest group producing identical detector
+   output, and the retained buffer independently proven equal to the captured frame. The two-run clause
+   is satisfied for the input that was measured.
+2. **FORMAL G4 CLOSURE = DEPENDS ON THE OWNER'S INTERPRETATION, AND IS NOT DEMONSTRATED EVEN UNDER
+   READING A.** Under reading A the gap is no longer the two-run clause — it is the set-wide clause:
+   1 of the 6 held-out images has been measured this way. Under reading B the gate is not satisfied at
+   all (2/100 fresh-capture departures). Under reading C it is not satisfied, for reading B's reason.
+
+So reading A must not be recorded as "G4 PASS". It is **OPEN**, pending either measurement of H2–H6
+under the reading-A protocol or an owner ruling on what the set-wide clause requires here — and
+pending the semantics ruling itself, which remains **OWNER DECISION REQUIRED**.
+
+Nothing else in this audit changes. No experiment was run to produce this correction; it is arithmetic
+and comparison over the two committed records.
