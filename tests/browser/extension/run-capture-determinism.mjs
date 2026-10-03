@@ -20,7 +20,7 @@
  *      the probe already computes over the RGBA TR-01 infers on. Distinct digests ⇒ the capture of an
  *      unchanging page is not bit-stable, measured, not inferred.
  *   B. INFERENCE, on a RETAINED REAL CAPTURED FRAME — one pass retains its raw frame in the realm
- *      (`op: "retain-raw"`), then N detector runs over THOSE EXACT BYTES. Genuinely fixed input, on
+ *      (`op: "retain-raw"`), then INFER detector runs over THOSE EXACT BYTES. Genuinely fixed input, on
  *      the stream's own tensor. Satisfies "≥ 5 inferences per input".
  *   C. INFERENCE, on the FROZEN FIXTURE — N detector runs over the held-out PNG, which is criterion
  *      6's "same fixture" literally. Costs nothing and is the established pattern in
@@ -55,6 +55,12 @@ const APP = join(ROOT, "apps", "extension");
 const EXT = join(APP, ".output", "chrome-mv3");
 const OUT = join(ROOT, "artifacts", "experiments", "M12-qg04-enforcement", "logs");
 const N = Number(process.env.M12_CD_N ?? 10);
+/**
+ * Phase A's pass count and the inference phases' count are separate knobs. Phase A characterises the
+ * CAPTURE, so its N is raised to bound a rate; B and C characterise the INFERENCE, which is already
+ * byte-identical over 10 on two fixed inputs, and raising them would only add runtime.
+ */
+const INFER = Number(process.env.M12_CD_INFER ?? Math.min(N, 10));
 const DPR = Number(process.env.M12_CD_DPR ?? 1);
 const IMAGE = process.env.M12_CD_IMAGE ?? "H1";
 const RUN = Number(process.env.M12_CD_RUN ?? 1);
@@ -73,7 +79,8 @@ const executablePath = process.env.CHROME_PATH;
 if (!executablePath || !existsSync(executablePath)) refuse("set CHROME_PATH to the Chrome for Testing binary");
 if (!TR01_SHA256) refuse("could not read TR-01's pinned SHA-256");
 if (!existsSync(PNG)) refuse(`missing held-out frame ${PNG}`);
-if (!(N >= 5)) refuse(`N must be at least 5 to satisfy the pre-registered "≥ 5 inferences per input"; got ${N}`);
+if (!(INFER >= 5)) refuse(`the inference count must be at least 5 to satisfy the pre-registered "≥ 5 inferences per input"; got ${INFER}`);
+if (!(N >= 1)) refuse(`Phase A needs at least one capture pass; got ${N}`);
 const TARGET = assertOwnEvidencePath(join(OUT, evidenceFileName(WS, RUN > 1 ? `cft-capture-determinism-run${RUN}.json` : "cft-capture-determinism.json")), WS);
 if (existsSync(TARGET)) refuse(`${TARGET} already exists; this run does not overwrite an earlier record`);
 
@@ -118,7 +125,7 @@ const record = {
   humanInTheLoop: true,
   invocationMethod: "a person clicked the extension's toolbar action once; nothing in this process produced, simulated or substituted for the click",
   notAJ7Run: "one image, one device scale, no RE-1 scoring and no gate verdict; this does not re-run J7 and does not alter G1-G4",
-  config: { run: RUN, n: N, dpr: DPR, image: IMAGE, heldOutPngSha256: shaFile(PNG) },
+  config: { run: RUN, capturePasses: N, inferencesPerFixedInput: INFER, dpr: DPR, image: IMAGE, heldOutPngSha256: shaFile(PNG) },
   frozen: { tr01Sha256: TR01_SHA256, detectorHost: "createTr01Host — the same factory the product wires at apps/extension/host/offscreen/main.ts:101, differing only in the instrumented worker spawn seam" },
   build: buildFacts,
   failure: null,
@@ -299,7 +306,7 @@ try {
   };
 
   // ── PHASE B — inference determinism on ONE retained REAL captured frame ───────────────────────
-  console.log(`\n>>> PHASE B — retaining one real captured frame, then ${N} detector runs over those exact bytes`);
+  console.log(`\n>>> PHASE B — retaining one real captured frame, then ${INFER} detector runs over those exact bytes`);
   await probe({ op: "retain-raw", name: "live" });
   const retainedPass = await onePass();
   if (retainedPass.frameSha256 === null) throw new Error("the retaining pass planned no mask, so no raw frame was retained");
@@ -317,7 +324,7 @@ try {
   const preparedB = await probe({ op: "prepare" });
   if (!preparedB.ready) throw new Error(`prepare failed: ${JSON.stringify(preparedB.status?.lastInit)}`);
   const liveRuns = [];
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < INFER; i++) {
     const r = await probe({ op: "detect", name: "live" });
     liveRuns.push(r.outcome);
     console.log(`    detect ${String(i + 1).padStart(2)}: ok=${r.outcome?.ok} ${r.outcome?.detections?.length ?? "-"} boxes`);
@@ -340,11 +347,11 @@ try {
   };
 
   // ── PHASE C — the same, on the FROZEN FIXTURE: criterion 6's "same fixture", literally ────────
-  console.log(`\n>>> PHASE C — ${N} detector runs over the frozen ${IMAGE}.png fixture`);
+  console.log(`\n>>> PHASE C — ${INFER} detector runs over the frozen ${IMAGE}.png fixture`);
   const img = decodePng(readFileSync(PNG));
   await probe({ op: "frame", name: "fixture", frame: { width: img.width, height: img.height, rgbaB64: Buffer.from(img.rgba.buffer, img.rgba.byteOffset, img.rgba.byteLength).toString("base64") } });
   const fixtureRuns = [];
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < INFER; i++) {
     const r = await probe({ op: "detect", name: "fixture" });
     fixtureRuns.push(r.outcome);
     console.log(`    detect ${String(i + 1).padStart(2)}: ok=${r.outcome?.ok} ${r.outcome?.detections?.length ?? "-"} boxes`);
