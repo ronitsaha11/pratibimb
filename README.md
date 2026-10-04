@@ -2,7 +2,7 @@
 
 **प्रतिबिम्ब — a reflection that reveals the structure, never the identity.**
 
-> Smart India Hackathon 2026 · Problem Statement **26171** · ISRO / Department of Space
+> ISRO / Department of Space
 > *On-device Visual Perception for Light-weight Browser Agents*
 
 ---
