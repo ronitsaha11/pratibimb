@@ -59,3 +59,36 @@
    (ADR-0012 §14.6).
 3. **B2:** a verifier that can return VERIFIED (an OCRProvider under QG-03), which remains the gating
    decision for any frame egress.
+
+---
+
+## Amendment 2026-10-02 — J7 on W2
+
+**J7 ran on W2** (real gesture, four device scales, three passes, 72 observations). Evidence:
+[`logs/w2-cft-stream-re1.json`](logs/w2-cft-stream-re1.json); analysis:
+[`logs/w2-j7-stream-determinism.md`](logs/w2-j7-stream-determinism.md). W1's records are untouched.
+
+| Item | Result |
+|---|---|
+| G1 zero exposed sensitive glyphs | **PASS 24/24** — 0 of 1,224 sensitive glyphs exposed |
+| G2 over-mask within budget | **PASS 24/24** (max 0.3755) |
+| G3 no blanket box | **PASS 24/24** (max 0.0504) |
+| G4 deterministic across passes | **FAIL 1/24** — DPR 1.0 / H1, `maxPassDeviationPx` 1.2519 |
+| **B5 / J7** | **STILL OPEN** |
+| F-M12-2 | **reproduced on W2**, narrower (1 of 24 rather than 2 of 4 windows) |
+
+**No security gate failed** (G1–G3 all pass), so M13's stop condition on those does not apply. G4's
+failure is recorded, not corrected.
+
+### Two things J7 now needs, neither of them a tuning change
+
+1. **Per-pass frame digests.** The evidence schema records no hash of the captured frame, so the
+   repository cannot tell an inference/runtime determinism issue from a capture/rasterisation
+   difference — the distinction J7 turns on. Adding it requires a harness change and a fresh formal run
+   with four more human gestures.
+2. **An owner ruling on `scaleToCss ≠ 1`.** The product route caps the stream to CSS size, so the
+   condition J7's text names cannot be produced by the route the product uses. M12 already asked for
+   this ruling; it remains outstanding and W2 does not change it.
+
+**Carried over, not re-run:** G5 (WASM validity vs native — a runtime property, not a capture-route
+property) and G6 (no plaintext output — structural, unchanged).

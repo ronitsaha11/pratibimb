@@ -1,0 +1,444 @@
+{
+  "experiment": "J7 closure — capture determinism and inference determinism, measured apart",
+  "question": "does an unchanging page yield a bit-identical captured frame on every fresh stream, and is the detector bit-exact on a fixed frame?",
+  "humanInTheLoop": true,
+  "invocationMethod": "a person clicked the extension's toolbar action once; nothing in this process produced, simulated or substituted for the click",
+  "notAJ7Run": "one image, one device scale, no RE-1 scoring and no gate verdict; this does not re-run J7 and does not alter G1-G4",
+  "config": {
+    "n": 10,
+    "dpr": 1,
+    "image": "H1",
+    "heldOutPngSha256": "dbad46d152d5091c6a7b86e6c27a98ca282765f354826604c65bacf4928a2fa4"
+  },
+  "frozen": {
+    "tr01Sha256": "18aaccf9c9cd27656becda13bc0ef31eaa0ea3aef4d45166839f2093561575e8",
+    "detectorHost": "createTr01Host — the same factory the product wires at apps/extension/host/offscreen/main.ts:101, differing only in the instrumented worker spawn seam"
+  },
+  "build": {
+    "productRoute": {
+      "background": "2d22c9d6a505b7e73693f3c8470558c52ceee0d78a2c26d229be8b7963f13043",
+      "content": "19a1d7bb361ac2def8cbfcc5882e48aa13f60f93a9f970d2437b41efd866fae7",
+      "manifest": "a5b38a8cc4e4b18ef1d24ab62c4bc97cec836ffaf490f69d2f5461ba5f3e599c",
+      "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions"
+    },
+    "evidenceRoute": {
+      "background": "2d22c9d6a505b7e73693f3c8470558c52ceee0d78a2c26d229be8b7963f13043",
+      "content": "19a1d7bb361ac2def8cbfcc5882e48aa13f60f93a9f970d2437b41efd866fae7",
+      "manifest": "a5b38a8cc4e4b18ef1d24ab62c4bc97cec836ffaf490f69d2f5461ba5f3e599c",
+      "connectSrc": "'self' http://127.0.0.1:8995"
+    },
+    "routeIdenticalToProduct": true,
+    "connectSrcDiffersOnlyByCollector": true,
+    "noCaptureVisibleTab": true,
+    "tr01Sha256": "18aaccf9c9cd27656becda13bc0ef31eaa0ea3aef4d45166839f2093561575e8"
+  },
+  "failure": null,
+  "shown": {
+    "naturalWidth": 1280,
+    "naturalHeight": 720,
+    "scrollX": 0,
+    "scrollY": 0,
+    "innerWidth": 1280,
+    "innerHeight": 720,
+    "devicePixelRatio": 1
+  },
+  "preflight": {
+    "fixturePageServed": true,
+    "contentScriptAttested": true,
+    "noGrantYet": true,
+    "captureRefusedBeforeGesture": true,
+    "pageDevicePixelRatio": 1
+  },
+  "gesture": {
+    "tabId": 1756045186,
+    "observedAt": "2026-10-02T15:39:05.817Z",
+    "waitedMs": 54536
+  },
+  "phaseA": {
+    "measures": "capture determinism: does an unchanging page yield a bit-identical frame on every fresh stream?",
+    "passes": [
+      {
+        "pass": 1,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 2,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 3,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 4,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 5,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 6,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 7,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 8,
+        "frameSha256": "6786a26fdabe3bd8792e39acf664c62bbe6d94566adddcd26692d5df51bf52fa",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 14
+      },
+      {
+        "pass": 9,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      },
+      {
+        "pass": 10,
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "capture": {
+          "w": 1280,
+          "h": 720,
+          "format": "live-bitmap",
+          "bytes": 3686400,
+          "dpr": 1,
+          "scaleToCss": 1
+        },
+        "route": "GESTURE_STREAM",
+        "detectorRan": true,
+        "failClosed": false,
+        "detections": 13
+      }
+    ],
+    "digests": [
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "6786a26fdabe3bd8792e39acf664c62bbe6d94566adddcd26692d5df51bf52fa",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+      "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d"
+    ],
+    "distinctDigestCount": 2,
+    "captureIsBitStable": false,
+    "captureVariationRate": {
+      "differingPasses": 1,
+      "ofPasses": 10
+    },
+    "groupedByFrame": [
+      {
+        "frameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+        "passes": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          9,
+          10
+        ],
+        "count": 9,
+        "detections": 13,
+        "boxesIdenticalWithinThisFrame": true
+      },
+      {
+        "frameSha256": "6786a26fdabe3bd8792e39acf664c62bbe6d94566adddcd26692d5df51bf52fa",
+        "passes": [
+          8
+        ],
+        "count": 1,
+        "detections": 14,
+        "boxesIdenticalWithinThisFrame": true
+      }
+    ],
+    "boxesIdenticalWhereverTheFrameWas": true,
+    "allBoxesIdenticalAcrossEveryPass": false,
+    "captureDims": [
+      "1280x720"
+    ],
+    "scaleToCssObserved": [
+      1
+    ],
+    "routesObserved": [
+      "GESTURE_STREAM"
+    ]
+  },
+  "phaseB": {
+    "measures": "inference determinism on a genuinely fixed input — the EXACT RGBA a real stream capture produced",
+    "retainedFrameSha256": "40b3d6404276635892496cd0a1d2cb7c4c2f57d896f8ef30729f1c84aeae560d",
+    "retainedFrameCapture": {
+      "w": 1280,
+      "h": 720,
+      "format": "live-bitmap",
+      "bytes": 3686400,
+      "dpr": 1,
+      "scaleToCss": 1
+    },
+    "frameAlsoSeenInPhaseA": true,
+    "inferences": 10,
+    "everyOutcomeOk": true,
+    "detectionsPerRun": [
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13
+    ],
+    "allDetectionsByteIdentical": true,
+    "distinctDetectionSets": 1,
+    "firstRunDetections": [
+      {
+        "x": 37.737154150197625,
+        "y": 20.463438735177867,
+        "w": 320.7756916996047,
+        "h": 22.073122529644273,
+        "score": 0.745417061493713
+      },
+      {
+        "x": 63.09905660377358,
+        "y": 79.28915094339624,
+        "w": 336.30188679245276,
+        "h": 24.79669811320754,
+        "score": 0.814650632854965
+      },
+      {
+        "x": 76.171875,
+        "y": 156.3046875,
+        "w": 46.40625,
+        "h": 21.515625,
+        "score": 0.7947833528243956
+      },
+      {
+        "x": 78.25399709302324,
+        "y": 182.92859738372093,
+        "w": 219.74200581395348,
+        "h": 24.517805232558175,
+        "score": 0.8808562043945076
+      },
+      {
+        "x": 78.25949367088607,
+        "y": 236.93354430379748,
+        "w": 102.23101265822784,
+        "h": 21.13291139240505,
+        "score": 0.8363511774321677
+      },
+      {
+        "x": 77.49177631578947,
+        "y": 264.3675986842106,
+        "w": 195.01644736842104,
+        "h": 27.01480263157896,
+        "score": 0.9610091812593836
+      },
+      {
+        "x": 75.9090909090909,
+        "y": 322.56818181818187,
+        "w": 85.68181818181819,
+        "h": 20.863636363636317,
+        "score": 0.7990799270698736
+      },
+      {
+        "x": 457.42647058823525,
+        "y": 322.80882352941177,
+        "w": 66.39705882352939,
+        "h": 20.382352941176464,
+        "score": 0.8693922879390938
+      },
+      {
+        "x": 76.2987012987013,
+        "y": 345.41883116883116,
+        "w": 99.90259740259737,
+        "h": 23.537337662337734,
+        "score": 0.8344718687285005
+      },
+      {
+        "x": 457.56167763157896,
+        "y": 345.4305098684211,
+        "w": 98.62664473684208,
+        "h": 23.513980263157862,
+        "score": 0.8680218302491886
+      },
+      {
+        "x": 77.39076327433628,
+        "y": 488.1516869469027,
+        "w": 286.4684734513274,
+        "h": 19.32162610619463,
+        "score": 0.7614555978067389
+      },
+      {
+        "x": 32.98828125,
+        "y": 611.314453125,
+        "w": 545.2734375,
+        "h": 24.99609375,
+        "score": 0.7720558875763169
+      },
+      {
+        "x": 33.24396306818181,
+        "y": 632.9195667613637,
+        "w": 224.76207386363632,
+        "h": 24.535866477272634,
+        "score": 0.7452804835058416
+      }
+    ],
+    "satisfiesPreRegisteredFiveInferences": true
+  },
+  "phaseC": {
+    "measures": "inference determinism on the frozen held-out PNG — criterion 6's 'two consecutive runs on the same fixture', literally; a cross-check on Phase B, not a substitute",
+    "note": "the PNG is read in Node, which is the established pattern in run-tr01-worker.mjs; no STREAM frame crosses the boundary, so serviceWorkerSawNoPixels is untouched",
+    "inferences": 10,
+    "everyOutcomeOk": true,
+    "detectionsPerRun": [
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11
+    ],
+    "allDetectionsByteIdentical": true,
+    "distinctDetectionSets": 1,
+    "sameAsLiveFrame": false
+  },
+  "findings": {
+    "captureDeterminism": "NOT BIT-STABLE: 2 distinct frames in 10 passes",
+    "inferenceDeterminismOnRetainedRealFrame": "BYTE-IDENTICAL over 10 inferences",
+    "inferenceDeterminismOnFrozenFixture": "BYTE-IDENTICAL over 10 inferences"
+  },
+  "notAClaim": [
+    "one image, one device scale, one window, one operator, one run. A bit-stable capture here does not prove the capture is bit-stable in general, and a non-zero variation rate here is this run's rate, not a population rate.",
+    "the earlier G4 failures (W1 DPR 1.25/H4 and 1.5/H3; W2 run 1 DPR 1.0/H1) were recorded without frame digests, so nothing measured here can be applied to them as FACT."
+  ],
+  "recordedAt": "2026-10-02T15:39:51.076Z",
+  "provenance": {
+    "workstation": "W2",
+    "host": "LAPTOP-SRCINK2B",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26200",
+    "cpu": "AMD Ryzen AI 7 350 w/ Radeon 860M              ",
+    "node": "v26.4.0",
+    "playwright": "1.63.0",
+    "browserBinary": "C:\\Users\\OMEN\\pratibimb-browsers\\cft-153.0.8010.12\\chrome.exe",
+    "headless": false
+  }
+}

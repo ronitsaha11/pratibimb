@@ -200,6 +200,17 @@ async function step(msg: Record<string, unknown>): Promise<unknown> {
       const ready = await host.prepare();
       return { ready, ms: performance.now() - t0, status: host.status() };
     }
+    case "retain-raw": {
+      retainRawAs = String(msg["name"]);
+      return { armed: retainRawAs };
+    }
+    /** EVIDENCE-ONLY: digest a RETAINED frame, so "the retained buffer is the captured buffer" is measured rather than assumed. */
+    case "frame-sha": {
+      const f = frames.get(String(msg["name"]));
+      if (!f) return { error: `no frame ${String(msg["name"])}` };
+      const d = await globalThis.crypto.subtle.digest("SHA-256", f.rgba.slice());
+      return { name: String(msg["name"]), width: f.width, height: f.height, bytes: f.rgba.length, sha256: [...new Uint8Array(d)].map((x) => x.toString(16).padStart(2, "0")).join("") };
+    }
     case "frame": {
       frames.set(String(msg["name"]), decodeFrame(msg["frame"] as { width: number; height: number; rgbaB64: string }));
       return { frames: frames.size };
@@ -433,6 +444,14 @@ let passControls: { rects: CssRect[]; cssWidth: number } = { rects: [], cssWidth
 /** Written by the pre-fill hook: the mask about to be applied, and digests of what must not change. */
 type Planned = { rects: { x: number; y: number; w: number; h: number }[]; outside: string; controls: string[]; controlsInMask: number; rawSha256: Promise<string> };
 let planned: Planned | null = null;
+/**
+ * EVIDENCE-ONLY. When armed by `op: "retain-raw"`, the next mask plan keeps a COPY of the raw frame
+ * under this name, in the existing `frames` map, so `op: "detect"` can be re-run over the EXACT bytes
+ * TR-01 inferred on. This is what separates capture determinism from inference determinism: without a
+ * retained frame the two are measured multiplied together. The copy never leaves this realm — only
+ * digests and detections cross to Node, as everywhere else in this probe. Disarms after one use.
+ */
+let retainRawAs: string | null = null;
 /** Read through a function: the hook assigns `planned` from inside the pass, which flow analysis cannot see. */
 const plannedNow = (): Planned | null => planned;
 
@@ -473,6 +492,10 @@ export const tr01Seam = {
     const rawSha256 = globalThis.crypto.subtle
       .digest("SHA-256", rgba.slice())
       .then((d) => [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join(""));
+    if (retainRawAs !== null) {
+      frames.set(retainRawAs, { width: frame.width, height: frame.height, rgba: rgba.slice() });
+      retainRawAs = null;
+    }
     planned = {
       rawSha256,
       rects: rects.map((r) => ({ x: r.x, y: r.y, w: r.w, h: r.h })),
