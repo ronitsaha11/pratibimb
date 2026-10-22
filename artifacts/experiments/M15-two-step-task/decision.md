@@ -40,3 +40,11 @@ Reproducibility at temperature 0, not a reliability rate. **Not a J7 experiment.
   - `main`'s adapter got this page right, and no M15 variant restored that.
   - Reliable reference choice needs more than this model, or the field's class in the handoff, which
     is a manifest decision. Recorded in the README; not decided here.
+
+## Addendum — M16 (forward pointer; the record above is unchanged)
+
+The M2-page finding above was addressed in M16. Privacy now pairs each empty field with the one
+reference that fits it, and the validator refuses anything outside that pairing. No manifest change
+was needed.
+
+See [`../M16-field-grounding/README.md`](../M16-field-grounding/README.md).

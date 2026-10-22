@@ -60,8 +60,9 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` Â
     `HOSTILE`: no fallback, no substitution).
   - The local model's grammar offers only the pairing.
   - Manifest, schema, ADRs, gates, CSP and pins unchanged.
-  - W1, real Qwen, M2 page: the model completed the task in 4 of 4 recorded runs, with no fallback.
-    Not a reliability rate
+  - W1, real Qwen, M2 page: the model completed the task in 11 of 11 recorded runs, with no
+    fallback (M15 recorded 0 of 3). The two-step control was unchanged at 3 of 3. Not a
+    reliability rate
     ([M16](artifacts/experiments/M16-field-grounding/README.md)).
 - Week-1 capability spikes (in progress).
 
