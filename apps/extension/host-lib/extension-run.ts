@@ -32,7 +32,16 @@
  */
 import { type EgressRecord, type EgressRefusal } from "@pratibimb/egress";
 import { observePage, type TransportBinding, type TransportRelay } from "@pratibimb/extension-transport";
-import { runTask, type GrantDecision, type GrantRequest, type Observation, type RunRecord } from "@pratibimb/orchestrator";
+import {
+  checkTurnBudget,
+  runTask,
+  runTaskLoop,
+  type GrantDecision,
+  type GrantRequest,
+  type LoopOutcome,
+  type Observation,
+  type RunRecord,
+} from "@pratibimb/orchestrator";
 import { deterministicReasoner, localModelReasoner, type ReasonerClient } from "@pratibimb/reasoner";
 
 import { type BoundaryReply, type BoundaryRequest, type CapabilityPayload } from "./boundary-protocol";
@@ -59,6 +68,12 @@ export interface ExtensionRunRequest {
   readonly endpoint: string | null;
   readonly sessionId: string;
   readonly requestId: string;
+  /**
+   * Stage 12: how many turns the task may take (1 … `MAX_TASK_TURNS`). Absent means one turn, exactly
+   * as before. Each turn passes every gate on its own; a refused, unverified or repeated turn stops
+   * the task and a person decides what happens next.
+   */
+  readonly maxTurns?: number;
 }
 
 /**
@@ -91,8 +106,19 @@ export type CrossableRunRecord = Omit<RunRecord, "initialObservation" | "observa
   readonly observation: ObservationSummary | null;
 };
 
+/** A multi-turn task's outcome, with every turn projected exactly as a single run's record is. */
+export interface CrossableLoopRecord {
+  readonly outcome: LoopOutcome;
+  readonly maxTurns: number;
+  readonly confirmedActions: number;
+  readonly turns: readonly CrossableRunRecord[];
+}
+
 export interface ExtensionRunResult {
+  /** The run's record; for a multi-turn task, the LAST turn's. */
   readonly record: CrossableRunRecord;
+  /** Present only when the request asked for `maxTurns`. */
+  readonly loop?: CrossableLoopRecord;
   readonly binding: {
     readonly origin: string;
     readonly documentId: string;
@@ -242,7 +268,7 @@ export async function runExtensionTask(
   });
 
   try {
-    const record = await runTask(ports, {
+    const runOptions = {
       goal: request.goal,
       sessionId: request.sessionId,
       requestId: request.requestId,
@@ -250,10 +276,29 @@ export async function runExtensionTask(
       permitTtlMs: TTL.permitMs,
       confirmationTtlMs: TTL.confirmationMs,
       grantTtlMs: TTL.grantMs,
-    });
+    };
+    let record: RunRecord;
+    let loop: CrossableLoopRecord | undefined;
+    if (request.maxTurns === undefined) {
+      record = await runTask(ports, runOptions);
+    } else {
+      // Stage 12. Every turn is a full `runTask` through the same ports, against the same attested
+      // document; between turns, every capability the last turn armed is revoked, so no authority is
+      // carried into a turn that did not earn it.
+      const result = await runTaskLoop(ports, {
+        ...runOptions,
+        maxTurns: checkTurnBudget(request.maxTurns),
+        betweenTurns: async () => {
+          deps.capabilities.revokeAll();
+        },
+      });
+      record = result.turns[result.turns.length - 1]!;
+      loop = { outcome: result.outcome, maxTurns: result.maxTurns, confirmedActions: result.confirmedActions, turns: result.turns.map(crossable) };
+    }
 
     return {
       record: crossable(record),
+      ...(loop === undefined ? {} : { loop }),
       binding: {
         origin,
         documentId: binding.document.documentId,

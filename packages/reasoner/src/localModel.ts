@@ -89,6 +89,13 @@ const planSchema = (grounding: Grounding): Record<string, unknown> => ({
             required: ["op", "target"],
             additionalProperties: false,
           },
+          {
+            // The goal is already met. The client accepts it only as the plan's sole step.
+            type: "object",
+            properties: { op: { const: "done" } },
+            required: ["op"],
+            additionalProperties: false,
+          },
         ],
       },
     },
@@ -102,6 +109,7 @@ const SYSTEM = [
   "- 'insert' puts a stored value into an EMPTY text field. Never into a button, never into a field that already has a value.",
   "- 'click' presses a button. Never a text field.",
   "- Pick the reference whose class matches the field.",
+  "- 'done', alone, means the goal is already achieved on this page. Never combine it with other steps.",
 ].join("\n");
 
 /**

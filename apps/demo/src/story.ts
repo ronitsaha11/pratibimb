@@ -225,7 +225,9 @@ export type ProposedStep =
   | { readonly kind: "fill-reference"; readonly targetLabel: string; readonly ref: string }
   /** A literal. Its text is never available here — only the class of what it was. */
   | { readonly kind: "fill-literal"; readonly targetLabel: string; readonly marker: string }
-  | { readonly kind: "click"; readonly targetLabel: string };
+  | { readonly kind: "click"; readonly targetLabel: string }
+  /** The model's claim that the goal is already met. Names no element and does nothing. */
+  | { readonly kind: "done" };
 
 export interface Proposal {
   readonly source: "LOCAL_MODEL" | "FALLBACK" | "PLANNER" | null;
@@ -272,7 +274,9 @@ export function proposalOf(input: StoryInput): Proposal {
       modelFailed,
       waiting: false,
       steps: record.plan.steps.map((s): ProposedStep =>
-        s.op === "click"
+        s.op === "done"
+          ? { kind: "done" }
+          : s.op === "click"
           ? { kind: "click", targetLabel: labelFor(observation, s.target) }
           : s.ref
             ? { kind: "fill-reference", targetLabel: labelFor(observation, s.target), ref: s.ref }

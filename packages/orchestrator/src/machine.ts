@@ -4,11 +4,13 @@
  *   IDLE → OBSERVE → SANITIZE → VERIFY_PAYLOAD → SEND → VALIDATE_PLAN → AWAIT_GRANT
  *        → REHYDRATE → ACT → VERIFY_RESULT → DONE
  *                                     ╰──────── any refusal ────────→ REFUSED (terminal)
+ *   … VALIDATE_PLAN → DONE, with nothing acted on, when the validated plan is the model's `done`.
  *
  * WHAT THIS IS NOT. Not an agent loop. It does not retry, recover, choose a target, plan a second
- * step, or decide what to do next. It runs one pre-stated task against one page and reports exactly
+ * step, or decide what to do next. It runs ONE TURN of a task against one page and reports exactly
  * how far it got and why it stopped. Every capability it has was injected (`ports.ts`), so the list
- * of things it could possibly do is finite and visible.
+ * of things it could possibly do is finite and visible. Stage 12 — "repeat, or stop and ask" — is
+ * `loop.ts`, which calls this function once per turn and decides nothing this function decides.
  *
  * FOUR PROPERTIES WORTH READING THE FILE FOR.
  *
@@ -202,6 +204,11 @@ export interface RunRecord {
   readonly literalsInserted: readonly { readonly target: string; readonly inserted: boolean }[];
   readonly confirmation: HumanConfirmation | null;
   readonly act: GuardedOutcome | null;
+  /**
+   * `true` when the validated plan was the model's `done`: the run ended at VALIDATE_PLAN → DONE and
+   * nothing was granted, rehydrated or acted on. A claim, recorded as one — `succeeded()` is `false`.
+   */
+  readonly declaredDone: boolean;
 }
 
 export interface RunOptions {
@@ -260,6 +267,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let refusal: RunRefusal | null = null;
   let reasonerKind: ReasonerKind | null = null;
   let fallback: FallbackDecision | null = null;
+  let declaredDone = false;
 
   /** The only way `state` changes. Refuses to move once the run has ended. */
   const go = (to: RunState): void => {
@@ -295,6 +303,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     literalsInserted,
     confirmation,
     act,
+    declaredDone,
   });
 
   const stop = (stage: RefusalStage, cause: string, detail: string, planRefusal?: PlanRefusal): RunRecord => {
@@ -518,6 +527,16 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   }
   if (!validation.ok) {
     return stop("VALIDATE_PLAN", validation.refusal.cause, validation.refusal.detail, validation.refusal);
+  }
+
+  // ── DONE, AS DECLARED ────────────────────────────────────────────────────────────────────
+  // The model says the goal is already met on the view it was shown, and the validator accepted that
+  // view as current. Ending here asks no human, restores no value and touches no page: nothing
+  // follows a `done` because a `done` authorises nothing. It is recorded as the model's claim.
+  if (validation.declaresDone) {
+    declaredDone = true;
+    go("DONE");
+    return record();
   }
 
   // Two kinds of insert, and only one of them involves a secret.

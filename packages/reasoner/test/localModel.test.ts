@@ -113,6 +113,29 @@ describe("the request that goes out", () => {
     expect(body).toContain("json_schema");
   });
 
+  it("offers the decoder `done` (stage 12) as a step with no target, beside insert and click", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "done" }]) };
+    await ask();
+    const sent = JSON.parse(received[received.length - 1]!) as {
+      response_format: { json_schema: { schema: { properties: { steps: { items: { oneOf: { properties: Record<string, unknown>; required: string[] }[] } } } } } };
+      messages: { role: string; content: string }[];
+    };
+    const branches = sent.response_format.json_schema.schema.properties.steps.items.oneOf;
+    expect(branches.map((b) => (b.properties.op as { const: string }).const)).toEqual(["insert", "click", "done"]);
+    const done = branches[2]!;
+    expect(Object.keys(done.properties)).toEqual(["op"]);
+    expect(done.required).toEqual(["op"]);
+    expect(sent.messages[0]!.content).toContain("'done', alone");
+  });
+
+  it("hands a returned done to the parser untouched, with the client's own provenance", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "done" }]) };
+    const { response } = await ask();
+    expect(response.received).toBe(true);
+    if (!response.received) return;
+    expect(response.raw).toMatchObject({ planVersion: "1", steps: [{ op: "done" }], provenance: { requestId: REQUEST, sessionId: SESSION } });
+  });
+
   it("reports itself as loopback HTTP, never as in-process", async () => {
     reply = { status: 200, contentType: "application/json", body: asContent([{ op: "click", target: "#submit" }]) };
     const { response } = await ask();

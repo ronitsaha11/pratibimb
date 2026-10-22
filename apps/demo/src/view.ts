@@ -235,6 +235,7 @@ function renderModel(input: StoryInput): void {
 
   const steps = p.steps
     .map((s) => {
+      if (s.kind === "done") return `<li><span class="verb">Done</span><span class="with">the model's claim, not a verified result</span></li>`;
       if (s.kind === "click") return `<li><span class="verb">Click</span><span class="target">${esc(s.targetLabel)}</span></li>`;
       if (s.kind === "fill-reference") {
         return `<li><span class="verb">Fill</span><span class="target">${esc(s.targetLabel)}</span><span class="with">with</span><code class="token sm">${esc(s.ref)}</code></li>`;
@@ -545,7 +546,9 @@ function serverPane(record: RunRecord | null): string {
 }
 
 const stepText = (step: SafeStep): string =>
-  step.op === "click"
+  step.op === "done"
+    ? `<code>done</code> (the model's claim)`
+    : step.op === "click"
     ? `<code>click</code> ${esc(step.target)}`
     : `<code>insert</code> ${
         step.ref ? `<code class="token sm">${esc(step.ref)}</code>` : `<span class="marker">${esc(step.literalMarker ?? "")}</span>`
@@ -593,7 +596,7 @@ function planPane(record: RunRecord | null): string {
     ${leak}
     <dl class="kv">
       <dt>validation</dt><dd>${verdict}</dd>
-      <dt>target</dt><dd>${esc(refusal?.target ?? record.plan.steps.map((s) => s.target).join(", "))}</dd>
+      <dt>target</dt><dd>${esc(refusal?.target ?? record.plan.steps.flatMap((s) => (s.op === "done" ? [] : [s.target])).join(", "))}</dd>
       <dt>freshness</dt><dd>${freshness}</dd>
       <dt>human grant</dt><dd>${grant}</dd>
       <dt>rehydration</dt><dd>${rehydration}</dd>

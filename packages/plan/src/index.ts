@@ -14,6 +14,7 @@ export {
   isParsedPlan,
   parsePlan,
   type ClickStep,
+  type DoneStep,
   type InsertStep,
   type ParseOutcome,
   type ParseRefusalCause,
@@ -21,12 +22,14 @@ export {
   type PlanOperation,
   type PlanProvenance,
   type PlanStep,
+  type TargetedStep,
 } from "./schema.js";
 
 export {
   literalMarker,
   redactPlan,
   type SafeClickStep,
+  type SafeDoneStep,
   type SafeInsertStep,
   type SafePlan,
   type SafeStep,
@@ -39,6 +42,7 @@ export {
   type PlanValidation,
   type PlanValidationContext,
   type ValidatedClick,
+  type ValidatedDone,
   type ValidatedInsert,
   type ValidatedLiteralInsert,
   type ValidatedReferenceInsert,

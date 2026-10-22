@@ -35,7 +35,11 @@ export interface SafeClickStep {
   readonly target: string;
 }
 
-export type SafeStep = SafeInsertStep | SafeClickStep;
+export interface SafeDoneStep {
+  readonly op: "done";
+}
+
+export type SafeStep = SafeInsertStep | SafeClickStep | SafeDoneStep;
 
 export interface SafePlan {
   readonly planVersion: "1";
@@ -61,6 +65,7 @@ export function redactPlan(plan: Plan, vault: LiteralOracle): SafePlan {
     provenance: plan.provenance,
     ...(plan.goal === undefined ? {} : { goal: plan.goal }),
     steps: plan.steps.map((step): SafeStep => {
+      if (step.op === "done") return { op: "done" };
       if (step.op === "click") return { op: "click", target: step.target };
       if (step.literal !== undefined) {
         const held = vault.holdsLiteral(step.literal);

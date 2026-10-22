@@ -109,7 +109,16 @@ export interface ValidatedClick {
   readonly target: string;
 }
 
-export type ValidatedStep = ValidatedInsert | ValidatedClick;
+/**
+ * The reasoner's claim that the goal is met, accepted as a claim. It authorises nothing: there is no
+ * target, no grant, no rehydration and no action behind it.
+ */
+export interface ValidatedDone {
+  readonly op: "done";
+  readonly index: number;
+}
+
+export type ValidatedStep = ValidatedInsert | ValidatedClick | ValidatedDone;
 
 export interface PlanRefusal {
   readonly cause: PlanRefusalCause;
@@ -129,7 +138,13 @@ export interface PlanRefusal {
 }
 
 export type PlanValidation =
-  | { readonly ok: true; readonly steps: readonly ValidatedStep[]; readonly needsHuman: readonly ValidatedInsert[] }
+  | {
+      readonly ok: true;
+      readonly steps: readonly ValidatedStep[];
+      readonly needsHuman: readonly ValidatedInsert[];
+      /** `true` only for a plan whose single step is `done`: a claim that nothing is left to do. */
+      readonly declaresDone: boolean;
+    }
   | { readonly ok: false; readonly refusal: PlanRefusal; readonly checked: readonly ValidatedStep[] };
 
 export interface PlanValidationContext {
@@ -202,6 +217,13 @@ export function validatePlan(plan: Plan, ctx: PlanValidationContext): PlanValida
   let inserted = false;
 
   for (const [index, step] of plan.steps.entries()) {
+    // `done` is a claim about the view, so it is accepted only after the view checks above have
+    // passed: a `done` made against a page the client has replaced is STALE_VIEW like anything else.
+    // The parser guarantees it is the plan's only step.
+    if (step.op === "done") {
+      checked.push({ op: "done", index });
+      continue;
+    }
     const target = step.target;
 
     // ── target identity ─────────────────────────────────────────────────────────────────────
@@ -248,6 +270,10 @@ export function validatePlan(plan: Plan, ctx: PlanValidationContext): PlanValida
     inserted = true;
   }
 
+  if (checked.length === 1 && checked[0]!.op === "done") {
+    return { ok: true, steps: checked, needsHuman: [], declaresDone: true };
+  }
+
   if (!checked.some((s) => s.op === "click")) {
     return refuse(
       { cause: "NO_EXECUTABLE_STEP", detail: "the plan proposes no action, so there is nothing to authorise." },
@@ -259,6 +285,7 @@ export function validatePlan(plan: Plan, ctx: PlanValidationContext): PlanValida
     ok: true,
     steps: checked,
     needsHuman: checked.filter((s): s is ValidatedInsert => s.op === "insert" && s.needsHuman),
+    declaresDone: false,
   };
 }
 
