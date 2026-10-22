@@ -17,6 +17,21 @@ with per-pass frame digests), `w2-cft-capture-determinism.json` (contaminated, k
 `-run2.json` (clean), `-run3.json` (clean, 100 passes), `w2-j7-closure-audit.md` (the specification
 audit and its 2026-10-03 correction), `w2-cft-stream-re1-dryrun.json` (degraded route).
 
+> **Evidence addendum, 2026-10-22 — read this before the evidence sections below.**
+>
+> This package was written without one W1 run: `w1-cft-stream-j7.json`, real gesture route,
+> 2026-10-01, 72 observations at four device scales, with per-pass frame digests and five retained-input
+> inferences per series. It was recovered uncommitted on W1 and is summarised, with its limits, in
+> [`w1-j7-evidence-addendum-2026-10-22.md`](w1-j7-evidence-addendum-2026-10-22.md).
+>
+> Two statements below were accurate for the records available on 2026-10-03 and are left as written:
+> - Decision 1's "1 of 6 held-out images has been measured that way";
+> - and the evidence summary's inventory.
+>
+> The addendum shows what the W1 run adds. It is **one complete run**, `scaleToCss = 1` throughout, and
+> no direct RGBA comparison. It **changes none of the four decisions**, which remain the owner's, and
+> the record's own `"j7": "CLOSED"` label is **not** J7 status (addendum §4).
+
 ---
 
 ## DECISION 1 — G4 semantics

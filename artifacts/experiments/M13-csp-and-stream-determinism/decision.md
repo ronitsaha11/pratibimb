@@ -66,3 +66,21 @@ harness that produced them:
 
 The line above — "J7 (Parts E–N) · **NOT RUN**, pending the owner" — described unit 1 and is left as
 written. This amendment supersedes it.
+
+---
+
+## Amendment 2026-10-22 — the W1 J7 run, recovered
+
+J7 Parts E–N had **also** been run on **W1** on 2026-10-01, the day *before* the W2 run above, with the
+harness `tests/browser/extension/run-stream-j7.mjs`. Its records were never pushed and were found
+uncommitted during the W1 recovery of 2026-10-22. They are published unchanged:
+
+- `logs/w1-cft-stream-j7.json`: formal, real gesture route, 72 observations;
+- `logs/w1-cft-stream-j7-dryrun.json`: degraded route, not stream evidence.
+
+**The formal record's own `"j7": "CLOSED"` label is the harness's rule, not J7 status.** What the run
+supports and does not support, including that it is one complete run with `scaleToCss = 1` throughout,
+is in `../M12-qg04-enforcement/logs/w1-j7-evidence-addendum-2026-10-22.md`.
+
+**J7 remains OPEN.** The four owner decisions in `w2-j7-owner-decision-package.md` remain the owner's.
+The amendment above is left as written.

@@ -463,6 +463,78 @@ const pixelRectOf = (r: CssRect, s: number, width: number, height: number) => ({
 });
 
 /**
+ * M13 J7 — REPEATED-CAPTURE PIXEL CHARACTERISATION (test builds only; synthetic held-out fixtures).
+ *
+ * While a series is open (`j7-reset` … `j7-end`), the pre-fill hook keeps a copy of the FIRST raw
+ * frame of the series and of the PREVIOUS one, and measures each new raw frame against both, before
+ * anything is masked. Only statistics leave this realm: counts, deltas, a bounding box and a coarse
+ * tile map — never pixels. `j7-redetect` runs TR-01 again on the first frame's exact bytes, so
+ * inference can be judged on IDENTICAL input, separately from the capture.
+ */
+const J7_TILE = 40;
+let j7: { open: boolean; first: { width: number; height: number; rgba: Uint8ClampedArray } | null; previous: { width: number; height: number; rgba: Uint8ClampedArray } | null; lastDiff: unknown } = { open: false, first: null, previous: null, lastDiff: null };
+
+function j7Diff(a: { width: number; height: number; rgba: Uint8ClampedArray }, b: { width: number; height: number; rgba: Uint8ClampedArray }) {
+  if (a.width !== b.width || a.height !== b.height) return { comparable: false, a: [a.width, a.height], b: [b.width, b.height] };
+  const { width, height } = a;
+  let changed = 0;
+  let maxDelta = 0;
+  let sumDelta = 0;
+  let x0 = width, y0 = height, x1 = -1, y1 = -1;
+  const hist = { d1: 0, d2: 0, d3to4: 0, d5to8: 0, d9to16: 0, dOver16: 0 };
+  const tiles = new Map<string, number>();
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++) {
+      const o = (y * width + x) * 4;
+      let d = 0;
+      for (let k = 0; k < 4; k++) d = Math.max(d, Math.abs((a.rgba[o + k] as number) - (b.rgba[o + k] as number)));
+      if (d === 0) continue;
+      changed++;
+      sumDelta += d;
+      if (d > maxDelta) maxDelta = d;
+      if (x < x0) x0 = x;
+      if (y < y0) y0 = y;
+      if (x > x1) x1 = x;
+      if (y > y1) y1 = y;
+      if (d === 1) hist.d1++;
+      else if (d === 2) hist.d2++;
+      else if (d <= 4) hist.d3to4++;
+      else if (d <= 8) hist.d5to8++;
+      else if (d <= 16) hist.d9to16++;
+      else hist.dOver16++;
+      const t = `${Math.floor(x / J7_TILE)},${Math.floor(y / J7_TILE)}`;
+      tiles.set(t, (tiles.get(t) ?? 0) + 1);
+    }
+  return {
+    comparable: true,
+    identical: changed === 0,
+    pixels: width * height,
+    changedPixels: changed,
+    maxChannelDelta: maxDelta,
+    meanMaxChannelDeltaOverChanged: changed ? sumDelta / changed : 0,
+    meanMaxChannelDeltaOverAll: sumDelta / (width * height),
+    changedBox: changed ? { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 } : null,
+    deltaHistogram: hist,
+    tileSizePx: J7_TILE,
+    changedTiles: [...tiles.entries()].map(([k, n]) => [...k.split(",").map(Number), n]).sort((p, q) => (q[2] as number) - (p[2] as number)),
+  };
+}
+
+/** TR-01, n times, on the series' first raw frame's exact bytes (a fresh copy each run). */
+async function j7Redetect(n: number): Promise<unknown> {
+  const first = j7.first;
+  if (!first) return { error: "no J7 reference frame: run a pass inside j7-reset first" };
+  host ??= createTr01Host({ spawn: instrumentedSpawn });
+  const sha = [...new Uint8Array(await globalThis.crypto.subtle.digest("SHA-256", first.rgba.slice()))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const runs: unknown[] = [];
+  for (let i = 0; i < n; i++) {
+    const outcome = await host.detect({ width: first.width, height: first.height, rgba: first.rgba.slice() });
+    runs.push(outcome.ok ? { ok: true, detections: outcome.detections } : { ok: false, code: outcome.code });
+  }
+  return { referenceRgbaSha256: sha, width: first.width, height: first.height, runs };
+}
+
+/**
  * THE SEAM an evidence build hands the offscreen document: an instrumented worker spawn, and a
  * pre-fill hook that records the mask and DIGESTS of everything that must stay unchanged — so the
  * sanitized frame can be verified afterwards with no raw copy kept anywhere.
@@ -486,6 +558,13 @@ export const tr01Seam = {
       return digest(rgba, frame.width, frame.height, (x, y) => x >= b.x0 && x < b.x1 && y >= b.y0 && y < b.y1);
     });
     mark("maskPlanned");
+    if (j7.open) {
+      const now = { width: frame.width, height: frame.height, rgba };
+      j7.lastDiff = { vsFirst: j7.first ? j7Diff(j7.first, now) : null, vsPrevious: j7.previous ? j7Diff(j7.previous, now) : null };
+      const copy = { width: frame.width, height: frame.height, rgba: rgba.slice() };
+      j7.previous = copy;
+      j7.first ??= copy;
+    }
     // M10.7: the RAW frame's SHA-256, so the sink can show it never received those bytes. The digest
     // is started over a transient copy (the fill is about to overwrite the original); the copy is
     // dropped when the digest resolves. Test builds only.
@@ -537,6 +616,7 @@ async function pass(msg: Record<string, unknown>, ctx: Tr01ProbeContext): Promis
         ? (rs: readonly { id: string; rect: CssRect }[]) => [...rs.map((r) => ({ id: r.id, rect: r.rect })), ...(rs[0] ? [{ id: rs[0].id, rect: rs[0].rect }] : [])]
         : undefined;
   const deadlineMs = typeof msg["deadlineMs"] === "number" ? msg["deadlineMs"] : undefined;
+  j7.lastDiff = null;
   const t0 = performance.now();
   const { observed, summary } = await ctx.perceiveTab(tabId, frameId, {
     ...(adjustRegions ? { adjustRegions } : {}),
@@ -596,6 +676,7 @@ async function pass(msg: Record<string, unknown>, ctx: Tr01ProbeContext): Promis
     verification,
     tr01: ctx.tr01Status(),
     rawRgbaSha256: p ? await p.rawSha256 : null,
+    j7: j7.open ? j7.lastDiff : undefined,
     // Relative to the pass's start, in this realm's clock.
     timeline: timeline.map((e) => ({ ...e, at: e.at - t0 })),
     wallMs,
@@ -833,6 +914,12 @@ export function serveTr01Probe(message: unknown, sender: { tab?: unknown }, send
       : msg["op"] === "product-state"
         ? // Preflight: the product host's state and whether a sanitized frame is held — no stale pass.
           Promise.resolve(context ? { tr01: context.tr01Status(), sanitizedFrameHeld: context.sanitizedFrame() !== null } : { error: "no offscreen context" })
+      : msg["op"] === "j7-reset"
+        ? Promise.resolve(((j7 = { open: true, first: null, previous: null, lastDiff: null }), { open: true }))
+      : msg["op"] === "j7-end"
+        ? Promise.resolve(((j7 = { open: false, first: null, previous: null, lastDiff: null }), { open: false }))
+      : msg["op"] === "j7-redetect"
+        ? j7Redetect(Number(msg["n"] ?? 5))
       : msg["op"] === "offscreen-arrivals"
         ? Promise.resolve({
             arrivals: offscreenArrivals.length,

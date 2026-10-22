@@ -206,3 +206,19 @@ CHROME_PATH=<cft chrome.exe> REF_PYTHON=<…> \
 
 Both establishment steps exit **non-zero** on purpose: an establishment run measured nothing against a
 baseline, so it must never be read as a passing verification.
+
+### W1 on the per-workstation layout — 2026-10-22
+
+During the W1 recovery, W1's fixtures were regenerated into `models/fixtures/W1/` (git-ignored) by
+`prepare-fixtures.mjs` in VERIFY mode, against W1's immutable baseline (M8.1's
+`results/tr-0{1,2}-run1.json`, read-only).
+
+- **Result:** `allMatchBaseline: true`. TR-01 and TR-02, 8 inputs each: every input tensor and native
+  output equals the M8.1 W1 record (16 of 16 each), and the native output is deterministic on 16 of 16.
+- **Geometry:** all six held-out pages re-measure their frozen geometry.
+- **Record:** `logs/w1-fixture-integrity.json`.
+- **Independent re-check:** 71 of 71. That covers 32 hashes against M8.1, the 32 fixture files on disk
+  against the record, and 7 screenshots.
+
+No baseline was re-established, no threshold changed, and `logs/fixture-integrity.json` (W1's
+historical record) is untouched.
