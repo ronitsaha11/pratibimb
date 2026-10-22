@@ -50,6 +50,19 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
   - `RUN_TASK` requires `postconditions`.
   - Demonstrated on W1 with the real extension and Qwen2.5-0.5B on a synthetic two-step page:
     [M15-two-step-task](artifacts/experiments/M15-two-step-task/README.md).
+- **M16 — which stored value goes into which field is the client's decision.** On the M2 page the
+  local model put the NAME reference into the mobile field. The binder refused it, and the task
+  stopped.
+  - `@pratibimb/privacy` `groundFill` pairs each empty field with the one reference that fits it,
+    using `fieldFit`, the class rule `bind` now shares. It withholds unknown, free-text, OTP,
+    unmatched and conflicting fields, and says why.
+  - The plan validator refuses any reference insert outside that pairing (`REFERENCE_NOT_GROUNDED`,
+    `HOSTILE`: no fallback, no substitution).
+  - The local model's grammar offers only the pairing.
+  - Manifest, schema, ADRs, gates, CSP and pins unchanged.
+  - W1, real Qwen, M2 page: the model completed the task in 4 of 4 recorded runs, with no fallback.
+    Not a reliability rate
+    ([M16](artifacts/experiments/M16-field-grounding/README.md)).
 - Week-1 capability spikes (in progress).
 
 **The first complete product loop** — `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN →

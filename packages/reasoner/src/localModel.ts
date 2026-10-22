@@ -59,6 +59,13 @@ interface Grounding {
    */
   readonly clickable: readonly string[];
   readonly refs: readonly string[];
+  /**
+   * The only inserts the model may write: each empty field privacy paired with a reference, and that
+   * reference (M16). Which stored value goes into which field is the client's decision. A 0.5B model
+   * asked to choose put the NAME reference into the mobile field; offered only the pairing, it can
+   * decide whether to fill the field, never what goes in it.
+   */
+  readonly inserts: readonly { readonly target: string; readonly ref: string }[];
 }
 
 /**
@@ -68,17 +75,20 @@ interface Grounding {
  */
 const CLICKABLE_ROLES = new Set(["button", "link", "checkbox", "radio", "tab", "menuitem", "switch"]);
 
-const groundingOf = (handoff: VerifiedHandoff): Grounding => ({
-  targets: handoff.elements.map((element) => element.id),
-  clickable: handoff.elements.filter((element) => element.visible && element.enabled && CLICKABLE_ROLES.has(element.role)).map((element) => element.id),
-  refs: handoff.redactions.filter((redaction) => redaction.token !== "").map((redaction) => redaction.token),
+const groundingOf = (request: ReasonerRequest): Grounding => ({
+  targets: request.handoff.elements.map((element) => element.id),
+  clickable: request.handoff.elements.filter((element) => element.visible && element.enabled && CLICKABLE_ROLES.has(element.role)).map((element) => element.id),
+  refs: request.handoff.redactions.filter((redaction) => redaction.token !== "").map((redaction) => redaction.token),
+  inserts: [...request.fill.fillable].map(([target, ref]) => ({ target, ref })),
 });
 
 /**
  * The JSON schema the decoder is constrained to.
  *
- * `target` and `ref` are enums over what actually exists, so the model cannot emit a selector the
- * page does not have or a reference the vault never issued. That is grounding, not enforcement:
+ * `target` is an enum over what actually exists, so the model cannot emit a selector the page does
+ * not have. An `insert` is one of the client's pairings, target and reference together, so it cannot
+ * name a reference the vault never issued or put one where privacy did not pair it. That is
+ * grounding, not enforcement:
  * `validatePlan` still checks every one of them, because a constrained decoder is a convenience and
  * the validator is the authority.
  */
@@ -88,23 +98,20 @@ const planSchema = (grounding: Grounding): Record<string, unknown> => ({
     steps: {
       type: "array",
       minItems: 1,
-      // A plan is the NEXT action: restorations (if any) then one click, or `done`. With nothing to
-      // restore, that is exactly one step (M15). The validator refuses a second click either way.
-      maxItems: grounding.refs.length === 0 ? 1 : 4,
+      // A plan is the NEXT action: the grounded fills (if any) then one click, or `done`. With nothing
+      // to fill, that is exactly one step (M15, M16). The validator refuses a second click either way.
+      maxItems: Math.min(4, grounding.inserts.length + 1),
       items: {
         oneOf: [
-          // `insert` only when there is a reference to insert. A page with none still has controls to
-          // click and may still be finished; an empty `ref` enum would make the whole grammar invalid.
-          ...(grounding.refs.length === 0
-            ? []
-            : [
-                {
-                  type: "object",
-                  properties: { op: { const: "insert" }, target: { enum: grounding.targets }, ref: { enum: grounding.refs } },
-                  required: ["op", "target", "ref"],
-                  additionalProperties: false,
-                },
-              ]),
+          // Each `insert` is one of privacy's pairings, target and reference together (M16). None when
+          // privacy paired nothing: a page with no fillable field still has controls to click and may
+          // still be finished.
+          ...grounding.inserts.map((insert) => ({
+            type: "object",
+            properties: { op: { const: "insert" }, target: { enum: [insert.target] }, ref: { enum: [insert.ref] } },
+            required: ["op", "target", "ref"],
+            additionalProperties: false,
+          })),
           ...(grounding.clickable.length === 0
             ? []
             : [
@@ -201,7 +208,7 @@ export function localModelReasoner(options: LocalModelOptions = {}): ReasonerCli
     name: `local-model:${options.model ?? "qwen2.5-0.5b-instruct-q4_k_m"}`,
     transport: "LOOPBACK_HTTP",
     async propose(request: ReasonerRequest): Promise<unknown> {
-      const grounding = groundingOf(request.handoff);
+      const grounding = groundingOf(request);
       // Nothing to point at means nothing to plan. A page with controls but no references is still a
       // page the model can act on — by clicking, or by saying it is finished (M15).
       if (grounding.targets.length === 0) return undefined;

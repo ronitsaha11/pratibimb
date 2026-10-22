@@ -102,10 +102,17 @@ export interface PageOptions {
   readonly verifyDoesNothing?: boolean;
   readonly verifyRenamesTo?: string;
   readonly verifyRemovesItself?: boolean;
+  /** M16: an empty "Confirm full name" field, which privacy pairs with the NAME reference. */
+  readonly withNameConfirm?: boolean;
+  /** M16: a second, filled phone field, so two PHONE references could go into the empty one. */
+  readonly withSecondMobile?: boolean;
 }
 
 /** What the two-step page's verify control is called once it has worked. */
 export const VERIFIED_NAME = "Mobile number verified";
+
+/** Synthetic, like `DEMO`: a second mobile number for the conflicting-references page. */
+export const SECOND_MOBILE = "9000000002";
 
 export class SimulatedPage {
   elements: Element[];
@@ -146,6 +153,36 @@ export class SimulatedPage {
         value: "",
         label: "Notes",
         type: "text",
+        isField: true,
+      });
+    }
+    if (options.withNameConfirm) {
+      this.elements.splice(this.elements.length - 1, 0, {
+        selector: "#name_confirm",
+        role: "textbox",
+        name: "Confirm full name",
+        rect: { x: 320, y: 500, w: 300, h: 32 },
+        enabled: true,
+        cssHidden: false,
+        value: "",
+        label: "Confirm full name",
+        type: "text",
+        autocomplete: "name",
+        isField: true,
+      });
+    }
+    if (options.withSecondMobile) {
+      this.elements.splice(this.elements.length - 1, 0, {
+        selector: "#mobile_alt",
+        role: "textbox",
+        name: "Alternate mobile number",
+        rect: { x: 320, y: 550, w: 300, h: 32 },
+        enabled: true,
+        cssHidden: false,
+        value: SECOND_MOBILE,
+        label: "Alternate mobile number",
+        type: "tel",
+        autocomplete: "tel",
         isField: true,
       });
     }

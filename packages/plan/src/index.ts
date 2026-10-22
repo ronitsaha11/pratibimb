@@ -39,6 +39,7 @@ export {
   validatePlan,
   type PlanRefusal,
   type PlanRefusalCause,
+  type FillRefusalCause,
   type PlanValidation,
   type PlanValidationContext,
   type ValidatedClick,

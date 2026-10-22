@@ -16,18 +16,35 @@ import { deterministicReasoner, sendToReasoner, type ReasonerClient } from "../s
 import { DEMO, GOAL, ORIGIN, REQUEST, SESSION, verifiedHandoff } from "./support/handoff.js";
 
 const request = async (over: Record<string, unknown> = {}) => {
-  const { handoff, vault } = await verifiedHandoff();
-  return { handoff, vault, goal: GOAL, requestId: REQUEST, sessionId: SESSION, origin: ORIGIN, ...over } as never;
+  const { handoff, vault, fill } = await verifiedHandoff();
+  return { handoff, vault, fill, goal: GOAL, requestId: REQUEST, sessionId: SESSION, origin: ORIGIN, ...over } as never;
 };
 
 describe("SEND refuses before it sends", () => {
+  it("refuses a fill grounding that names an element or reference the handoff does not carry (M16)", async () => {
+    const { handoff, vault, fill } = await verifiedHandoff();
+    const base = { handoff, vault, goal: GOAL, requestId: REQUEST, sessionId: SESSION, origin: ORIGIN };
+    const phone = [...fill.fillable.values()][0]!;
+    for (const forged of [
+      { fillable: new Map([["#not-on-the-page", phone]]), withheld: [] },
+      { fillable: new Map([["#mobile_confirm", "<PII:PHONE:9>"]]), withheld: [] },
+      { fillable: new Map(), withheld: [{ target: "#elsewhere", cause: "AMBIGUOUS_FIELD" as const }] },
+    ]) {
+      const response = await sendToReasoner(deterministicReasoner(), { ...base, fill: forged });
+      expect(response).toMatchObject({ received: false, cause: "FILL_NOT_FROM_HANDOFF" });
+    }
+    const missing = await sendToReasoner(deterministicReasoner(), base as never);
+    expect(missing).toMatchObject({ received: false, cause: "FILL_NOT_FROM_HANDOFF" });
+  });
+
   it("refuses a handoff the privacy verifier did not produce", async () => {
-    const { handoff, vault } = await verifiedHandoff();
+    const { handoff, vault, fill } = await verifiedHandoff();
     const forged = JSON.parse(JSON.stringify(handoff)) as typeof handoff;
     expect(forged.verified).toBe(true); // the flag is right; the membership is not
     const response = await sendToReasoner(deterministicReasoner(), {
       handoff: forged,
       vault,
+      fill,
       goal: GOAL,
       requestId: REQUEST,
       sessionId: SESSION,
@@ -163,7 +180,7 @@ describe("the deterministic planner", () => {
   });
 
   it("says so rather than guessing when the page lacks what the goal needs", async () => {
-    const { handoff, vault } = await verifiedHandoff();
+    const { handoff, vault, fill } = await verifiedHandoff();
     const withoutFields = {
       ...handoff,
       elements: handoff.elements.filter((e) => e.id !== "#mobile_confirm"),
@@ -172,6 +189,7 @@ describe("the deterministic planner", () => {
     const raw = (await deterministicReasoner().propose({
       handoff: withoutFields as never,
       vault,
+      fill,
       goal: GOAL,
       requestId: REQUEST,
       sessionId: SESSION,
