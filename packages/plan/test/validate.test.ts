@@ -58,8 +58,8 @@ describe("the accepted plan", () => {
   });
 
   it("reports NEEDS_HUMAN_GRANT for a SENSITIVE class instead of deciding for the human", async () => {
-    const s = await scenario();
-    const plan = parse(rawPlan([insertRef(s.aadhaarRef, "#aadhaar"), clickStep]));
+    const s = await scenario({}, { aadhaarConfirm: true });
+    const plan = parse(rawPlan([insertRef(s.aadhaarRef, "#aadhaar_confirm"), clickStep]));
     const result = validatePlan(plan, s.ctx);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -68,9 +68,9 @@ describe("the accepted plan", () => {
   });
 
   it("accepts the SENSITIVE step once a matching human grant exists — decided by bind, not here", async () => {
-    const s = await scenario();
-    const plan = parse(rawPlan([insertRef(s.aadhaarRef, "#aadhaar"), clickStep]));
-    s.useGrants.push(grantFor(s.aadhaarRef, "#aadhaar", { piiClass: "AADHAAR" }));
+    const s = await scenario({}, { aadhaarConfirm: true });
+    const plan = parse(rawPlan([insertRef(s.aadhaarRef, "#aadhaar_confirm"), clickStep]));
+    s.useGrants.push(grantFor(s.aadhaarRef, "#aadhaar_confirm", { piiClass: "AADHAAR" }));
     const result = validatePlan(plan, s.ctx);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -422,10 +422,11 @@ describe("what the validator does not do", () => {
   });
 
   it("never marks a grant used", async () => {
-    const s = await scenario();
-    const grant = grantFor(s.aadhaarRef, "#aadhaar", { piiClass: "AADHAAR" });
+    const s = await scenario({}, { aadhaarConfirm: true });
+    const grant = grantFor(s.aadhaarRef, "#aadhaar_confirm", { piiClass: "AADHAAR" });
     s.useGrants.push(grant);
-    validatePlan(parse(rawPlan([insertRef(s.aadhaarRef, "#aadhaar"), clickStep])), s.ctx);
+    const result = validatePlan(parse(rawPlan([insertRef(s.aadhaarRef, "#aadhaar_confirm"), clickStep])), s.ctx);
+    expect(result.ok).toBe(true); // the grant was actually consulted, not refused around
     expect(grant.used).toBe(false);
   });
 
@@ -442,5 +443,42 @@ describe("what the validator does not do", () => {
     const s = await scenario();
     expect(s.ctx.classOriginGrants.has(classOriginKey("PHONE", ORIGIN))).toBe(true);
     expect(s.ctx.now).toBe(NOW);
+  });
+});
+
+describe("the pairing privacy grounded (M16)", () => {
+  it("refuses a reference insert into a field that already holds a value, without quoting anything", async () => {
+    const s = await scenario();
+    const result = validatePlan(parse(rawPlan([insertRef(s.phoneRef, "#mobile"), clickStep])), s.ctx);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.refusal).toMatchObject({ cause: "REFERENCE_NOT_GROUNDED", fillCause: "NOT_AN_EMPTY_FIELD", target: "#mobile", piiClass: "PHONE" });
+    for (const secret of Object.values(DEMO)) expect(JSON.stringify(result)).not.toContain(secret);
+  });
+
+  it("reports the binder's CLASS_MISMATCH first for NAME into the mobile field: privacy's own cause wins", async () => {
+    const s = await scenario();
+    const nameRef = s.handoff.redactions.find((r) => r.class === "NAME")!.token;
+    const result = validatePlan(parse(rawPlan([insertRef(nameRef), clickStep])), s.ctx);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.refusal).toMatchObject({ cause: "PRIVACY_REFUSED", bindCause: "CLASS_MISMATCH" });
+  });
+
+  it("refuses the pairing when privacy withheld the field, and says why", async () => {
+    const s = await scenario({ fill: { fillable: new Map(), withheld: [{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }] } });
+    const result = validatePlan(parse(rawPlan([insertRef(s.phoneRef), clickStep])), s.ctx);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.refusal).toMatchObject({ cause: "REFERENCE_NOT_GROUNDED", fillCause: "CONFLICTING_REFERENCES" });
+    expect(result.refusal.detail).toMatch(/Say which one/);
+  });
+
+  it("leaves a safe literal to the literal check: grounding is about stored values only", async () => {
+    const s = await scenario();
+    const result = validatePlan(parse(rawPlan([{ op: "insert", target: "#mobile_confirm", literal: DEMO.mobile }, clickStep])), s.ctx);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.refusal.cause).toBe("LITERAL_REFUSED");
   });
 });

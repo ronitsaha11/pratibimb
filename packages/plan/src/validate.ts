@@ -34,6 +34,8 @@ import {
   type BindCause,
   type BindDecision,
   type BindView,
+  type FillCause,
+  type FillGrounding,
   type LiteralCause,
   type LiteralFinding,
   type LiteralSeverity,
@@ -61,7 +63,16 @@ export type PlanRefusalCause =
   | "NO_EXECUTABLE_STEP"
   | "CLICK_BEFORE_INSERT"
   | "PRIVACY_REFUSED"
-  | "LITERAL_REFUSED";
+  | "LITERAL_REFUSED"
+  | "REFERENCE_NOT_GROUNDED";
+
+/**
+ * Why a reference insert is not one of the pairings privacy grounded (M16).
+ *
+ * Privacy's own `FillCause` when it withheld the field; otherwise the field was not one of the empty
+ * fields grounded at all, or the reference is not the one privacy matched to it.
+ */
+export type FillRefusalCause = FillCause | "NOT_AN_EMPTY_FIELD" | "NOT_THE_GROUNDED_REFERENCE";
 
 /**
  * An insert backed by a vault reference. The value comes from `rehydrate`, after a human agrees.
@@ -127,6 +138,8 @@ export interface PlanRefusal {
   readonly target?: string;
   /** The binder's own cause, when privacy refused. */
   readonly bindCause?: BindCause;
+  /** Why the pairing was not grounded, when a reference insert was not one privacy offered. */
+  readonly fillCause?: FillRefusalCause;
   /** The literal check's own cause, when a literal was refused. */
   readonly literalCause?: LiteralCause;
   readonly literalSeverity?: LiteralSeverity;
@@ -165,6 +178,11 @@ export interface PlanValidationContext {
   readonly now: number;
   /** Targets that carry a redaction span in the handoff that was sent. */
   readonly redactedTargets: ReadonlySet<string>;
+  /**
+   * Privacy's pairing of empty fields with the one reference each may take (`groundFill`, M16).
+   * A reference insert that is not one of these is refused, whatever the binder would say.
+   */
+  readonly fill: FillGrounding;
   /** Which targets this client is willing to act on: present, visible, enabled. */
   readonly actionableTargets: ReadonlySet<string>;
   readonly today?: Date;
@@ -289,6 +307,17 @@ export function validatePlan(plan: Plan, ctx: PlanValidationContext): PlanValida
   };
 }
 
+/** What the person is told. A request for clarification where the client could not decide. */
+const FILL_DETAIL: Readonly<Record<FillRefusalCause, string>> = {
+  UNKNOWN_TARGET: "the field is not in the view this client grounded; nothing was filled.",
+  CRITICAL_FIELD: "the field takes a one-time code, which is never agent-typed; enter it yourself.",
+  AMBIGUOUS_FIELD: "this client could not establish what the field accepts; nothing was filled. Fill it yourself, or say which value it takes.",
+  NO_MATCHING_REFERENCE: "no stored value of the kind this field accepts is available; nothing was filled.",
+  CONFLICTING_REFERENCES: "more than one stored value could go into this field; nothing was filled. Say which one it takes.",
+  NOT_AN_EMPTY_FIELD: "the field already holds a value, or is not a field this client offered for filling; nothing was filled.",
+  NOT_THE_GROUNDED_REFERENCE: "the stored value proposed is not the one this client matched to the field; nothing was filled, and no other value was substituted.",
+};
+
 /**
  * One insert step.
  *
@@ -352,6 +381,27 @@ function validateInsert(
         bindCause: decision.cause,
         ...(descriptor ? { piiClass: descriptor.piiClass } : {}),
         detail: `the privacy layer refused this reference (${decision.cause}).`,
+      },
+    };
+  }
+
+  // ── the pairing privacy grounded ─────────────────────────────────────────────────────────
+  // The binder answers "may this class go into this field?"; it would let one of two phone numbers
+  // into a phone field, or a phone number into a phone field that already holds one. Privacy's
+  // grounding answers "which value is this field's?", and a reference insert must match it exactly.
+  // Not a second class check: a comparison against privacy's own answer, reported with its cause.
+  const grounded = ctx.fill.fillable.get(target);
+  if (grounded !== step.ref) {
+    const withheld = ctx.fill.withheld.find((entry) => entry.target === target);
+    const fillCause: FillRefusalCause = withheld?.cause ?? (grounded === undefined ? "NOT_AN_EMPTY_FIELD" : "NOT_THE_GROUNDED_REFERENCE");
+    return {
+      refusal: {
+        cause: "REFERENCE_NOT_GROUNDED",
+        at: index,
+        target,
+        fillCause,
+        ...(descriptor ? { piiClass: descriptor.piiClass } : {}),
+        detail: FILL_DETAIL[fillCause],
       },
     };
   }

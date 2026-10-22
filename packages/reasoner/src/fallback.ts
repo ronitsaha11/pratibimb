@@ -115,8 +115,13 @@ export const decideFallback = (outcome: ModelOutcome, policy: FallbackPolicy = D
  *
  * These are `@pratibimb/plan`'s own cause names, matched as strings so this package does not depend
  * on it; the orchestrator, which imports both, does the mapping.
+ *
+ * `REFERENCE_NOT_GROUNDED` (M16) is a stored value proposed for a field privacy did not pair it with.
+ * It joins `PRIVACY_REFUSED` for the same reason: a second planner answering would put a different
+ * private value — or the same one by another route — where the client just refused one, and the
+ * person must see the refusal rather than a quiet substitution.
  */
-export const HOSTILE_REFUSAL_CAUSES: readonly string[] = ["LITERAL_REFUSED", "PRIVACY_REFUSED", "NOT_A_PARSED_PLAN"];
+export const HOSTILE_REFUSAL_CAUSES: readonly string[] = ["LITERAL_REFUSED", "PRIVACY_REFUSED", "NOT_A_PARSED_PLAN", "REFERENCE_NOT_GROUNDED"];
 
 /** Classify a plan-validation refusal. `HOSTILE` blocks the fallback; `UNUSABLE` permits it. */
 export const outcomeOfRefusal = (cause: string): ModelOutcome =>

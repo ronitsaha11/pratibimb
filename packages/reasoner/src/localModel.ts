@@ -53,18 +53,28 @@ export const DEFAULT_MODEL_ENDPOINT = "http://127.0.0.1:8977/v1/chat/completions
 interface Grounding {
   readonly targets: readonly string[];
   readonly refs: readonly string[];
+  /**
+   * The only inserts the model may write: each empty field privacy paired with a reference, and that
+   * reference (M16). Which stored value goes into which field is the client's decision. A 0.5B model
+   * asked to choose put the NAME reference into the mobile field; offered only the pairing, it can
+   * decide whether to fill the field, never what goes in it.
+   */
+  readonly inserts: readonly { readonly target: string; readonly ref: string }[];
 }
 
-const groundingOf = (handoff: VerifiedHandoff): Grounding => ({
-  targets: handoff.elements.map((element) => element.id),
-  refs: handoff.redactions.filter((redaction) => redaction.token !== "").map((redaction) => redaction.token),
+const groundingOf = (request: ReasonerRequest): Grounding => ({
+  targets: request.handoff.elements.map((element) => element.id),
+  refs: request.handoff.redactions.filter((redaction) => redaction.token !== "").map((redaction) => redaction.token),
+  inserts: [...request.fill.fillable].map(([target, ref]) => ({ target, ref })),
 });
 
 /**
  * The JSON schema the decoder is constrained to.
  *
- * `target` and `ref` are enums over what actually exists, so the model cannot emit a selector the
- * page does not have or a reference the vault never issued. That is grounding, not enforcement:
+ * `target` is an enum over what actually exists, so the model cannot emit a selector the page does
+ * not have. An `insert` is one of the client's pairings, target and reference together, so it cannot
+ * name a reference the vault never issued or put one where privacy did not pair it. That is
+ * grounding, not enforcement:
  * `validatePlan` still checks every one of them, because a constrained decoder is a convenience and
  * the validator is the authority.
  */
@@ -74,15 +84,16 @@ const planSchema = (grounding: Grounding): Record<string, unknown> => ({
     steps: {
       type: "array",
       minItems: 1,
-      maxItems: 4,
+      // Every grounded fill, then one click; with nothing to fill, one step (M16).
+      maxItems: Math.min(4, grounding.inserts.length + 1),
       items: {
         oneOf: [
-          {
+          ...grounding.inserts.map((insert) => ({
             type: "object",
-            properties: { op: { const: "insert" }, target: { enum: grounding.targets }, ref: { enum: grounding.refs } },
+            properties: { op: { const: "insert" }, target: { enum: [insert.target] }, ref: { enum: [insert.ref] } },
             required: ["op", "target", "ref"],
             additionalProperties: false,
-          },
+          })),
           {
             type: "object",
             properties: { op: { const: "click" }, target: { enum: grounding.targets } },
@@ -173,7 +184,7 @@ export function localModelReasoner(options: LocalModelOptions = {}): ReasonerCli
     name: `local-model:${options.model ?? "qwen2.5-0.5b-instruct-q4_k_m"}`,
     transport: "LOOPBACK_HTTP",
     async propose(request: ReasonerRequest): Promise<unknown> {
-      const grounding = groundingOf(request.handoff);
+      const grounding = groundingOf(request);
       if (grounding.targets.length === 0 || grounding.refs.length === 0) return undefined;
 
       const body = {
