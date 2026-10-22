@@ -27,7 +27,8 @@
  * this, and has not yet". Nothing here can produce that permission; there is no automatic grant, no
  * blanket grant, and no persistence.
  */
-import { TIER_OF, type FieldClass, type PiiClass } from "./classes.js";
+import { type FieldClass, type PiiClass } from "./classes.js";
+import { fieldFit } from "./fill.js";
 import { REVEAL } from "./internal.js";
 import { parseToken } from "./tokens.js";
 import { type Vault } from "./vault.js";
@@ -145,12 +146,11 @@ export function bind(step: BindStep, ctx: BindContext): BindDecision {
   const descriptor = ctx.vault.describe(step.ref);
   if (!descriptor) return refuse("UNKNOWN_TOKEN");
 
-  // A CRITICAL reference cannot exist — issuance refuses one — so this is defence in depth against a
-  // vault that was populated some other way.
-  if (TIER_OF[descriptor.piiClass] === "CRITICAL") return needsUser("CRITICAL_NEVER_AGENT_TYPED");
-  if (field.accepts === "OTP") return needsUser("CRITICAL_FIELD");
-  if (field.accepts === "UNKNOWN" || field.accepts === "FREE_TEXT") return needsUser("AMBIGUOUS_FIELD");
-  if (field.accepts !== descriptor.piiClass) return refuse("CLASS_MISMATCH");
+  // CRITICAL token → OTP field → ambiguous field → class: `fieldFit` is that sequence, shared with
+  // `groundFill` so the pairing offered to a reasoner and the pairing bound are one rule (M16).
+  const fit = fieldFit(field.accepts, descriptor.piiClass);
+  if (fit === "CLASS_MISMATCH") return refuse(fit);
+  if (fit !== "FITS") return needsUser(fit);
   if (field.origin !== descriptor.origin) return refuse("ORIGIN_MISMATCH");
   if (descriptor.consumed) return refuse("CONSUMED");
   if (!ctx.classOriginGrants.has(classOriginKey(descriptor.piiClass, field.origin))) {

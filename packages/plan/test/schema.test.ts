@@ -76,7 +76,10 @@ describe("everything else is refused", () => {
   });
 
   it("refuses an operation outside the allowlist, by name", () => {
-    for (const op of ["type", "navigate", "eval", "scroll", "done", ""]) {
+    // `done` left this list in M14: it is the frozen schema's terminal step and is now parsed, alone and
+    // without a target. A `done` carrying a target, as here, is still refused, as DONE_TAKES_NO_TARGET
+    // (done.test.ts).
+    for (const op of ["type", "navigate", "eval", "scroll", ""]) {
       const parsed = parsePlan(rawPlan([{ op, target: "#submit" }]));
       expect(parsed.ok, op).toBe(false);
       if (parsed.ok) continue;

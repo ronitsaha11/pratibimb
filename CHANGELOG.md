@@ -7,6 +7,43 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 ## [Unreleased]
 
 ### Added
+- **M14 — stage 12, "repeat, or stop and ask"** (constitution §1). A task can now take more than one
+  turn. `runTaskLoop` (`@pratibimb/orchestrator`, `src/loop.ts`) runs each turn as one complete
+  `runTask`, through every gate:
+  - each turn gets a fresh observation, sanitize, verified handoff, plan, VALIDATE / REFRESH, grant,
+    REHYDRATE, ACT and VERIFY RESULT;
+  - each turn has its own request id (`<id>.t<n>`), so a plan made for one turn is refused on another
+    (`REQUEST_MISMATCH`);
+  - no plan, reference, grant, permit or value is carried between turns.
+
+  It continues only after a turn whose action VERIFY RESULT **confirmed**. It stops and asks on a
+  refusal, an unconfirmed result, a deterministic-planner turn, a repeated plan, or a spent budget
+  (`MAX_TASK_TURNS = 5`).
+- **The `done` step** from the frozen action schema (`@pratibimb/plan`):
+  - It must be the plan's only step and names no element.
+  - It passes the same identity and stale-view checks as an action, and authorises nothing — no
+    grant, rehydration or click.
+  - The machine ends `VALIDATE_PLAN → DONE` with `declaredDone: true`. The loop reports it as
+    `COMPLETED_AS_DECLARED`, **the model's claim**; `succeeded()` stays false for that turn.
+  - The local model's constrained grammar offers it. `EXECUTABLE_ACTIONS` is still `["click"]`.
+- **Extension.** `RUN_TASK` accepts an optional `maxTurns` (1–5). Without it the run is exactly the
+  single turn it was before. With it, `result.loop` carries the outcome and every turn's projected
+  record, and every capability is revoked between turns.
+- **Not yet shown:** a multi-turn task in the browser against a real model. The loop is tested against
+  the real gates in Node (`packages/orchestrator/test/loop.test.ts`) with a scripted test reasoner.
+- **M16 — which stored value goes into which field is the client's decision.** On the M2 page the
+  local model put the NAME reference into the mobile field. The binder refused it, and the task
+  stopped.
+  - `@pratibimb/privacy` `groundFill` pairs each empty field with the one reference that fits it,
+    using `fieldFit`, the class rule `bind` now shares. It withholds unknown, free-text, OTP,
+    unmatched and conflicting fields, and says why.
+  - The plan validator refuses any reference insert outside that pairing (`REFERENCE_NOT_GROUNDED`,
+    `HOSTILE`: no fallback, no substitution).
+  - The local model's grammar offers only the pairing.
+  - Manifest, schema, ADRs, gates, CSP and pins unchanged.
+  - W1, real Qwen, M2 page: the model completed the task in 4 of 4 recorded runs, with no fallback.
+    Not a reliability rate
+    ([M16](artifacts/experiments/M16-field-grounding/README.md)).
 - Week-1 capability spikes (in progress).
 
 **The first complete product loop** — `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN →

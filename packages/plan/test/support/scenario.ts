@@ -20,6 +20,7 @@ import {
 import {
   classOriginKey,
   fingerprintOf,
+  groundFill,
   sanitize,
   type BindView,
   type ObservedField,
@@ -69,8 +70,29 @@ const MEASUREMENTS: DomMeasurement[] = [
   { selector: "#submit", role: "button", name: "Submit application", rect: { x: 320, y: 450, w: 180, h: 40 }, enabled: true, cssHidden: false, parentIndex: -1 },
 ];
 
-export const demoGraph = (frame = frameId("plan-demo-1")): ElementGraph =>
-  buildElementGraph(MEASUREMENTS, geometry, frame);
+/**
+ * One page variant (M16): an empty "Confirm Aadhaar number" field, so a SENSITIVE reference has an
+ * empty field privacy pairs it with. The SENSITIVE-grant tests need one: privacy grounds only empty
+ * fields, so restoring the Aadhaar number into the field it was read from is not a pairing it offers.
+ */
+export interface ScenarioPage {
+  readonly aadhaarConfirm?: boolean;
+}
+
+const AADHAAR_CONFIRM: DomMeasurement = {
+  selector: "#aadhaar_confirm",
+  role: "textbox",
+  name: "Confirm Aadhaar number",
+  rect: { x: 320, y: 510, w: 300, h: 32 },
+  enabled: true,
+  cssHidden: false,
+  parentIndex: -1,
+};
+
+const measurementsFor = (page: ScenarioPage): DomMeasurement[] => (page.aadhaarConfirm ? [...MEASUREMENTS, AADHAAR_CONFIRM] : MEASUREMENTS);
+
+export const demoGraph = (frame = frameId("plan-demo-1"), page: ScenarioPage = {}): ElementGraph =>
+  buildElementGraph(measurementsFor(page), geometry, frame);
 
 export const demoFields = (): ObservedField[] => [
   { id: "#name", value: DEMO.name, label: "Full name", autocomplete: "name", type: "text", origin: ORIGIN },
@@ -83,7 +105,7 @@ export const demoFields = (): ObservedField[] => [
 ];
 
 export const fingerprint = (selector: string): string => {
-  const m = MEASUREMENTS.find((x) => x.selector === selector);
+  const m = [...MEASUREMENTS, AADHAAR_CONFIRM].find((x) => x.selector === selector);
   if (!m) throw new Error(`test setup: no measurement for ${selector}`);
   return fingerprintOf(m.selector, m.role, m.name);
 };
@@ -96,13 +118,14 @@ const ACCEPTS: Readonly<Record<string, ViewField["accepts"]>> = {
   "#otp": "OTP",
   "#mobile_confirm": "PHONE",
   "#submit": "UNKNOWN",
+  "#aadhaar_confirm": "AADHAAR",
 };
 
-export const demoView = (viewId = REQUEST): BindView => ({
+export const demoView = (viewId = REQUEST, page: ScenarioPage = {}): BindView => ({
   viewId,
   documentId: DOCUMENT,
   fields: new Map(
-    MEASUREMENTS.map((m) => [
+    measurementsFor(page).map((m) => [
       m.selector,
       { accepts: ACCEPTS[m.selector] ?? "UNKNOWN", origin: ORIGIN, fingerprint: fingerprint(m.selector) },
     ])
@@ -119,12 +142,16 @@ export interface Scenario {
 }
 
 /** Run the real sanitizer and assemble the validation context the way the orchestrator does. */
-export const scenario = async (over: Partial<PlanValidationContext> = {}): Promise<Scenario> => {
+export const scenario = async (over: Partial<PlanValidationContext> = {}, page: ScenarioPage = {}): Promise<Scenario> => {
   const outcome = await sanitize(
-    demoGraph(),
+    demoGraph(undefined, page),
     GOAL,
     { sessionId: SESSION, requestId: REQUEST, origin: ORIGIN, viewport: VIEWPORT, now: NOW, today: TODAY },
-    { fields: demoFields() }
+    {
+      fields: page.aadhaarConfirm
+        ? [...demoFields(), { id: "#aadhaar_confirm", value: "", label: "Confirm Aadhaar number", type: "text", origin: ORIGIN }]
+        : demoFields(),
+    }
   );
   if (!outcome.ok) throw new Error(`test setup: sanitize refused (${outcome.refused})`);
 
@@ -135,12 +162,16 @@ export const scenario = async (over: Partial<PlanValidationContext> = {}): Promi
   };
 
   const useGrants: UseGrant[] = [];
+  const redactedTargets = new Set(outcome.handoff.redactions.map((r) => r.targetId));
+  const view = over.view ?? demoView(REQUEST, page);
+  // Privacy's pairing, grounded the way the orchestrator grounds it (M16).
+  const emptyFields = outcome.handoff.elements.filter((e) => e.role === "textbox" && !redactedTargets.has(e.id)).map((e) => e.id);
   const ctx: PlanValidationContext = {
     vault: outcome.vault,
     sessionId: SESSION,
     requestId: REQUEST,
     origin: ORIGIN,
-    view: demoView(),
+    view,
     currentDocumentId: DOCUMENT,
     classOriginGrants: new Set(
       outcome.handoff.redactions
@@ -149,8 +180,9 @@ export const scenario = async (over: Partial<PlanValidationContext> = {}): Promi
     ),
     useGrants,
     now: NOW,
-    redactedTargets: new Set(outcome.handoff.redactions.map((r) => r.targetId)),
-    actionableTargets: new Set(MEASUREMENTS.map((m) => m.selector)),
+    redactedTargets,
+    fill: groundFill(view, outcome.handoff.redactions, emptyFields),
+    actionableTargets: new Set(measurementsFor(page).map((m) => m.selector)),
     today: TODAY,
     ...over,
   };

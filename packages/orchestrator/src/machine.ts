@@ -4,11 +4,13 @@
  *   IDLE → OBSERVE → SANITIZE → VERIFY_PAYLOAD → SEND → VALIDATE_PLAN → AWAIT_GRANT
  *        → REHYDRATE → ACT → VERIFY_RESULT → DONE
  *                                     ╰──────── any refusal ────────→ REFUSED (terminal)
+ *   … VALIDATE_PLAN → DONE, with nothing acted on, when the validated plan is the model's `done`.
  *
  * WHAT THIS IS NOT. Not an agent loop. It does not retry, recover, choose a target, plan a second
- * step, or decide what to do next. It runs one pre-stated task against one page and reports exactly
+ * step, or decide what to do next. It runs ONE TURN of a task against one page and reports exactly
  * how far it got and why it stopped. Every capability it has was injected (`ports.ts`), so the list
- * of things it could possibly do is finite and visible.
+ * of things it could possibly do is finite and visible. Stage 12 — "repeat, or stop and ask" — is
+ * `loop.ts`, which calls this function once per turn and decides nothing this function decides.
  *
  * FOUR PROPERTIES WORTH READING THE FILE FOR.
  *
@@ -40,11 +42,13 @@ import {
   classifyField,
   fingerprintOf,
   findUseGrant,
+  groundFill,
   isVerifiedHandoff,
   rehydrate,
   sanitize,
   serializeHandoff,
   type BindView,
+  type FillGrounding,
   type LedgerEntry,
   type UseGrant,
   type VerifiedHandoff,
@@ -202,6 +206,19 @@ export interface RunRecord {
   readonly literalsInserted: readonly { readonly target: string; readonly inserted: boolean }[];
   readonly confirmation: HumanConfirmation | null;
   readonly act: GuardedOutcome | null;
+  /**
+   * `true` when the validated plan was the model's `done`: the run ended at VALIDATE_PLAN → DONE and
+   * nothing was granted, rehydrated or acted on. A claim, recorded as one — `succeeded()` is `false`.
+   */
+  readonly declaredDone: boolean;
+  /**
+   * M16 — privacy's pairing of each empty field with the one reference it may take, and the empty
+   * fields nothing may fill, with why. Ids, tokens and codes; never a value. `null` before SEND.
+   */
+  readonly fill: {
+    readonly fillable: readonly { readonly target: string; readonly ref: string }[];
+    readonly withheld: FillGrounding["withheld"];
+  } | null;
 }
 
 export interface RunOptions {
@@ -260,6 +277,8 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let refusal: RunRefusal | null = null;
   let reasonerKind: ReasonerKind | null = null;
   let fallback: FallbackDecision | null = null;
+  let declaredDone = false;
+  let fillRecord: RunRecord["fill"] = null;
 
   /** The only way `state` changes. Refuses to move once the run has ended. */
   const go = (to: RunState): void => {
@@ -295,6 +314,8 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     literalsInserted,
     confirmation,
     act,
+    declaredDone,
+    fill: fillRecord,
   });
 
   const stop = (stage: RefusalStage, cause: string, detail: string, planRefusal?: PlanRefusal): RunRecord => {
@@ -378,6 +399,15 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   }
   handoffSerialized = serializeHandoff(handoff);
 
+  // ── WHICH STORED VALUE MAY GO WHERE (M16) ────────────────────────────────────────────────
+  // Privacy pairs each empty field with the one reference it may take, or withholds it. The model is
+  // offered only those pairings, and the validator refuses any reference insert outside them: which
+  // private value belongs in which field is this client's decision, not the reasoner's.
+  const redactedTargets = new Set(handoff.redactions.map((r) => r.targetId));
+  const emptyFields = handoff.elements.filter((e) => e.role === "textbox" && !redactedTargets.has(e.id)).map((e) => e.id);
+  const fill = groundFill(view, handoff.redactions, emptyFields);
+  fillRecord = { fillable: [...fill.fillable].map(([target, ref]) => ({ target, ref })), withheld: fill.withheld };
+
   // ── SEND ─────────────────────────────────────────────────────────────────────────────────
   //
   // One stage, two possible reasoners, and the choice between them is a recorded decision rather
@@ -410,6 +440,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
         sessionId: options.sessionId,
         origin: options.origin,
         vault: boundary.oracle,
+        fill,
       },
       { ...(options.reasonerTimeoutMs === undefined ? {} : { timeoutMs: options.reasonerTimeoutMs }) }
     );
@@ -473,7 +504,6 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   };
   await adopt(parsedPlan);
 
-  const redactedTargets = new Set(handoff.redactions.map((r) => r.targetId));
   // The class×origin grants this session holds. In this phase the user's per-use decision covers
   // both levels at once; there is no blanket grant and nothing is persisted.
   const classOriginGrants = new Set<string>(
@@ -493,6 +523,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
       useGrants,
       now: clock(),
       redactedTargets,
+      fill,
       actionableTargets: observation!.actionable,
       ...(options.today ? { today: options.today } : {}),
     });
@@ -518,6 +549,16 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   }
   if (!validation.ok) {
     return stop("VALIDATE_PLAN", validation.refusal.cause, validation.refusal.detail, validation.refusal);
+  }
+
+  // ── DONE, AS DECLARED ────────────────────────────────────────────────────────────────────
+  // The model says the goal is already met on the view it was shown, and the validator accepted that
+  // view as current. Ending here asks no human, restores no value and touches no page: nothing
+  // follows a `done` because a `done` authorises nothing. It is recorded as the model's claim.
+  if (validation.declaresDone) {
+    declaredDone = true;
+    go("DONE");
+    return record();
   }
 
   // Two kinds of insert, and only one of them involves a secret.

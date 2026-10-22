@@ -21,6 +21,17 @@ export {
 } from "./machine.js";
 
 export {
+  MAX_TASK_TURNS,
+  TurnBudgetError,
+  checkTurnBudget,
+  runTaskLoop,
+  turnRequestId,
+  type LoopOptions,
+  type LoopOutcome,
+  type LoopRecord,
+} from "./loop.js";
+
+export {
   type ClientPorts,
   type GrantDecision,
   type GrantRequest,

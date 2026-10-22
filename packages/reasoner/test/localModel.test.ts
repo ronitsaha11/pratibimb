@@ -57,11 +57,12 @@ afterAll(async () => {
 });
 
 const ask = async (over: Record<string, unknown> = {}) => {
-  const { handoff, vault } = await verifiedHandoff();
+  const { handoff, vault, fill } = await verifiedHandoff();
   const client = localModelReasoner({ endpoint, ...over });
   const response = await sendToReasoner(client, {
     handoff,
     vault,
+    fill,
     goal: GOAL,
     requestId: REQUEST,
     sessionId: SESSION,
@@ -111,6 +112,66 @@ describe("the request that goes out", () => {
     // enum grounding: the decoder cannot emit a selector the page does not have.
     expect(body).toContain('"enum"');
     expect(body).toContain("json_schema");
+  });
+
+  it("offers the decoder `done` (stage 12) as a step with no target, beside insert and click", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "done" }]) };
+    await ask();
+    const sent = JSON.parse(received[received.length - 1]!) as {
+      response_format: { json_schema: { schema: { properties: { steps: { items: { oneOf: { properties: Record<string, unknown>; required: string[] }[] } } } } } };
+      messages: { role: string; content: string }[];
+    };
+    const branches = sent.response_format.json_schema.schema.properties.steps.items.oneOf;
+    expect(branches.map((b) => (b.properties.op as { const: string }).const)).toEqual(["insert", "click", "done"]);
+    const done = branches[2]!;
+    expect(Object.keys(done.properties)).toEqual(["op"]);
+    expect(done.required).toEqual(["op"]);
+    expect(sent.messages[0]!.content).toContain("'done', alone");
+  });
+
+  it("offers an insert only as privacy's pairing: the empty mobile field with the PHONE reference (M16)", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "done" }]) };
+    const { handoff } = await verifiedHandoff();
+    await ask();
+    const sent = JSON.parse(received[received.length - 1]!) as {
+      response_format: { json_schema: { schema: { properties: { steps: { maxItems: number; items: { oneOf: { properties: Record<string, { const?: string; enum?: string[] }> }[] } } } } } };
+    };
+    const steps = sent.response_format.json_schema.schema.properties.steps;
+    const inserts = steps.items.oneOf.filter((b) => b.properties.op!.const === "insert");
+    const phone = handoff.redactions.find((r) => r.class === "PHONE")!.token;
+    expect(inserts.map((b) => [b.properties.target!.enum, b.properties.ref!.enum])).toEqual([[["#mobile_confirm"], [phone]]]);
+    // The NAME reference is still shown to the model as context, and cannot be written anywhere.
+    const name = handoff.redactions.find((r) => r.class === "NAME")!.token;
+    expect(JSON.stringify(inserts)).not.toContain(name);
+    expect(steps.maxItems).toBe(2);
+  });
+
+  it("offers no insert at all when privacy paired nothing, and a plan of one step (M16)", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "click", target: "#submit" }]) };
+    const { handoff, vault } = await verifiedHandoff();
+    await sendToReasoner(localModelReasoner({ endpoint }), {
+      handoff,
+      vault,
+      fill: { fillable: new Map(), withheld: [{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }] },
+      goal: GOAL,
+      requestId: REQUEST,
+      sessionId: SESSION,
+      origin: ORIGIN,
+    });
+    const sent = JSON.parse(received[received.length - 1]!) as {
+      response_format: { json_schema: { schema: { properties: { steps: { maxItems: number; items: { oneOf: { properties: Record<string, { const?: string }> }[] } } } } } };
+    };
+    const steps = sent.response_format.json_schema.schema.properties.steps;
+    expect(steps.items.oneOf.map((b) => b.properties.op!.const)).toEqual(["click", "done"]);
+    expect(steps.maxItems).toBe(1);
+  });
+
+  it("hands a returned done to the parser untouched, with the client's own provenance", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "done" }]) };
+    const { response } = await ask();
+    expect(response.received).toBe(true);
+    if (!response.received) return;
+    expect(response.raw).toMatchObject({ planVersion: "1", steps: [{ op: "done" }], provenance: { requestId: REQUEST, sessionId: SESSION } });
   });
 
   it("reports itself as loopback HTTP, never as in-process", async () => {
@@ -183,11 +244,12 @@ describe("what comes back is untrusted", () => {
 
 describe("the model has no authority", () => {
   it("cannot make the request go anywhere but this machine", async () => {
-    const { handoff, vault } = await verifiedHandoff();
+    const { handoff, vault, fill } = await verifiedHandoff();
     const offMachine = localModelReasoner({ endpoint: "https://example.invalid/v1/chat/completions" });
     const response = await sendToReasoner(offMachine, {
       handoff,
       vault,
+      fill,
       goal: GOAL,
       requestId: REQUEST,
       sessionId: SESSION,
@@ -238,16 +300,19 @@ describe("failure and misbehaviour are different events", () => {
     expect(outcomeOfRefusal("LITERAL_REFUSED")).toBe("HOSTILE");
     expect(outcomeOfRefusal("PRIVACY_REFUSED")).toBe("HOSTILE");
     expect(outcomeOfRefusal("NOT_A_PARSED_PLAN")).toBe("HOSTILE");
+    // M16: a stored value proposed for a field privacy did not pair it with. No second planner.
+    expect(outcomeOfRefusal("REFERENCE_NOT_GROUNDED")).toBe("HOSTILE");
     for (const benign of ["UNKNOWN_TARGET", "TARGET_NOT_ACTIONABLE", "CLICK_BEFORE_INSERT", "NO_EXECUTABLE_STEP"]) {
       expect(outcomeOfRefusal(benign), benign).toBe("UNUSABLE");
     }
   });
 
   it("classifies a response that never arrived", async () => {
-    const { handoff, vault } = await verifiedHandoff();
+    const { handoff, vault, fill } = await verifiedHandoff();
     const response = await sendToReasoner(unavailableReasoner(), {
       handoff,
       vault,
+      fill,
       goal: GOAL,
       requestId: REQUEST,
       sessionId: SESSION,
@@ -264,10 +329,11 @@ describe("failure and misbehaviour are different events", () => {
   });
 
   it("keeps the deterministic planner untrusted too", async () => {
-    const { handoff, vault } = await verifiedHandoff();
+    const { handoff, vault, fill } = await verifiedHandoff();
     const response = await sendToReasoner(deterministicReasoner(), {
       handoff,
       vault,
+      fill,
       goal: GOAL,
       requestId: REQUEST,
       sessionId: SESSION,

@@ -6,7 +6,15 @@
  * property these tests must not work around.
  */
 import { buildElementGraph, frameId, type CaptureGeometry, type DomMeasurement } from "@pratibimb/perception";
-import { sanitize, type ObservedField, type Vault, type VerifiedHandoff } from "@pratibimb/privacy";
+import {
+  classifyField,
+  groundFill,
+  sanitize,
+  type FillGrounding,
+  type ObservedField,
+  type Vault,
+  type VerifiedHandoff,
+} from "@pratibimb/privacy";
 
 export const ORIGIN = "http://127.0.0.1:8973";
 export const SESSION = "reasoner-session-1";
@@ -48,7 +56,7 @@ const FIELDS: ObservedField[] = [
 
 export const verifiedHandoff = async (
   over: { readonly sessionId?: string; readonly requestId?: string } = {}
-): Promise<{ handoff: VerifiedHandoff; vault: Vault }> => {
+): Promise<{ handoff: VerifiedHandoff; vault: Vault; fill: FillGrounding }> => {
   const outcome = await sanitize(
     buildElementGraph(MEASUREMENTS, geometry, frameId("reasoner-demo-1")),
     GOAL,
@@ -63,5 +71,20 @@ export const verifiedHandoff = async (
     { fields: FIELDS }
   );
   if (!outcome.ok) throw new Error(`test setup: sanitize refused (${outcome.refused})`);
-  return { handoff: outcome.handoff, vault: outcome.vault };
+  return { handoff: outcome.handoff, vault: outcome.vault, fill: fillFor(outcome.handoff) };
+};
+
+/**
+ * Privacy's pairing for this page, grounded the way the orchestrator grounds it (M16): each field's
+ * class from `classifyField`, the empty fields from the handoff's own redaction spans.
+ */
+export const fillFor = (handoff: VerifiedHandoff, fields: readonly ObservedField[] = FIELDS): FillGrounding => {
+  const accepts = new Map(fields.map((field) => [field.id, classifyField(field)]));
+  const view = {
+    viewId: handoff.request.requestId,
+    documentId: "reasoner-doc-1",
+    fields: new Map(handoff.elements.map((e) => [e.id, { accepts: accepts.get(e.id) ?? ("UNKNOWN" as const), origin: ORIGIN, fingerprint: e.id }])),
+  };
+  const redacted = new Set(handoff.redactions.map((r) => r.targetId));
+  return groundFill(view, handoff.redactions, handoff.elements.filter((e) => e.role === "textbox" && !redacted.has(e.id)).map((e) => e.id));
 };
