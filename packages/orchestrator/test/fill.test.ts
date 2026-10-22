@@ -96,7 +96,13 @@ describe("the pairing the reasoner is offered", () => {
 
   it("is recorded, as ids, tokens and codes — never a value", async () => {
     const { record } = await run(proposing((r) => [{ op: "insert", target: "#mobile_confirm", ref: refOf(r, "PHONE") }, { op: "click", target: "#submit" }]), { withNotesField: true });
-    expect(record.fill).toEqual({ fillable: [{ target: "#mobile_confirm", ref: "<PII:PHONE:1>" }], withheld: [{ target: "#notes", cause: "AMBIGUOUS_FIELD" }] });
+    expect(record.fill).toEqual({
+      fillable: [{ target: "#mobile_confirm", ref: "<PII:PHONE:1>" }],
+      withheld: [{ target: "#notes", cause: "AMBIGUOUS_FIELD" }],
+      chosenByPerson: [],
+    });
+    // An unknown field is not a question a person is asked: no clarification, no choice.
+    expect(record.clarifications).toEqual([]);
     const serialized = JSON.stringify(record.fill);
     for (const secret of Object.values(DEMO)) expect(serialized).not.toContain(secret);
   });
@@ -187,23 +193,33 @@ describe("what the client cannot decide, it withholds and says so", () => {
     expectNothingHappened(page, record, fallback);
   });
 
-  it("two phone numbers and one empty phone field: withheld as conflicting; neither is chosen", async () => {
+  it("two phone numbers and one empty phone field, and no way to ask: the run stops before any planner is asked (M17)", async () => {
     const seen: ReasonerRequest[] = [];
     const { page, record, fallback } = await run(
       proposing((r) => [{ op: "insert", target: "#mobile_confirm", ref: refOf(r, "PHONE", "#mobile") }, { op: "click", target: "#submit" }], seen),
       { withSecondMobile: true }
     );
-    expect([...seen[0]!.fill.fillable]).toEqual([]);
-    expect(seen[0]!.fill.withheld).toEqual([{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }]);
-    expect(record.refusal?.planRefusal?.fillCause).toBe("CONFLICTING_REFERENCES");
-    expectNothingHappened(page, record, fallback);
-    expect(JSON.stringify(record.fill)).not.toContain(SECOND_MOBILE);
+    // Neither number is chosen, nobody plans around the empty field, nothing is submitted.
+    expect(seen).toHaveLength(0);
+    expect(fallback.asked).toBe(0);
+    expect(record.state).toBe("REFUSED");
+    expect(record.refusal).toMatchObject({ stage: "AWAIT_CLARIFICATION", cause: "CLARIFICATION_UNAVAILABLE" });
+    expect(record.fill?.withheld).toEqual([{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES", candidates: ["<PII:PHONE:1>", "<PII:PHONE:2>"] }]);
+    expect(record.rehydrated).toEqual([]);
+    expect(page.clicks).toBe(0);
+    expect(page.submitted).toBe(false);
+    expect(page.find("#mobile_confirm")?.value).toBe("");
+    // Everything but the two readings, which hold the page's values in this in-process realm and are
+    // projected away before any record crosses (extension-run.ts `crossable`).
+    const { initialObservation: _i, observation: _o, ...crossing } = record;
+    expect(JSON.stringify(crossing).includes(SECOND_MOBILE)).toBe(false);
   });
 
-  it("the deterministic fallback cannot fill a withheld field either: the validator is the authority", async () => {
+  it("the deterministic planner is not asked either: an unresolved conflict stops every planner", async () => {
     const page = new SimulatedPage({ withSecondMobile: true });
     const record = await runTask(portsFor(page, { withSecondMobile: true, reasoner: deterministicReasoner() }), RUN_OPTIONS);
-    expect(record.refusal?.cause).toBe("REFERENCE_NOT_GROUNDED");
+    expect(record.refusal?.cause).toBe("CLARIFICATION_UNAVAILABLE");
+    expect(record.response).toBeNull();
     expect(page.clicks).toBe(0);
     expect(page.find("#mobile_confirm")?.value).toBe("");
   });

@@ -39,6 +39,17 @@ export {
 } from "./loop.js";
 
 export {
+  CLARIFICATION_DETAIL,
+  checkClarificationAnswer,
+  prepareClarification,
+  type ClarificationAnswer,
+  type ClarificationCandidate,
+  type ClarificationRefusal,
+  type ClarificationRequest,
+  type PreparedClarification,
+} from "./clarification.js";
+
+export {
   type ClientPorts,
   type GrantDecision,
   type GrantRequest,

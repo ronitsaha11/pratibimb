@@ -45,6 +45,8 @@ function locate(pathname) {
   if (pathname === "/" || pathname === "/index.html") return join(ROOT, "apps/demo/index.html");
   if (pathname === "/planning-view.css") return join(ROOT, "apps/demo/planning-view.css");
   if (pathname === "/fixture" || pathname === "/fixture/") return join(HERE, "fixture/application.html");
+  /** M17's clarification fixture: the M2 page with a second registered number. */
+  if (pathname === "/two-phones" || pathname === "/two-phones/") return join(ROOT, "tests/browser/extension/fixture/two-phones.html");
   /**
    * M3.1's perception fixture, which is NOT the demo's.
    *

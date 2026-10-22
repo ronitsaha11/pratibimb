@@ -1,0 +1,434 @@
+{
+  "experiment": "M17 — user-guided clarification of an ambiguous stored-value match, in the real extension (not a J7 experiment)",
+  "notAJ7Experiment": true,
+  "verdict": "PASS",
+  "goal": "Submit my application with my registered mobile number.",
+  "fixture": {
+    "path": "tests/browser/extension/fixture/two-phones.html",
+    "sha256": "0286eb1f56cce632aaff4ff3291f9e07d3bda7d9513eb48c5aeb01fb5a76d0e5"
+  },
+  "maxTurns": 2,
+  "postconditions": {
+    "#submit": {
+      "kind": "TARGET_ENABLED",
+      "expected": false
+    }
+  },
+  "scenarios": [
+    "c1",
+    "c2",
+    "decline"
+  ],
+  "failure": null,
+  "model": {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956"
+  },
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-m8177FDykU5Du1Rd/j5mkhTgw4bPCr4KkGCjgcTQlvI='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "browser": {
+    "binary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "scenario": "c1",
+      "error": null,
+      "panel": {
+        "shown": [
+          {
+            "question": "More than one stored phone could go into \"Confirm mobile number\". Which one should PratiBimb use?",
+            "options": [
+              "The number from “Mobile number”",
+              "The number from “Alternate mobile number”"
+            ],
+            "useDisabledBeforeChoosing": true
+          }
+        ],
+        "reply": {
+          "state": "chosen",
+          "text": "Answer sent. PratiBimb will still ask before it uses the value."
+        }
+      },
+      "clarificationsAsked": 1,
+      "grantsAnswered": 1,
+      "outcome": "COMPLETED_AS_DECLARED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "transitions": [
+            "OBSERVE",
+            "SANITIZE",
+            "VERIFY_PAYLOAD",
+            "AWAIT_CLARIFICATION",
+            "SEND",
+            "VALIDATE_PLAN",
+            "AWAIT_GRANT",
+            "REHYDRATE",
+            "ACT",
+            "VERIFY_RESULT",
+            "DONE"
+          ],
+          "refusal": null,
+          "clarifications": [
+            {
+              "target": "#mobile_confirm",
+              "candidates": 2,
+              "outcome": "CHOSEN",
+              "candidateId": "c1"
+            }
+          ],
+          "fill": {
+            "fillable": [
+              {
+                "target": "#mobile_confirm",
+                "ref": "<PII:PHONE:1>"
+              }
+            ],
+            "withheld": [],
+            "chosenByPerson": [
+              "#mobile_confirm"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [
+            {
+              "ref": "<PII:PHONE:1>",
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "inserted": true
+            }
+          ],
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false
+        },
+        {
+          "turn": 2,
+          "state": "DONE",
+          "transitions": [
+            "OBSERVE",
+            "SANITIZE",
+            "VERIFY_PAYLOAD",
+            "SEND",
+            "VALIDATE_PLAN",
+            "DONE"
+          ],
+          "refusal": null,
+          "clarifications": [],
+          "fill": {
+            "fillable": [],
+            "withheld": [],
+            "chosenByPerson": []
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": true
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "status": "Application submitted",
+        "submitDisabled": true,
+        "submitEvents": 1,
+        "confirmHolds": "REGISTERED"
+      },
+      "judged": {
+        "thePanelShowedTwoLabelledOptionsAndNoValue": true,
+        "askedOnceBeforeAnyPlanning": true,
+        "noValueShapedTextReachedTheModel": true,
+        "noFixtureValueInTheRecord": true,
+        "allEgressLoopbackReasoner": true,
+        "theChoiceWasRecorded": true,
+        "theModelPlannedFromTheLocalModel": true,
+        "theGrantWasStillAsked": true,
+        "theFieldHoldsExactlyTheChosenNumber": true,
+        "thePageDecidedTheResult": true
+      }
+    },
+    {
+      "run": 2,
+      "scenario": "c2",
+      "error": null,
+      "panel": {
+        "shown": [
+          {
+            "question": "More than one stored phone could go into \"Confirm mobile number\". Which one should PratiBimb use?",
+            "options": [
+              "The number from “Mobile number”",
+              "The number from “Alternate mobile number”"
+            ],
+            "useDisabledBeforeChoosing": true
+          }
+        ],
+        "reply": {
+          "state": "chosen",
+          "text": "Answer sent. PratiBimb will still ask before it uses the value."
+        }
+      },
+      "clarificationsAsked": 1,
+      "grantsAnswered": 1,
+      "outcome": "STOPPED_UNVERIFIED",
+      "confirmedActions": 0,
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "transitions": [
+            "OBSERVE",
+            "SANITIZE",
+            "VERIFY_PAYLOAD",
+            "AWAIT_CLARIFICATION",
+            "SEND",
+            "VALIDATE_PLAN",
+            "AWAIT_GRANT",
+            "REHYDRATE",
+            "ACT",
+            "VERIFY_RESULT",
+            "DONE"
+          ],
+          "refusal": null,
+          "clarifications": [
+            {
+              "target": "#mobile_confirm",
+              "candidates": 2,
+              "outcome": "CHOSEN",
+              "candidateId": "c2"
+            }
+          ],
+          "fill": {
+            "fillable": [
+              {
+                "target": "#mobile_confirm",
+                "ref": "<PII:PHONE:2>"
+              }
+            ],
+            "withheld": [],
+            "chosenByPerson": [
+              "#mobile_confirm"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:2>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [
+            {
+              "ref": "<PII:PHONE:2>",
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "inserted": true
+            }
+          ],
+          "verification": {
+            "verification": "NOT_CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "cause": "STATE_DIFFERS",
+            "detail": "#submit is enabled; the expected state was disabled."
+          },
+          "declaredDone": false
+        }
+      ],
+      "modelRequests": 1,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:2>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}"
+      ],
+      "modelRequestTripwire": [
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "status": "Mobile number does not match",
+        "submitDisabled": false,
+        "submitEvents": 1,
+        "confirmHolds": "ALTERNATE"
+      },
+      "judged": {
+        "thePanelShowedTwoLabelledOptionsAndNoValue": true,
+        "askedOnceBeforeAnyPlanning": true,
+        "noValueShapedTextReachedTheModel": true,
+        "noFixtureValueInTheRecord": true,
+        "allEgressLoopbackReasoner": true,
+        "theChoiceWasRecorded": true,
+        "theModelPlannedFromTheLocalModel": true,
+        "theGrantWasStillAsked": true,
+        "theFieldHoldsExactlyTheChosenNumber": true,
+        "thePageDecidedTheResult": true
+      }
+    },
+    {
+      "run": 3,
+      "scenario": "decline",
+      "error": null,
+      "panel": {
+        "shown": [
+          {
+            "question": "More than one stored phone could go into \"Confirm mobile number\". Which one should PratiBimb use?",
+            "options": [
+              "The number from “Mobile number”",
+              "The number from “Alternate mobile number”"
+            ],
+            "useDisabledBeforeChoosing": true
+          }
+        ],
+        "reply": {
+          "state": "declined",
+          "text": "Declined. Nothing was filled."
+        }
+      },
+      "clarificationsAsked": 1,
+      "grantsAnswered": 0,
+      "outcome": "STOPPED_REFUSED",
+      "confirmedActions": 0,
+      "turns": [
+        {
+          "turn": 1,
+          "state": "REFUSED",
+          "transitions": [
+            "OBSERVE",
+            "SANITIZE",
+            "VERIFY_PAYLOAD",
+            "AWAIT_CLARIFICATION",
+            "REFUSED"
+          ],
+          "refusal": {
+            "stage": "AWAIT_CLARIFICATION",
+            "cause": "CLARIFICATION_DECLINED",
+            "detail": "you chose not to pick a stored value; the field was left empty and nothing was submitted."
+          },
+          "clarifications": [
+            {
+              "target": "#mobile_confirm",
+              "candidates": 2,
+              "outcome": "CLARIFICATION_DECLINED"
+            }
+          ],
+          "fill": {
+            "fillable": [],
+            "withheld": [
+              {
+                "target": "#mobile_confirm",
+                "cause": "CONFLICTING_REFERENCES",
+                "candidates": [
+                  "<PII:PHONE:1>",
+                  "<PII:PHONE:2>"
+                ]
+              }
+            ],
+            "chosenByPerson": []
+          },
+          "reasonerKind": null,
+          "fallback": null,
+          "plan": null,
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": false
+        }
+      ],
+      "modelRequests": 0,
+      "modelProposals": [],
+      "modelRequestTripwire": [],
+      "egress": [],
+      "page": {
+        "status": "Not submitted",
+        "submitDisabled": false,
+        "submitEvents": 0,
+        "confirmHolds": "EMPTY"
+      },
+      "judged": {
+        "thePanelShowedTwoLabelledOptionsAndNoValue": true,
+        "askedOnceBeforeAnyPlanning": true,
+        "noValueShapedTextReachedTheModel": true,
+        "noFixtureValueInTheRecord": true,
+        "allEgressLoopbackReasoner": true,
+        "declinedAndStoppedBeforePlanning": true,
+        "nothingFilledNothingClicked": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "one synthetic page, one run per scenario; no reliability claim",
+    "the side panel page was opened in a tab, because a harness cannot open Chrome's side panel; the page, its code and its messages are the shipped ones",
+    "the harness clicked the panel's controls and answered the value-use grant as the operator; no person was in the loop",
+    "perception ran the product's no-gesture DOM floor; no frame was captured and none left the client"
+  ],
+  "recordedAt": "2026-10-22T21:09:08.085Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0",
+    "playwright": "1.63.0",
+    "headless": false
+  }
+}

@@ -26,9 +26,12 @@ describe("SEND refuses before it sends", () => {
     const base = { handoff, vault, goal: GOAL, requestId: REQUEST, sessionId: SESSION, origin: ORIGIN };
     const phone = [...fill.fillable.values()][0]!;
     for (const forged of [
-      { fillable: new Map([["#not-on-the-page", phone]]), withheld: [] },
-      { fillable: new Map([["#mobile_confirm", "<PII:PHONE:9>"]]), withheld: [] },
-      { fillable: new Map(), withheld: [{ target: "#elsewhere", cause: "AMBIGUOUS_FIELD" as const }] },
+      { fillable: new Map([["#not-on-the-page", phone]]), withheld: [], chosenByPerson: [] },
+      { fillable: new Map([["#mobile_confirm", "<PII:PHONE:9>"]]), withheld: [], chosenByPerson: [] },
+      { fillable: new Map(), withheld: [{ target: "#elsewhere", cause: "AMBIGUOUS_FIELD" as const }], chosenByPerson: [] },
+      // M17: a candidate the handoff never issued, and a "person's choice" with no pairing behind it.
+      { fillable: new Map(), withheld: [{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" as const, candidates: [phone, "<PII:PHONE:9>"] }], chosenByPerson: [] },
+      { fillable: new Map(), withheld: [], chosenByPerson: ["#mobile_confirm"] },
     ]) {
       const response = await sendToReasoner(deterministicReasoner(), { ...base, fill: forged });
       expect(response).toMatchObject({ received: false, cause: "FILL_NOT_FROM_HANDOFF" });

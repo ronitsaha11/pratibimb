@@ -31,7 +31,7 @@ import {
   type FrameId,
 } from "@pratibimb/perception";
 import { type ObservedField } from "@pratibimb/privacy";
-import { type ClientPorts, type GrantDecision, type GrantRequest, type Observation } from "../../src/index.js";
+import { type ClarificationRequest, type ClientPorts, type GrantDecision, type GrantRequest, type Observation } from "../../src/index.js";
 import { deterministicReasoner, type ReasonerClient } from "@pratibimb/reasoner";
 
 export const ORIGIN = "http://127.0.0.1:8974";
@@ -106,6 +106,10 @@ export interface PageOptions {
   readonly withNameConfirm?: boolean;
   /** M16: a second, filled phone field, so two PHONE references could go into the empty one. */
   readonly withSecondMobile?: boolean;
+  /** M17: the second phone field's label. "Mobile number" makes the two candidates indistinguishable. */
+  readonly secondMobileLabel?: string;
+  /** M17: report constitution §6's structural signal, so a change while a person decides is seen. */
+  readonly withStructure?: boolean;
 }
 
 /** What the two-step page's verify control is called once it has worked. */
@@ -122,6 +126,8 @@ export class SimulatedPage {
   /** How many times the click bridge was actually driven. Zero is the refusal tests' claim. */
   clicks = 0;
   observations = 0;
+  /** M17: the structural sequence the page reports when `withStructure` is set. Bump it to "move". */
+  structureSeq = 0;
   #frame = 0;
 
   constructor(private readonly options: PageOptions = {}) {
@@ -175,12 +181,12 @@ export class SimulatedPage {
       this.elements.splice(this.elements.length - 1, 0, {
         selector: "#mobile_alt",
         role: "textbox",
-        name: "Alternate mobile number",
+        name: options.secondMobileLabel ?? "Alternate mobile number",
         rect: { x: 320, y: 550, w: 300, h: 32 },
         enabled: true,
         cssHidden: false,
         value: SECOND_MOBILE,
-        label: "Alternate mobile number",
+        label: options.secondMobileLabel ?? "Alternate mobile number",
         type: "tel",
         autocomplete: "tel",
         isField: true,
@@ -239,6 +245,7 @@ export class SimulatedPage {
       focusedSelector: null,
       actionable: new Set(this.elements.filter((e) => e.enabled && !e.cssHidden).map((e) => e.selector)),
       statusText: this.statusText,
+      ...(this.options.withStructure ? { structure: { watching: true, seq: this.structureSeq } } : {}),
     };
   }
 
@@ -327,6 +334,8 @@ export interface PortOptions extends PageOptions {
   readonly grant?: GrantDecision;
   /** Observe the grant requests a run made. */
   readonly onGrant?: (request: GrantRequest) => void;
+  /** M17: how a person answers "which stored value?". Absent: there is no way to ask. */
+  readonly clarify?: (request: ClarificationRequest) => Promise<unknown>;
 }
 
 export const portsFor = (page: SimulatedPage, options: PortOptions = {}): ClientPorts => ({
@@ -338,6 +347,8 @@ export const portsFor = (page: SimulatedPage, options: PortOptions = {}): Client
   },
   insert: (target, value) => page.insert(target, value),
   bridges: page.bridges,
+  ...(options.clarify ? { clarify: options.clarify } : {}),
+  ...(options.withStructure ? { structure: async () => ({ watching: true, seq: page.structureSeq }) } : {}),
 });
 
 export const RUN_OPTIONS = {

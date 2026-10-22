@@ -323,6 +323,7 @@ const FILL_DETAIL: Readonly<Record<FillRefusalCause, string>> = {
   AMBIGUOUS_FIELD: "this client could not establish what the field accepts; nothing was filled. Fill it yourself, or say which value it takes.",
   NO_MATCHING_REFERENCE: "no stored value of the kind this field accepts is available; nothing was filled.",
   CONFLICTING_REFERENCES: "more than one stored value could go into this field; nothing was filled. Say which one it takes.",
+  CHOICE_NOT_A_CANDIDATE: "the choice made for this field is not one of the stored values that fit it; nothing was filled, and no other value was substituted.",
   NOT_AN_EMPTY_FIELD: "the field already holds a value, or is not a field this client offered for filling; nothing was filled.",
   NOT_THE_GROUNDED_REFERENCE: "the stored value proposed is not the one this client matched to the field; nothing was filled, and no other value was substituted.",
 };

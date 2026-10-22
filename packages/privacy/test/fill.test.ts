@@ -108,7 +108,9 @@ describe("groundFill — one reference per empty field, or the field is withheld
   it("withholds a field two references could fill, and chooses neither", () => {
     const fill = groundFill(viewOf({ "#mobile_confirm": "PHONE" }), [PHONE, ref("<PII:PHONE:2>", "PHONE"), NAME], ["#mobile_confirm"]);
     expect(fill.fillable.size).toBe(0);
-    expect(fill.withheld).toEqual([{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }]);
+    // M17: the candidates are named, so a person can be asked; nothing is chosen here.
+    expect(fill.withheld).toEqual([{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES", candidates: [PHONE.token, "<PII:PHONE:2>"] }]);
+    expect(fill.chosenByPerson).toEqual([]);
   });
 
   it("does not count a masked span with no token as a reference", () => {
@@ -126,5 +128,62 @@ describe("groundFill — one reference per empty field, or the field is withheld
       expect(fill.fillable.get("#mobile_confirm")).toBe(PHONE.token);
       expect(fill.fillable.get("#name_confirm")).toBe(NAME.token);
     }
+  });
+});
+
+describe("groundFill with a person's choice (M17) — evidence of intent, re-checked here", () => {
+  const PHONE2 = ref("<PII:PHONE:2>", "PHONE");
+  const twoPhones = [PHONE, PHONE2, NAME];
+  const view = viewOf({ "#mobile_confirm": "PHONE", "#name_confirm": "NAME", "#notes": "UNKNOWN" });
+
+  it.each([
+    ["the first", PHONE.token],
+    ["the second", PHONE2.token],
+  ])("applies %s candidate to the conflicting field, and records that a person chose it", (_, token) => {
+    const fill = groundFill(view, twoPhones, ["#mobile_confirm"], new Map([["#mobile_confirm", token]]));
+    expect([...fill.fillable]).toEqual([["#mobile_confirm", token]]);
+    expect(fill.chosenByPerson).toEqual(["#mobile_confirm"]);
+    expect(fill.withheld).toEqual([]);
+  });
+
+  it("refuses a choice of a reference that does not fit the field, and substitutes nothing", () => {
+    const fill = groundFill(view, twoPhones, ["#mobile_confirm"], new Map([["#mobile_confirm", NAME.token]]));
+    expect(fill.fillable.size).toBe(0);
+    expect(fill.withheld).toEqual([{ target: "#mobile_confirm", cause: "CHOICE_NOT_A_CANDIDATE", candidates: [PHONE.token, PHONE2.token] }]);
+  });
+
+  it("refuses a choice that became incompatible: the field now accepts NAME on this view", () => {
+    const changed = viewOf({ "#mobile_confirm": "NAME" });
+    const fill = groundFill(changed, [...twoPhones, ref("<PII:NAME:2>", "NAME")], ["#mobile_confirm"], new Map([["#mobile_confirm", PHONE.token]]));
+    expect(fill.fillable.size).toBe(0);
+    expect(fill.withheld[0]).toMatchObject({ target: "#mobile_confirm", cause: "CHOICE_NOT_A_CANDIDATE" });
+  });
+
+  it("refuses a choice of a token the handoff never issued", () => {
+    const fill = groundFill(view, twoPhones, ["#mobile_confirm"], new Map([["#mobile_confirm", "<PII:PHONE:9>"]]));
+    expect(fill.fillable.size).toBe(0);
+    expect(fill.withheld[0]?.cause).toBe("CHOICE_NOT_A_CANDIDATE");
+  });
+
+  it("refuses a choice for a field that had only one candidate: nobody was asked", () => {
+    const fill = groundFill(view, twoPhones, ["#name_confirm"], new Map([["#name_confirm", NAME.token]]));
+    expect(fill.fillable.size).toBe(0);
+    expect(fill.withheld).toEqual([{ target: "#name_confirm", cause: "CHOICE_NOT_A_CANDIDATE" }]);
+  });
+
+  it("refuses a choice for a field of unknown type: a person's pick does not tell the binder what it accepts", () => {
+    const fill = groundFill(view, twoPhones, ["#notes"], new Map([["#notes", PHONE.token]]));
+    expect(fill.withheld).toEqual([{ target: "#notes", cause: "CHOICE_NOT_A_CANDIDATE" }]);
+  });
+
+  it("refuses a choice for a field that is not empty in this reading", () => {
+    const fill = groundFill(view, twoPhones, [], new Map([["#mobile_confirm", PHONE.token]]));
+    expect(fill.withheld).toEqual([{ target: "#mobile_confirm", cause: "CHOICE_NOT_A_CANDIDATE" }]);
+  });
+
+  it("leaves every other field to the ordinary rule", () => {
+    const fill = groundFill(view, twoPhones, ["#mobile_confirm", "#name_confirm"], new Map([["#mobile_confirm", PHONE2.token]]));
+    expect(new Map(fill.fillable)).toEqual(new Map([["#mobile_confirm", PHONE2.token], ["#name_confirm", NAME.token]]));
+    expect(fill.chosenByPerson).toEqual(["#mobile_confirm"]);
   });
 });

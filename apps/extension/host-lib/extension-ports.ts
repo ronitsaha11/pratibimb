@@ -37,6 +37,7 @@ import { type ElementGraph, type ViewportMeasurement } from "@pratibimb/percepti
 import {
   type ClientPorts,
   type GrantDecision,
+  type ClarificationRequest,
   type GrantRequest,
   type Observation,
   type StructuralStatus,
@@ -59,6 +60,8 @@ export interface ExtensionPortsOptions {
   readonly reasonerKind?: ReasonerKind;
   readonly fallback?: ReasonerClient;
   requestGrant(request: GrantRequest): Promise<GrantDecision>;
+  /** M17 — ask a person which stored value a field takes. Absent: such a field stops the run. */
+  clarify?(request: ClarificationRequest): Promise<unknown>;
   /**
    * M3 — look at the page as well as reading it.
    *
@@ -287,6 +290,7 @@ export function createExtensionPorts(options: ExtensionPortsOptions): ExtensionP
       ...(options.reasonerKind ? { reasonerKind: options.reasonerKind } : {}),
       ...(options.fallback ? { fallback: options.fallback } : {}),
       requestGrant: options.requestGrant,
+      ...(options.clarify ? { clarify: options.clarify } : {}),
     },
   };
 }
