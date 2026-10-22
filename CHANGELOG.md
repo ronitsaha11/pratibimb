@@ -31,6 +31,25 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
   record, and every capability is revoked between turns.
 - **Not yet shown:** a multi-turn task in the browser against a real model. The loop is tested against
   the real gates in Node (`packages/orchestrator/test/loop.test.ts`) with a scripted test reasoner.
+- **M15 — action-specific result verification.** Every click's expected effect is now declared by
+  the client with the task: `postconditions`, target → an ADR-0007 postcondition, checked by
+  `checkPostconditions`. Nothing assumes "submit disables itself" any more.
+  - **Refused before any grant, value restoration or click:** a click with no declaration
+    (`NO_DECLARED_POSTCONDITION`), and one whose postcondition already holds
+    (`POSTCONDITION_ALREADY_HOLDS`).
+  - **Model-supplied success conditions are dropped** by the parser.
+  - **A post-action read-back that fails** is `UNKNOWN` (`OBSERVATION_FAILED`), not an escaped
+    exception.
+  - **One click per plan** (`MORE_THAN_ONE_CLICK`).
+  - **The local model:**
+    - is now asked on pages with no references;
+    - sees each button's `enabled` state;
+    - has its clicks grounded to enabled controls.
+  - **Each turn acts through its own transport cycle**, fixing an M14 defect that refused every second
+    turn in the real extension.
+  - `RUN_TASK` requires `postconditions`.
+  - Demonstrated on W1 with the real extension and Qwen2.5-0.5B on a synthetic two-step page:
+    [M15-two-step-task](artifacts/experiments/M15-two-step-task/README.md).
 - Week-1 capability spikes (in progress).
 
 **The first complete product loop** — `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN →

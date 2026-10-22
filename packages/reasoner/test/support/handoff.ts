@@ -47,10 +47,20 @@ const FIELDS: ObservedField[] = [
 ];
 
 export const verifiedHandoff = async (
-  over: { readonly sessionId?: string; readonly requestId?: string } = {}
+  over: { readonly sessionId?: string; readonly requestId?: string; readonly clickOnly?: boolean; readonly disabledButton?: boolean } = {}
 ): Promise<{ handoff: VerifiedHandoff; vault: Vault }> => {
+  // `clickOnly`: the same page with its fields removed — controls to click, no value, no reference.
+  // `disabledButton`: plus a second, disabled control, as a two-step page has before its first step.
+  const base = over.clickOnly ? MEASUREMENTS.filter((m) => m.role === "button") : MEASUREMENTS;
+  const measurements = over.disabledButton
+    ? [
+        ...base,
+        { selector: "#book", role: "button", name: "Book slot", rect: { x: 520, y: 450, w: 180, h: 40 }, enabled: false, cssHidden: false, parentIndex: -1 },
+        { selector: "#status", role: "status", name: "Slot not confirmed", rect: { x: 320, y: 500, w: 300, h: 30 }, enabled: true, cssHidden: false, parentIndex: -1 },
+      ]
+    : base;
   const outcome = await sanitize(
-    buildElementGraph(MEASUREMENTS, geometry, frameId("reasoner-demo-1")),
+    buildElementGraph(measurements, geometry, frameId("reasoner-demo-1")),
     GOAL,
     {
       sessionId: over.sessionId ?? SESSION,
@@ -60,7 +70,7 @@ export const verifiedHandoff = async (
       now: 1_760_000_000_000,
       today: TODAY,
     },
-    { fields: FIELDS }
+    { fields: over.clickOnly ? [] : FIELDS }
   );
   if (!outcome.ok) throw new Error(`test setup: sanitize refused (${outcome.refused})`);
   return { handoff: outcome.handoff, vault: outcome.vault };

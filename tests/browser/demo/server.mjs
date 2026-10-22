@@ -81,6 +81,11 @@ function locate(pathname) {
     return join(ROOT, "tests/browser/extension/fixture/visual-mask.html");
   }
 
+  /** M15's two-step task: confirm a slot, then book it. Click-only, synthetic, no values on it. */
+  if (pathname === "/two-step" || pathname === "/two-step/") {
+    return join(ROOT, "tests/browser/extension/fixture/two-step.html");
+  }
+
   /** M10's visual-only region fixture: canvases and images, some deliberately not enumerable. */
   if (pathname === "/regions" || pathname === "/regions/") {
     return join(ROOT, "tests/browser/extension/fixture/visual-regions.html");

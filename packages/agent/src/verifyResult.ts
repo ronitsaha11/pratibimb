@@ -101,7 +101,9 @@ export type UnknownVerificationCause =
   | "TARGET_AMBIGUOUS"
   | "TARGET_IDENTITY_CHANGED"
   | "FOCUS_NOT_OBSERVED"
-  | "MALFORMED_REQUEST";
+  | "MALFORMED_REQUEST"
+  /** The page could not be read back after the action: the action ran, its effect is unestablished. */
+  | "OBSERVATION_FAILED";
 
 export type VerificationResult =
   | {
@@ -313,3 +315,32 @@ export function verifyActionResult(request: VerificationRequest): VerificationRe
  * `undefined` for a refusal.
  */
 export const actedNodeId = (r: ActResult): NodeId | null => (r.status === "EXECUTED" ? r.target.nodeId : null);
+
+/**
+ * Does the declared postcondition ALREADY hold, before the action?
+ *
+ * If it does, VERIFY RESULT would read the page back afterwards and report CONFIRMED for a state the
+ * action did not produce — the dressed-up version of assuming success that step 4 above refuses for a
+ * stale observation. So an orchestrator asks this first, on the reading it is about to act from, and
+ * does not act when the answer is anything but `DOES_NOT_HOLD`.
+ *
+ * Same closed set, same three-valued honesty: an unreported focus is `UNKNOWN`, never "nothing".
+ */
+export function postconditionHoldsNow(
+  expected: ExpectedPostcondition,
+  target: ElementNode,
+  observation: Pick<PostActionObservation, "focusedSelector" | "focusedNth">
+): "HOLDS" | "DOES_NOT_HOLD" | "UNKNOWN" {
+  switch (expected.kind) {
+    case "TARGET_ENABLED":
+      return target.enabled === expected.expected ? "HOLDS" : "DOES_NOT_HOLD";
+    case "TARGET_NAME":
+      return target.name === expected.expected ? "HOLDS" : "DOES_NOT_HOLD";
+    case "FOCUS_ON_TARGET": {
+      if (!("focusedSelector" in observation) || observation.focusedSelector === undefined) return "UNKNOWN";
+      const focused = observation.focusedSelector;
+      if (focused === null) return "DOES_NOT_HOLD";
+      return matchesRef(target, focused, observation.focusedNth) ? "HOLDS" : "DOES_NOT_HOLD";
+    }
+  }
+}

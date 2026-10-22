@@ -33,6 +33,7 @@
 import { type EgressRecord, type EgressRefusal } from "@pratibimb/egress";
 import { observePage, type TransportBinding, type TransportRelay } from "@pratibimb/extension-transport";
 import {
+  checkPostconditions,
   checkTurnBudget,
   runTask,
   runTaskLoop,
@@ -74,6 +75,13 @@ export interface ExtensionRunRequest {
    * the task and a person decides what happens next.
    */
   readonly maxTurns?: number;
+  /**
+   * What each control this task may click must make true — target selector → an ADR-0007
+   * postcondition. Supplied by whoever states the task (the control plane, a harness), never by the
+   * model or the page, and checked before the page is even observed. A click on a control with no
+   * declaration is refused before anything is granted, restored or clicked.
+   */
+  readonly postconditions: unknown;
 }
 
 /**
@@ -194,6 +202,10 @@ export async function runExtensionTask(
   deps: ExtensionRunDeps,
   request: ExtensionRunRequest
 ): Promise<ExtensionRunResult> {
+  // The task's declarations are checked first: a malformed table refuses the task before any page is
+  // read, rather than being discovered at the first click.
+  const postconditions = checkPostconditions(request.postconditions);
+
   // The binding comes first and everything else is bound to it: the browser attests which document
   // answered, and no later message may name a different one.
   const observation = await observePage(deps.relay, { tabId: request.tabId, frameId: request.frameId });
@@ -242,7 +254,7 @@ export async function runExtensionTask(
     },
   });
 
-  const { ports, report } = createExtensionPorts({
+  const { ports, report, nextTurn } = createExtensionPorts({
     relay: deps.relay,
     binding,
     origin,
@@ -276,6 +288,7 @@ export async function runExtensionTask(
       permitTtlMs: TTL.permitMs,
       confirmationTtlMs: TTL.confirmationMs,
       grantTtlMs: TTL.grantMs,
+      postconditions,
     };
     let record: RunRecord;
     let loop: CrossableLoopRecord | undefined;
@@ -290,6 +303,8 @@ export async function runExtensionTask(
         maxTurns: checkTurnBudget(request.maxTurns),
         betweenTurns: async () => {
           deps.capabilities.revokeAll();
+          // The next turn acts through its own transport cycle, bound to its own fresh frame.
+          nextTurn();
         },
       });
       record = result.turns[result.turns.length - 1]!;

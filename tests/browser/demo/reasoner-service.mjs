@@ -167,7 +167,8 @@ export async function startReasonerService(options = {}) {
           tripwire: tripwire(body),
           mode,
         };
-        captures.push({ ...capture, body });
+        const entry = { ...capture, body };
+        captures.push(entry);
         mkdirSync(CAPTURE_DIR, { recursive: true });
         // Namespaced by port: two fronts run at once during the demo and must not overwrite each
         // other's captures.
@@ -208,6 +209,13 @@ export async function startReasonerService(options = {}) {
             body,
           });
           const text = await upstream.text();
+          // M15: the model's own answer, kept IN MEMORY with the capture (never written to the capture
+          // files), so a harness can show what the model proposed before any client gate saw it.
+          try {
+            entry.modelContent = JSON.parse(text).choices?.[0]?.message?.content ?? null;
+          } catch {
+            entry.modelContent = null;
+          }
           response.writeHead(upstream.status, { "content-type": "application/json", ...cors, ...receipt });
           response.end(text);
         } catch {

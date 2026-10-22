@@ -31,7 +31,9 @@
  */
 import {
   guardedAct,
+  postconditionHoldsNow,
   recordHumanConfirmation,
+  type ExpectedPostcondition,
   type GuardedOutcome,
   type HumanConfirmation,
   type ProposedAction,
@@ -79,6 +81,7 @@ import {
 } from "@pratibimb/reasoner";
 
 import { type ClientPorts, type GrantDecision, type Observation, type StructuralStatus } from "./ports.js";
+import { type ClickPostconditions } from "./postconditions.js";
 import { createLocalPrivacyBoundary } from "./privacyBoundary.js";
 
 /**
@@ -209,6 +212,8 @@ export interface RunRecord {
    * nothing was granted, rehydrated or acted on. A claim, recorded as one — `succeeded()` is `false`.
    */
   readonly declaredDone: boolean;
+  /** The client's declared postcondition for this turn's click, as VERIFY RESULT evaluated it. */
+  readonly postcondition: ExpectedPostcondition | null;
 }
 
 export interface RunOptions {
@@ -230,6 +235,12 @@ export interface RunOptions {
   readonly reasonerTimeoutMs?: number;
   /** Governs whether the deterministic planner may answer after a model outcome. */
   readonly fallbackPolicy?: FallbackPolicy;
+  /**
+   * What each click this task may perform must make true (`postconditions.ts`). Declared by the
+   * client with the task — never by the model, never by the page. A click whose target is not here is
+   * refused before anything is granted, restored or clicked.
+   */
+  readonly postconditions: ClickPostconditions;
 }
 
 const labelOf = (observation: Observation, selector: string): string =>
@@ -268,6 +279,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let reasonerKind: ReasonerKind | null = null;
   let fallback: FallbackDecision | null = null;
   let declaredDone = false;
+  let postcondition: ExpectedPostcondition | null = null;
 
   /** The only way `state` changes. Refuses to move once the run has ended. */
   const go = (to: RunState): void => {
@@ -304,6 +316,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     confirmation,
     act,
     declaredDone,
+    postcondition,
   });
 
   const stop = (stage: RefusalStage, cause: string, detail: string, planRefusal?: PlanRefusal): RunRecord => {
@@ -554,6 +567,28 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     return stop("VALIDATE_PLAN", "NO_EXECUTABLE_STEP", "the plan proposes no action.");
   }
 
+  // ── WHAT THE CLICK MUST DO ───────────────────────────────────────────────────────────────
+  // The client's own declaration for this target (`postconditions.ts`), looked up by the validated
+  // target and nothing the model wrote. No declaration: the result could never be verified, so the
+  // click is not performed. Already true: confirming it afterwards would prove nothing.
+  const declared = Object.prototype.hasOwnProperty.call(options.postconditions, click.target)
+    ? options.postconditions[click.target]
+    : undefined;
+  if (declared === undefined) {
+    return stop("VALIDATE_PLAN", "NO_DECLARED_POSTCONDITION", "the client declared no expected result for this control, so a click on it could not be verified.");
+  }
+  postcondition = declared;
+  const holdsBefore = (reading: Observation): "HOLDS" | "DOES_NOT_HOLD" | "UNKNOWN" => {
+    const target = reading.graph.nodes.find((n) => n.domRef.selector === click.target);
+    if (!target) return "UNKNOWN";
+    return postconditionHoldsNow(declared, target, reading.focusedSelector === undefined ? {} : { focusedSelector: reading.focusedSelector });
+  };
+  const preCause = (answer: "HOLDS" | "UNKNOWN"): string => (answer === "HOLDS" ? "POSTCONDITION_ALREADY_HOLDS" : "POSTCONDITION_UNDETERMINED");
+  const before = holdsBefore(observation);
+  if (before !== "DOES_NOT_HOLD") {
+    return stop("VALIDATE_PLAN", preCause(before), "the expected result is already true, or cannot be read, before the click; confirming it afterwards would prove nothing.");
+  }
+
   // ── AWAIT GRANT ──────────────────────────────────────────────────────────────────────────
   // One human decision, covering exactly what it says: this value, into this field, then this
   // action. It produces two one-shot authorisations — a privacy use-grant and an agent
@@ -680,6 +715,11 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   if (!node || (node.evidence.kind !== "OBSERVED" && node.evidence.kind !== "CLIPPED")) {
     return stop("ACT", "TARGET_ABSENT_AFTER_REFRESH", "the control the plan named is no longer actionable.");
   }
+  // The same question on the reading the click will be made from: the page may have moved since.
+  const beforeClick = holdsBefore(fresh);
+  if (beforeClick !== "DOES_NOT_HOLD") {
+    return stop("ACT", preCause(beforeClick), "the expected result is already true, or cannot be read, on the page about to be clicked; nothing was clicked.");
+  }
 
   // The human's decision, recorded for this exact control now that it has been re-identified.
   const recorded = recordHumanConfirmation(
@@ -753,9 +793,9 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     guardedAct(fresh.graph, action, ports.bridges, {
       ...(structuralWitness ? { structure: structuralWitness } : {}),
       verify: {
-        // The postcondition is a real observable of this fixture: a submitted form disables its own
-        // submit control. Nothing here hardcodes CONFIRMED — the verifier reads the page back.
-        expect: { kind: "TARGET_ENABLED", expected: false },
+        // The client's declaration for this control. Nothing here hardcodes CONFIRMED — the verifier
+        // reads the page back and answers CONFIRMED, NOT_CONFIRMED or UNKNOWN.
+        expect: declared,
         observe: async () => {
           const after = await timed("verifyResultMs", () => ports.observe());
           observation = after;

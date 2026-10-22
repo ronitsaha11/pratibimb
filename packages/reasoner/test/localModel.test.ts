@@ -56,8 +56,8 @@ afterAll(async () => {
   await new Promise((r) => server.close(r));
 });
 
-const ask = async (over: Record<string, unknown> = {}) => {
-  const { handoff, vault } = await verifiedHandoff();
+const ask = async (over: Record<string, unknown> = {}, page: { readonly clickOnly?: boolean; readonly disabledButton?: boolean } = {}) => {
+  const { handoff, vault } = await verifiedHandoff(page);
   const client = localModelReasoner({ endpoint, ...over });
   const response = await sendToReasoner(client, {
     handoff,
@@ -126,6 +126,39 @@ describe("the request that goes out", () => {
     expect(Object.keys(done.properties)).toEqual(["op"]);
     expect(done.required).toEqual(["op"]);
     expect(sent.messages[0]!.content).toContain("'done', alone");
+  });
+
+  it("asks the model on a page with controls and no references, offering only click and done (M15)", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "click", target: "#submit" }]) };
+    const before = received.length;
+    const { response } = await ask({}, { clickOnly: true });
+    expect(received.length).toBe(before + 1);
+    expect(response.received).toBe(true);
+    const sent = JSON.parse(received[received.length - 1]!) as {
+      response_format: { json_schema: { schema: { properties: { steps: { items: { oneOf: { properties: Record<string, unknown> }[] } } } } } };
+    };
+    const ops = sent.response_format.json_schema.schema.properties.steps.items.oneOf.map((b) => (b.properties.op as { const: string }).const);
+    // No reference exists, so the decoder is not offered `insert` and cannot invent one, and the plan is
+    // the one next step.
+    expect(ops).toEqual(["click", "done"]);
+    expect((sent.response_format.json_schema.schema.properties.steps as unknown as { maxItems: number }).maxItems).toBe(1);
+  });
+
+  it("does not offer the decoder a disabled control, and tells the model which buttons are enabled (M15)", async () => {
+    reply = { status: 200, contentType: "application/json", body: asContent([{ op: "click", target: "#submit" }]) };
+    await ask({}, { clickOnly: true, disabledButton: true });
+    const sent = JSON.parse(received[received.length - 1]!) as {
+      response_format: { json_schema: { schema: { properties: { steps: { items: { oneOf: { properties: { op: { const: string }; target?: { enum: string[] } } }[] } } } } } };
+      messages: { role: string; content: string }[];
+    };
+    const click = sent.response_format.json_schema.schema.properties.steps.items.oneOf.find((b) => b.properties.op.const === "click");
+    // Only the enabled CONTROL: not the disabled button, and not the (enabled, visible) status line.
+    expect(click?.properties.target?.enum).toEqual(["#submit"]);
+    const context = JSON.parse(sent.messages[sent.messages.length - 1]!.content) as { buttons: { id: string; name: string; enabled: boolean }[] };
+    expect(context.buttons).toEqual([
+      { id: "#submit", name: "Submit application", enabled: true },
+      { id: "#book", name: "Book slot", enabled: false },
+    ]);
   });
 
   it("hands a returned done to the parser untouched, with the client's own provenance", async () => {

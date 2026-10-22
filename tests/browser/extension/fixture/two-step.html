@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Test centre — book a slot</title>
+    <link rel="icon" href="data:," />
+    <style>
+      body { font: 14px system-ui, sans-serif; margin: 20px; max-width: 520px; color: #1a1a1a; }
+      h1 { font-size: 18px; margin: 0 0 4px; }
+      p.lede { margin: 0 0 16px; color: #555; }
+      fieldset { border: 1px solid #ddd; border-radius: 6px; margin: 0 0 16px; padding: 12px 14px; }
+      legend { font-weight: 600; padding: 0 6px; color: #444; }
+      button { margin-top: 8px; padding: 9px 16px; font: inherit; font-weight: 600; border-radius: 4px; border: 1px solid #2f6f4f; background: #35815b; color: #fff; }
+      button:disabled { background: #ccc; border-color: #bbb; color: #666; }
+      #status { margin-top: 16px; padding: 9px 10px; background: #f3f3f3; border-radius: 4px; border-left: 4px solid #999; }
+    </style>
+  </head>
+  <body>
+    <!--
+      M15 — A SYNTHETIC TWO-STEP PAGE. No person, no value, no credential: nothing here is data.
+
+      Step 1, "Confirm slot", renames itself to "Slot confirmed", disables itself (a step that is done
+      cannot be redone, as on most real forms — fixture v2) and enables step 2.
+      Step 2, "Book slot", is DISABLED until step 1 has happened; clicking it disables it.
+
+      So the second action depends on a state only the first produces, and each click has its own
+      observable effect, which the task declares as its postcondition:
+        #confirm-slot → TARGET_NAME "Slot confirmed"
+        #book         → TARGET_ENABLED false
+
+      Deterministic and local: no network, no timers, no animation. `window.__clicks` counts the click
+      events each button actually received — the harness's own witness, independent of the extension.
+    -->
+    <h1>Book a test slot</h1>
+    <p class="lede">Confirm the slot shown below, then book it.</p>
+
+    <fieldset>
+      <legend>Slot: Tuesday, 10:00 — Hall B</legend>
+      <button id="confirm-slot" type="button">Confirm slot</button>
+      <button id="book" type="button" disabled>Book slot</button>
+    </fieldset>
+
+    <p id="status" role="status" data-stage="0">Slot not confirmed</p>
+
+    <script>
+      (function () {
+        const confirm = document.getElementById("confirm-slot");
+        const book = document.getElementById("book");
+        const status = document.getElementById("status");
+        window.__clicks = { "confirm-slot": 0, book: 0 };
+
+        confirm.addEventListener("click", () => {
+          window.__clicks["confirm-slot"] += 1;
+          if (confirm.textContent === "Slot confirmed") return;
+          confirm.textContent = "Slot confirmed";
+          confirm.disabled = true;
+          book.disabled = false;
+          status.textContent = "Slot confirmed — not yet booked";
+          status.dataset.stage = "1";
+        });
+
+        book.addEventListener("click", () => {
+          window.__clicks.book += 1;
+          if (book.disabled) return;
+          book.disabled = true;
+          status.textContent = "Slot booked";
+          status.dataset.stage = "2";
+        });
+      })();
+    </script>
+  </body>
+</html>

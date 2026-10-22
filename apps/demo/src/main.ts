@@ -46,6 +46,13 @@ const GOAL = "Submit my application with my registered mobile number.";
  */
 const TTL = { permitMs: 5_000, confirmationMs: 60_000, grantMs: 60_000 } as const;
 
+/**
+ * What this fixture's one clickable control does when it works: `tests/browser/demo/fixture/
+ * application.html` disables its submit button once the application is submitted. Declared here,
+ * beside the fixture it describes — the orchestrator assumes no postcondition for any click.
+ */
+const POSTCONDITIONS = { "#submit": { kind: "TARGET_ENABLED", expected: false } } as const;
+
 let runs = 0;
 
 const frame = (): HTMLIFrameElement => {
@@ -225,6 +232,7 @@ export async function run(request: RunRequest = {}): Promise<RunRecord> {
     permitTtlMs: TTL.permitMs,
     confirmationTtlMs: TTL.confirmationMs,
     grantTtlMs: TTL.grantMs,
+    postconditions: POSTCONDITIONS,
   });
 
   // The record replaces everything the taps saw. Not guarded: a fault here should fail loudly.

@@ -118,6 +118,7 @@ export {
 
 export {
   actedNodeId,
+  postconditionHoldsNow,
   verifyActionResult,
   wasConfirmed,
   type ExpectedPostcondition,

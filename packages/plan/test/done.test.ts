@@ -82,6 +82,16 @@ describe("validating done", () => {
   });
 });
 
+describe("one action per turn (M15)", () => {
+  it("refuses a plan with two clicks, naming the second", async () => {
+    const s = await scenario();
+    const result = validatePlan(parse(rawPlan([{ op: "insert", target: "#mobile_confirm", ref: s.phoneRef }, CLICK, { op: "click", target: "#mobile_confirm" }])), s.ctx);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.refusal).toMatchObject({ cause: "MORE_THAN_ONE_CLICK", at: 2 });
+  });
+});
+
 describe("displaying done", () => {
   it("projects to a bare done step: nothing to redact and nothing to show but the claim", async () => {
     const s = await scenario();
