@@ -201,3 +201,38 @@ describe("panel → desk → the real gates", () => {
     expect(JSON.stringify(crossing).includes(SUFFIX.text)).toBe(false);
   });
 });
+
+describe("the real side panel shows its questions where a person sees them (M19 manual-test finding)", () => {
+  // On W1 the real Chrome side panel put the consent request below three inert placeholder sections
+  // — "Synthetic profile", "Grants (inert placeholders)" with disabled "Allow PHONE on this origin" /
+  // "Approve one use" buttons, "Payload Inspector" — so the request was out of view, and the inert
+  // buttons looked like it. These pin the corrected layout.
+  const html = readFileSync(join(ROOT, "apps/extension/host/sidepanel/index.html"), "utf8");
+  const body = html.slice(html.indexOf("<body>"));
+  const panel = strip(readFileSync(join(ROOT, "apps/extension/host/sidepanel/main.ts"), "utf8"));
+
+  it("the consent request and the which-value question are the first two sections of the panel", () => {
+    const fieldsets = [...body.matchAll(/<fieldset(?: id="([a-z-]+)")?/g)].map((m) => m[1] ?? "(unnamed)");
+    expect(fieldsets.slice(0, 2)).toEqual(["consent", "clarify"]);
+    expect(body.indexOf('id="consent"')).toBeLessThan(body.indexOf('id="goal"'));
+    expect(body.indexOf('id="clarify"')).toBeLessThan(body.indexOf('id="task"'));
+  });
+
+  it("no inert control imitates a consent: the placeholder sections are gone", () => {
+    for (const needle of ['id="grant-class"', 'id="grant-use"', "inert placeholders", "Payload Inspector", "Synthetic profile", 'id="profile"']) {
+      expect(body.includes(needle), needle).toBe(false);
+    }
+    // The only buttons that allow anything are the consent box's own.
+    const allowButtons = [...body.matchAll(/<button id="([a-z-]+)"[^>]*>[^<]*Allow[^<]*</g)].map((m) => m[1]);
+    expect(allowButtons).toEqual(["consent-allow"]);
+  });
+
+  it("the banner no longer claims there is no sanitizer or verifier", () => {
+    expect(body).not.toMatch(/no sanitizer|no verifier|Not the product/);
+  });
+
+  it("a request that appears is scrolled into view", () => {
+    expect(panel).toMatch(/consentBox\.hidden = false;\s*consentBox\?\.scrollIntoView\(\{ block: "start" \}\);/);
+    expect(panel).toMatch(/clarifyBox\.hidden = false;\s*clarifyBox\?\.scrollIntoView\(\{ block: "start" \}\);/);
+  });
+});

@@ -11,7 +11,7 @@ import { prepareDeclarationForm, runTaskLoop, type DeclarationForm } from "@prat
 import { type ReasonerClient } from "@pratibimb/reasoner";
 
 import { createTaskDesk } from "../host-lib/task-desk";
-import { addExpectation, describeExpectation, panelFormOf, summariseTask, taskAnswer, type PanelForm } from "../host-lib/task-panel";
+import { addExpectation, describeExpectation, panelFormOf, summariseTask, taskAnswer, taskHeadline, type PanelForm } from "../host-lib/task-panel";
 import { GOAL, ORIGIN, RUN_OPTIONS, SESSION, SimulatedPage, portsFor } from "../../../packages/orchestrator/test/support/simulatedPage";
 
 const ROOT = resolve(fileURLToPath(new URL("../../..", import.meta.url)));
@@ -68,6 +68,14 @@ describe("the panel's model of the form", () => {
       },
     });
     expect(text).toBe("STOPPED_UNVERIFIED — turn 1: clicked #go → NOT_CONFIRMED");
+  });
+
+  it("ties the status line to the task it describes: when and where it started (M19 manual-test finding)", () => {
+    const at = new Date(2026, 9, 23, 18, 22, 5);
+    expect(taskHeadline({ at, origin: "http://127.0.0.1:8975" }, "COMPLETED_AS_DECLARED — turn 1: clicked #submit → CONFIRMED")).toBe(
+      "Task started 18:22:05 on http://127.0.0.1:8975 (if you reloaded the page since, this is that earlier page): COMPLETED_AS_DECLARED — turn 1: clicked #submit → CONFIRMED"
+    );
+    expect(taskHeadline(null, "No task started.")).toBe("No task started.");
   });
 
   it("says a refused click was proposed and refused — never that it was clicked", () => {
@@ -144,6 +152,9 @@ describe("only the person's panel declares", () => {
   it("the panel renders page text as text and builds its answer through taskAnswer", () => {
     expect(panel).not.toMatch(/innerHTML|outerHTML|insertAdjacentHTML/);
     expect(panel).toContain("taskAnswer(taskForm, goalInput?.value ?? \"\", expectations)");
+    // A new reading clears the last task's line; a started task's line names when and where.
+    expect(panel).toContain("taskStarted = null; // a new reading");
+    expect(panel).toContain("say(taskHeadline(taskStarted, summariseTask(status)));");
   });
 });
 

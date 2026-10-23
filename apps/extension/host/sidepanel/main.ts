@@ -14,6 +14,7 @@ import {
   panelFormOf,
   summariseTask,
   taskAnswer,
+  taskHeadline,
   type Expectation,
   type PanelForm,
 } from "../../host-lib/task-panel";
@@ -111,6 +112,7 @@ function renderClarification(raw: unknown): void {
   if (clarifyUse) clarifyUse.disabled = true;
   if (clarifyResult) clarifyResult.textContent = "";
   if (clarifyBox) clarifyBox.hidden = false;
+  clarifyBox?.scrollIntoView({ block: "start" });
   document.documentElement.dataset.clarification = "pending";
 }
 
@@ -173,6 +175,8 @@ const taskStatus = document.getElementById("task-status");
 
 let taskForm: PanelForm | null = null;
 let expectations: readonly Expectation[] = [];
+/** When, and on which site, the task the status line describes was started. */
+let taskStarted: { readonly at: Date; readonly origin: string } | null = null;
 
 const say = (text: string): void => {
   if (taskStatus) taskStatus.textContent = text;
@@ -220,6 +224,7 @@ taskRead?.addEventListener("click", () => {
   void (async () => {
     taskForm = null;
     expectations = [];
+    taskStarted = null; // a new reading: the last task's line no longer describes this page
     taskControls?.replaceChildren();
     renderDeclared();
     const tabId = await activeTabId();
@@ -269,8 +274,9 @@ taskStart?.addEventListener("click", () => {
     if (taskStart) taskStart.disabled = true; // one press, one answer; the desk refuses a second
     const reply = (await chrome.runtime.sendMessage({ target: "offscreen", kind: "TASK_START", answer })) as { ok?: boolean; refused?: string; at?: number } | undefined;
     if (reply?.ok) {
+      taskStarted = { at: new Date(), origin: taskForm.origin };
       document.documentElement.dataset.task = "started";
-      say("Started.");
+      say(taskHeadline(taskStarted, "Running…"));
     } else {
       document.documentElement.dataset.task = "refused";
       say(`Not started: ${reply?.refused ?? "no reply"}${reply?.at === undefined ? "" : ` (expected result ${reply.at + 1})`}. Read the page again.`);
@@ -284,7 +290,7 @@ async function pollTask(): Promise<void> {
     const status = await chrome.runtime.sendMessage({ target: "offscreen", kind: "TASK_STATUS" });
     const task = (status as { task?: { state?: string } } | undefined)?.task;
     if (task && task.state !== "RUNNING") document.documentElement.dataset.task = "finished";
-    say(summariseTask(status));
+    say(taskHeadline(taskStarted, summariseTask(status)));
   } catch {
     /* the next poll will say */
   }
@@ -331,6 +337,8 @@ function renderConsent(raw: unknown): void {
   if (consentAllow) consentAllow.disabled = false;
   if (consentDeny) consentDeny.disabled = false;
   if (consentBox) consentBox.hidden = false;
+  // A request a person cannot see is one they cannot answer: bring it into view (M19 manual test).
+  consentBox?.scrollIntoView({ block: "start" });
   document.documentElement.dataset.consent = "pending";
 }
 

@@ -97,6 +97,19 @@ export const taskAnswer = (form: PanelForm, goal: string, list: readonly Expecta
   declarations: list.map((e) => ({ ...e })),
 });
 
+/**
+ * The status line, tied to the task it describes (M19 manual test finding).
+ *
+ * A bare outcome outlived the page it described: after a reload the panel still said "clicked
+ * #submit → CONFIRMED" beside an empty, unsubmitted form. The line now says which task it is — when
+ * it was started, and on which site — and that the page may have changed since.
+ */
+export function taskHeadline(started: { readonly at: Date; readonly origin: string } | null, summary: string): string {
+  if (started === null) return summary;
+  const time = started.at.toTimeString().slice(0, 8);
+  return `Task started ${time} on ${started.origin} (if you reloaded the page since, this is that earlier page): ${summary}`;
+}
+
 /** A value-free summary of a task's outcome, for the panel's status line. */
 export function summariseTask(status: unknown): string {
   if (!isRecord(status) || !isRecord(status.task)) return "No task started.";
