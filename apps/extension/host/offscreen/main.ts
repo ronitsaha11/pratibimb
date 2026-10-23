@@ -14,7 +14,8 @@ import { checkTurnBudget, prepareDeclarationForm, type GrantDecision, type Grant
 import { bootstrapOrtRealm, createPinnedInferenceSession, resolvePackagedAsset } from "../../entrypoints/ortRuntime";
 import { type BoundaryReply, type BoundaryRequest, type CapabilityPayload } from "../../host-lib/boundary-protocol";
 import { runExtensionTask, type ExtensionRunRequest, type ExtensionRunResult } from "../../host-lib/extension-run";
-import { identityOf, isFromExtensionUi, isFromThisExtension, type ToOffscreen } from "../../host-lib/messages";
+import { identityOf, isFromExtensionUi, isFromSidePanel, isFromThisExtension, type ToOffscreen } from "../../host-lib/messages";
+import { createConsentDesk } from "../../host-lib/consent-desk";
 import { createClarificationDesk } from "../../host-lib/clarification-desk";
 import { createTaskDesk } from "../../host-lib/task-desk";
 import { chromeRelay } from "../../host-lib/transport-chrome";
@@ -262,6 +263,8 @@ let running: Promise<ExtensionRunResult> | null = null;
 let pendingGrant: { request: GrantRequest; answer: (decision: GrantDecision) => void } | null = null;
 /** M17: a "which stored value?" question waiting for the side panel. Same discipline as the grant. */
 const clarificationDesk = createClarificationDesk();
+/** M19: a request to restore a stored value, waiting for the person in the side panel. */
+const consentDesk = createConsentDesk();
 /** M18: the task form a person is filling in, and the last task the panel started. */
 const taskDesk = createTaskDesk();
 let lastTask:
@@ -296,7 +299,7 @@ async function sendToBoundary(binding: TransportBinding, body: BoundaryRequest):
   return reply ?? { ok: false, refused: "NO_RESPONSE" };
 }
 
-async function runTask(request: ExtensionRunRequest): Promise<ExtensionRunResult> {
+async function runTask(request: ExtensionRunRequest, startedInThePanel = false): Promise<ExtensionRunResult> {
   if (running !== null) throw new Error("A_RUN_IS_ALREADY_IN_PROGRESS");
   captureTabId = request.tabId;
   captureDocumentId = null;
@@ -312,6 +315,8 @@ async function runTask(request: ExtensionRunRequest): Promise<ExtensionRunResult
           pendingGrant = { request: grantRequest, answer: resolve };
         }),
       askPerson: (question) => clarificationDesk.ask(question),
+      // M19: a task the person started in the panel asks them there before any value is restored.
+      ...(startedInThePanel ? { askConsent: (consent, preview) => consentDesk.ask(consent, preview) } : {}),
     },
     request
   );
@@ -325,6 +330,7 @@ async function runTask(request: ExtensionRunRequest): Promise<ExtensionRunResult
     // An approval nobody answered does not outlive the run it belonged to.
     pendingGrant = null;
     clarificationDesk.clear();
+    consentDesk.clear();
   }
 }
 
@@ -342,6 +348,8 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
     | { target: "offscreen"; kind: "TASK_PREPARE"; tabId: number }
     | { target: "offscreen"; kind: "TASK_START"; answer: unknown; maxTurns?: unknown }
     | { target: "offscreen"; kind: "TASK_STATUS" }
+    | { target: "offscreen"; kind: "CONSENT_PEEK" }
+    | { target: "offscreen"; kind: "CONSENT_DECIDE"; answer: unknown }
     | { target: "offscreen"; kind: "CLARIFY_DECIDE"; answer: unknown }
     | { target: "offscreen"; kind: "REALM_PROBE" }
     | { target: "offscreen"; kind: "STREAM_CONSUME"; streamId: string; maxWidth?: number; maxHeight?: number }
@@ -660,7 +668,7 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
       maxTurns,
       postconditions: declaration.postconditions,
       declaration,
-    })
+    }, true)
       .then((result) => {
         lastTask = { state: "FINISHED", formId: declaration.formId, result };
       })
@@ -668,6 +676,22 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
         lastTask = { state: "FAILED", formId: declaration.formId, refused: error instanceof Error ? error.message : String(error) };
       });
     sendResponse({ ok: true, started: true, formId: declaration.formId });
+    return false;
+  }
+  /**
+   * M19 — "may PratiBimb put this stored value into this field?", read and answered in the side panel.
+   *
+   * Only the side panel page may do either (`isFromSidePanel`): not a page (its content script's
+   * sender URL is the page's), not the service worker's control plane, not this document. The desk
+   * takes one answer for the question waiting; the orchestrator and the binder decide what it is worth.
+   */
+  if (msg.kind === "CONSENT_PEEK" || msg.kind === "CONSENT_DECIDE") {
+    if (!isFromSidePanel(sender)) {
+      sendResponse({ refused: "NOT_FROM_THE_SIDE_PANEL" });
+      return false;
+    }
+    if (msg.kind === "CONSENT_PEEK") sendResponse({ pending: consentDesk.peek() });
+    else sendResponse(consentDesk.decide(msg.answer));
     return false;
   }
   if (msg.kind === "CLARIFY_PEEK" || msg.kind === "CLARIFY_DECIDE") {

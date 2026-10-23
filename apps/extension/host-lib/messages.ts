@@ -111,6 +111,13 @@ export function isFromContentScript(sender: chrome.runtime.MessageSender): boole
 export const isFromExtensionUi = (sender: chrome.runtime.MessageSender): boolean =>
   isFromThisExtension(sender) && typeof sender.url === "string" && sender.url.startsWith(chrome.runtime.getURL(""));
 
+/**
+ * M19 — the side panel page itself, and only it: the one surface where a person allows a stored value
+ * to be restored. Not the offscreen document, not the service worker's control plane, not a page.
+ */
+export const isFromSidePanel = (sender: chrome.runtime.MessageSender): boolean =>
+  isFromThisExtension(sender) && typeof sender.url === "string" && sender.url.startsWith(chrome.runtime.getURL("sidepanel.html"));
+
 /** An extension page (offscreen document, side panel): this extension, and no tab. */
 export const isFromExtensionPage = (sender: chrome.runtime.MessageSender): boolean =>
   isFromThisExtension(sender) && !sender.tab && typeof sender.url === "string" && sender.url.startsWith(chrome.runtime.getURL(""));

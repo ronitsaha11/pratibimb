@@ -92,9 +92,13 @@ describe("the privacy layer does not grow a planner", () => {
 });
 
 describe("there is one path from a reference to a value", () => {
-  it("only bind.ts reaches the vault's reveal symbol", () => {
+  it("only bind.ts reaches the vault's reveal symbol to restore a value — and preview.ts only to mask one (M19)", () => {
+    // M19, owner decision (artifacts/experiments/M19-panel-consent/decision.md): the consent preview
+    // reads the value to mask it. It is the second reader, named here so it cannot be a silent one;
+    // what it may return is pinned in preview.test.ts (two trailing digits of a validated mobile
+    // number, or a fixed generic indicator).
     const reachers = FILES.filter((f) => code(f).includes("REVEAL")).map(rel).sort();
-    expect(reachers).toEqual(["bind.ts", "internal.ts", "vault.ts"]);
+    expect(reachers).toEqual(["bind.ts", "internal.ts", "preview.ts", "vault.ts"]);
   });
 
   it("does not export the reveal symbol to callers", () => {

@@ -31,7 +31,7 @@ import {
   type FrameId,
 } from "@pratibimb/perception";
 import { type ObservedField } from "@pratibimb/privacy";
-import { type ClarificationRequest, type ClientPorts, type GrantDecision, type GrantRequest, type Observation } from "../../src/index.js";
+import { type ClarificationRequest, type ConsentRequest, type ClientPorts, type GrantDecision, type GrantRequest, type Observation } from "../../src/index.js";
 import { deterministicReasoner, type ReasonerClient } from "@pratibimb/reasoner";
 
 export const ORIGIN = "http://127.0.0.1:8974";
@@ -336,6 +336,8 @@ export interface PortOptions extends PageOptions {
   readonly onGrant?: (request: GrantRequest) => void;
   /** M17: how a person answers "which stored value?". Absent: there is no way to ask. */
   readonly clarify?: (request: ClarificationRequest) => Promise<unknown>;
+  /** M19: how a person answers "may this stored value go into this field?". Absent: requestGrant. */
+  readonly consent?: (request: ConsentRequest) => Promise<unknown>;
 }
 
 export const portsFor = (page: SimulatedPage, options: PortOptions = {}): ClientPorts => ({
@@ -348,6 +350,7 @@ export const portsFor = (page: SimulatedPage, options: PortOptions = {}): Client
   insert: (target, value) => page.insert(target, value),
   bridges: page.bridges,
   ...(options.clarify ? { clarify: options.clarify } : {}),
+  ...(options.consent ? { consent: options.consent } : {}),
   ...(options.withStructure ? { structure: async () => ({ watching: true, seq: page.structureSeq }) } : {}),
 });
 

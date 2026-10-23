@@ -89,6 +89,7 @@ import {
   type ClarificationRefusal,
 } from "./clarification.js";
 import { type ClientPorts, type GrantDecision, type Observation, type StructuralStatus } from "./ports.js";
+import { CONSENT_DETAIL, checkConsentAnswer, prepareConsent, type ConsentRefusal } from "./consent.js";
 import { declarationProblem, isDeclarableControl, type TaskDeclaration } from "./declaration.js";
 import { type ClickPostconditions } from "./postconditions.js";
 import { createLocalPrivacyBoundary } from "./privacyBoundary.js";
@@ -238,6 +239,15 @@ export interface RunRecord {
    */
   readonly declaration: { readonly source: "PERSON"; readonly formId: string; readonly targets: readonly string[] } | null;
   /**
+   * M19 — every restoration the person was asked about in their own panel, and the answer. Field,
+   * class and a code; never a value or a preview. Empty when the grant came through `requestGrant`.
+   */
+  readonly consents: readonly {
+    readonly target: string;
+    readonly piiClass: string;
+    readonly outcome: "ALLOWED_ONCE" | ConsentRefusal | "CONSENT_FAILED" | "CONSENT_STALE";
+  }[];
+  /**
    * M16 — privacy's pairing of each empty field with the one reference it may take, and the empty
    * fields nothing may fill, with why. Ids, tokens and codes; never a value. `null` before SEND.
    */
@@ -333,6 +343,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let postcondition: ExpectedPostcondition | null = null;
   let fillRecord: RunRecord["fill"] = null;
   const clarifications: RunRecord["clarifications"][number][] = [];
+  const consents: RunRecord["consents"][number][] = [];
 
   /** The only way `state` changes. Refuses to move once the run has ended. */
   const go = (to: RunState): void => {
@@ -375,6 +386,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
       : null,
     fill: fillRecord,
     clarifications,
+    consents,
   });
 
   const stop = (stage: RefusalStage, cause: string, detail: string, planRefusal?: PlanRefusal): RunRecord => {
@@ -760,12 +772,12 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   // confirmation — each bound to its own subject. Neither is blanket and neither is persisted.
   go("AWAIT_GRANT");
   const clickLabel = labelOf(observation, click.target);
-  const grantResult = await timed("grantMs", async () => {
-    for (const insert of referenceInserts) {
+  const grantResult = await timed("grantMs", async (): Promise<{ stopped: string | null; detail?: string }> => {
+    for (const [index, insert] of referenceInserts.entries()) {
       const field = view.fields.get(insert.target);
       if (!field) return { stopped: "UNKNOWN_TARGET" as const };
       grantRequested = true;
-      const decision = await ports.requestGrant({
+      const grantRequest = {
         ref: insert.ref,
         piiClass: insert.piiClass,
         target: insert.target,
@@ -776,7 +788,32 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
         purpose: `Allow PratiBimb to use your ${insert.piiClass.toLowerCase()} for "${labelOf(observation!, insert.target)}" on this page`,
         actionContext: `restore it into ${insert.target}, then click ${click.target} ("${clickLabel}")`,
         action: { target: click.target, label: clickLabel },
-      });
+      };
+      let decision: GrantDecision;
+      if (ports.consent) {
+        // M19: the person's own panel, asked about exactly this restoration. The answer is checked
+        // here, against this request; an allow becomes the same one-shot grant below, and the binder
+        // still decides whether it suffices.
+        const request = prepareConsent(grantRequest, {
+          consentId: `${options.requestId}.consent.${index + 1}`,
+          requestId: options.requestId,
+          documentId: observation!.documentId,
+          viewId,
+        });
+        let raw: unknown;
+        try {
+          raw = await ports.consent(request);
+        } catch {
+          consents.push({ target: insert.target, piiClass: insert.piiClass, outcome: "CONSENT_FAILED" });
+          return { stopped: "CONSENT_FAILED", detail: CONSENT_DETAIL.CONSENT_FAILED };
+        }
+        const checked = checkConsentAnswer(request, raw);
+        consents.push({ target: insert.target, piiClass: insert.piiClass, outcome: checked.ok ? "ALLOWED_ONCE" : checked.cause });
+        if (!checked.ok) return { stopped: checked.cause, detail: CONSENT_DETAIL[checked.cause] };
+        decision = { granted: true };
+      } else {
+        decision = await ports.requestGrant(grantRequest);
+      }
       grantDecision = decision;
       if (!decision.granted) return { stopped: decision.reason };
 
@@ -798,7 +835,21 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     return { stopped: null };
   });
   if (grantResult.stopped !== null) {
-    return stop("AWAIT_GRANT", grantResult.stopped, "a human did not authorise the use of a local value.");
+    return stop("AWAIT_GRANT", grantResult.stopped, grantResult.detail ?? "a human did not authorise the use of a local value.");
+  }
+  // M19: a person deciding in the panel may take a while. If the page can say whether its structure
+  // moved meanwhile, ask: an allow given for one page is not applied to another.
+  if (consents.length > 0 && ports.structure && observation.structure) {
+    let now: StructuralStatus | null = null;
+    try {
+      now = await ports.structure();
+    } catch {
+      now = null;
+    }
+    if (now === null || !now.watching || now.seq !== observation.structure.seq) {
+      consents[consents.length - 1] = { ...consents[consents.length - 1]!, outcome: "CONSENT_STALE" };
+      return stop("AWAIT_GRANT", "CONSENT_STALE", CONSENT_DETAIL.CONSENT_STALE);
+    }
   }
 
   // Re-validate with the grants in hand. The binder must be the thing that says the grant suffices —

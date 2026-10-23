@@ -28,7 +28,9 @@ import {
   createVaultView,
   verifyHandoff,
   createLedger,
+  GENERIC_PREVIEW,
   type AsyncLiteralOracle,
+  type ConsentPreview,
   type BindView,
   type EgressLedger,
   type HeldLiteral,
@@ -95,6 +97,12 @@ export interface RemoteBoundaryDeps {
 
 export interface RemotePrivacyBoundary extends PrivacyBoundary {
   readonly report: RemoteBoundaryReport;
+  /**
+   * M19: the masked preview for the person's consent panel, computed in the page realm. `null` when
+   * the page realm refused or answered with anything but a well-formed preview. Never a value; never
+   * recorded; handed only to the consent desk.
+   */
+  preview(ref: string, target: string): Promise<ConsentPreview | null>;
   /** End the run in the page realm: its vault is destroyed there. */
   forget(): Promise<number>;
 }
@@ -299,6 +307,16 @@ export function createRemotePrivacyBoundary(deps: RemoteBoundaryDeps): RemotePri
       if (reply.kind !== "RELEASED") return { ok: false, cause: `UNEXPECTED_${reply.kind}` };
       if (reply.inserted) report.writes += 1;
       return { ok: true, ref: reply.ref, piiClass: reply.piiClass, inserted: reply.inserted };
+    },
+
+    async preview(ref: string, target: string): Promise<ConsentPreview | null> {
+      const reply = await deps.send({ kind: "PREVIEW", ref, target });
+      if (!reply.ok || reply.kind !== "PREVIEWED" || reply.ref !== ref) return null;
+      const p = reply.preview as Partial<ConsentPreview> | undefined;
+      // Only the two shapes privacy produces. Anything else is not shown.
+      if (p?.style === "SUFFIX" && typeof p.text === "string" && /^•{1,12}[0-9]{2}$/.test(p.text)) return { style: "SUFFIX", text: p.text };
+      if (p?.style === "GENERIC" && p.text === GENERIC_PREVIEW) return { style: "GENERIC", text: GENERIC_PREVIEW };
+      return null;
     },
 
     async forget() {
