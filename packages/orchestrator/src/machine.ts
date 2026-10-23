@@ -89,6 +89,7 @@ import {
   type ClarificationRefusal,
 } from "./clarification.js";
 import { type ClientPorts, type GrantDecision, type Observation, type StructuralStatus } from "./ports.js";
+import { declarationProblem, isDeclarableControl, type TaskDeclaration } from "./declaration.js";
 import { type ClickPostconditions } from "./postconditions.js";
 import { createLocalPrivacyBoundary } from "./privacyBoundary.js";
 
@@ -232,6 +233,11 @@ export interface RunRecord {
   /** The client's declared postcondition for this turn's click, as VERIFY RESULT evaluated it. */
   readonly postcondition: ExpectedPostcondition | null;
   /**
+   * M18 — whose declaration this run enforced: the person's, with the form it came from and the
+   * controls it covers, or `null` when the table came with the task. Ids and selectors; no value.
+   */
+  readonly declaration: { readonly source: "PERSON"; readonly formId: string; readonly targets: readonly string[] } | null;
+  /**
    * M16 — privacy's pairing of each empty field with the one reference it may take, and the empty
    * fields nothing may fill, with why. Ids, tokens and codes; never a value. `null` before SEND.
    */
@@ -278,6 +284,14 @@ export interface RunOptions {
    * refused before anything is granted, restored or clicked.
    */
   readonly postconditions: ClickPostconditions;
+  /**
+   * M18 — the person's own declaration of what each click must do (`declaration.ts`), when the
+   * expectations came from them rather than from whoever stated the task. Present, the run checks
+   * that it was made for this session, origin, goal and document, that `postconditions` is exactly
+   * its table, and — before every click — that the control is still the one the person declared.
+   * Any mismatch stops the run; nothing is clicked on a guess.
+   */
+  readonly declaration?: TaskDeclaration;
 }
 
 const labelOf = (observation: Observation, selector: string): string =>
@@ -356,6 +370,9 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     act,
     declaredDone,
     postcondition,
+    declaration: options.declaration
+      ? { source: "PERSON", formId: options.declaration.formId, targets: options.declaration.targets.map((t) => t.selector) }
+      : null,
     fill: fillRecord,
     clarifications,
   });
@@ -398,11 +415,22 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
 
   // ── OBSERVE ──────────────────────────────────────────────────────────────────────────────
   go("OBSERVE");
+  // M18: a person's declaration is for one session, one origin, one task and exactly one table.
+  const declarationRefusal = options.declaration
+    ? declarationProblem(options.declaration, { sessionId: options.sessionId, origin: options.origin, goal: options.goal, postconditions: options.postconditions })
+    : null;
+  if (declarationRefusal !== null) {
+    return stop("OBSERVE", declarationRefusal, "the declared expectations were made for a different task, session or site; nothing was read or done.");
+  }
   try {
     observation = await timed("observeMs", () => ports.observe());
     initialObservation = observation;
   } catch {
     return stop("OBSERVE", "OBSERVER_THREW", "the page could not be read; nothing was planned or done.");
+  }
+  // ...and for the document the person was looking at. A reload or navigation is another page.
+  if (options.declaration && observation.documentId !== options.declaration.documentId) {
+    return stop("OBSERVE", "DECLARATION_STALE", "the page changed since the expectations were declared; declare them again for this page.");
   }
 
   // ── SANITIZE ─────────────────────────────────────────────────────────────────────────────
@@ -703,6 +731,18 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     return stop("VALIDATE_PLAN", "NO_DECLARED_POSTCONDITION", "the client declared no expected result for this control, so a click on it could not be verified.");
   }
   postcondition = declared;
+  // M18: the control must still be the one the person declared — same selector, role and accessible
+  // name — on the reading the plan was made from, and again on the one the click is made from.
+  const declaredTarget = options.declaration?.targets.find((t) => t.selector === click.target);
+  const declarationStale = (reading: Observation): boolean => {
+    if (!options.declaration) return false;
+    if (!declaredTarget || reading.documentId !== options.declaration.documentId) return true;
+    const node = reading.graph.nodes.find((n) => n.domRef.selector === click.target);
+    return !node || !isDeclarableControl(node) || fingerprintOf(node.domRef.selector, node.role, node.name) !== declaredTarget.fingerprint;
+  };
+  if (declarationStale(observation)) {
+    return stop("VALIDATE_PLAN", "DECLARATION_STALE", "the control is no longer the one whose result was declared; nothing was clicked.");
+  }
   const holdsBefore = (reading: Observation): "HOLDS" | "DOES_NOT_HOLD" | "UNKNOWN" => {
     const target = reading.graph.nodes.find((n) => n.domRef.selector === click.target);
     if (!target) return "UNKNOWN";
@@ -841,6 +881,9 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     return stop("ACT", "TARGET_ABSENT_AFTER_REFRESH", "the control the plan named is no longer actionable.");
   }
   // The same question on the reading the click will be made from: the page may have moved since.
+  if (declarationStale(fresh)) {
+    return stop("ACT", "DECLARATION_STALE", "the control changed before it could be clicked; nothing was clicked.");
+  }
   const beforeClick = holdsBefore(fresh);
   if (beforeClick !== "DOES_NOT_HOLD") {
     return stop("ACT", preCause(beforeClick), "the expected result is already true, or cannot be read, on the page about to be clicked; nothing was clicked.");

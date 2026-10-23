@@ -39,6 +39,25 @@ export {
 } from "./loop.js";
 
 export {
+  MAX_DECLARATIONS,
+  MAX_EXPECTED_NAME,
+  MAX_GOAL,
+  checkDeclaration,
+  declarationProblem,
+  isDeclarableControl,
+  prepareDeclarationForm,
+  viewOfDeclarationForm,
+  type DeclarableControl,
+  type DeclarationForm,
+  type DeclarationFormView,
+  type DeclarationOffer,
+  type DeclarationProblem,
+  type DeclarationRefusal,
+  type DeclaredTarget,
+  type TaskDeclaration,
+} from "./declaration.js";
+
+export {
   CLARIFICATION_DETAIL,
   checkClarificationAnswer,
   prepareClarification,

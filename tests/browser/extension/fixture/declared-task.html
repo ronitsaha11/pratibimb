@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Account — notification settings</title>
+    <link rel="icon" href="data:," />
+    <style>
+      body { font: 14px system-ui, sans-serif; margin: 20px; max-width: 520px; color: #1a1a1a; }
+      h1 { font-size: 18px; margin: 0 0 4px; }
+      p.lede { margin: 0 0 16px; color: #555; }
+      fieldset { border: 1px solid #ddd; border-radius: 6px; margin: 0 0 16px; padding: 12px 14px; }
+      legend { font-weight: 600; padding: 0 6px; color: #444; }
+      button { margin: 8px 8px 0 0; padding: 9px 16px; font: inherit; font-weight: 600; border-radius: 4px; border: 1px solid #2f6f4f; background: #35815b; color: #fff; }
+      button:disabled { background: #ccc; border-color: #bbb; color: #666; }
+      #status { margin-top: 16px; padding: 9px 10px; background: #f3f3f3; border-radius: 4px; border-left: 4px solid #999; }
+    </style>
+  </head>
+  <body>
+    <!--
+      M18 — A SYNTHETIC SETTINGS PAGE. No person, no value, no credential: nothing here is data.
+
+      Three controls, each with one observable effect a person could declare in the side panel:
+        #alerts   "Turn on alerts"      → renames itself to "Alerts on"           (TARGET_NAME)
+        #save     "Save preferences"    → disables itself                         (TARGET_ENABLED false)
+        #callback "Request a callback"  → does NOTHING observable: callbacks are closed.
+      The last is the negative case: whatever a person expects of it, the page will not show it, and
+      the run must stop rather than call the click a success.
+
+      Deterministic and local: no network, no timers, no animation. `window.__clicks` counts the click
+      events each control actually received — the harness's own witness, independent of the extension.
+    -->
+    <h1>Notification settings</h1>
+    <p class="lede">Choose how we contact you about your application.</p>
+
+    <fieldset>
+      <legend>Alerts</legend>
+      <button id="alerts" type="button">Turn on alerts</button>
+      <button id="save" type="button">Save preferences</button>
+      <button id="callback" type="button">Request a callback</button>
+    </fieldset>
+
+    <p id="status" role="status">No changes yet</p>
+
+    <script>
+      (function () {
+        const alerts = document.getElementById("alerts");
+        const save = document.getElementById("save");
+        const callback = document.getElementById("callback");
+        const status = document.getElementById("status");
+        window.__clicks = { alerts: 0, save: 0, callback: 0 };
+
+        alerts.addEventListener("click", () => {
+          window.__clicks.alerts += 1;
+          alerts.textContent = "Alerts on";
+          status.textContent = "Alerts are on";
+        });
+        save.addEventListener("click", () => {
+          window.__clicks.save += 1;
+          if (save.disabled) return;
+          save.disabled = true;
+          status.textContent = "Preferences saved";
+        });
+        callback.addEventListener("click", () => {
+          window.__clicks.callback += 1;
+          // Callbacks are closed: nothing about the control changes.
+        });
+      })();
+    </script>
+  </body>
+</html>

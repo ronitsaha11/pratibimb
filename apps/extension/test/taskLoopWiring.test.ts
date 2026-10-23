@@ -45,7 +45,8 @@ describe("stage 12 in the extension run", () => {
     const observed = code.indexOf("const observation = await observePage(");
     expect(checked).toBeGreaterThan(-1);
     expect(observed).toBeGreaterThan(checked);
-    expect(code).toMatch(/grantTtlMs: TTL\.grantMs,\s*postconditions,\s*\};/);
+    // M18: the person's declaration, when there is one, travels with the same checked table.
+    expect(code).toMatch(/grantTtlMs: TTL\.grantMs,\s*postconditions,\s*\.\.\.\(request\.declaration \? \{ declaration: request\.declaration \} : \{\}\),\s*\};/);
   });
 
   it("M15: each turn acts through its own transport cycle — the spent one is dropped between turns", () => {

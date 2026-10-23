@@ -39,6 +39,7 @@ import {
   runTaskLoop,
   type ClarificationRequest,
   type GrantDecision,
+  type TaskDeclaration,
   type GrantRequest,
   type LoopOutcome,
   type Observation,
@@ -83,6 +84,12 @@ export interface ExtensionRunRequest {
    * declaration is refused before anything is granted, restored or clicked.
    */
   readonly postconditions: unknown;
+  /**
+   * M18 — the person's declaration, when the expectations came from them (`task-desk.ts`). Only the
+   * offscreen document's own TASK_START sets it; a RUN_TASK message carrying one is refused there.
+   * The machine checks it against this run's session, origin, goal, table and document.
+   */
+  readonly declaration?: TaskDeclaration;
 }
 
 /**
@@ -307,6 +314,7 @@ export async function runExtensionTask(
       confirmationTtlMs: TTL.confirmationMs,
       grantTtlMs: TTL.grantMs,
       postconditions,
+      ...(request.declaration ? { declaration: request.declaration } : {}),
     };
     let record: RunRecord;
     let loop: CrossableLoopRecord | undefined;

@@ -9,13 +9,14 @@ import { observePage, type TransportBinding, type VisualRegionReading } from "@p
 import { serveStructuralProbe } from "#structural-probe";
 import { serveTr01Probe, tr01Seam } from "#tr01-probe";
 import { serveEgressEvidence } from "#egress-evidence-probe";
-import { type GrantDecision, type GrantRequest } from "@pratibimb/orchestrator";
+import { checkTurnBudget, prepareDeclarationForm, type GrantDecision, type GrantRequest } from "@pratibimb/orchestrator";
 
 import { bootstrapOrtRealm, createPinnedInferenceSession, resolvePackagedAsset } from "../../entrypoints/ortRuntime";
 import { type BoundaryReply, type BoundaryRequest, type CapabilityPayload } from "../../host-lib/boundary-protocol";
 import { runExtensionTask, type ExtensionRunRequest, type ExtensionRunResult } from "../../host-lib/extension-run";
 import { identityOf, isFromExtensionUi, isFromThisExtension, type ToOffscreen } from "../../host-lib/messages";
 import { createClarificationDesk } from "../../host-lib/clarification-desk";
+import { createTaskDesk } from "../../host-lib/task-desk";
 import { chromeRelay } from "../../host-lib/transport-chrome";
 import { installTransportControlPlane } from "../../host-lib/transport-control-plane";
 import { type CaptureTicket } from "../../host-lib/capture-authority";
@@ -261,6 +262,13 @@ let running: Promise<ExtensionRunResult> | null = null;
 let pendingGrant: { request: GrantRequest; answer: (decision: GrantDecision) => void } | null = null;
 /** M17: a "which stored value?" question waiting for the side panel. Same discipline as the grant. */
 const clarificationDesk = createClarificationDesk();
+/** M18: the task form a person is filling in, and the last task the panel started. */
+const taskDesk = createTaskDesk();
+let lastTask:
+  | { readonly state: "RUNNING"; readonly formId: string }
+  | { readonly state: "FINISHED"; readonly formId: string; readonly result: ExtensionRunResult }
+  | { readonly state: "FAILED"; readonly formId: string; readonly refused: string }
+  | null = null;
 
 /** Answer the approval currently outstanding. `false` means there was nothing to answer. */
 function decideGrant(granted: boolean): boolean {
@@ -331,6 +339,9 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
     | { target: "offscreen"; kind: "GRANT_PEEK" }
     | { target: "offscreen"; kind: "GRANT_DECIDE"; granted: boolean }
     | { target: "offscreen"; kind: "CLARIFY_PEEK" }
+    | { target: "offscreen"; kind: "TASK_PREPARE"; tabId: number }
+    | { target: "offscreen"; kind: "TASK_START"; answer: unknown; maxTurns?: unknown }
+    | { target: "offscreen"; kind: "TASK_STATUS" }
     | { target: "offscreen"; kind: "CLARIFY_DECIDE"; answer: unknown }
     | { target: "offscreen"; kind: "REALM_PROBE" }
     | { target: "offscreen"; kind: "STREAM_CONSUME"; streamId: string; maxWidth?: number; maxHeight?: number }
@@ -544,6 +555,12 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
       sendResponse({ refused: "RUN_ONLY_FROM_SERVICE_WORKER" });
       return false;
     }
+    // M18: a declaration "from the person" arrives only through TASK_START below, from the form this
+    // realm issued. One supplied with a control-plane request would be nobody's declaration.
+    if (typeof msg.request === "object" && msg.request !== null && "declaration" in msg.request) {
+      sendResponse({ ok: false, refused: "DECLARATION_ONLY_FROM_THE_PANEL" });
+      return false;
+    }
     void runTask(msg.request)
       .then((result) => sendResponse({ ok: true, result }))
       .catch((error: unknown) => sendResponse({ ok: false, refused: error instanceof Error ? `${error.name}: ${error.message}` : String(error) }));
@@ -571,6 +588,88 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
    * then accepts one answer, for the question waiting; the orchestrator and privacy decide whether
    * it means anything.
    */
+  /**
+   * M18 — a task the person states in the side panel, with what each click must do.
+   *
+   * TASK_PREPARE reads the page through the same transport a run uses and returns the form: the
+   * page's controls and, for each, only the ADR-0007 expectations that are not already true. Roles,
+   * accessible names and ids — the transport's value-free vocabulary. TASK_START hands the person's
+   * answer to `checkDeclaration`; an accepted answer starts one run, bound to that form's session,
+   * origin, document and controls, through every gate a control-plane run passes. TASK_STATUS reads
+   * how it went. Only this extension's own pages may send any of them.
+   */
+  if (msg.kind === "TASK_PREPARE" || msg.kind === "TASK_START" || msg.kind === "TASK_STATUS") {
+    if (!isFromExtensionUi(sender)) {
+      sendResponse({ ok: false, refused: "NOT_FROM_AN_EXTENSION_PAGE" });
+      return false;
+    }
+    if (msg.kind === "TASK_STATUS") {
+      sendResponse({ ok: true, task: lastTask });
+      return false;
+    }
+    if (running !== null) {
+      sendResponse({ ok: false, refused: "A_RUN_IS_ALREADY_IN_PROGRESS" });
+      return false;
+    }
+    if (msg.kind === "TASK_PREPARE") {
+      if (!Number.isInteger(msg.tabId) || msg.tabId < 0) {
+        sendResponse({ ok: false, refused: "NO_TAB" });
+        return false;
+      }
+      const target = { tabId: msg.tabId, frameId: 0 };
+      void observePage(chromeRelay, target)
+        .then((reading) => {
+          const focus =
+            reading.focus.state === "UNESTABLISHED" ? {} : { focusedSelector: reading.focus.state === "NONE" ? null : reading.focus.selector };
+          const form = prepareDeclarationForm(
+            { nodes: reading.graph.nodes, ...focus },
+            {
+              formId: crypto.randomUUID(),
+              sessionId: crypto.randomUUID(),
+              origin: reading.binding.document.origin,
+              documentId: reading.binding.document.documentId,
+            }
+          );
+          sendResponse({ ok: true, ...taskDesk.hold(form, target) });
+        })
+        .catch((error: unknown) => sendResponse({ ok: false, refused: error instanceof Error ? error.message : String(error) }));
+      return true;
+    }
+    let maxTurns: number;
+    try {
+      maxTurns = checkTurnBudget(msg.maxTurns ?? 3);
+    } catch {
+      sendResponse({ ok: false, refused: "INVALID_TURN_BUDGET" });
+      return false;
+    }
+    const started = taskDesk.start(msg.answer);
+    if (!started.ok) {
+      sendResponse({ ok: false, refused: started.cause, ...(started.at === undefined ? {} : { at: started.at }) });
+      return false;
+    }
+    const { declaration, target } = started;
+    lastTask = { state: "RUNNING", formId: declaration.formId };
+    void runTask({
+      tabId: target.tabId,
+      frameId: target.frameId,
+      goal: declaration.goal,
+      act: "SUCCESS",
+      endpoint: __REASONER_ENDPOINT__,
+      sessionId: declaration.sessionId,
+      requestId: `task-${crypto.randomUUID()}`,
+      maxTurns,
+      postconditions: declaration.postconditions,
+      declaration,
+    })
+      .then((result) => {
+        lastTask = { state: "FINISHED", formId: declaration.formId, result };
+      })
+      .catch((error: unknown) => {
+        lastTask = { state: "FAILED", formId: declaration.formId, refused: error instanceof Error ? error.message : String(error) };
+      });
+    sendResponse({ ok: true, started: true, formId: declaration.formId });
+    return false;
+  }
   if (msg.kind === "CLARIFY_PEEK" || msg.kind === "CLARIFY_DECIDE") {
     if (!isFromExtensionUi(sender)) {
       sendResponse({ refused: "NOT_FROM_AN_EXTENSION_PAGE" });

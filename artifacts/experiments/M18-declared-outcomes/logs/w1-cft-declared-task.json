@@ -1,0 +1,509 @@
+{
+  "experiment": "M18 — user-declared click outcomes, in the real extension, with the real local model (not a J7 experiment)",
+  "notAJ7Experiment": true,
+  "verdict": "PASS",
+  "fixture": {
+    "path": "tests/browser/extension/fixture/declared-task.html",
+    "sha256": "fca61654c0e5d30b95ec8f8df172b65be957d3771b1078321b169078fadad721"
+  },
+  "scenarios": [
+    {
+      "name": "Alerts on",
+      "goal": "Turn on alerts.",
+      "control": "Turn on alerts",
+      "expect": "TARGET_RENAMED",
+      "outcome": "CONFIRMED"
+    },
+    {
+      "name": "save",
+      "goal": "Save my preferences.",
+      "control": "Save preferences",
+      "expect": "TARGET_DISABLED",
+      "outcome": "CONFIRMED"
+    },
+    {
+      "name": "callback",
+      "goal": "Request a callback.",
+      "control": "Request a callback",
+      "expect": "TARGET_DISABLED",
+      "outcome": "NOT_CONFIRMED"
+    }
+  ],
+  "failure": null,
+  "model": {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956"
+  },
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-m8177FDykU5Du1Rd/j5mkhTgw4bPCr4KkGCjgcTQlvI='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "browser": {
+    "binary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "scenario": "alerts",
+      "goal": "Turn on alerts.",
+      "panel": {
+        "offered": {
+          "status": "Read http://127.0.0.1:8975. Choose a control and what clicking it should do.",
+          "controls": [
+            "Turn on alerts — button",
+            "Save preferences — button",
+            "Request a callback — button"
+          ]
+        },
+        "expectOptions": [
+          "It becomes unavailable (greyed out)",
+          "Its label changes to…",
+          "It takes keyboard focus"
+        ],
+        "declaredShown": [
+          "Turn on alerts — button: Its label changes to “Alerts on”"
+        ],
+        "startState": "started",
+        "finalText": "STOPPED_REFUSED — turn 1: clicked #alerts → CONFIRMED; turn 2: the model proposed clicking #alerts; refused (DECLARATION_STALE), nothing clicked"
+      },
+      "taskState": "FINISHED",
+      "taskRefused": null,
+      "outcome": "STOPPED_REFUSED",
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "declaration": {
+            "source": "PERSON",
+            "formId": "b3a0be54-dcfa-4df0-88d8-4a217ad4b833",
+            "targets": [
+              "#alerts"
+            ]
+          },
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Alerts on"
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#alerts"
+            }
+          ],
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_NAME",
+            "evidence": "#alerts is named \"Alerts on\", as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-93d05a3b-48e9-4daa-9f4a-9d611e9000a5",
+          "afterFrame": "transport-6c7500c8-3669-46f2-8978-68003fa9ebb9"
+        },
+        {
+          "turn": 2,
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "VALIDATE_PLAN",
+            "cause": "DECLARATION_STALE"
+          },
+          "declaration": {
+            "source": "PERSON",
+            "formId": "b3a0be54-dcfa-4df0-88d8-4a217ad4b833",
+            "targets": [
+              "#alerts"
+            ]
+          },
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Alerts on"
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#alerts"
+            }
+          ],
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-4aceb7ef-a18d-4e65-ae42-4524fa3ad6da",
+          "afterFrame": "transport-4aceb7ef-a18d-4e65-ae42-4524fa3ad6da"
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"click\",\"target\":\"#alerts\"}]}",
+        "{\"steps\":[{\"op\":\"click\",\"target\":\"#alerts\"}]}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "perception": [
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        }
+      ],
+      "page": {
+        "alertsName": "Alerts on",
+        "saveDisabled": false,
+        "callbackName": "Request a callback",
+        "status": "Alerts are on",
+        "clicks": {
+          "alerts": 1,
+          "save": 0,
+          "callback": 0
+        }
+      },
+      "judged": {
+        "thePanelOfferedThePagesControls": true,
+        "theDeclarationCameFromThePanel": true,
+        "theDeclaredPostconditionWasEnforced": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "allEgressLoopbackReasoner": true,
+        "productBuildCapturedNoFrame": true,
+        "onlyTheDeclaredControlWasClicked": true,
+        "theModelProposedTheDeclaredControl": true,
+        "confirmedOnAFreshReading": true,
+        "thePageAgrees": true
+      }
+    },
+    {
+      "run": 2,
+      "scenario": "save",
+      "goal": "Save my preferences.",
+      "panel": {
+        "offered": {
+          "status": "Read http://127.0.0.1:8975. Choose a control and what clicking it should do.",
+          "controls": [
+            "Turn on alerts — button",
+            "Save preferences — button",
+            "Request a callback — button"
+          ]
+        },
+        "expectOptions": [
+          "It becomes unavailable (greyed out)",
+          "Its label changes to…",
+          "It takes keyboard focus"
+        ],
+        "declaredShown": [
+          "Save preferences — button: It becomes unavailable (greyed out)"
+        ],
+        "startState": "started",
+        "finalText": "STOPPED_REFUSED — turn 1: clicked #save → CONFIRMED; turn 2: the model proposed clicking #alerts; refused (NO_DECLARED_POSTCONDITION), nothing clicked"
+      },
+      "taskState": "FINISHED",
+      "taskRefused": null,
+      "outcome": "STOPPED_REFUSED",
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "declaration": {
+            "source": "PERSON",
+            "formId": "3c091f5f-8d9a-4683-847d-bd2cf2d6881a",
+            "targets": [
+              "#save"
+            ]
+          },
+          "postcondition": {
+            "kind": "TARGET_ENABLED",
+            "expected": false
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#save"
+            }
+          ],
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#save is disabled, as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-49c2a76c-f82e-41f6-bcc9-ab7a414f97a2",
+          "afterFrame": "transport-fc562d9b-270c-40f3-b69b-430090773c9e"
+        },
+        {
+          "turn": 2,
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "VALIDATE_PLAN",
+            "cause": "NO_DECLARED_POSTCONDITION"
+          },
+          "declaration": {
+            "source": "PERSON",
+            "formId": "3c091f5f-8d9a-4683-847d-bd2cf2d6881a",
+            "targets": [
+              "#save"
+            ]
+          },
+          "postcondition": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#alerts"
+            }
+          ],
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-12cf1f79-781c-4e5b-91f9-5a69b44d2d8b",
+          "afterFrame": "transport-12cf1f79-781c-4e5b-91f9-5a69b44d2d8b"
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"click\",\"target\":\"#save\"}]}",
+        "{\"steps\":[{\"op\":\"click\",\"target\":\"#alerts\"}]}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "perception": [
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        }
+      ],
+      "page": {
+        "alertsName": "Turn on alerts",
+        "saveDisabled": true,
+        "callbackName": "Request a callback",
+        "status": "Preferences saved",
+        "clicks": {
+          "alerts": 0,
+          "save": 1,
+          "callback": 0
+        }
+      },
+      "judged": {
+        "thePanelOfferedThePagesControls": true,
+        "theDeclarationCameFromThePanel": true,
+        "theDeclaredPostconditionWasEnforced": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "allEgressLoopbackReasoner": true,
+        "productBuildCapturedNoFrame": true,
+        "onlyTheDeclaredControlWasClicked": true,
+        "theModelProposedTheDeclaredControl": true,
+        "confirmedOnAFreshReading": true,
+        "thePageAgrees": true
+      }
+    },
+    {
+      "run": 3,
+      "scenario": "callback",
+      "goal": "Request a callback.",
+      "panel": {
+        "offered": {
+          "status": "Read http://127.0.0.1:8975. Choose a control and what clicking it should do.",
+          "controls": [
+            "Turn on alerts — button",
+            "Save preferences — button",
+            "Request a callback — button"
+          ]
+        },
+        "expectOptions": [
+          "It becomes unavailable (greyed out)",
+          "Its label changes to…",
+          "It takes keyboard focus"
+        ],
+        "declaredShown": [
+          "Request a callback — button: It becomes unavailable (greyed out)"
+        ],
+        "startState": "started",
+        "finalText": "STOPPED_UNVERIFIED — turn 1: clicked #callback → NOT_CONFIRMED"
+      },
+      "taskState": "FINISHED",
+      "taskRefused": null,
+      "outcome": "STOPPED_UNVERIFIED",
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "declaration": {
+            "source": "PERSON",
+            "formId": "7eed27b4-8971-47cb-9b58-ad53dc721440",
+            "targets": [
+              "#callback"
+            ]
+          },
+          "postcondition": {
+            "kind": "TARGET_ENABLED",
+            "expected": false
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#callback"
+            }
+          ],
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "NOT_CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "cause": "STATE_DIFFERS",
+            "detail": "#callback is enabled; the expected state was disabled."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-a5571e6c-2212-4ec8-ae9d-460bb58e94da",
+          "afterFrame": "transport-7b673c94-3ba7-46d0-96f5-11678b357d8b"
+        }
+      ],
+      "modelRequests": 1,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"click\",\"target\":\"#callback\"}]}"
+      ],
+      "modelRequestTripwire": [
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "perception": [
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT",
+          "route": null
+        }
+      ],
+      "page": {
+        "alertsName": "Turn on alerts",
+        "saveDisabled": false,
+        "callbackName": "Request a callback",
+        "status": "No changes yet",
+        "clicks": {
+          "alerts": 0,
+          "save": 0,
+          "callback": 1
+        }
+      },
+      "judged": {
+        "thePanelOfferedThePagesControls": true,
+        "theDeclarationCameFromThePanel": true,
+        "theDeclaredPostconditionWasEnforced": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "allEgressLoopbackReasoner": true,
+        "productBuildCapturedNoFrame": true,
+        "onlyTheDeclaredControlWasClicked": true,
+        "theModelProposedTheDeclaredControl": true,
+        "notConfirmedOnAFreshReading": true,
+        "theLoopStopped": true,
+        "theControlReallyWasClickedOnce": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "one run per scenario on one synthetic page; no reliability claim",
+    "the panel page ran in its own popup window, because a harness cannot open Chrome's side panel; the page, its code and its messages are the shipped ones, but Chrome's side-panel surface itself was not exercised",
+    "the harness operated the panel's controls as an operator; no person was in the loop",
+    "perception ran the product's no-gesture floor: no frame was captured (no toolbar invocation occurred), and none left the client"
+  ],
+  "recordedAt": "2026-10-23T09:30:33.694Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0",
+    "playwright": "1.63.0",
+    "headless": false
+  }
+}

@@ -152,7 +152,8 @@ export default defineConfig({
   vite: () => ({
     // Substituted at build time so the degraded path is absent from a product bundle rather than
     // present behind a runtime check, the same rule `#e6-probe` follows.
-    define: { __M3_WORKER_FRAME__: JSON.stringify(WORKER_FRAME) },
+    // M18: the endpoint a panel-started task reasons through — the same two constants the CSP pins.
+    define: { __M3_WORKER_FRAME__: JSON.stringify(WORKER_FRAME), __REASONER_ENDPOINT__: JSON.stringify(`${HOST_COLLECTOR_ORIGIN}${HOST_REASONER_PATH}`) },
     resolve: {
       alias: {
         "@pratibimb/agent": join(ROOT, "packages", "agent", "src", "index.ts"),
