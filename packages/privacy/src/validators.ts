@@ -94,14 +94,25 @@ export const normaliseAadhaar = (raw: string): string | null =>
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 
 /**
- * Ten digits beginning 6–9, with an optional `+91`, `0091` or leading `0` trunk prefix.
+ * Ten digits beginning 6–9, with an optional `+91`, `0091`, `91` or leading `0` trunk prefix.
  *
  * The leading-digit rule is the whole check: Indian mobile ranges start 6, 7, 8 or 9, so a
  * ten-digit string starting 5 is not one, and a twelve-digit Aadhaar number is not one either.
+ *
+ * A PREFIX IS STRIPPED ONLY WHEN WHAT REMAINS IS EXACTLY TEN DIGITS (M19 fix). The earlier form
+ * stripped a leading `91` unconditionally, so a bare ten-digit mobile that itself begins 91 lost its
+ * first two digits and was rejected — a PHONE value the D2 channel did not see as one. A bare
+ * ten-digit mobile is now accepted as it is; a prefix is taken off only from an eleven-, twelve-,
+ * thirteen- or fourteen-character form that is a prefix and ten digits. Anything else still fails.
  */
+const MOBILE_DIGITS = /^[6-9][0-9]{9}$/;
+const PREFIXED_MOBILE = /^(?:\+91|0091|91|0)([0-9]{10})$/;
+
 export function normaliseIndianMobile(raw: string): string | null {
-  const value = digitsOnly(raw).replace(/^(?:\+?91|0091|0)/, "");
-  return /^[6-9][0-9]{9}$/.test(value) ? value : null;
+  const value = digitsOnly(raw);
+  if (MOBILE_DIGITS.test(value)) return value;
+  const national = PREFIXED_MOBILE.exec(value)?.[1];
+  return national !== undefined && MOBILE_DIGITS.test(national) ? national : null;
 }
 
 export const isIndianMobile = (raw: string): boolean => normaliseIndianMobile(raw) !== null;

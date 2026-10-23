@@ -6,6 +6,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  classifyValue,
   isAadhaarNumber,
   isDateOfBirth,
   isDemoSafeName,
@@ -73,6 +74,48 @@ describe("Indian mobile", () => {
 
   it("does not accept a twelve-digit Aadhaar number as a phone number", () => {
     expect(isIndianMobile("234567890124")).toBe(false);
+  });
+
+  // M19 regression: a bare ten-digit mobile that begins 91 used to lose its first two digits to an
+  // unconditional "+91" strip and be rejected. Synthetic numbers only.
+  it.each(["9100000042", "9123456780", "9199999999", "91000 00042", "91-0000-0042"])(
+    "keeps a bare ten-digit mobile that begins 91 exactly as it is (%s)",
+    (raw) => {
+      const expected = raw.replace(/[\s-]/g, "");
+      expect(normaliseIndianMobile(raw) === expected).toBe(true);
+      expect(isIndianMobile(raw)).toBe(true);
+    }
+  );
+
+  it("classifies a bare ten-digit mobile that begins 91 as PHONE", () => {
+    expect(classifyValue("9100000042", TODAY)).toBe("PHONE");
+  });
+
+  it.each([
+    ["+91 and a mobile that begins 91", "+91 91000 00042", "9100000042"],
+    ["91 and a mobile that begins 91", "919100000042", "9100000042"],
+    ["0091 and a mobile", "0091 9000000001", "9000000001"],
+    ["0091 and a mobile that begins 91", "00919100000042", "9100000042"],
+    ["a trunk 0 and a mobile that begins 91", "09100000042", "9100000042"],
+    ["+91 with hyphens", "+91-90000-00001", "9000000001"],
+  ])("normalises a supported prefixed form: %s", (_, raw, expected) => {
+    expect(normaliseIndianMobile(raw) === expected).toBe(true);
+  });
+
+  it.each([
+    ["eleven digits beginning 91, no valid split", "91900000004"],
+    ["a 91 prefix and nine digits", "91900000000"],
+    ["a 91 prefix and eleven digits", "9190000000012"],
+    ["+91 and a number starting 5", "+915000000001"],
+    ["+91 and a number starting 0", "+910900000001"],
+    ["a prefix with nothing after it", "+91"],
+    ["a doubled country code", "+91+919000000001"],
+    ["a plus sign mid-number", "90000+00001"],
+    ["letters", "9OOOOOOOO1"],
+    ["a dotted number", "9000.000.001"],
+  ])("still fails closed for %s", (_, raw) => {
+    expect(normaliseIndianMobile(raw)).toBeNull();
+    expect(isIndianMobile(raw)).toBe(false);
   });
 });
 
