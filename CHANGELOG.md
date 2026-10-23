@@ -7,6 +7,78 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 ## [Unreleased]
 
 ### Added
+- **M14 — stage 12, "repeat, or stop and ask"** (constitution §1). A task can now take more than one
+  turn. `runTaskLoop` (`@pratibimb/orchestrator`, `src/loop.ts`) runs each turn as one complete
+  `runTask`, through every gate:
+  - each turn gets a fresh observation, sanitize, verified handoff, plan, VALIDATE / REFRESH, grant,
+    REHYDRATE, ACT and VERIFY RESULT;
+  - each turn has its own request id (`<id>.t<n>`), so a plan made for one turn is refused on another
+    (`REQUEST_MISMATCH`);
+  - no plan, reference, grant, permit or value is carried between turns.
+
+  It continues only after a turn whose action VERIFY RESULT **confirmed**. It stops and asks on a
+  refusal, an unconfirmed result, a deterministic-planner turn, a repeated plan, or a spent budget
+  (`MAX_TASK_TURNS = 5`).
+- **The `done` step** from the frozen action schema (`@pratibimb/plan`):
+  - It must be the plan's only step and names no element.
+  - It passes the same identity and stale-view checks as an action, and authorises nothing — no
+    grant, rehydration or click.
+  - The machine ends `VALIDATE_PLAN → DONE` with `declaredDone: true`. The loop reports it as
+    `COMPLETED_AS_DECLARED`, **the model's claim**; `succeeded()` stays false for that turn.
+  - The local model's constrained grammar offers it. `EXECUTABLE_ACTIONS` is still `["click"]`.
+- **Extension.** `RUN_TASK` accepts an optional `maxTurns` (1–5). Without it the run is exactly the
+  single turn it was before. With it, `result.loop` carries the outcome and every turn's projected
+  record, and every capability is revoked between turns.
+- **Not yet shown:** a multi-turn task in the browser against a real model. The loop is tested against
+  the real gates in Node (`packages/orchestrator/test/loop.test.ts`) with a scripted test reasoner.
+- **M15 — action-specific result verification.** Every click's expected effect is now declared by
+  the client with the task: `postconditions`, target → an ADR-0007 postcondition, checked by
+  `checkPostconditions`. Nothing assumes "submit disables itself" any more.
+  - **Refused before any grant, value restoration or click:** a click with no declaration
+    (`NO_DECLARED_POSTCONDITION`), and one whose postcondition already holds
+    (`POSTCONDITION_ALREADY_HOLDS`).
+  - **Model-supplied success conditions are dropped** by the parser.
+  - **A post-action read-back that fails** is `UNKNOWN` (`OBSERVATION_FAILED`), not an escaped
+    exception.
+  - **One click per plan** (`MORE_THAN_ONE_CLICK`).
+  - **The local model:**
+    - is now asked on pages with no references;
+    - sees each button's `enabled` state;
+    - has its clicks grounded to enabled controls.
+  - **Each turn acts through its own transport cycle**, fixing an M14 defect that refused every second
+    turn in the real extension.
+  - `RUN_TASK` requires `postconditions`.
+  - Demonstrated on W1 with the real extension and Qwen2.5-0.5B on a synthetic two-step page:
+    [M15-two-step-task](artifacts/experiments/M15-two-step-task/README.md).
+- **M16 — which stored value goes into which field is the client's decision.** On the M2 page the
+  local model put the NAME reference into the mobile field. The binder refused it, and the task
+  stopped.
+  - `@pratibimb/privacy` `groundFill` pairs each empty field with the one reference that fits it,
+    using `fieldFit`, the class rule `bind` now shares. It withholds unknown, free-text, OTP,
+    unmatched and conflicting fields, and says why.
+  - The plan validator refuses any reference insert outside that pairing (`REFERENCE_NOT_GROUNDED`,
+    `HOSTILE`: no fallback, no substitution).
+  - The local model's grammar offers only the pairing.
+  - Manifest, schema, ADRs, gates, CSP and pins unchanged.
+  - W1, real Qwen, M2 page: the model completed the task in 11 of 11 recorded runs, with no
+    fallback (M15 recorded 0 of 3). The two-step control was unchanged at 3 of 3. Not a
+    reliability rate
+    ([M16](artifacts/experiments/M16-field-grounding/README.md)).
+- **M17 — the person decides when two stored values fit one field.** The run stops at
+  `AWAIT_CLARIFICATION` before anything is sent or planned. The side panel asks which value, naming
+  each candidate only by the label of the field it came from.
+  - `checkClarificationAnswer` binds the answer to the question: id, session, origin, view, document,
+    field and candidate set, plus expiry. Strict keys mean an answer cannot carry an action, a value
+    or a reference.
+  - `groundFill` re-checks the choice, and the validator, binder, grant, REFRESH, permit gate and
+    VERIFY RESULT all still run.
+  - Declining, or any invalid or stale answer, stops the run with nothing filled. Candidates the
+    labels cannot tell apart are not offered ("enter the value yourself").
+  - W1, product build, real Qwen: one run per scenario (choose first, choose second, decline), all
+    as expected ([M17](artifacts/experiments/M17-clarification/README.md)).
+  - The eight "failing" product-build perception checks from M16 are the product correctly refusing
+    capture without a person's invocation (ADR-0009). `run-extension-loop.mjs` now judges each build
+    by its own contract; the evidence build is unchanged at 72/72.
 - Week-1 capability spikes (in progress).
 
 **The first complete product loop** — `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN →

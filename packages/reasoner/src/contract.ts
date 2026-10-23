@@ -19,11 +19,16 @@
  * The handoff's own verification is what makes that claim checkable, and `sendToReasoner` refuses to
  * send anything else.
  *
+ * ONE CLIENT DECISION TRAVELS WITH IT (M16): `fill`, privacy's pairing of each empty field with the
+ * one reference it may take. It is built from ids and tokens the handoff already carries, related by
+ * privacy's own field classifier, and it holds no value. It is not part of the manifest; it narrows
+ * what a reasoner is offered, and the validator refuses any reference insert outside it.
+ *
  * WHAT THIS PHASE DOES NOT CLAIM. No byte leaves the machine. There is no network client, no egress
  * proof, and the transport below is an in-process function call. `ReasonerResponse.transport` says
  * which, in the record, so no artifact can imply otherwise.
  */
-import { isVerifiedHandoff, type AsyncLiteralOracle, type VerifiedHandoff } from "@pratibimb/privacy";
+import { isVerifiedHandoff, type AsyncLiteralOracle, type FillGrounding, type VerifiedHandoff } from "@pratibimb/privacy";
 
 /** What the client asks for. The handoff is the only page-derived thing in it. */
 export interface ReasonerRequest {
@@ -46,6 +51,11 @@ export interface ReasonerRequest {
    * and can learn nothing else. A test asserts no reasoner source reaches for the value path.
    */
   readonly vault: AsyncLiteralOracle;
+  /**
+   * M16 — which empty field takes which reference, decided by the client (`groundFill`), and which
+   * empty fields nothing may fill. A reasoner may offer only these pairings; it cannot widen them.
+   */
+  readonly fill: FillGrounding;
 }
 
 /**
@@ -73,6 +83,7 @@ export type SendRefusalCause =
   | "HANDOFF_NOT_VERIFIED"
   | "EMPTY_GOAL"
   | "IDENTITY_MISMATCH"
+  | "FILL_NOT_FROM_HANDOFF"
   | "REASONER_THREW"
   | "REASONER_TIMEOUT";
 
@@ -110,6 +121,18 @@ export const DEFAULT_REASONER_TIMEOUT_MS = 10_000;
  * not (INV-22). A thrown reasoner and a timed-out one are both refusals: neither produces a plan, and
  * neither is allowed to look like one.
  */
+function fillIsFromHandoff(request: ReasonerRequest): boolean {
+  const fill = request.fill as Partial<ReasonerRequest["fill"]> | undefined;
+  if (!fill || !(fill.fillable instanceof Map) || !Array.isArray(fill.withheld)) return false;
+  const ids = new Set(request.handoff.elements.map((element) => element.id));
+  const tokens = new Set(request.handoff.redactions.filter((r) => r.token !== "").map((r) => r.token));
+  for (const [target, ref] of fill.fillable) {
+    if (!ids.has(target) || !tokens.has(ref)) return false;
+  }
+  if (!Array.isArray(fill.chosenByPerson) || !fill.chosenByPerson.every((target) => fill.fillable!.has(target))) return false;
+  return fill.withheld.every((entry) => ids.has(entry.target) && ((entry as { candidates?: readonly string[] }).candidates ?? []).every((token: string) => tokens.has(token)));
+}
+
 export async function sendToReasoner(
   client: ReasonerClient,
   request: ReasonerRequest,
@@ -133,6 +156,11 @@ export async function sendToReasoner(
     request.handoff.capture.origin !== request.origin
   ) {
     return { received: false, cause: "IDENTITY_MISMATCH", elapsedMs: since() };
+  }
+  // The grounding may relate only what the handoff already carries: its element ids and the tokens
+  // it issued. Anything else would be page-derived data that never passed the verifier (M16).
+  if (!fillIsFromHandoff(request)) {
+    return { received: false, cause: "FILL_NOT_FROM_HANDOFF", elapsedMs: since() };
   }
 
   const timeoutMs = options.timeoutMs ?? DEFAULT_REASONER_TIMEOUT_MS;

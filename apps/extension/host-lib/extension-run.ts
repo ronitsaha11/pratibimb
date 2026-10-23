@@ -32,7 +32,18 @@
  */
 import { type EgressRecord, type EgressRefusal } from "@pratibimb/egress";
 import { observePage, type TransportBinding, type TransportRelay } from "@pratibimb/extension-transport";
-import { runTask, type GrantDecision, type GrantRequest, type Observation, type RunRecord } from "@pratibimb/orchestrator";
+import {
+  checkPostconditions,
+  checkTurnBudget,
+  runTask,
+  runTaskLoop,
+  type ClarificationRequest,
+  type GrantDecision,
+  type GrantRequest,
+  type LoopOutcome,
+  type Observation,
+  type RunRecord,
+} from "@pratibimb/orchestrator";
 import { deterministicReasoner, localModelReasoner, type ReasonerClient } from "@pratibimb/reasoner";
 
 import { type BoundaryReply, type BoundaryRequest, type CapabilityPayload } from "./boundary-protocol";
@@ -59,6 +70,19 @@ export interface ExtensionRunRequest {
   readonly endpoint: string | null;
   readonly sessionId: string;
   readonly requestId: string;
+  /**
+   * Stage 12: how many turns the task may take (1 … `MAX_TASK_TURNS`). Absent means one turn, exactly
+   * as before. Each turn passes every gate on its own; a refused, unverified or repeated turn stops
+   * the task and a person decides what happens next.
+   */
+  readonly maxTurns?: number;
+  /**
+   * What each control this task may click must make true — target selector → an ADR-0007
+   * postcondition. Supplied by whoever states the task (the control plane, a harness), never by the
+   * model or the page, and checked before the page is even observed. A click on a control with no
+   * declaration is refused before anything is granted, restored or clicked.
+   */
+  readonly postconditions: unknown;
 }
 
 /**
@@ -91,8 +115,19 @@ export type CrossableRunRecord = Omit<RunRecord, "initialObservation" | "observa
   readonly observation: ObservationSummary | null;
 };
 
+/** A multi-turn task's outcome, with every turn projected exactly as a single run's record is. */
+export interface CrossableLoopRecord {
+  readonly outcome: LoopOutcome;
+  readonly maxTurns: number;
+  readonly confirmedActions: number;
+  readonly turns: readonly CrossableRunRecord[];
+}
+
 export interface ExtensionRunResult {
+  /** The run's record; for a multi-turn task, the LAST turn's. */
   readonly record: CrossableRunRecord;
+  /** Present only when the request asked for `maxTurns`. */
+  readonly loop?: CrossableLoopRecord;
   readonly binding: {
     readonly origin: string;
     readonly documentId: string;
@@ -108,6 +143,8 @@ export interface ExtensionRunResult {
   /** M3: how the perception realm came up. Null when this build ran the DOM-only floor. */
   readonly perceptionBoot: unknown;
   readonly grant: { readonly asked: boolean; readonly granted: boolean | null };
+  /** M17: how many "which stored value?" questions a person was asked. The answers are in the record. */
+  readonly clarificationsAsked: number;
 }
 
 /** How the offscreen realm asks the page to come and collect, and how a human answers. */
@@ -125,6 +162,12 @@ export interface ExtensionRunDeps {
   sendToBoundary(binding: TransportBinding, body: BoundaryRequest): Promise<BoundaryReply>;
   /** Park the request until someone outside this realm decides. Never resolved from in here. */
   askHuman(request: GrantRequest): Promise<GrantDecision>;
+  /**
+   * M17 — park a "which stored value?" question until a person answers it in the side panel.
+   * Never resolved from in here; what comes back is checked by the orchestrator, then by privacy.
+   * Absent, a field two stored values fit stops the run.
+   */
+  askPerson?(request: ClarificationRequest): Promise<unknown>;
   /**
    * M3 — the local perception pass, or nothing.
    *
@@ -168,6 +211,10 @@ export async function runExtensionTask(
   deps: ExtensionRunDeps,
   request: ExtensionRunRequest
 ): Promise<ExtensionRunResult> {
+  // The task's declarations are checked first: a malformed table refuses the task before any page is
+  // read, rather than being discovered at the first click.
+  const postconditions = checkPostconditions(request.postconditions);
+
   // The binding comes first and everything else is bound to it: the browser attests which document
   // answered, and no later message may name a different one.
   const observation = await observePage(deps.relay, { tabId: request.tabId, frameId: request.frameId });
@@ -187,6 +234,7 @@ export async function runExtensionTask(
     request.endpoint === null ? deterministic : localModelReasoner({ endpoint: request.endpoint, onEgress });
 
   const grant = { asked: false, granted: null as boolean | null };
+  let clarificationsAsked = 0;
 
   /**
    * M3 — the most recent perception pass, for the manifest the core realm assembles.
@@ -216,7 +264,7 @@ export async function runExtensionTask(
     },
   });
 
-  const { ports, report } = createExtensionPorts({
+  const { ports, report, nextTurn } = createExtensionPorts({
     relay: deps.relay,
     binding,
     origin,
@@ -239,10 +287,18 @@ export async function runExtensionTask(
       grant.granted = decision.granted;
       return decision;
     },
+    ...(deps.askPerson
+      ? {
+          clarify: (question: ClarificationRequest) => {
+            clarificationsAsked += 1;
+            return deps.askPerson!(question);
+          },
+        }
+      : {}),
   });
 
   try {
-    const record = await runTask(ports, {
+    const runOptions = {
       goal: request.goal,
       sessionId: request.sessionId,
       requestId: request.requestId,
@@ -250,10 +306,32 @@ export async function runExtensionTask(
       permitTtlMs: TTL.permitMs,
       confirmationTtlMs: TTL.confirmationMs,
       grantTtlMs: TTL.grantMs,
-    });
+      postconditions,
+    };
+    let record: RunRecord;
+    let loop: CrossableLoopRecord | undefined;
+    if (request.maxTurns === undefined) {
+      record = await runTask(ports, runOptions);
+    } else {
+      // Stage 12. Every turn is a full `runTask` through the same ports, against the same attested
+      // document; between turns, every capability the last turn armed is revoked, so no authority is
+      // carried into a turn that did not earn it.
+      const result = await runTaskLoop(ports, {
+        ...runOptions,
+        maxTurns: checkTurnBudget(request.maxTurns),
+        betweenTurns: async () => {
+          deps.capabilities.revokeAll();
+          // The next turn acts through its own transport cycle, bound to its own fresh frame.
+          nextTurn();
+        },
+      });
+      record = result.turns[result.turns.length - 1]!;
+      loop = { outcome: result.outcome, maxTurns: result.maxTurns, confirmedActions: result.confirmedActions, turns: result.turns.map(crossable) };
+    }
 
     return {
       record: crossable(record),
+      ...(loop === undefined ? {} : { loop }),
       binding: {
         origin,
         documentId: binding.document.documentId,
@@ -266,6 +344,7 @@ export async function runExtensionTask(
       boundary: privacy.report,
       egress,
       grant,
+      clarificationsAsked,
     };
   } finally {
     // However the run ended — success, refusal, or a throw — no capability outlives it.

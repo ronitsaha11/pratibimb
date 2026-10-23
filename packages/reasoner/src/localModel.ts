@@ -52,19 +52,43 @@ export const DEFAULT_MODEL_ENDPOINT = "http://127.0.0.1:8977/v1/chat/completions
 /** What the model is allowed to name. Everything else is unrepresentable in its output. */
 interface Grounding {
   readonly targets: readonly string[];
+  /**
+   * What may be CLICKED: CONTROLS (`CLICKABLE_ROLES`) the handoff reports as visible and enabled.
+   * A disabled control cannot be acted on, so the decoder is not offered it (M15) — the validator
+   * still refuses one regardless; this only stops the model wasting its one plan on it.
+   */
+  readonly clickable: readonly string[];
   readonly refs: readonly string[];
+  /**
+   * The only inserts the model may write: each empty field privacy paired with a reference, and that
+   * reference (M16). Which stored value goes into which field is the client's decision. A 0.5B model
+   * asked to choose put the NAME reference into the mobile field; offered only the pairing, it can
+   * decide whether to fill the field, never what goes in it.
+   */
+  readonly inserts: readonly { readonly target: string; readonly ref: string }[];
 }
 
-const groundingOf = (handoff: VerifiedHandoff): Grounding => ({
-  targets: handoff.elements.map((element) => element.id),
-  refs: handoff.redactions.filter((redaction) => redaction.token !== "").map((redaction) => redaction.token),
+/**
+ * Roles that are controls a click operates. Not a text field, a label, a status line or a generic
+ * container: on the first real two-step run the model was offered a `status` region and proposed
+ * clicking it (M15). The validator and the declared postconditions would refuse such a click anyway.
+ */
+const CLICKABLE_ROLES = new Set(["button", "link", "checkbox", "radio", "tab", "menuitem", "switch"]);
+
+const groundingOf = (request: ReasonerRequest): Grounding => ({
+  targets: request.handoff.elements.map((element) => element.id),
+  clickable: request.handoff.elements.filter((element) => element.visible && element.enabled && CLICKABLE_ROLES.has(element.role)).map((element) => element.id),
+  refs: request.handoff.redactions.filter((redaction) => redaction.token !== "").map((redaction) => redaction.token),
+  inserts: [...request.fill.fillable].map(([target, ref]) => ({ target, ref })),
 });
 
 /**
  * The JSON schema the decoder is constrained to.
  *
- * `target` and `ref` are enums over what actually exists, so the model cannot emit a selector the
- * page does not have or a reference the vault never issued. That is grounding, not enforcement:
+ * `target` is an enum over what actually exists, so the model cannot emit a selector the page does
+ * not have. An `insert` is one of the client's pairings, target and reference together, so it cannot
+ * name a reference the vault never issued or put one where privacy did not pair it. That is
+ * grounding, not enforcement:
  * `validatePlan` still checks every one of them, because a constrained decoder is a convenience and
  * the validator is the authority.
  */
@@ -74,19 +98,35 @@ const planSchema = (grounding: Grounding): Record<string, unknown> => ({
     steps: {
       type: "array",
       minItems: 1,
-      maxItems: 4,
+      // A plan is the NEXT action: the grounded fills (if any) then one click, or `done`. With nothing
+      // to fill, that is exactly one step (M15, M16). The validator refuses a second click either way.
+      maxItems: Math.min(4, grounding.inserts.length + 1),
       items: {
         oneOf: [
-          {
+          // Each `insert` is one of privacy's pairings, target and reference together (M16). None when
+          // privacy paired nothing: a page with no fillable field still has controls to click and may
+          // still be finished.
+          ...grounding.inserts.map((insert) => ({
             type: "object",
-            properties: { op: { const: "insert" }, target: { enum: grounding.targets }, ref: { enum: grounding.refs } },
+            properties: { op: { const: "insert" }, target: { enum: [insert.target] }, ref: { enum: [insert.ref] } },
             required: ["op", "target", "ref"],
             additionalProperties: false,
-          },
+          })),
+          ...(grounding.clickable.length === 0
+            ? []
+            : [
+                {
+                  type: "object",
+                  properties: { op: { const: "click" }, target: { enum: grounding.clickable } },
+                  required: ["op", "target"],
+                  additionalProperties: false,
+                },
+              ]),
           {
+            // The goal is already met. The client accepts it only as the plan's sole step.
             type: "object",
-            properties: { op: { const: "click" }, target: { enum: grounding.targets } },
-            required: ["op", "target"],
+            properties: { op: { const: "done" } },
+            required: ["op"],
             additionalProperties: false,
           },
         ],
@@ -100,8 +140,10 @@ const planSchema = (grounding: Grounding): Record<string, unknown> => ({
 const SYSTEM = [
   "Plan the fewest browser steps that achieve the goal.",
   "- 'insert' puts a stored value into an EMPTY text field. Never into a button, never into a field that already has a value.",
-  "- 'click' presses a button. Never a text field.",
+  "- 'click' presses a button. Never a text field. Only a button whose 'enabled' is true.",
+  "- Plan only the NEXT click. After it, you are shown the page again and can plan the step after.",
   "- Pick the reference whose class matches the field.",
+  "- 'done', alone, means the goal is already achieved on this page. Never combine it with other steps.",
 ].join("\n");
 
 /**
@@ -120,7 +162,7 @@ const EXAMPLE = {
       { id: "#email", name: "Email", empty: false },
       { id: "#email2", name: "Confirm email", empty: true },
     ],
-    buttons: [{ id: "#go", name: "Register" }],
+    buttons: [{ id: "#go", name: "Register", enabled: true }],
     references: [{ token: "REF_A", class: "EMAIL" }],
   }),
   assistant: JSON.stringify({
@@ -143,9 +185,10 @@ function contextFor(handoff: VerifiedHandoff, goal: string): Record<string, unkn
   const fields = handoff.elements
     .filter((element) => element.role === "textbox")
     .map((element) => ({ id: element.id, name: element.name, empty: !redactedTargets.has(element.id) }));
+  // `enabled` is the manifest's own field (manifest-schema.md): a structural fact, never a value.
   const buttons = handoff.elements
     .filter((element) => element.role === "button")
-    .map((element) => ({ id: element.id, name: element.name }));
+    .map((element) => ({ id: element.id, name: element.name, enabled: element.enabled }));
   const references = handoff.redactions
     .filter((redaction) => redaction.token !== "")
     .map((redaction) => ({ token: redaction.token, class: redaction.class, hint: redaction.hint }));
@@ -165,8 +208,10 @@ export function localModelReasoner(options: LocalModelOptions = {}): ReasonerCli
     name: `local-model:${options.model ?? "qwen2.5-0.5b-instruct-q4_k_m"}`,
     transport: "LOOPBACK_HTTP",
     async propose(request: ReasonerRequest): Promise<unknown> {
-      const grounding = groundingOf(request.handoff);
-      if (grounding.targets.length === 0 || grounding.refs.length === 0) return undefined;
+      const grounding = groundingOf(request);
+      // Nothing to point at means nothing to plan. A page with controls but no references is still a
+      // page the model can act on — by clicking, or by saying it is finished (M15).
+      if (grounding.targets.length === 0) return undefined;
 
       const body = {
         ...(options.model ? { model: options.model } : {}),

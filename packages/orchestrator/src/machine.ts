@@ -4,11 +4,13 @@
  *   IDLE → OBSERVE → SANITIZE → VERIFY_PAYLOAD → SEND → VALIDATE_PLAN → AWAIT_GRANT
  *        → REHYDRATE → ACT → VERIFY_RESULT → DONE
  *                                     ╰──────── any refusal ────────→ REFUSED (terminal)
+ *   … VALIDATE_PLAN → DONE, with nothing acted on, when the validated plan is the model's `done`.
  *
  * WHAT THIS IS NOT. Not an agent loop. It does not retry, recover, choose a target, plan a second
- * step, or decide what to do next. It runs one pre-stated task against one page and reports exactly
+ * step, or decide what to do next. It runs ONE TURN of a task against one page and reports exactly
  * how far it got and why it stopped. Every capability it has was injected (`ports.ts`), so the list
- * of things it could possibly do is finite and visible.
+ * of things it could possibly do is finite and visible. Stage 12 — "repeat, or stop and ask" — is
+ * `loop.ts`, which calls this function once per turn and decides nothing this function decides.
  *
  * FOUR PROPERTIES WORTH READING THE FILE FOR.
  *
@@ -29,7 +31,9 @@
  */
 import {
   guardedAct,
+  postconditionHoldsNow,
   recordHumanConfirmation,
+  type ExpectedPostcondition,
   type GuardedOutcome,
   type HumanConfirmation,
   type ProposedAction,
@@ -40,11 +44,13 @@ import {
   classifyField,
   fingerprintOf,
   findUseGrant,
+  groundFill,
   isVerifiedHandoff,
   rehydrate,
   sanitize,
   serializeHandoff,
   type BindView,
+  type FillGrounding,
   type LedgerEntry,
   type UseGrant,
   type VerifiedHandoff,
@@ -76,7 +82,14 @@ import {
   type ReasonerResponse,
 } from "@pratibimb/reasoner";
 
+import {
+  CLARIFICATION_DETAIL,
+  checkClarificationAnswer,
+  prepareClarification,
+  type ClarificationRefusal,
+} from "./clarification.js";
 import { type ClientPorts, type GrantDecision, type Observation, type StructuralStatus } from "./ports.js";
+import { type ClickPostconditions } from "./postconditions.js";
 import { createLocalPrivacyBoundary } from "./privacyBoundary.js";
 
 /**
@@ -94,6 +107,12 @@ export type RunState =
   | "OBSERVE"
   | "SANITIZE"
   | "VERIFY_PAYLOAD"
+  /**
+   * M17 — a person is choosing which stored value goes into a field privacy could not decide.
+   * Entered only when it withheld one as `CONFLICTING_REFERENCES`; a human decision, like
+   * AWAIT_GRANT, not a pipeline stage. Nothing has been sent, planned, restored or clicked yet.
+   */
+  | "AWAIT_CLARIFICATION"
   | "SEND"
   | "VALIDATE_PLAN"
   | "AWAIT_GRANT"
@@ -110,6 +129,7 @@ export type RefusalStage =
   | "OBSERVE"
   | "SANITIZE"
   | "VERIFY_PAYLOAD"
+  | "AWAIT_CLARIFICATION"
   | "SEND"
   | "PARSE_PLAN"
   | "VALIDATE_PLAN"
@@ -138,6 +158,8 @@ export interface RunTimings {
   observeMs?: number;
   /** Time spent asking the page whether its structure moved. No capture in it. */
   structureMs?: number;
+  /** M17: time a person spent choosing which stored value a field takes. */
+  clarifyMs?: number;
   sanitizeMs?: number;
   verifyPayloadMs?: number;
   sendMs?: number;
@@ -202,6 +224,33 @@ export interface RunRecord {
   readonly literalsInserted: readonly { readonly target: string; readonly inserted: boolean }[];
   readonly confirmation: HumanConfirmation | null;
   readonly act: GuardedOutcome | null;
+  /**
+   * `true` when the validated plan was the model's `done`: the run ended at VALIDATE_PLAN → DONE and
+   * nothing was granted, rehydrated or acted on. A claim, recorded as one — `succeeded()` is `false`.
+   */
+  readonly declaredDone: boolean;
+  /** The client's declared postcondition for this turn's click, as VERIFY RESULT evaluated it. */
+  readonly postcondition: ExpectedPostcondition | null;
+  /**
+   * M16 — privacy's pairing of each empty field with the one reference it may take, and the empty
+   * fields nothing may fill, with why. Ids, tokens and codes; never a value. `null` before SEND.
+   */
+  readonly fill: {
+    readonly fillable: readonly { readonly target: string; readonly ref: string }[];
+    readonly withheld: FillGrounding["withheld"];
+    /** Fields whose reference a person chose (M17). */
+    readonly chosenByPerson: readonly string[];
+  } | null;
+  /**
+   * M17 — every question a person was asked about which stored value a field takes, and what came
+   * of it. Field ids, counts, opaque candidate ids and codes; no label, no token, no value.
+   */
+  readonly clarifications: readonly {
+    readonly target: string;
+    readonly candidates: number;
+    readonly outcome: "CHOSEN" | ClarificationRefusal | "CANDIDATES_INDISTINGUISHABLE" | "CLARIFICATION_UNAVAILABLE" | "CLARIFICATION_FAILED";
+    readonly candidateId?: string;
+  }[];
 }
 
 export interface RunOptions {
@@ -223,6 +272,12 @@ export interface RunOptions {
   readonly reasonerTimeoutMs?: number;
   /** Governs whether the deterministic planner may answer after a model outcome. */
   readonly fallbackPolicy?: FallbackPolicy;
+  /**
+   * What each click this task may perform must make true (`postconditions.ts`). Declared by the
+   * client with the task — never by the model, never by the page. A click whose target is not here is
+   * refused before anything is granted, restored or clicked.
+   */
+  readonly postconditions: ClickPostconditions;
 }
 
 const labelOf = (observation: Observation, selector: string): string =>
@@ -260,6 +315,10 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let refusal: RunRefusal | null = null;
   let reasonerKind: ReasonerKind | null = null;
   let fallback: FallbackDecision | null = null;
+  let declaredDone = false;
+  let postcondition: ExpectedPostcondition | null = null;
+  let fillRecord: RunRecord["fill"] = null;
+  const clarifications: RunRecord["clarifications"][number][] = [];
 
   /** The only way `state` changes. Refuses to move once the run has ended. */
   const go = (to: RunState): void => {
@@ -295,6 +354,10 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     literalsInserted,
     confirmation,
     act,
+    declaredDone,
+    postcondition,
+    fill: fillRecord,
+    clarifications,
   });
 
   const stop = (stage: RefusalStage, cause: string, detail: string, planRefusal?: PlanRefusal): RunRecord => {
@@ -378,6 +441,89 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   }
   handoffSerialized = serializeHandoff(handoff);
 
+  // ── WHICH STORED VALUE MAY GO WHERE (M16) ────────────────────────────────────────────────
+  // Privacy pairs each empty field with the one reference it may take, or withholds it. The model is
+  // offered only those pairings, and the validator refuses any reference insert outside them: which
+  // private value belongs in which field is this client's decision, not the reasoner's.
+  const redactedTargets = new Set(handoff.redactions.map((r) => r.targetId));
+  const emptyFields = handoff.elements.filter((e) => e.role === "textbox" && !redactedTargets.has(e.id)).map((e) => e.id);
+  const recordFill = (grounded: FillGrounding): void => {
+    fillRecord = {
+      fillable: [...grounded.fillable].map(([target, ref]) => ({ target, ref })),
+      withheld: grounded.withheld,
+      chosenByPerson: grounded.chosenByPerson,
+    };
+  };
+  let fill = groundFill(view, handoff.redactions, emptyFields);
+  recordFill(fill);
+
+  // ── AWAIT CLARIFICATION (M17) ────────────────────────────────────────────────────────────
+  // A field more than one stored value fits is the person's to decide. They are asked before anything
+  // is sent or planned, one field at a time; any field left undecided stops the run here, so no
+  // value is restored into it and nothing that depends on it is submitted. A choice is evidence of
+  // intent and nothing more: privacy re-grounds with it, and every later gate still runs.
+  const conflicts = fill.withheld.filter((entry) => entry.cause === "CONFLICTING_REFERENCES");
+  if (conflicts.length > 0) {
+    go("AWAIT_CLARIFICATION");
+    const choices = new Map<string, string>();
+    for (const [index, conflict] of conflicts.entries()) {
+      const candidates = conflict.candidates?.length ?? 0;
+      const prepared = prepareClarification(conflict, handoff, {
+        clarificationId: `${options.requestId}.clarify.${index + 1}`,
+        sessionId: options.sessionId,
+        requestId: options.requestId,
+        origin: options.origin,
+        viewId,
+        documentId: observation.documentId,
+        expiresAt: clock() + options.grantTtlMs,
+      });
+      if (!prepared.ok) {
+        clarifications.push({ target: conflict.target, candidates, outcome: "CANDIDATES_INDISTINGUISHABLE" });
+        return stop("AWAIT_CLARIFICATION", "CANDIDATES_INDISTINGUISHABLE", CLARIFICATION_DETAIL.CANDIDATES_INDISTINGUISHABLE);
+      }
+      if (!ports.clarify) {
+        clarifications.push({ target: conflict.target, candidates, outcome: "CLARIFICATION_UNAVAILABLE" });
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_UNAVAILABLE", CLARIFICATION_DETAIL.CLARIFICATION_UNAVAILABLE);
+      }
+      let answer: unknown;
+      try {
+        answer = await timed("clarifyMs", () => ports.clarify!(prepared.prepared.request));
+      } catch {
+        clarifications.push({ target: conflict.target, candidates, outcome: "CLARIFICATION_FAILED" });
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_FAILED", CLARIFICATION_DETAIL.CLARIFICATION_FAILED);
+      }
+      const checked = checkClarificationAnswer(prepared.prepared, answer, clock());
+      if (!checked.ok) {
+        clarifications.push({ target: conflict.target, candidates, outcome: checked.cause });
+        return stop("AWAIT_CLARIFICATION", checked.cause, CLARIFICATION_DETAIL[checked.cause]);
+      }
+      clarifications.push({ target: conflict.target, candidates, outcome: "CHOSEN", candidateId: checked.candidateId });
+      choices.set(conflict.target, checked.token);
+    }
+
+    // The person may have taken a while. If the page can say whether its structure moved, ask it:
+    // a choice made about one page is not applied to another. Without the signal, REFRESH and the
+    // execution gate's freshness checks still stand before any click.
+    if (ports.structure && observation.structure) {
+      let now: StructuralStatus;
+      try {
+        now = await ports.structure();
+      } catch {
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_STALE", CLARIFICATION_DETAIL.CLARIFICATION_STALE);
+      }
+      if (!now.watching || now.seq !== observation.structure.seq) {
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_STALE", CLARIFICATION_DETAIL.CLARIFICATION_STALE);
+      }
+    }
+
+    // Privacy decides again, with the choice as an input it may refuse.
+    fill = groundFill(view, handoff.redactions, emptyFields, choices);
+    recordFill(fill);
+    if (fill.withheld.some((entry) => entry.cause === "CHOICE_NOT_A_CANDIDATE" || entry.cause === "CONFLICTING_REFERENCES")) {
+      return stop("AWAIT_CLARIFICATION", "CHOICE_NOT_A_CANDIDATE", CLARIFICATION_DETAIL.CHOICE_NOT_A_CANDIDATE);
+    }
+  }
+
   // ── SEND ─────────────────────────────────────────────────────────────────────────────────
   //
   // One stage, two possible reasoners, and the choice between them is a recorded decision rather
@@ -410,6 +556,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
         sessionId: options.sessionId,
         origin: options.origin,
         vault: boundary.oracle,
+        fill,
       },
       { ...(options.reasonerTimeoutMs === undefined ? {} : { timeoutMs: options.reasonerTimeoutMs }) }
     );
@@ -473,7 +620,6 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   };
   await adopt(parsedPlan);
 
-  const redactedTargets = new Set(handoff.redactions.map((r) => r.targetId));
   // The class×origin grants this session holds. In this phase the user's per-use decision covers
   // both levels at once; there is no blanket grant and nothing is persisted.
   const classOriginGrants = new Set<string>(
@@ -493,6 +639,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
       useGrants,
       now: clock(),
       redactedTargets,
+      fill,
       actionableTargets: observation!.actionable,
       ...(options.today ? { today: options.today } : {}),
     });
@@ -520,6 +667,16 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     return stop("VALIDATE_PLAN", validation.refusal.cause, validation.refusal.detail, validation.refusal);
   }
 
+  // ── DONE, AS DECLARED ────────────────────────────────────────────────────────────────────
+  // The model says the goal is already met on the view it was shown, and the validator accepted that
+  // view as current. Ending here asks no human, restores no value and touches no page: nothing
+  // follows a `done` because a `done` authorises nothing. It is recorded as the model's claim.
+  if (validation.declaresDone) {
+    declaredDone = true;
+    go("DONE");
+    return record();
+  }
+
   // Two kinds of insert, and only one of them involves a secret.
   //
   // A reference-backed insert needs a human grant and goes through `rehydrate`. A literal-backed
@@ -533,6 +690,28 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   const click = validation.steps.find((s) => s.op === "click");
   if (!click) {
     return stop("VALIDATE_PLAN", "NO_EXECUTABLE_STEP", "the plan proposes no action.");
+  }
+
+  // ── WHAT THE CLICK MUST DO ───────────────────────────────────────────────────────────────
+  // The client's own declaration for this target (`postconditions.ts`), looked up by the validated
+  // target and nothing the model wrote. No declaration: the result could never be verified, so the
+  // click is not performed. Already true: confirming it afterwards would prove nothing.
+  const declared = Object.prototype.hasOwnProperty.call(options.postconditions, click.target)
+    ? options.postconditions[click.target]
+    : undefined;
+  if (declared === undefined) {
+    return stop("VALIDATE_PLAN", "NO_DECLARED_POSTCONDITION", "the client declared no expected result for this control, so a click on it could not be verified.");
+  }
+  postcondition = declared;
+  const holdsBefore = (reading: Observation): "HOLDS" | "DOES_NOT_HOLD" | "UNKNOWN" => {
+    const target = reading.graph.nodes.find((n) => n.domRef.selector === click.target);
+    if (!target) return "UNKNOWN";
+    return postconditionHoldsNow(declared, target, reading.focusedSelector === undefined ? {} : { focusedSelector: reading.focusedSelector });
+  };
+  const preCause = (answer: "HOLDS" | "UNKNOWN"): string => (answer === "HOLDS" ? "POSTCONDITION_ALREADY_HOLDS" : "POSTCONDITION_UNDETERMINED");
+  const before = holdsBefore(observation);
+  if (before !== "DOES_NOT_HOLD") {
+    return stop("VALIDATE_PLAN", preCause(before), "the expected result is already true, or cannot be read, before the click; confirming it afterwards would prove nothing.");
   }
 
   // ── AWAIT GRANT ──────────────────────────────────────────────────────────────────────────
@@ -661,6 +840,11 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   if (!node || (node.evidence.kind !== "OBSERVED" && node.evidence.kind !== "CLIPPED")) {
     return stop("ACT", "TARGET_ABSENT_AFTER_REFRESH", "the control the plan named is no longer actionable.");
   }
+  // The same question on the reading the click will be made from: the page may have moved since.
+  const beforeClick = holdsBefore(fresh);
+  if (beforeClick !== "DOES_NOT_HOLD") {
+    return stop("ACT", preCause(beforeClick), "the expected result is already true, or cannot be read, on the page about to be clicked; nothing was clicked.");
+  }
 
   // The human's decision, recorded for this exact control now that it has been re-identified.
   const recorded = recordHumanConfirmation(
@@ -734,9 +918,9 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     guardedAct(fresh.graph, action, ports.bridges, {
       ...(structuralWitness ? { structure: structuralWitness } : {}),
       verify: {
-        // The postcondition is a real observable of this fixture: a submitted form disables its own
-        // submit control. Nothing here hardcodes CONFIRMED — the verifier reads the page back.
-        expect: { kind: "TARGET_ENABLED", expected: false },
+        // The client's declaration for this control. Nothing here hardcodes CONFIRMED — the verifier
+        // reads the page back and answers CONFIRMED, NOT_CONFIRMED or UNKNOWN.
+        expect: declared,
         observe: async () => {
           const after = await timed("verifyResultMs", () => ports.observe());
           observation = after;

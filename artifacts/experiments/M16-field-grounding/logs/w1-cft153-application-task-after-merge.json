@@ -1,0 +1,645 @@
+{
+  "experiment": "M15 — two-step task in the real extension, planned by the real local model (not a J7 experiment)",
+  "notAJ7Experiment": true,
+  "goal": "Submit my application with my registered mobile number.",
+  "task": "application",
+  "fixture": {
+    "path": "tests/browser/demo/fixture/application.html",
+    "sha256": "8a0a3e83fda5677a8e99caf6163d9c4d719dbe5898bfc19e79d4c177709a680e"
+  },
+  "maxTurns": 2,
+  "postconditions": {
+    "#submit": {
+      "kind": "TARGET_ENABLED",
+      "expected": false
+    }
+  },
+  "runsRequested": 5,
+  "runsCompleted": 5,
+  "runsCompletingBothSteps": 0,
+  "failure": null,
+  "model": {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956"
+  },
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-m8177FDykU5Du1Rd/j5mkhTgw4bPCr4KkGCjgcTQlvI='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "browser": {
+    "binary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "error": null,
+      "grantsAnswered": 1,
+      "outcome": "COMPLETED_AS_DECLARED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-1.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_ENABLED",
+            "expected": false
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-51a87cc9-fd38-4ca7-92cc-0a6c4d17d5e3",
+          "afterFrame": "transport-9a4b93b3-60d6-4b6f-8d77-c7b50976d097",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#submit",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-1.t2",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": true,
+          "observedFrame": "transport-99e109e2-a4c2-4245-9973-2a67aacfd393",
+          "afterFrame": "transport-99e109e2-a4c2-4245-9973-2a67aacfd393",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "status": "Application submitted",
+        "submitDisabled": true
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 2,
+      "error": null,
+      "grantsAnswered": 1,
+      "outcome": "COMPLETED_AS_DECLARED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-2.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_ENABLED",
+            "expected": false
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-b17d6c17-21f6-4b9c-b168-363855f47082",
+          "afterFrame": "transport-119ca94b-d4f6-4ee2-88cc-f1550d5efd0e",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#submit",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-2.t2",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": true,
+          "observedFrame": "transport-bcf5f2e1-8311-4091-a3a7-df45f2b80cd4",
+          "afterFrame": "transport-bcf5f2e1-8311-4091-a3a7-df45f2b80cd4",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "status": "Application submitted",
+        "submitDisabled": true
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 3,
+      "error": null,
+      "grantsAnswered": 1,
+      "outcome": "COMPLETED_AS_DECLARED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-3.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_ENABLED",
+            "expected": false
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-ccc7ea6b-e017-4e82-98ea-c859e96d4b07",
+          "afterFrame": "transport-bdfc6d63-b6a7-464d-8f76-8680e495bc0f",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#submit",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-3.t2",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": true,
+          "observedFrame": "transport-746d77e9-3949-4fa6-9ba5-6e7a1992dc28",
+          "afterFrame": "transport-746d77e9-3949-4fa6-9ba5-6e7a1992dc28",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "status": "Application submitted",
+        "submitDisabled": true
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 4,
+      "error": null,
+      "grantsAnswered": 1,
+      "outcome": "COMPLETED_AS_DECLARED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-4.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_ENABLED",
+            "expected": false
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-8484be3a-dd90-4681-99dd-336580a36575",
+          "afterFrame": "transport-bf602a65-d374-49c9-93d7-5d8ac0330fb4",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#submit",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-4.t2",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": true,
+          "observedFrame": "transport-ffdec305-b2cb-46fb-b737-a19286cda2f0",
+          "afterFrame": "transport-ffdec305-b2cb-46fb-b737-a19286cda2f0",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "status": "Application submitted",
+        "submitDisabled": true
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 5,
+      "error": null,
+      "grantsAnswered": 1,
+      "outcome": "COMPLETED_AS_DECLARED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-5.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_ENABLED",
+            "expected": false
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-f97e1d18-d19d-4c1a-9c29-6f77787dd5ef",
+          "afterFrame": "transport-b1e3e86f-386f-4481-acd2-4e463a92850f",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#submit",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-5.t2",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": true,
+          "observedFrame": "transport-f08a5f16-9067-4607-96d1-0bfcb3c08096",
+          "afterFrame": "transport-f08a5f16-9067-4607-96d1-0bfcb3c08096",
+          "actionableAtStart": [
+            "label",
+            "#name",
+            "#mobile",
+            "#aadhaar",
+            "#dob",
+            "#otp",
+            "#mobile_confirm",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "status": "Application submitted",
+        "submitDisabled": true
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "a handful of runs of one synthetic page; no claim about other pages, longer tasks or the model's reliability beyond these runs",
+    "perception ran the product's no-gesture DOM floor; no frame was captured and none left the client",
+    "the harness answered approvals on the operator's behalf (none was expected: the page holds no values)"
+  ],
+  "recordedAt": "2026-10-22T20:22:33.226Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0",
+    "playwright": "1.63.0",
+    "headless": false
+  }
+}

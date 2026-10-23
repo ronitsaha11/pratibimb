@@ -31,7 +31,7 @@ import {
   type FrameId,
 } from "@pratibimb/perception";
 import { type ObservedField } from "@pratibimb/privacy";
-import { type ClientPorts, type GrantDecision, type GrantRequest, type Observation } from "../../src/index.js";
+import { type ClarificationRequest, type ClientPorts, type GrantDecision, type GrantRequest, type Observation } from "../../src/index.js";
 import { deterministicReasoner, type ReasonerClient } from "@pratibimb/reasoner";
 
 export const ORIGIN = "http://127.0.0.1:8974";
@@ -93,7 +93,30 @@ export interface PageOptions {
   readonly renameSubmitAfterObserve?: boolean;
   /** Accept the submission without disabling the button, so the postcondition is not met. */
   readonly neverDisablesSubmit?: boolean;
+  /**
+   * M15 — a TWO-STEP page. Submit starts disabled; "Verify mobile number" must be clicked first, which
+   * renames it to `VERIFIED_NAME` and enables submit. Each click has its own observable effect.
+   */
+  readonly twoStep?: boolean;
+  /** Two-step variants for the failure paths: verify does nothing, renames wrongly, or vanishes. */
+  readonly verifyDoesNothing?: boolean;
+  readonly verifyRenamesTo?: string;
+  readonly verifyRemovesItself?: boolean;
+  /** M16: an empty "Confirm full name" field, which privacy pairs with the NAME reference. */
+  readonly withNameConfirm?: boolean;
+  /** M16: a second, filled phone field, so two PHONE references could go into the empty one. */
+  readonly withSecondMobile?: boolean;
+  /** M17: the second phone field's label. "Mobile number" makes the two candidates indistinguishable. */
+  readonly secondMobileLabel?: string;
+  /** M17: report constitution §6's structural signal, so a change while a person decides is seen. */
+  readonly withStructure?: boolean;
 }
+
+/** What the two-step page's verify control is called once it has worked. */
+export const VERIFIED_NAME = "Mobile number verified";
+
+/** Synthetic, like `DEMO`: a second mobile number for the conflicting-references page. */
+export const SECOND_MOBILE = "9000000002";
 
 export class SimulatedPage {
   elements: Element[];
@@ -103,10 +126,28 @@ export class SimulatedPage {
   /** How many times the click bridge was actually driven. Zero is the refusal tests' claim. */
   clicks = 0;
   observations = 0;
+  /** M17: the structural sequence the page reports when `withStructure` is set. Bump it to "move". */
+  structureSeq = 0;
   #frame = 0;
 
   constructor(private readonly options: PageOptions = {}) {
     this.elements = initial();
+    if (options.twoStep) {
+      const submit = this.find("#submit");
+      if (submit) submit.enabled = false;
+      this.elements.push({
+        selector: "#verify",
+        role: "button",
+        name: "Verify mobile number",
+        rect: { x: 520, y: 450, w: 180, h: 40 },
+        enabled: true,
+        cssHidden: false,
+        value: "",
+        label: "",
+        type: "",
+        isField: false,
+      });
+    }
     if (options.withNotesField) {
       this.elements.splice(6, 0, {
         selector: "#notes",
@@ -118,6 +159,36 @@ export class SimulatedPage {
         value: "",
         label: "Notes",
         type: "text",
+        isField: true,
+      });
+    }
+    if (options.withNameConfirm) {
+      this.elements.splice(this.elements.length - 1, 0, {
+        selector: "#name_confirm",
+        role: "textbox",
+        name: "Confirm full name",
+        rect: { x: 320, y: 500, w: 300, h: 32 },
+        enabled: true,
+        cssHidden: false,
+        value: "",
+        label: "Confirm full name",
+        type: "text",
+        autocomplete: "name",
+        isField: true,
+      });
+    }
+    if (options.withSecondMobile) {
+      this.elements.splice(this.elements.length - 1, 0, {
+        selector: "#mobile_alt",
+        role: "textbox",
+        name: options.secondMobileLabel ?? "Alternate mobile number",
+        rect: { x: 320, y: 550, w: 300, h: 32 },
+        enabled: true,
+        cssHidden: false,
+        value: SECOND_MOBILE,
+        label: options.secondMobileLabel ?? "Alternate mobile number",
+        type: "tel",
+        autocomplete: "tel",
         isField: true,
       });
     }
@@ -174,6 +245,7 @@ export class SimulatedPage {
       focusedSelector: null,
       actionable: new Set(this.elements.filter((e) => e.enabled && !e.cssHidden).map((e) => e.selector)),
       statusText: this.statusText,
+      ...(this.options.withStructure ? { structure: { watching: true, seq: this.structureSeq } } : {}),
     };
   }
 
@@ -187,6 +259,18 @@ export class SimulatedPage {
   }
 
   /** What the fixture does when its submit button is clicked. */
+  private verifyMobile(): void {
+    if (this.options.verifyDoesNothing) return;
+    if (this.options.verifyRemovesItself) {
+      this.elements = this.elements.filter((e) => e.selector !== "#verify");
+    } else {
+      const verify = this.find("#verify");
+      if (verify) verify.name = this.options.verifyRenamesTo ?? VERIFIED_NAME;
+    }
+    const submit = this.find("#submit");
+    if (submit) submit.enabled = true;
+  }
+
   private submit(): void {
     const confirm = this.find("#mobile_confirm")?.value ?? "";
     const registered = this.find("#mobile")?.value ?? "";
@@ -222,6 +306,7 @@ export class SimulatedPage {
           page.clicks += 1;
           const element = page.at(point);
           if (element?.selector === "#submit" && element.enabled) page.submit();
+          if (element?.selector === "#verify" && element.enabled) page.verifyMobile();
         },
       },
       hitTest: {
@@ -249,6 +334,8 @@ export interface PortOptions extends PageOptions {
   readonly grant?: GrantDecision;
   /** Observe the grant requests a run made. */
   readonly onGrant?: (request: GrantRequest) => void;
+  /** M17: how a person answers "which stored value?". Absent: there is no way to ask. */
+  readonly clarify?: (request: ClarificationRequest) => Promise<unknown>;
 }
 
 export const portsFor = (page: SimulatedPage, options: PortOptions = {}): ClientPorts => ({
@@ -260,6 +347,8 @@ export const portsFor = (page: SimulatedPage, options: PortOptions = {}): Client
   },
   insert: (target, value) => page.insert(target, value),
   bridges: page.bridges,
+  ...(options.clarify ? { clarify: options.clarify } : {}),
+  ...(options.withStructure ? { structure: async () => ({ watching: true, seq: page.structureSeq }) } : {}),
 });
 
 export const RUN_OPTIONS = {
@@ -272,4 +361,6 @@ export const RUN_OPTIONS = {
   confirmationTtlMs: 60_000,
   grantTtlMs: 60_000,
   today: TODAY,
+  /** This fixture's declared effect: a submitted form disables its own submit control. */
+  postconditions: { "#submit": { kind: "TARGET_ENABLED", expected: false } },
 } as const;

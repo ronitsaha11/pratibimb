@@ -18,6 +18,13 @@
  *   reference or a literal, never a secret the plan itself supplies — and a literal is exactly what
  *   the literal-echo check exists to refuse.
  *
+ * **`done`** is neither. It is the reasoner's claim that the goal is already met on the page it was
+ *   shown — the frozen action schema's `done`, and constitution §1 stage 12's "repeat, or stop". It
+ *   names no target and authorises nothing: no grant, no rehydration, no click. It must be the plan's
+ *   only step, because "do this, and also we are finished" is two claims the client cannot tell apart.
+ *   Accepting it can only ever END a task — stopping is the one decision that is always safe — and the
+ *   client records it as the model's claim, never as a verified success.
+ *
  * WHY A LITERAL IS EXPRESSIBLE AT ALL. `docs/architecture/action-schema.md` is explicit that a schema
  * unable to express a non-sensitive literal cannot drive a browser, and that literals are therefore
  * allowed and then checked. Making them unrepresentable here would move the refusal from a place that
@@ -40,10 +47,18 @@ export interface ClickStep {
   readonly target: string;
 }
 
-export type PlanStep = InsertStep | ClickStep;
+/** The reasoner's claim that the goal is met. Names no target; executes nothing. */
+export interface DoneStep {
+  readonly op: "done";
+}
+
+export type PlanStep = InsertStep | ClickStep | DoneStep;
+
+/** A step that names an element: everything except `done`. */
+export type TargetedStep = InsertStep | ClickStep;
 
 /** The operations this client will consider. Anything else is refused by name. */
-export const PLAN_OPERATIONS = ["insert", "click"] as const;
+export const PLAN_OPERATIONS = ["insert", "click", "done"] as const;
 export type PlanOperation = (typeof PLAN_OPERATIONS)[number];
 
 /**
@@ -79,6 +94,8 @@ export type ParseRefusalCause =
   | "MALFORMED_TARGET"
   | "INSERT_NEEDS_REF_OR_LITERAL"
   | "INSERT_NOT_BOTH"
+  | "DONE_NOT_ALONE"
+  | "DONE_TAKES_NO_TARGET"
   | "MISSING_PROVENANCE";
 
 export type ParseOutcome =
@@ -131,7 +148,14 @@ export function parsePlan(raw: unknown): ParseOutcome {
   for (const [index, candidate] of raw.steps.entries()) {
     if (!isObject(candidate)) return { ok: false, cause: "STEP_NOT_AN_OBJECT", at: index };
     const op = candidate.op;
-    if (op !== "insert" && op !== "click") return { ok: false, cause: "UNSUPPORTED_OPERATION", at: index };
+    if (op !== "insert" && op !== "click" && op !== "done") return { ok: false, cause: "UNSUPPORTED_OPERATION", at: index };
+    if (op === "done") {
+      if (raw.steps.length !== 1) return { ok: false, cause: "DONE_NOT_ALONE", at: index };
+      // A `done` that names an element is a claim about that element the client cannot interpret.
+      if (candidate.target !== undefined) return { ok: false, cause: "DONE_TAKES_NO_TARGET", at: index };
+      steps.push({ op });
+      continue;
+    }
     if (!isNonEmptyString(candidate.target)) return { ok: false, cause: "MALFORMED_TARGET", at: index };
 
     if (op === "click") {

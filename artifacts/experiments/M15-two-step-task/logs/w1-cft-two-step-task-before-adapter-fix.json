@@ -1,0 +1,239 @@
+{
+  "experiment": "M15 — two-step task in the real extension, planned by the real local model (not a J7 experiment)",
+  "notAJ7Experiment": true,
+  "goal": "Confirm the slot, then book it.",
+  "maxTurns": 3,
+  "postconditions": {
+    "#confirm-slot": {
+      "kind": "TARGET_NAME",
+      "expected": "Slot confirmed"
+    },
+    "#book": {
+      "kind": "TARGET_ENABLED",
+      "expected": false
+    }
+  },
+  "runsRequested": 3,
+  "runsCompleted": 3,
+  "runsCompletingBothSteps": 0,
+  "failure": null,
+  "model": {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956"
+  },
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-m8177FDykU5Du1Rd/j5mkhTgw4bPCr4KkGCjgcTQlvI='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "browser": {
+    "binary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "error": null,
+      "grantsAnswered": 0,
+      "outcome": "STOPPED_REFUSED",
+      "confirmedActions": 0,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-1.t1",
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "PARSE_PLAN",
+            "cause": "NO_STEPS"
+          },
+          "reasonerKind": "DETERMINISTIC_FALLBACK",
+          "fallback": {
+            "outcome": "UNAVAILABLE",
+            "fellBack": true,
+            "reason": "the model produced no usable plan (UNAVAILABLE), so the deterministic planner answers instead."
+          },
+          "modelResponded": true,
+          "plan": null,
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-41398b51-03c8-46f5-b2f1-ea7d9e10b744",
+          "afterFrame": "transport-41398b51-03c8-46f5-b2f1-ea7d9e10b744",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 0,
+      "modelRequestTripwire": [],
+      "egress": [],
+      "page": {
+        "confirmName": "Confirm slot",
+        "bookDisabled": true,
+        "stage": "0",
+        "status": "Slot not confirmed",
+        "clicks": {
+          "confirm-slot": 0,
+          "book": 0
+        }
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": false,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 2,
+      "error": null,
+      "grantsAnswered": 0,
+      "outcome": "STOPPED_REFUSED",
+      "confirmedActions": 0,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-2.t1",
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "PARSE_PLAN",
+            "cause": "NO_STEPS"
+          },
+          "reasonerKind": "DETERMINISTIC_FALLBACK",
+          "fallback": {
+            "outcome": "UNAVAILABLE",
+            "fellBack": true,
+            "reason": "the model produced no usable plan (UNAVAILABLE), so the deterministic planner answers instead."
+          },
+          "modelResponded": true,
+          "plan": null,
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-249ed6ec-d701-42bb-8eaf-43eabe4b5a0c",
+          "afterFrame": "transport-249ed6ec-d701-42bb-8eaf-43eabe4b5a0c",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 0,
+      "modelRequestTripwire": [],
+      "egress": [],
+      "page": {
+        "confirmName": "Confirm slot",
+        "bookDisabled": true,
+        "stage": "0",
+        "status": "Slot not confirmed",
+        "clicks": {
+          "confirm-slot": 0,
+          "book": 0
+        }
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": false,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 3,
+      "error": null,
+      "grantsAnswered": 0,
+      "outcome": "STOPPED_REFUSED",
+      "confirmedActions": 0,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-3.t1",
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "PARSE_PLAN",
+            "cause": "NO_STEPS"
+          },
+          "reasonerKind": "DETERMINISTIC_FALLBACK",
+          "fallback": {
+            "outcome": "UNAVAILABLE",
+            "fellBack": true,
+            "reason": "the model produced no usable plan (UNAVAILABLE), so the deterministic planner answers instead."
+          },
+          "modelResponded": true,
+          "plan": null,
+          "postcondition": null,
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-068b9657-90cc-4117-bb3d-d9c8fdb600f4",
+          "afterFrame": "transport-068b9657-90cc-4117-bb3d-d9c8fdb600f4",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 0,
+      "modelRequestTripwire": [],
+      "egress": [],
+      "page": {
+        "confirmName": "Confirm slot",
+        "bookDisabled": true,
+        "stage": "0",
+        "status": "Slot not confirmed",
+        "clicks": {
+          "confirm-slot": 0,
+          "book": 0
+        }
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": false,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": false,
+        "secondStepFromAFreshObservation": false,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "a handful of runs of one synthetic page; no claim about other pages, longer tasks or the model's reliability beyond these runs",
+    "perception ran the product's no-gesture DOM floor; no frame was captured and none left the client",
+    "the harness answered approvals on the operator's behalf (none was expected: the page holds no values)"
+  ],
+  "recordedAt": "2026-10-22T14:19:21.358Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0",
+    "playwright": "1.63.0",
+    "headless": false
+  }
+}

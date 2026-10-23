@@ -45,6 +45,8 @@ function locate(pathname) {
   if (pathname === "/" || pathname === "/index.html") return join(ROOT, "apps/demo/index.html");
   if (pathname === "/planning-view.css") return join(ROOT, "apps/demo/planning-view.css");
   if (pathname === "/fixture" || pathname === "/fixture/") return join(HERE, "fixture/application.html");
+  /** M17's clarification fixture: the M2 page with a second registered number. */
+  if (pathname === "/two-phones" || pathname === "/two-phones/") return join(ROOT, "tests/browser/extension/fixture/two-phones.html");
   /**
    * M3.1's perception fixture, which is NOT the demo's.
    *
@@ -79,6 +81,11 @@ function locate(pathname) {
   /** M10.5's pixel-mask fixture: canvas and image text, a partly off-screen canvas, DOM controls. */
   if (pathname === "/mask" || pathname === "/mask/") {
     return join(ROOT, "tests/browser/extension/fixture/visual-mask.html");
+  }
+
+  /** M15's two-step task: confirm a slot, then book it. Click-only, synthetic, no values on it. */
+  if (pathname === "/two-step" || pathname === "/two-step/") {
+    return join(ROOT, "tests/browser/extension/fixture/two-step.html");
   }
 
   /** M10's visual-only region fixture: canvases and images, some deliberately not enumerable. */

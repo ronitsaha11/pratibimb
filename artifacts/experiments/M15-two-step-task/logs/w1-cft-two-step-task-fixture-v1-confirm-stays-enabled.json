@@ -1,0 +1,386 @@
+{
+  "experiment": "M15 — two-step task in the real extension, planned by the real local model (not a J7 experiment)",
+  "notAJ7Experiment": true,
+  "goal": "Confirm the slot, then book it.",
+  "maxTurns": 3,
+  "postconditions": {
+    "#confirm-slot": {
+      "kind": "TARGET_NAME",
+      "expected": "Slot confirmed"
+    },
+    "#book": {
+      "kind": "TARGET_ENABLED",
+      "expected": false
+    }
+  },
+  "runsRequested": 3,
+  "runsCompleted": 3,
+  "runsCompletingBothSteps": 0,
+  "failure": null,
+  "model": {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956"
+  },
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-m8177FDykU5Du1Rd/j5mkhTgw4bPCr4KkGCjgcTQlvI='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "browser": {
+    "binary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "error": null,
+      "grantsAnswered": 0,
+      "outcome": "STOPPED_REFUSED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-1.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#confirm-slot"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Slot confirmed"
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_NAME",
+            "evidence": "#confirm-slot is named \"Slot confirmed\", as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-3c4b763c-2b37-4266-9712-4340e5ec1020",
+          "afterFrame": "transport-93aaa7b3-8ebb-4099-ae65-bbbec41442d9",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-1.t2",
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "VALIDATE_PLAN",
+            "cause": "POSTCONDITION_ALREADY_HOLDS"
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#confirm-slot"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Slot confirmed"
+          },
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-bd9dd0e1-7c9a-48f5-ab1c-59a525560dc7",
+          "afterFrame": "transport-bd9dd0e1-7c9a-48f5-ab1c-59a525560dc7",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#book",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "confirmName": "Slot confirmed",
+        "bookDisabled": false,
+        "stage": "1",
+        "status": "Slot confirmed — not yet booked",
+        "clicks": {
+          "confirm-slot": 1,
+          "book": 0
+        }
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": true,
+        "secondStepFromAFreshObservation": true,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 2,
+      "error": null,
+      "grantsAnswered": 0,
+      "outcome": "STOPPED_REFUSED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-2.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#confirm-slot"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Slot confirmed"
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_NAME",
+            "evidence": "#confirm-slot is named \"Slot confirmed\", as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-9591eaf9-1bfd-4426-8595-84080208a73b",
+          "afterFrame": "transport-cf858972-906f-485e-b6f9-1d064b0586ec",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-2.t2",
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "VALIDATE_PLAN",
+            "cause": "POSTCONDITION_ALREADY_HOLDS"
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#confirm-slot"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Slot confirmed"
+          },
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-77d4cb20-737b-47f0-bc0e-1710e5464188",
+          "afterFrame": "transport-77d4cb20-737b-47f0-bc0e-1710e5464188",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#book",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "confirmName": "Slot confirmed",
+        "bookDisabled": false,
+        "stage": "1",
+        "status": "Slot confirmed — not yet booked",
+        "clicks": {
+          "confirm-slot": 1,
+          "book": 0
+        }
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": true,
+        "secondStepFromAFreshObservation": true,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    },
+    {
+      "run": 3,
+      "error": null,
+      "grantsAnswered": 0,
+      "outcome": "STOPPED_REFUSED",
+      "confirmedActions": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "requestId": "m15-request-3.t1",
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#confirm-slot"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Slot confirmed"
+          },
+          "acted": "VERIFY_RESULT",
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_NAME",
+            "evidence": "#confirm-slot is named \"Slot confirmed\", as expected."
+          },
+          "declaredDone": false,
+          "observedFrame": "transport-3f740e25-3dfa-4f9c-bdd3-11451e9bcee5",
+          "afterFrame": "transport-9f7e0f14-cd8b-4500-8ca0-c1cba7b8215b",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#status"
+          ]
+        },
+        {
+          "turn": 2,
+          "requestId": "m15-request-3.t2",
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "VALIDATE_PLAN",
+            "cause": "POSTCONDITION_ALREADY_HOLDS"
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "modelResponded": true,
+          "plan": [
+            {
+              "op": "click",
+              "target": "#confirm-slot"
+            }
+          ],
+          "postcondition": {
+            "kind": "TARGET_NAME",
+            "expected": "Slot confirmed"
+          },
+          "acted": null,
+          "verification": null,
+          "declaredDone": false,
+          "observedFrame": "transport-fa74f793-292f-4089-8f33-8f8025904380",
+          "afterFrame": "transport-fa74f793-292f-4089-8f33-8f8025904380",
+          "actionableAtStart": [
+            "#confirm-slot",
+            "#book",
+            "#status"
+          ]
+        }
+      ],
+      "modelRequests": 2,
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "page": {
+        "confirmName": "Slot confirmed",
+        "bookDisabled": false,
+        "stage": "1",
+        "status": "Slot confirmed — not yet booked",
+        "clicks": {
+          "confirm-slot": 1,
+          "book": 0
+        }
+      },
+      "judged": {
+        "stayedWithinBudget": true,
+        "everyTurnFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "firstStepConfirmedByThePage": true,
+        "secondStepFromAFreshObservation": true,
+        "secondStepConfirmedByThePage": false,
+        "loopStoppedOnASupportedOutcome": true,
+        "onlyAuthorisedClicks": true,
+        "allEgressLoopbackReasoner": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "a handful of runs of one synthetic page; no claim about other pages, longer tasks or the model's reliability beyond these runs",
+    "perception ran the product's no-gesture DOM floor; no frame was captured and none left the client",
+    "the harness answered approvals on the operator's behalf (none was expected: the page holds no values)"
+  ],
+  "recordedAt": "2026-10-22T14:25:04.939Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0",
+    "playwright": "1.63.0",
+    "headless": false
+  }
+}

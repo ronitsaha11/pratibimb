@@ -1,0 +1,3823 @@
+{
+  "experiment": "M1 — the product loop through the real MV3 extension",
+  "verdict": "FAIL",
+  "status": "FAIL",
+  "claim": "the page's own field values are read, classified and held in the content script's isolated world; only the sanitized handoff crosses the service worker; the plan refers to references; the value is rehydrated locally under a one-shot capability and clicked through guardedAct — and the worker's own recording of every message it saw contains none of the page's values",
+  "notAClaim": [
+    "no claim of perfect PII recall: detection is the repository's deterministic D1/D2 channels on one synthetic fixture, and a value they do not classify is a value that is not protected",
+    "no claim of zero leakage in general: what is checked is this fixture's values against this run's traffic",
+    "no claim of production readiness: memory-only vault, one loopback origin, no TLS, no auth, no real user data",
+    "the human's answer comes from the harness through the worker's control plane, exactly as the demo rehearsal's auto mode does; no human-facing grant surface was built in M1",
+    "one run of each act on one machine in one browser cell is not a benchmark and not a reliability claim",
+    "no visual perception, capture, detector, OCR or pixel redaction took part"
+  ],
+  "loopExercisedThroughExtension": true,
+  "checks": {
+    "successReachedTheEnd": true,
+    "successWasConfirmed": true,
+    "successDidNotFallBack": true,
+    "successAskedAHuman": true,
+    "successRestoredOneValue": true,
+    "successClickedOnce": true,
+    "successSubmittedThePage": true,
+    "successRestoredTheRightValue": true,
+    "refusalWasRefused": true,
+    "refusalWasBlockedAtTheLiteral": true,
+    "refusalSanitizedAndSent": true,
+    "refusalNeverAskedAHuman": true,
+    "refusalReleasedNothing": true,
+    "refusalRestoredNothing": true,
+    "refusalClickedNothing": true,
+    "refusalLeftTheFieldEmpty": true,
+    "refusalDidNotFallBack": true,
+    "outageReachedTheEnd": true,
+    "outageWasConfirmed": true,
+    "outageFellBack": true,
+    "outageAskedAHuman": true,
+    "outageRestoredOneValue": true,
+    "outageSubmittedThePage": true,
+    "pageRealmReadTheRealPage": true,
+    "referencesWereIssued": true,
+    "otpWasMaskedNotTokenised": true,
+    "otpGotNoReference": true,
+    "exactlyOneRelease": true,
+    "noLiteralWasEverWritten": true,
+    "forgedNonceRefused": true,
+    "armedCapabilityIsAccepted": true,
+    "reusedNonceRefused": true,
+    "wrongTargetRefused": true,
+    "wrongDocumentRefused": true,
+    "wrongTabRefused": true,
+    "pageCannotReachTheCoreRealm": true,
+    "theWorkerSawTraffic": true,
+    "noFixtureValueInAnyWorkerMessage": true,
+    "noValueInAnythingTheHarnessSaw": true,
+    "noValueInTheHandoffThatWasSent": true,
+    "nothingLeakedToTheReasoner": true,
+    "egressReportedClean": true,
+    "perceptionWasAttemptedOnEveryReading": true,
+    "perceptionRanForRealAtLeastOnce": false,
+    "everyRefusedPassIsTyped": true,
+    "theTierClaimMatchesWhatActuallyRan": true,
+    "aRealFrameWasCaptured": false,
+    "theDetectorRanOnThePinnedArtifact": false,
+    "theDetectorProducedGeometryNotText": true,
+    "fusionJoinedDomAndVision": false,
+    "theCoordinateContractIsDerivedNotAssumed": false,
+    "everyPassRecordsItsRoute": true,
+    "everyPassSaysWhetherTheWorkerSawPixels": true,
+    "theRouteCategoryIsRecorded": false,
+    "theDegradedRouteIsReportedHonestly": true,
+    "theHandoffDeclaresTheVisualTier": false,
+    "elementsCarryFusionProvenance": false,
+    "noPixelsInTheHandoffThatWasSent": true,
+    "noPixelsInAnythingTheReasonerReceived": true,
+    "noPixelsInTheRunRecord": true,
+    "noPixelsRetainedByTheWorker": true,
+    "noPixelsInAnythingTheHarnessSaw": true,
+    "theBundleHasNoE6Surface": true,
+    "theBundleHasExactlyOneClickSite": true,
+    "theBundleNeverCallsElementClick": true,
+    "oneContentScriptPerDocument": true,
+    "noOtherClickPathRan": true,
+    "successFiredExactlyOnce": true,
+    "outageFiredExactlyOnce": true,
+    "refusalFiredNothing": true,
+    "everyObservedEventIsOurs": true,
+    "thePageRegisteredItsOwnListenersOnce": true
+  },
+  "failure": null,
+  "acts": {
+    "SUCCESS": {
+      "outcome": {
+        "ok": true,
+        "result": {
+          "record": {
+            "goal": "Submit my application with my registered mobile number.",
+            "sessionId": "m2-success-session",
+            "requestId": "m2-success-request",
+            "origin": "http://127.0.0.1:8975",
+            "state": "DONE",
+            "transitions": [
+              {
+                "from": "IDLE",
+                "to": "OBSERVE",
+                "at": 1792700604290,
+                "elapsedMs": 0
+              },
+              {
+                "from": "OBSERVE",
+                "to": "SANITIZE",
+                "at": 1792700604710,
+                "elapsedMs": 420
+              },
+              {
+                "from": "SANITIZE",
+                "to": "VERIFY_PAYLOAD",
+                "at": 1792700604721,
+                "elapsedMs": 431
+              },
+              {
+                "from": "VERIFY_PAYLOAD",
+                "to": "SEND",
+                "at": 1792700604722,
+                "elapsedMs": 432
+              },
+              {
+                "from": "SEND",
+                "to": "VALIDATE_PLAN",
+                "at": 1792700606939,
+                "elapsedMs": 2649
+              },
+              {
+                "from": "VALIDATE_PLAN",
+                "to": "AWAIT_GRANT",
+                "at": 1792700606940,
+                "elapsedMs": 2650
+              },
+              {
+                "from": "AWAIT_GRANT",
+                "to": "REHYDRATE",
+                "at": 1792700607090,
+                "elapsedMs": 2800
+              },
+              {
+                "from": "REHYDRATE",
+                "to": "ACT",
+                "at": 1792700607095,
+                "elapsedMs": 2805
+              },
+              {
+                "from": "ACT",
+                "to": "VERIFY_RESULT",
+                "at": 1792700607096,
+                "elapsedMs": 2806
+              },
+              {
+                "from": "VERIFY_RESULT",
+                "to": "DONE",
+                "at": 1792700607103,
+                "elapsedMs": 2813
+              }
+            ],
+            "timings": {
+              "observeMs": 420,
+              "sanitizeMs": 11,
+              "verifyPayloadMs": 0,
+              "sendMs": 2217,
+              "validatePlanMs": 0,
+              "grantMs": 150,
+              "rehydrateMs": 2,
+              "refreshMs": 3,
+              "structureMs": 1,
+              "verifyResultMs": 3,
+              "actMs": 7,
+              "totalMs": 2813
+            },
+            "refusal": null,
+            "initialObservation": {
+              "nodes": 14,
+              "fields": 0,
+              "frameId": "transport-136b7a2b-553b-4ddd-a768-1b09248ab8d6",
+              "viewport": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scrollX": 0,
+                "scrollY": 0
+              },
+              "documentId": "CE4A0CC258C6198199DA797F80840ABA",
+              "focusedSelector": null,
+              "actionable": [
+                "label",
+                "#name",
+                "#mobile",
+                "#aadhaar",
+                "#dob",
+                "#otp",
+                "#mobile_confirm",
+                "#submit",
+                "#status"
+              ]
+            },
+            "observation": {
+              "nodes": 14,
+              "fields": 0,
+              "frameId": "transport-197269ff-1d71-4e68-b1b0-56b4ea40db4b",
+              "viewport": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scrollX": 0,
+                "scrollY": 0
+              },
+              "documentId": "CE4A0CC258C6198199DA797F80840ABA",
+              "focusedSelector": null,
+              "actionable": [
+                "label",
+                "#name",
+                "#mobile",
+                "#aadhaar",
+                "#dob",
+                "#otp",
+                "#mobile_confirm",
+                "#status"
+              ]
+            },
+            "handoff": {
+              "manifestVersion": "1.1",
+              "capture": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scale_to_css": 1,
+                "scroll": {
+                  "x": 0,
+                  "y": 0
+                },
+                "origin": "http://127.0.0.1:8975"
+              },
+              "capability": {
+                "backend": "none",
+                "tiers_fired": [
+                  "T0",
+                  "T2"
+                ]
+              },
+              "elements": [
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Full name",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    122.80000305175781,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#name",
+                  "role": "textbox",
+                  "name": "Full name",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    145.1999969482422,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    187.1999969482422,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#mobile",
+                  "role": "textbox",
+                  "name": "Mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    209.60000610351562,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Aadhaar number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    251.60000610351562,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#aadhaar",
+                  "role": "textbox",
+                  "name": "Aadhaar number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    274,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Date of birth",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    316,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#dob",
+                  "role": "textbox",
+                  "name": "Date of birth",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    338.3999938964844,
+                    490.3999938964844,
+                    34
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "OTP",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    382.3999938964844,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#otp",
+                  "role": "textbox",
+                  "name": "OTP",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    404.8000183105469,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Confirm mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    506,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#mobile_confirm",
+                  "role": "textbox",
+                  "name": "Confirm mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    528.4000244140625,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "#submit",
+                  "role": "button",
+                  "name": "Submit application",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    572.4000244140625,
+                    153.4250030517578,
+                    38
+                  ]
+                },
+                {
+                  "id": "#status",
+                  "role": "status",
+                  "name": "Not submitted",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    20,
+                    639.2000122070312,
+                    520,
+                    36.400001525878906
+                  ]
+                }
+              ],
+              "goal": "Submit my application with my registered mobile number.",
+              "redactions": [
+                {
+                  "token": "<PII:NAME:1>",
+                  "class": "NAME",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    145.1999969482422,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 12,
+                    "kind": "alpha",
+                    "field_role": "name"
+                  },
+                  "targetId": "#name"
+                },
+                {
+                  "token": "<PII:PHONE:1>",
+                  "class": "PHONE",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    209.60000610351562,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 10,
+                    "kind": "numeric",
+                    "field_role": "tel"
+                  },
+                  "targetId": "#mobile"
+                },
+                {
+                  "token": "<PII:AADHAAR:1>",
+                  "class": "AADHAAR",
+                  "tier": "SENSITIVE",
+                  "bbox": [
+                    34.79999923706055,
+                    274,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 14,
+                    "kind": "numeric"
+                  },
+                  "targetId": "#aadhaar"
+                },
+                {
+                  "token": "<PII:DOB:1>",
+                  "class": "DOB",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    338.3999938964844,
+                    490.3999938964844,
+                    34
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 10,
+                    "kind": "date",
+                    "field_role": "date"
+                  },
+                  "targetId": "#dob"
+                },
+                {
+                  "token": "",
+                  "class": "OTP",
+                  "tier": "CRITICAL",
+                  "bbox": [
+                    34.79999923706055,
+                    404.8000183105469,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "masked_no_token",
+                  "detectors": [
+                    "D1"
+                  ],
+                  "hint": {
+                    "len": 6,
+                    "kind": "numeric",
+                    "field_role": "one-time-code"
+                  },
+                  "targetId": "#otp"
+                }
+              ],
+              "request": {
+                "requestId": "m2-success-request",
+                "sessionId": "m2-success-session",
+                "issuedAt": 1792700604710
+              },
+              "verified": true
+            },
+            "handoffSerialized": "{\"manifestVersion\":\"1.1\",\"capture\":{\"w\":1280,\"h\":720,\"dpr\":1.0000000149011612,\"zoom\":1,\"scale_to_css\":1,\"scroll\":{\"x\":0,\"y\":0},\"origin\":\"http://127.0.0.1:8975\"},\"capability\":{\"backend\":\"none\",\"tiers_fired\":[\"T0\",\"T2\"]},\"elements\":[{\"id\":\"label\",\"role\":\"label\",\"name\":\"Full name\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,122.80000305175781,490.3999938964844,18.399999618530273]},{\"id\":\"#name\",\"role\":\"textbox\",\"name\":\"Full name\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,145.1999969482422,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,187.1999969482422,490.3999938964844,18.399999618530273]},{\"id\":\"#mobile\",\"role\":\"textbox\",\"name\":\"Mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,209.60000610351562,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Aadhaar number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,251.60000610351562,490.3999938964844,18.399999618530273]},{\"id\":\"#aadhaar\",\"role\":\"textbox\",\"name\":\"Aadhaar number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,274,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Date of birth\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,316,490.3999938964844,18.399999618530273]},{\"id\":\"#dob\",\"role\":\"textbox\",\"name\":\"Date of birth\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,338.3999938964844,490.3999938964844,34]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"OTP\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,382.3999938964844,490.3999938964844,18.399999618530273]},{\"id\":\"#otp\",\"role\":\"textbox\",\"name\":\"OTP\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,404.8000183105469,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Confirm mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,506,490.3999938964844,18.399999618530273]},{\"id\":\"#mobile_confirm\",\"role\":\"textbox\",\"name\":\"Confirm mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,528.4000244140625,490.3999938964844,32]},{\"id\":\"#submit\",\"role\":\"button\",\"name\":\"Submit application\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,572.4000244140625,153.4250030517578,38]},{\"id\":\"#status\",\"role\":\"status\",\"name\":\"Not submitted\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[20,639.2000122070312,520,36.400001525878906]}],\"goal\":\"Submit my application with my registered mobile number.\",\"redactions\":[{\"token\":\"<PII:NAME:1>\",\"class\":\"NAME\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,145.1999969482422,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":12,\"kind\":\"alpha\",\"field_role\":\"name\"},\"targetId\":\"#name\"},{\"token\":\"<PII:PHONE:1>\",\"class\":\"PHONE\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,209.60000610351562,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":10,\"kind\":\"numeric\",\"field_role\":\"tel\"},\"targetId\":\"#mobile\"},{\"token\":\"<PII:AADHAAR:1>\",\"class\":\"AADHAAR\",\"tier\":\"SENSITIVE\",\"bbox\":[34.79999923706055,274,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":14,\"kind\":\"numeric\"},\"targetId\":\"#aadhaar\"},{\"token\":\"<PII:DOB:1>\",\"class\":\"DOB\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,338.3999938964844,490.3999938964844,34],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":10,\"kind\":\"date\",\"field_role\":\"date\"},\"targetId\":\"#dob\"},{\"token\":\"\",\"class\":\"OTP\",\"tier\":\"CRITICAL\",\"bbox\":[34.79999923706055,404.8000183105469,490.3999938964844,32],\"method\":\"masked_no_token\",\"detectors\":[\"D1\"],\"hint\":{\"len\":6,\"kind\":\"numeric\",\"field_role\":\"one-time-code\"},\"targetId\":\"#otp\"}],\"request\":{\"requestId\":\"m2-success-request\",\"sessionId\":\"m2-success-session\",\"issuedAt\":1792700604710},\"verified\":true}",
+            "ledgerEntry": {
+              "sessionId": "m2-success-session",
+              "requestId": "m2-success-request",
+              "at": 1792700604710,
+              "destination": "(no egress client in this phase)",
+              "payloadSha256": "1ac2b10b5e08b8aa301b342c018ee0208e07f4bb9f263e7b1464e21087650a3b",
+              "payloadBytes": 4255,
+              "verified": true,
+              "leakCheck": "CLEAN",
+              "elements": 14,
+              "references": [
+                {
+                  "token": "<PII:NAME:1>",
+                  "class": "NAME",
+                  "tier": "PERSONAL"
+                },
+                {
+                  "token": "<PII:PHONE:1>",
+                  "class": "PHONE",
+                  "tier": "PERSONAL"
+                },
+                {
+                  "token": "<PII:AADHAAR:1>",
+                  "class": "AADHAAR",
+                  "tier": "SENSITIVE"
+                },
+                {
+                  "token": "<PII:DOB:1>",
+                  "class": "DOB",
+                  "tier": "PERSONAL"
+                }
+              ],
+              "maskedWithoutReference": 1,
+              "note": "privacy-layer record only: this phase has no egress client, so this is not evidence of a network send"
+            },
+            "response": {
+              "received": true,
+              "reasoner": "local-model:qwen2.5-0.5b-instruct-q4_k_m",
+              "transport": "LOOPBACK_HTTP",
+              "elapsedMs": 2217,
+              "requestId": "m2-success-request"
+            },
+            "plan": {
+              "planVersion": "1",
+              "provenance": {
+                "requestId": "m2-success-request",
+                "sessionId": "m2-success-session",
+                "viewId": "m2-success-request",
+                "origin": "http://127.0.0.1:8975"
+              },
+              "goal": "Submit my application with my registered mobile number.",
+              "steps": [
+                {
+                  "op": "insert",
+                  "target": "#mobile_confirm",
+                  "ref": "<PII:PHONE:1>"
+                },
+                {
+                  "op": "click",
+                  "target": "#submit"
+                }
+              ]
+            },
+            "validation": {
+              "ok": true,
+              "steps": [
+                {
+                  "op": "insert",
+                  "source": "reference",
+                  "index": 0,
+                  "target": "#mobile_confirm",
+                  "ref": "<PII:PHONE:1>",
+                  "piiClass": "PHONE",
+                  "binding": {
+                    "decision": "BIND_OK"
+                  },
+                  "needsHuman": false
+                },
+                {
+                  "op": "click",
+                  "index": 1,
+                  "target": "#submit"
+                }
+              ],
+              "needsHuman": [],
+              "declaresDone": false
+            },
+            "reasonerKind": "LOCAL_MODEL",
+            "fallback": null,
+            "grant": {
+              "requested": true,
+              "decision": {
+                "granted": true
+              },
+              "useGrant": {
+                "ref": "<PII:PHONE:1>",
+                "piiClass": "PHONE",
+                "fingerprint": "#mobile_confirm|textbox|Confirm mobile number",
+                "origin": "http://127.0.0.1:8975",
+                "sessionId": "m2-success-session",
+                "purpose": "Use of PHONE for \"Confirm mobile number\"",
+                "actionContext": "insert into #mobile_confirm, then click #submit",
+                "grantedAt": 1792700607090,
+                "expiresAt": 1792700667090,
+                "used": true
+              }
+            },
+            "rehydrated": [
+              {
+                "ref": "<PII:PHONE:1>",
+                "target": "#mobile_confirm",
+                "piiClass": "PHONE",
+                "inserted": true
+              }
+            ],
+            "literalsInserted": [],
+            "confirmation": {
+              "subject": {
+                "nodeId": "e12",
+                "selector": "#submit",
+                "role": "button",
+                "name": "Submit application",
+                "frameId": "transport-65e7924c-0e4c-42c9-b322-e9a52975ddde",
+                "origin": "http://127.0.0.1:8975"
+              },
+              "purpose": "Click \"Submit application\" to submit this application",
+              "confirmedAt": 1792700607095,
+              "expiresAt": 1792700667095
+            },
+            "act": {
+              "reached": "VERIFY_RESULT",
+              "decision": {
+                "decision": "ALLOW",
+                "kind": "click",
+                "node": {
+                  "id": "e12",
+                  "role": "button",
+                  "name": "Submit application",
+                  "domRef": {
+                    "selector": "#submit"
+                  },
+                  "evidence": {
+                    "kind": "OBSERVED",
+                    "frameId": "transport-65e7924c-0e4c-42c9-b322-e9a52975ddde",
+                    "viewportBox": {
+                      "x": 34.79999923706055,
+                      "y": 572.4000244140625,
+                      "w": 153.4250030517578,
+                      "h": 38
+                    },
+                    "documentBox": {
+                      "x": 34.79999923706055,
+                      "y": 572.4000244140625,
+                      "w": 153.4250030517578,
+                      "h": 38
+                    }
+                  },
+                  "enabled": true,
+                  "parent": null,
+                  "children": []
+                },
+                "frameId": "transport-65e7924c-0e4c-42c9-b322-e9a52975ddde",
+                "viewportBox": {
+                  "x": 34.79999923706055,
+                  "y": 572.4000244140625,
+                  "w": 153.4250030517578,
+                  "h": 38
+                },
+                "movedCssPx": 0,
+                "boxIou": 1,
+                "structurallyCurrent": true,
+                "point": {
+                  "x": 112,
+                  "y": 591
+                }
+              },
+              "hit": {
+                "agreement": "MATCH",
+                "point": {
+                  "x": 112,
+                  "y": 591
+                },
+                "observed": {
+                  "frameId": "transport-65e7924c-0e4c-42c9-b322-e9a52975ddde",
+                  "selector": "#submit",
+                  "role": "button",
+                  "name": "Submit application",
+                  "box": {
+                    "x": 34.79999923706055,
+                    "y": 572.4000244140625,
+                    "w": 153.4250030517578,
+                    "h": 38
+                  }
+                },
+                "boxIou": 1,
+                "elapsedMs": 1
+              },
+              "result": {
+                "status": "EXECUTED",
+                "kind": "click",
+                "target": {
+                  "nodeId": "e12",
+                  "role": "button",
+                  "name": "Submit application",
+                  "point": {
+                    "x": 112,
+                    "y": 591
+                  },
+                  "box": {
+                    "x": 34.79999923706055,
+                    "y": 572.4000244140625,
+                    "w": 153.4250030517578,
+                    "h": 38
+                  }
+                },
+                "dispatchMs": 2
+              },
+              "verification": {
+                "verification": "CONFIRMED",
+                "postcondition": "TARGET_ENABLED",
+                "evidence": "#submit is disabled, as expected."
+              }
+            },
+            "declaredDone": false,
+            "postcondition": {
+              "kind": "TARGET_ENABLED",
+              "expected": false
+            },
+            "fill": {
+              "fillable": [
+                {
+                  "target": "#mobile_confirm",
+                  "ref": "<PII:PHONE:1>"
+                }
+              ],
+              "withheld": []
+            }
+          },
+          "binding": {
+            "origin": "http://127.0.0.1:8975",
+            "documentId": "CE4A0CC258C6198199DA797F80840ABA",
+            "tabId": 1795533811,
+            "frameId": 0,
+            "swBootId": "7a9b3f6f-0846-46dc-b2f7-2dfca1d8146e"
+          },
+          "ports": {
+            "observations": 3,
+            "structureReads": 1,
+            "inserts": 0,
+            "insertRefusals": [],
+            "cycle": {
+              "cycleId": "3d7fa8fc-6aa3-4e7a-b5a9-f9ab2560ff0b",
+              "hitTest": {
+                "point": {
+                  "x": 112,
+                  "y": 591
+                },
+                "topmost": "#submit",
+                "receivedAt": 1792700607098,
+                "sampledAt": 1792700607098.1
+              },
+              "dispatch": {
+                "deliveryId": "e4d99ffe-057b-475a-846a-b22dfa63a909",
+                "point": {
+                  "x": 112,
+                  "y": 591
+                },
+                "dispatchedTo": "#submit",
+                "receivedAt": 1792700607099.4,
+                "dispatchedAt": 1792700607099.7
+              },
+              "refusals": []
+            },
+            "cycles": [
+              {
+                "cycleId": "3d7fa8fc-6aa3-4e7a-b5a9-f9ab2560ff0b",
+                "hitTest": {
+                  "point": {
+                    "x": 112,
+                    "y": 591
+                  },
+                  "topmost": "#submit",
+                  "receivedAt": 1792700607098,
+                  "sampledAt": 1792700607098.1
+                },
+                "dispatch": {
+                  "deliveryId": "e4d99ffe-057b-475a-846a-b22dfa63a909",
+                  "point": {
+                    "x": 112,
+                    "y": 591
+                  },
+                  "dispatchedTo": "#submit",
+                  "receivedAt": 1792700607099.4,
+                  "dispatchedAt": 1792700607099.7
+                },
+                "refusals": []
+              }
+            ],
+            "perception": [
+              {
+                "ran": false,
+                "refusal": {
+                  "code": "NO_ACTIVE_TAB_GRANT",
+                  "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+                },
+                "route": null,
+                "workerSawPixels": false,
+                "capture": null,
+                "detector": {
+                  "modelId": "none",
+                  "revision": "none",
+                  "backend": "wasm",
+                  "ran": false,
+                  "detections": 0,
+                  "byClass": {},
+                  "refusal": null
+                },
+                "fusion": null,
+                "text": {
+                  "available": false,
+                  "refusal": {
+                    "code": "TEXT_PERCEPTION_UNAVAILABLE",
+                    "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+                  },
+                  "findings": [],
+                  "ms": 0
+                },
+                "redaction": {
+                  "outcome": "NOT_RUN",
+                  "failClosed": null,
+                  "reason": null,
+                  "refusal": null,
+                  "detector": {
+                    "modelId": "PP-OCRv4_mobile_det",
+                    "ran": false,
+                    "code": null,
+                    "detections": 0
+                  },
+                  "regions": 0,
+                  "maskRects": 0,
+                  "pixelWrites": 0,
+                  "rawBitmapClosed": null,
+                  "frameKept": false,
+                  "ms": {
+                    "detector": 0,
+                    "mapping": 0,
+                    "plan": 0,
+                    "pixelMapping": 0,
+                    "fill": 0
+                  }
+                },
+                "elements": [],
+                "sourceBySelector": {},
+                "ms": {
+                  "capture": 0,
+                  "decode": 0,
+                  "encode": 0,
+                  "preprocess": 0,
+                  "infer": 0,
+                  "fuse": 0,
+                  "total": 0
+                }
+              },
+              {
+                "ran": false,
+                "refusal": {
+                  "code": "NO_ACTIVE_TAB_GRANT",
+                  "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+                },
+                "route": null,
+                "workerSawPixels": false,
+                "capture": null,
+                "detector": {
+                  "modelId": "none",
+                  "revision": "none",
+                  "backend": "wasm",
+                  "ran": false,
+                  "detections": 0,
+                  "byClass": {},
+                  "refusal": null
+                },
+                "fusion": null,
+                "text": {
+                  "available": false,
+                  "refusal": {
+                    "code": "TEXT_PERCEPTION_UNAVAILABLE",
+                    "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+                  },
+                  "findings": [],
+                  "ms": 0
+                },
+                "redaction": {
+                  "outcome": "NOT_RUN",
+                  "failClosed": null,
+                  "reason": null,
+                  "refusal": null,
+                  "detector": {
+                    "modelId": "PP-OCRv4_mobile_det",
+                    "ran": false,
+                    "code": null,
+                    "detections": 0
+                  },
+                  "regions": 0,
+                  "maskRects": 0,
+                  "pixelWrites": 0,
+                  "rawBitmapClosed": null,
+                  "frameKept": false,
+                  "ms": {
+                    "detector": 0,
+                    "mapping": 0,
+                    "plan": 0,
+                    "pixelMapping": 0,
+                    "fill": 0
+                  }
+                },
+                "elements": [],
+                "sourceBySelector": {},
+                "ms": {
+                  "capture": 0,
+                  "decode": 0,
+                  "encode": 0,
+                  "preprocess": 0,
+                  "infer": 0,
+                  "fuse": 0,
+                  "total": 0
+                }
+              },
+              {
+                "ran": false,
+                "refusal": {
+                  "code": "NO_ACTIVE_TAB_GRANT",
+                  "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+                },
+                "route": null,
+                "workerSawPixels": false,
+                "capture": null,
+                "detector": {
+                  "modelId": "none",
+                  "revision": "none",
+                  "backend": "wasm",
+                  "ran": false,
+                  "detections": 0,
+                  "byClass": {},
+                  "refusal": null
+                },
+                "fusion": null,
+                "text": {
+                  "available": false,
+                  "refusal": {
+                    "code": "TEXT_PERCEPTION_UNAVAILABLE",
+                    "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+                  },
+                  "findings": [],
+                  "ms": 0
+                },
+                "redaction": {
+                  "outcome": "NOT_RUN",
+                  "failClosed": null,
+                  "reason": null,
+                  "refusal": null,
+                  "detector": {
+                    "modelId": "PP-OCRv4_mobile_det",
+                    "ran": false,
+                    "code": null,
+                    "detections": 0
+                  },
+                  "regions": 0,
+                  "maskRects": 0,
+                  "pixelWrites": 0,
+                  "rawBitmapClosed": null,
+                  "frameKept": false,
+                  "ms": {
+                    "detector": 0,
+                    "mapping": 0,
+                    "plan": 0,
+                    "pixelMapping": 0,
+                    "fill": 0
+                  }
+                },
+                "elements": [],
+                "sourceBySelector": {},
+                "ms": {
+                  "capture": 0,
+                  "decode": 0,
+                  "encode": 0,
+                  "preprocess": 0,
+                  "infer": 0,
+                  "fuse": 0,
+                  "total": 0
+                }
+              }
+            ]
+          },
+          "perceptionBoot": {
+            "ok": true,
+            "error": null,
+            "ms": 417,
+            "pin": {
+              "artifact": "ort-wasm-simd-threaded.jsep.wasm",
+              "sha256": "db816fadbab47a755170c08f933961e231412ac17f5981f9a62e519708a44dea",
+              "bytes": 27797172,
+              "installedAt": "2026-10-22T20:23:24.354Z"
+            }
+          },
+          "boundary": {
+            "classifications": 1,
+            "fieldsSeenByThePageRealm": 6,
+            "referencesIssued": 4,
+            "questions": 2,
+            "textsAsked": 2,
+            "capabilitiesArmed": 3,
+            "releases": 1,
+            "writes": 1,
+            "refusals": []
+          },
+          "egress": [
+            {
+              "record": {
+                "requestId": "m2-success-request",
+                "sessionId": "m2-success-session",
+                "destination": "http://127.0.0.1:8995/v1/chat/completions",
+                "at": 1792700606938,
+                "transport": "LOOPBACK_HTTP",
+                "reasoner": "local-model:qwen2.5-0.5b-instruct-q4_k_m",
+                "verified": true,
+                "payloadSha256": "8503ab7866949f347eaae47c4fcbae8c43bad35e287ea13229e76296c23c909f",
+                "payloadBytes": 2776,
+                "leakCheck": "CLEAN",
+                "references": [
+                  "<PII:NAME:1>",
+                  "<PII:PHONE:1>",
+                  "<PII:AADHAAR:1>",
+                  "<PII:DOB:1>"
+                ],
+                "responseStatus": 200,
+                "responseBytes": 836,
+                "peerReceipt": {
+                  "sha256": "8503ab7866949f347eaae47c4fcbae8c43bad35e287ea13229e76296c23c909f",
+                  "bytes": 2776,
+                  "agrees": true
+                },
+                "elapsedMs": 2217
+              }
+            }
+          ],
+          "grant": {
+            "asked": true,
+            "granted": true
+          }
+        }
+      },
+      "error": null,
+      "grantAsked": {
+        "ref": "<PII:PHONE:1>",
+        "piiClass": "PHONE",
+        "target": "#mobile_confirm",
+        "targetLabel": "Confirm mobile number",
+        "fingerprint": "#mobile_confirm|textbox|Confirm mobile number",
+        "origin": "http://127.0.0.1:8975",
+        "sessionId": "m2-success-session",
+        "purpose": "Allow PratiBimb to use your phone for \"Confirm mobile number\" on this page",
+        "actionContext": "restore it into #mobile_confirm, then click #submit (\"Submit application\")",
+        "action": {
+          "target": "#submit",
+          "label": "Submit application"
+        }
+      },
+      "page": {
+        "confirmValue": "9000000001",
+        "submitted": "true",
+        "statusText": "Application submitted",
+        "submitEvents": [
+          "pointerdown@112,591",
+          "mousedown@112,591",
+          "pointerup@112,591",
+          "mouseup@112,591",
+          "click@112,591"
+        ],
+        "submitDisabled": true,
+        "probeInstalls": 1,
+        "probe": {
+          "events": [
+            {
+              "type": "pointerdown",
+              "trusted": false,
+              "at": 1792700607099.6,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "mousedown",
+              "trusted": false,
+              "at": 1792700607099.6,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "pointerup",
+              "trusted": false,
+              "at": 1792700607099.6,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "mouseup",
+              "trusted": false,
+              "at": 1792700607099.6,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "click",
+              "trusted": false,
+              "at": 1792700607099.6,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            }
+          ],
+          "objectSeenTwice": 0,
+          "listenersOnSubmit": 6,
+          "timeOrigin": 1792700604239.5
+        }
+      },
+      "audit": {
+        "ok": true,
+        "instances": 1,
+        "e6Clicks": 0,
+        "transport": {
+          "hitTests": 1,
+          "dispatchRequests": 1,
+          "firesStarted": 1,
+          "firesCompleted": 1,
+          "refusals": [],
+          "fires": [
+            {
+              "cycleId": "3d7fa8fc-6aa3-4e7a-b5a9-f9ab2560ff0b",
+              "deliveryId": "e4d99ffe-057b-475a-846a-b22dfa63a909",
+              "requestId": "c6db6eeb-d65f-4854-aad2-55a3bb6e222a",
+              "to": "#submit",
+              "preparedAt": 1792700607099.4,
+              "at": 1792700607099.7,
+              "doneAt": 1792700607100.2
+            }
+          ],
+          "structure": {
+            "watching": true,
+            "seq": 1,
+            "nodes": 1,
+            "attributes": 1,
+            "text": 0,
+            "resizes": 0,
+            "tracked": 15,
+            "at": 1792700607100.3
+          },
+          "structuralBatches": 1
+        }
+      },
+      "connections": 1,
+      "served": 1,
+      "leaked": []
+    },
+    "REFUSAL": {
+      "outcome": {
+        "ok": true,
+        "result": {
+          "record": {
+            "goal": "Submit my application with my registered mobile number.",
+            "sessionId": "m2-refusal-session",
+            "requestId": "m2-refusal-request",
+            "origin": "http://127.0.0.1:8975",
+            "state": "REFUSED",
+            "transitions": [
+              {
+                "from": "IDLE",
+                "to": "OBSERVE",
+                "at": 1792700607428,
+                "elapsedMs": 0
+              },
+              {
+                "from": "OBSERVE",
+                "to": "SANITIZE",
+                "at": 1792700607430,
+                "elapsedMs": 2
+              },
+              {
+                "from": "SANITIZE",
+                "to": "VERIFY_PAYLOAD",
+                "at": 1792700607435,
+                "elapsedMs": 7
+              },
+              {
+                "from": "VERIFY_PAYLOAD",
+                "to": "SEND",
+                "at": 1792700607435,
+                "elapsedMs": 7
+              },
+              {
+                "from": "SEND",
+                "to": "VALIDATE_PLAN",
+                "at": 1792700607441,
+                "elapsedMs": 13
+              },
+              {
+                "from": "VALIDATE_PLAN",
+                "to": "REFUSED",
+                "at": 1792700607443,
+                "elapsedMs": 15
+              }
+            ],
+            "timings": {
+              "observeMs": 2,
+              "sanitizeMs": 5,
+              "verifyPayloadMs": 0,
+              "sendMs": 6,
+              "validatePlanMs": 1,
+              "totalMs": 15
+            },
+            "refusal": {
+              "stage": "VALIDATE_PLAN",
+              "cause": "LITERAL_REFUSED",
+              "detail": "the plan returned a value this client holds locally and never sent. Refused before rehydration and before any action; the value is not quoted.",
+              "planRefusal": {
+                "cause": "LITERAL_REFUSED",
+                "at": 0,
+                "target": "#mobile_confirm",
+                "literalCause": "VAULT_LITERAL_ECHO",
+                "literalSeverity": "LEAKAGE_EVENT",
+                "literalFindings": [
+                  {
+                    "cause": "VAULT_LITERAL_ECHO",
+                    "severity": "LEAKAGE_EVENT",
+                    "piiClass": "PHONE"
+                  },
+                  {
+                    "cause": "PII_SHAPED_LITERAL",
+                    "severity": "PLAN_DEFECT",
+                    "piiClass": "PHONE"
+                  }
+                ],
+                "piiClass": "PHONE",
+                "detail": "the plan returned a value this client holds locally and never sent. Refused before rehydration and before any action; the value is not quoted."
+              }
+            },
+            "initialObservation": {
+              "nodes": 14,
+              "fields": 0,
+              "frameId": "transport-9784a701-78da-4ae5-80c4-3c727b68a56d",
+              "viewport": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scrollX": 0,
+                "scrollY": 0
+              },
+              "documentId": "5F0046D495F623C74403C8CEBF2F9AAA",
+              "focusedSelector": null,
+              "actionable": [
+                "label",
+                "#name",
+                "#mobile",
+                "#aadhaar",
+                "#dob",
+                "#otp",
+                "#mobile_confirm",
+                "#submit",
+                "#status"
+              ]
+            },
+            "observation": {
+              "nodes": 14,
+              "fields": 0,
+              "frameId": "transport-9784a701-78da-4ae5-80c4-3c727b68a56d",
+              "viewport": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scrollX": 0,
+                "scrollY": 0
+              },
+              "documentId": "5F0046D495F623C74403C8CEBF2F9AAA",
+              "focusedSelector": null,
+              "actionable": [
+                "label",
+                "#name",
+                "#mobile",
+                "#aadhaar",
+                "#dob",
+                "#otp",
+                "#mobile_confirm",
+                "#submit",
+                "#status"
+              ]
+            },
+            "handoff": {
+              "manifestVersion": "1.1",
+              "capture": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scale_to_css": 1,
+                "scroll": {
+                  "x": 0,
+                  "y": 0
+                },
+                "origin": "http://127.0.0.1:8975"
+              },
+              "capability": {
+                "backend": "none",
+                "tiers_fired": [
+                  "T0",
+                  "T2"
+                ]
+              },
+              "elements": [
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Full name",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    122.80000305175781,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#name",
+                  "role": "textbox",
+                  "name": "Full name",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    145.1999969482422,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    187.1999969482422,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#mobile",
+                  "role": "textbox",
+                  "name": "Mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    209.60000610351562,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Aadhaar number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    251.60000610351562,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#aadhaar",
+                  "role": "textbox",
+                  "name": "Aadhaar number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    274,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Date of birth",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    316,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#dob",
+                  "role": "textbox",
+                  "name": "Date of birth",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    338.3999938964844,
+                    490.3999938964844,
+                    34
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "OTP",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    382.3999938964844,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#otp",
+                  "role": "textbox",
+                  "name": "OTP",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    404.8000183105469,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Confirm mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    506,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#mobile_confirm",
+                  "role": "textbox",
+                  "name": "Confirm mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    528.4000244140625,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "#submit",
+                  "role": "button",
+                  "name": "Submit application",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    572.4000244140625,
+                    153.4250030517578,
+                    38
+                  ]
+                },
+                {
+                  "id": "#status",
+                  "role": "status",
+                  "name": "Not submitted",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    20,
+                    639.2000122070312,
+                    520,
+                    36.400001525878906
+                  ]
+                }
+              ],
+              "goal": "Submit my application with my registered mobile number.",
+              "redactions": [
+                {
+                  "token": "<PII:NAME:1>",
+                  "class": "NAME",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    145.1999969482422,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 12,
+                    "kind": "alpha",
+                    "field_role": "name"
+                  },
+                  "targetId": "#name"
+                },
+                {
+                  "token": "<PII:PHONE:1>",
+                  "class": "PHONE",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    209.60000610351562,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 10,
+                    "kind": "numeric",
+                    "field_role": "tel"
+                  },
+                  "targetId": "#mobile"
+                },
+                {
+                  "token": "<PII:AADHAAR:1>",
+                  "class": "AADHAAR",
+                  "tier": "SENSITIVE",
+                  "bbox": [
+                    34.79999923706055,
+                    274,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 14,
+                    "kind": "numeric"
+                  },
+                  "targetId": "#aadhaar"
+                },
+                {
+                  "token": "<PII:DOB:1>",
+                  "class": "DOB",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    338.3999938964844,
+                    490.3999938964844,
+                    34
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 10,
+                    "kind": "date",
+                    "field_role": "date"
+                  },
+                  "targetId": "#dob"
+                },
+                {
+                  "token": "",
+                  "class": "OTP",
+                  "tier": "CRITICAL",
+                  "bbox": [
+                    34.79999923706055,
+                    404.8000183105469,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "masked_no_token",
+                  "detectors": [
+                    "D1"
+                  ],
+                  "hint": {
+                    "len": 6,
+                    "kind": "numeric",
+                    "field_role": "one-time-code"
+                  },
+                  "targetId": "#otp"
+                }
+              ],
+              "request": {
+                "requestId": "m2-refusal-request",
+                "sessionId": "m2-refusal-session",
+                "issuedAt": 1792700607430
+              },
+              "verified": true
+            },
+            "handoffSerialized": "{\"manifestVersion\":\"1.1\",\"capture\":{\"w\":1280,\"h\":720,\"dpr\":1.0000000149011612,\"zoom\":1,\"scale_to_css\":1,\"scroll\":{\"x\":0,\"y\":0},\"origin\":\"http://127.0.0.1:8975\"},\"capability\":{\"backend\":\"none\",\"tiers_fired\":[\"T0\",\"T2\"]},\"elements\":[{\"id\":\"label\",\"role\":\"label\",\"name\":\"Full name\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,122.80000305175781,490.3999938964844,18.399999618530273]},{\"id\":\"#name\",\"role\":\"textbox\",\"name\":\"Full name\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,145.1999969482422,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,187.1999969482422,490.3999938964844,18.399999618530273]},{\"id\":\"#mobile\",\"role\":\"textbox\",\"name\":\"Mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,209.60000610351562,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Aadhaar number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,251.60000610351562,490.3999938964844,18.399999618530273]},{\"id\":\"#aadhaar\",\"role\":\"textbox\",\"name\":\"Aadhaar number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,274,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Date of birth\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,316,490.3999938964844,18.399999618530273]},{\"id\":\"#dob\",\"role\":\"textbox\",\"name\":\"Date of birth\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,338.3999938964844,490.3999938964844,34]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"OTP\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,382.3999938964844,490.3999938964844,18.399999618530273]},{\"id\":\"#otp\",\"role\":\"textbox\",\"name\":\"OTP\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,404.8000183105469,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Confirm mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,506,490.3999938964844,18.399999618530273]},{\"id\":\"#mobile_confirm\",\"role\":\"textbox\",\"name\":\"Confirm mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,528.4000244140625,490.3999938964844,32]},{\"id\":\"#submit\",\"role\":\"button\",\"name\":\"Submit application\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,572.4000244140625,153.4250030517578,38]},{\"id\":\"#status\",\"role\":\"status\",\"name\":\"Not submitted\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[20,639.2000122070312,520,36.400001525878906]}],\"goal\":\"Submit my application with my registered mobile number.\",\"redactions\":[{\"token\":\"<PII:NAME:1>\",\"class\":\"NAME\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,145.1999969482422,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":12,\"kind\":\"alpha\",\"field_role\":\"name\"},\"targetId\":\"#name\"},{\"token\":\"<PII:PHONE:1>\",\"class\":\"PHONE\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,209.60000610351562,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":10,\"kind\":\"numeric\",\"field_role\":\"tel\"},\"targetId\":\"#mobile\"},{\"token\":\"<PII:AADHAAR:1>\",\"class\":\"AADHAAR\",\"tier\":\"SENSITIVE\",\"bbox\":[34.79999923706055,274,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":14,\"kind\":\"numeric\"},\"targetId\":\"#aadhaar\"},{\"token\":\"<PII:DOB:1>\",\"class\":\"DOB\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,338.3999938964844,490.3999938964844,34],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":10,\"kind\":\"date\",\"field_role\":\"date\"},\"targetId\":\"#dob\"},{\"token\":\"\",\"class\":\"OTP\",\"tier\":\"CRITICAL\",\"bbox\":[34.79999923706055,404.8000183105469,490.3999938964844,32],\"method\":\"masked_no_token\",\"detectors\":[\"D1\"],\"hint\":{\"len\":6,\"kind\":\"numeric\",\"field_role\":\"one-time-code\"},\"targetId\":\"#otp\"}],\"request\":{\"requestId\":\"m2-refusal-request\",\"sessionId\":\"m2-refusal-session\",\"issuedAt\":1792700607430},\"verified\":true}",
+            "ledgerEntry": {
+              "sessionId": "m2-refusal-session",
+              "requestId": "m2-refusal-request",
+              "at": 1792700607430,
+              "destination": "(no egress client in this phase)",
+              "payloadSha256": "51c64927abd3a2e6fb7e524e2db7dcaf5771a5016db936e20682ee2380e0989c",
+              "payloadBytes": 4255,
+              "verified": true,
+              "leakCheck": "CLEAN",
+              "elements": 14,
+              "references": [
+                {
+                  "token": "<PII:NAME:1>",
+                  "class": "NAME",
+                  "tier": "PERSONAL"
+                },
+                {
+                  "token": "<PII:PHONE:1>",
+                  "class": "PHONE",
+                  "tier": "PERSONAL"
+                },
+                {
+                  "token": "<PII:AADHAAR:1>",
+                  "class": "AADHAAR",
+                  "tier": "SENSITIVE"
+                },
+                {
+                  "token": "<PII:DOB:1>",
+                  "class": "DOB",
+                  "tier": "PERSONAL"
+                }
+              ],
+              "maskedWithoutReference": 1,
+              "note": "privacy-layer record only: this phase has no egress client, so this is not evidence of a network send"
+            },
+            "response": {
+              "received": true,
+              "reasoner": "local-model:qwen2.5-0.5b-instruct-q4_k_m",
+              "transport": "LOOPBACK_HTTP",
+              "elapsedMs": 6,
+              "requestId": "m2-refusal-request"
+            },
+            "plan": {
+              "planVersion": "1",
+              "provenance": {
+                "requestId": "m2-refusal-request",
+                "sessionId": "m2-refusal-session",
+                "viewId": "m2-refusal-request",
+                "origin": "http://127.0.0.1:8975"
+              },
+              "goal": "Submit my application with my registered mobile number.",
+              "steps": [
+                {
+                  "op": "insert",
+                  "target": "#mobile_confirm",
+                  "literalMarker": "⟨literal:PHONE⟩",
+                  "literalClass": "PHONE"
+                },
+                {
+                  "op": "click",
+                  "target": "#submit"
+                }
+              ]
+            },
+            "validation": {
+              "ok": false,
+              "refusal": {
+                "cause": "LITERAL_REFUSED",
+                "at": 0,
+                "target": "#mobile_confirm",
+                "literalCause": "VAULT_LITERAL_ECHO",
+                "literalSeverity": "LEAKAGE_EVENT",
+                "literalFindings": [
+                  {
+                    "cause": "VAULT_LITERAL_ECHO",
+                    "severity": "LEAKAGE_EVENT",
+                    "piiClass": "PHONE"
+                  },
+                  {
+                    "cause": "PII_SHAPED_LITERAL",
+                    "severity": "PLAN_DEFECT",
+                    "piiClass": "PHONE"
+                  }
+                ],
+                "piiClass": "PHONE",
+                "detail": "the plan returned a value this client holds locally and never sent. Refused before rehydration and before any action; the value is not quoted."
+              },
+              "checked": []
+            },
+            "reasonerKind": "LOCAL_MODEL",
+            "fallback": {
+              "outcome": "HOSTILE",
+              "fellBack": false,
+              "reason": "the model returned a plan the client refused; falling back would hide a caught event behind a success."
+            },
+            "grant": {
+              "requested": false,
+              "decision": null,
+              "useGrant": null
+            },
+            "rehydrated": [],
+            "literalsInserted": [],
+            "confirmation": null,
+            "act": null,
+            "declaredDone": false,
+            "postcondition": null,
+            "fill": {
+              "fillable": [
+                {
+                  "target": "#mobile_confirm",
+                  "ref": "<PII:PHONE:1>"
+                }
+              ],
+              "withheld": []
+            }
+          },
+          "binding": {
+            "origin": "http://127.0.0.1:8975",
+            "documentId": "5F0046D495F623C74403C8CEBF2F9AAA",
+            "tabId": 1795533811,
+            "frameId": 0,
+            "swBootId": "7a9b3f6f-0846-46dc-b2f7-2dfca1d8146e"
+          },
+          "ports": {
+            "observations": 1,
+            "structureReads": 0,
+            "inserts": 0,
+            "insertRefusals": [],
+            "cycle": null,
+            "cycles": [],
+            "perception": [
+              {
+                "ran": false,
+                "refusal": {
+                  "code": "NO_ACTIVE_TAB_GRANT",
+                  "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+                },
+                "route": null,
+                "workerSawPixels": false,
+                "capture": null,
+                "detector": {
+                  "modelId": "none",
+                  "revision": "none",
+                  "backend": "wasm",
+                  "ran": false,
+                  "detections": 0,
+                  "byClass": {},
+                  "refusal": null
+                },
+                "fusion": null,
+                "text": {
+                  "available": false,
+                  "refusal": {
+                    "code": "TEXT_PERCEPTION_UNAVAILABLE",
+                    "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+                  },
+                  "findings": [],
+                  "ms": 0
+                },
+                "redaction": {
+                  "outcome": "NOT_RUN",
+                  "failClosed": null,
+                  "reason": null,
+                  "refusal": null,
+                  "detector": {
+                    "modelId": "PP-OCRv4_mobile_det",
+                    "ran": false,
+                    "code": null,
+                    "detections": 0
+                  },
+                  "regions": 0,
+                  "maskRects": 0,
+                  "pixelWrites": 0,
+                  "rawBitmapClosed": null,
+                  "frameKept": false,
+                  "ms": {
+                    "detector": 0,
+                    "mapping": 0,
+                    "plan": 0,
+                    "pixelMapping": 0,
+                    "fill": 0
+                  }
+                },
+                "elements": [],
+                "sourceBySelector": {},
+                "ms": {
+                  "capture": 0,
+                  "decode": 0,
+                  "encode": 0,
+                  "preprocess": 0,
+                  "infer": 0,
+                  "fuse": 0,
+                  "total": 0
+                }
+              }
+            ]
+          },
+          "perceptionBoot": {
+            "ok": true,
+            "error": null,
+            "ms": 417,
+            "pin": {
+              "artifact": "ort-wasm-simd-threaded.jsep.wasm",
+              "sha256": "db816fadbab47a755170c08f933961e231412ac17f5981f9a62e519708a44dea",
+              "bytes": 27797172,
+              "installedAt": "2026-10-22T20:23:24.354Z"
+            }
+          },
+          "boundary": {
+            "classifications": 1,
+            "fieldsSeenByThePageRealm": 6,
+            "referencesIssued": 4,
+            "questions": 3,
+            "textsAsked": 3,
+            "capabilitiesArmed": 3,
+            "releases": 0,
+            "writes": 0,
+            "refusals": []
+          },
+          "egress": [
+            {
+              "record": {
+                "requestId": "m2-refusal-request",
+                "sessionId": "m2-refusal-session",
+                "destination": "http://127.0.0.1:8995/v1/chat/completions",
+                "at": 1792700607441,
+                "transport": "LOOPBACK_HTTP",
+                "reasoner": "local-model:qwen2.5-0.5b-instruct-q4_k_m",
+                "verified": true,
+                "payloadSha256": "8503ab7866949f347eaae47c4fcbae8c43bad35e287ea13229e76296c23c909f",
+                "payloadBytes": 2776,
+                "leakCheck": "CLEAN",
+                "references": [
+                  "<PII:NAME:1>",
+                  "<PII:PHONE:1>",
+                  "<PII:AADHAAR:1>",
+                  "<PII:DOB:1>"
+                ],
+                "responseStatus": 200,
+                "responseBytes": 173,
+                "peerReceipt": {
+                  "sha256": "8503ab7866949f347eaae47c4fcbae8c43bad35e287ea13229e76296c23c909f",
+                  "bytes": 2776,
+                  "agrees": true
+                },
+                "elapsedMs": 6
+              }
+            }
+          ],
+          "grant": {
+            "asked": false,
+            "granted": null
+          }
+        }
+      },
+      "error": null,
+      "grantAsked": null,
+      "page": {
+        "confirmValue": "",
+        "submitted": "false",
+        "statusText": "Not submitted",
+        "submitEvents": [],
+        "submitDisabled": false,
+        "probeInstalls": 1,
+        "probe": {
+          "events": [],
+          "objectSeenTwice": 0,
+          "listenersOnSubmit": 6,
+          "timeOrigin": 1792700607375.7
+        }
+      },
+      "audit": {
+        "ok": true,
+        "instances": 1,
+        "e6Clicks": 0,
+        "transport": {
+          "hitTests": 0,
+          "dispatchRequests": 0,
+          "firesStarted": 0,
+          "firesCompleted": 0,
+          "refusals": [],
+          "fires": [],
+          "structure": {
+            "watching": true,
+            "seq": 0,
+            "nodes": 0,
+            "attributes": 0,
+            "text": 0,
+            "resizes": 0,
+            "tracked": 15,
+            "at": null
+          },
+          "structuralBatches": 0
+        }
+      },
+      "served": 1,
+      "leaked": []
+    },
+    "OUTAGE": {
+      "outcome": {
+        "ok": true,
+        "result": {
+          "record": {
+            "goal": "Submit my application with my registered mobile number.",
+            "sessionId": "m2-outage-session",
+            "requestId": "m2-outage-request",
+            "origin": "http://127.0.0.1:8975",
+            "state": "DONE",
+            "transitions": [
+              {
+                "from": "IDLE",
+                "to": "OBSERVE",
+                "at": 1792700607749,
+                "elapsedMs": 0
+              },
+              {
+                "from": "OBSERVE",
+                "to": "SANITIZE",
+                "at": 1792700607751,
+                "elapsedMs": 2
+              },
+              {
+                "from": "SANITIZE",
+                "to": "VERIFY_PAYLOAD",
+                "at": 1792700607755,
+                "elapsedMs": 6
+              },
+              {
+                "from": "VERIFY_PAYLOAD",
+                "to": "SEND",
+                "at": 1792700607756,
+                "elapsedMs": 7
+              },
+              {
+                "from": "SEND",
+                "to": "VALIDATE_PLAN",
+                "at": 1792700607759,
+                "elapsedMs": 10
+              },
+              {
+                "from": "VALIDATE_PLAN",
+                "to": "AWAIT_GRANT",
+                "at": 1792700607759,
+                "elapsedMs": 10
+              },
+              {
+                "from": "AWAIT_GRANT",
+                "to": "REHYDRATE",
+                "at": 1792700608009,
+                "elapsedMs": 260
+              },
+              {
+                "from": "REHYDRATE",
+                "to": "ACT",
+                "at": 1792700608013,
+                "elapsedMs": 264
+              },
+              {
+                "from": "ACT",
+                "to": "VERIFY_RESULT",
+                "at": 1792700608013,
+                "elapsedMs": 264
+              },
+              {
+                "from": "VERIFY_RESULT",
+                "to": "DONE",
+                "at": 1792700608017,
+                "elapsedMs": 268
+              }
+            ],
+            "timings": {
+              "observeMs": 2,
+              "sanitizeMs": 4,
+              "verifyPayloadMs": 0,
+              "sendMs": 2,
+              "fallbackMs": 1,
+              "validatePlanMs": 0,
+              "grantMs": 250,
+              "rehydrateMs": 2,
+              "refreshMs": 2,
+              "structureMs": 0,
+              "verifyResultMs": 2,
+              "actMs": 4,
+              "totalMs": 268
+            },
+            "refusal": null,
+            "initialObservation": {
+              "nodes": 14,
+              "fields": 0,
+              "frameId": "transport-eebad897-4a99-4d07-a88c-9a3d10cf254a",
+              "viewport": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scrollX": 0,
+                "scrollY": 0
+              },
+              "documentId": "E5B35972DC813DCF6E0F089B823B21D8",
+              "focusedSelector": null,
+              "actionable": [
+                "label",
+                "#name",
+                "#mobile",
+                "#aadhaar",
+                "#dob",
+                "#otp",
+                "#mobile_confirm",
+                "#submit",
+                "#status"
+              ]
+            },
+            "observation": {
+              "nodes": 14,
+              "fields": 0,
+              "frameId": "transport-d56f99a9-d62a-445c-ac59-f3f56b235406",
+              "viewport": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scrollX": 0,
+                "scrollY": 0
+              },
+              "documentId": "E5B35972DC813DCF6E0F089B823B21D8",
+              "focusedSelector": null,
+              "actionable": [
+                "label",
+                "#name",
+                "#mobile",
+                "#aadhaar",
+                "#dob",
+                "#otp",
+                "#mobile_confirm",
+                "#status"
+              ]
+            },
+            "handoff": {
+              "manifestVersion": "1.1",
+              "capture": {
+                "w": 1280,
+                "h": 720,
+                "dpr": 1.0000000149011612,
+                "zoom": 1,
+                "scale_to_css": 1,
+                "scroll": {
+                  "x": 0,
+                  "y": 0
+                },
+                "origin": "http://127.0.0.1:8975"
+              },
+              "capability": {
+                "backend": "none",
+                "tiers_fired": [
+                  "T0",
+                  "T2"
+                ]
+              },
+              "elements": [
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Full name",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    122.80000305175781,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#name",
+                  "role": "textbox",
+                  "name": "Full name",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    145.1999969482422,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    187.1999969482422,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#mobile",
+                  "role": "textbox",
+                  "name": "Mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    209.60000610351562,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Aadhaar number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    251.60000610351562,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#aadhaar",
+                  "role": "textbox",
+                  "name": "Aadhaar number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    274,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Date of birth",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    316,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#dob",
+                  "role": "textbox",
+                  "name": "Date of birth",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    338.3999938964844,
+                    490.3999938964844,
+                    34
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "OTP",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    382.3999938964844,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#otp",
+                  "role": "textbox",
+                  "name": "OTP",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    404.8000183105469,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "label",
+                  "role": "label",
+                  "name": "Confirm mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    506,
+                    490.3999938964844,
+                    18.399999618530273
+                  ]
+                },
+                {
+                  "id": "#mobile_confirm",
+                  "role": "textbox",
+                  "name": "Confirm mobile number",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    528.4000244140625,
+                    490.3999938964844,
+                    32
+                  ]
+                },
+                {
+                  "id": "#submit",
+                  "role": "button",
+                  "name": "Submit application",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    34.79999923706055,
+                    572.4000244140625,
+                    153.4250030517578,
+                    38
+                  ]
+                },
+                {
+                  "id": "#status",
+                  "role": "status",
+                  "name": "Not submitted",
+                  "source": "dom",
+                  "visible": true,
+                  "offscreen": false,
+                  "enabled": true,
+                  "bbox": [
+                    20,
+                    639.2000122070312,
+                    520,
+                    36.400001525878906
+                  ]
+                }
+              ],
+              "goal": "Submit my application with my registered mobile number.",
+              "redactions": [
+                {
+                  "token": "<PII:NAME:1>",
+                  "class": "NAME",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    145.1999969482422,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 12,
+                    "kind": "alpha",
+                    "field_role": "name"
+                  },
+                  "targetId": "#name"
+                },
+                {
+                  "token": "<PII:PHONE:1>",
+                  "class": "PHONE",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    209.60000610351562,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 10,
+                    "kind": "numeric",
+                    "field_role": "tel"
+                  },
+                  "targetId": "#mobile"
+                },
+                {
+                  "token": "<PII:AADHAAR:1>",
+                  "class": "AADHAAR",
+                  "tier": "SENSITIVE",
+                  "bbox": [
+                    34.79999923706055,
+                    274,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 14,
+                    "kind": "numeric"
+                  },
+                  "targetId": "#aadhaar"
+                },
+                {
+                  "token": "<PII:DOB:1>",
+                  "class": "DOB",
+                  "tier": "PERSONAL",
+                  "bbox": [
+                    34.79999923706055,
+                    338.3999938964844,
+                    490.3999938964844,
+                    34
+                  ],
+                  "method": "token_reference",
+                  "detectors": [
+                    "D1",
+                    "D2"
+                  ],
+                  "hint": {
+                    "len": 10,
+                    "kind": "date",
+                    "field_role": "date"
+                  },
+                  "targetId": "#dob"
+                },
+                {
+                  "token": "",
+                  "class": "OTP",
+                  "tier": "CRITICAL",
+                  "bbox": [
+                    34.79999923706055,
+                    404.8000183105469,
+                    490.3999938964844,
+                    32
+                  ],
+                  "method": "masked_no_token",
+                  "detectors": [
+                    "D1"
+                  ],
+                  "hint": {
+                    "len": 6,
+                    "kind": "numeric",
+                    "field_role": "one-time-code"
+                  },
+                  "targetId": "#otp"
+                }
+              ],
+              "request": {
+                "requestId": "m2-outage-request",
+                "sessionId": "m2-outage-session",
+                "issuedAt": 1792700607751
+              },
+              "verified": true
+            },
+            "handoffSerialized": "{\"manifestVersion\":\"1.1\",\"capture\":{\"w\":1280,\"h\":720,\"dpr\":1.0000000149011612,\"zoom\":1,\"scale_to_css\":1,\"scroll\":{\"x\":0,\"y\":0},\"origin\":\"http://127.0.0.1:8975\"},\"capability\":{\"backend\":\"none\",\"tiers_fired\":[\"T0\",\"T2\"]},\"elements\":[{\"id\":\"label\",\"role\":\"label\",\"name\":\"Full name\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,122.80000305175781,490.3999938964844,18.399999618530273]},{\"id\":\"#name\",\"role\":\"textbox\",\"name\":\"Full name\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,145.1999969482422,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,187.1999969482422,490.3999938964844,18.399999618530273]},{\"id\":\"#mobile\",\"role\":\"textbox\",\"name\":\"Mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,209.60000610351562,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Aadhaar number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,251.60000610351562,490.3999938964844,18.399999618530273]},{\"id\":\"#aadhaar\",\"role\":\"textbox\",\"name\":\"Aadhaar number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,274,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Date of birth\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,316,490.3999938964844,18.399999618530273]},{\"id\":\"#dob\",\"role\":\"textbox\",\"name\":\"Date of birth\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,338.3999938964844,490.3999938964844,34]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"OTP\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,382.3999938964844,490.3999938964844,18.399999618530273]},{\"id\":\"#otp\",\"role\":\"textbox\",\"name\":\"OTP\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,404.8000183105469,490.3999938964844,32]},{\"id\":\"label\",\"role\":\"label\",\"name\":\"Confirm mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,506,490.3999938964844,18.399999618530273]},{\"id\":\"#mobile_confirm\",\"role\":\"textbox\",\"name\":\"Confirm mobile number\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,528.4000244140625,490.3999938964844,32]},{\"id\":\"#submit\",\"role\":\"button\",\"name\":\"Submit application\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[34.79999923706055,572.4000244140625,153.4250030517578,38]},{\"id\":\"#status\",\"role\":\"status\",\"name\":\"Not submitted\",\"source\":\"dom\",\"visible\":true,\"offscreen\":false,\"enabled\":true,\"bbox\":[20,639.2000122070312,520,36.400001525878906]}],\"goal\":\"Submit my application with my registered mobile number.\",\"redactions\":[{\"token\":\"<PII:NAME:1>\",\"class\":\"NAME\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,145.1999969482422,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":12,\"kind\":\"alpha\",\"field_role\":\"name\"},\"targetId\":\"#name\"},{\"token\":\"<PII:PHONE:1>\",\"class\":\"PHONE\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,209.60000610351562,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":10,\"kind\":\"numeric\",\"field_role\":\"tel\"},\"targetId\":\"#mobile\"},{\"token\":\"<PII:AADHAAR:1>\",\"class\":\"AADHAAR\",\"tier\":\"SENSITIVE\",\"bbox\":[34.79999923706055,274,490.3999938964844,32],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":14,\"kind\":\"numeric\"},\"targetId\":\"#aadhaar\"},{\"token\":\"<PII:DOB:1>\",\"class\":\"DOB\",\"tier\":\"PERSONAL\",\"bbox\":[34.79999923706055,338.3999938964844,490.3999938964844,34],\"method\":\"token_reference\",\"detectors\":[\"D1\",\"D2\"],\"hint\":{\"len\":10,\"kind\":\"date\",\"field_role\":\"date\"},\"targetId\":\"#dob\"},{\"token\":\"\",\"class\":\"OTP\",\"tier\":\"CRITICAL\",\"bbox\":[34.79999923706055,404.8000183105469,490.3999938964844,32],\"method\":\"masked_no_token\",\"detectors\":[\"D1\"],\"hint\":{\"len\":6,\"kind\":\"numeric\",\"field_role\":\"one-time-code\"},\"targetId\":\"#otp\"}],\"request\":{\"requestId\":\"m2-outage-request\",\"sessionId\":\"m2-outage-session\",\"issuedAt\":1792700607751},\"verified\":true}",
+            "ledgerEntry": {
+              "sessionId": "m2-outage-session",
+              "requestId": "m2-outage-request",
+              "at": 1792700607751,
+              "destination": "(no egress client in this phase)",
+              "payloadSha256": "53f2200d1f9a5ba37fddf23993c7773a0a63485de7e04ea9410ee0b3f2149804",
+              "payloadBytes": 4253,
+              "verified": true,
+              "leakCheck": "CLEAN",
+              "elements": 14,
+              "references": [
+                {
+                  "token": "<PII:NAME:1>",
+                  "class": "NAME",
+                  "tier": "PERSONAL"
+                },
+                {
+                  "token": "<PII:PHONE:1>",
+                  "class": "PHONE",
+                  "tier": "PERSONAL"
+                },
+                {
+                  "token": "<PII:AADHAAR:1>",
+                  "class": "AADHAAR",
+                  "tier": "SENSITIVE"
+                },
+                {
+                  "token": "<PII:DOB:1>",
+                  "class": "DOB",
+                  "tier": "PERSONAL"
+                }
+              ],
+              "maskedWithoutReference": 1,
+              "note": "privacy-layer record only: this phase has no egress client, so this is not evidence of a network send"
+            },
+            "response": {
+              "received": true,
+              "reasoner": "deterministic:reference",
+              "transport": "IN_PROCESS",
+              "elapsedMs": 1,
+              "requestId": "m2-outage-request"
+            },
+            "plan": {
+              "planVersion": "1",
+              "provenance": {
+                "requestId": "m2-outage-request",
+                "sessionId": "m2-outage-session",
+                "viewId": "m2-outage-request",
+                "origin": "http://127.0.0.1:8975"
+              },
+              "goal": "Submit my application with my registered mobile number.",
+              "steps": [
+                {
+                  "op": "insert",
+                  "target": "#mobile_confirm",
+                  "ref": "<PII:PHONE:1>"
+                },
+                {
+                  "op": "click",
+                  "target": "#submit"
+                }
+              ]
+            },
+            "validation": {
+              "ok": true,
+              "steps": [
+                {
+                  "op": "insert",
+                  "source": "reference",
+                  "index": 0,
+                  "target": "#mobile_confirm",
+                  "ref": "<PII:PHONE:1>",
+                  "piiClass": "PHONE",
+                  "binding": {
+                    "decision": "BIND_OK"
+                  },
+                  "needsHuman": false
+                },
+                {
+                  "op": "click",
+                  "index": 1,
+                  "target": "#submit"
+                }
+              ],
+              "needsHuman": [],
+              "declaresDone": false
+            },
+            "reasonerKind": "DETERMINISTIC_FALLBACK",
+            "fallback": {
+              "outcome": "UNAVAILABLE",
+              "fellBack": true,
+              "reason": "the model produced no usable plan (UNAVAILABLE), so the deterministic planner answers instead."
+            },
+            "grant": {
+              "requested": true,
+              "decision": {
+                "granted": true
+              },
+              "useGrant": {
+                "ref": "<PII:PHONE:1>",
+                "piiClass": "PHONE",
+                "fingerprint": "#mobile_confirm|textbox|Confirm mobile number",
+                "origin": "http://127.0.0.1:8975",
+                "sessionId": "m2-outage-session",
+                "purpose": "Use of PHONE for \"Confirm mobile number\"",
+                "actionContext": "insert into #mobile_confirm, then click #submit",
+                "grantedAt": 1792700608009,
+                "expiresAt": 1792700668009,
+                "used": true
+              }
+            },
+            "rehydrated": [
+              {
+                "ref": "<PII:PHONE:1>",
+                "target": "#mobile_confirm",
+                "piiClass": "PHONE",
+                "inserted": true
+              }
+            ],
+            "literalsInserted": [],
+            "confirmation": {
+              "subject": {
+                "nodeId": "e12",
+                "selector": "#submit",
+                "role": "button",
+                "name": "Submit application",
+                "frameId": "transport-0dd78b8a-a2c3-436b-9741-38e373805998",
+                "origin": "http://127.0.0.1:8975"
+              },
+              "purpose": "Click \"Submit application\" to submit this application",
+              "confirmedAt": 1792700608013,
+              "expiresAt": 1792700668013
+            },
+            "act": {
+              "reached": "VERIFY_RESULT",
+              "decision": {
+                "decision": "ALLOW",
+                "kind": "click",
+                "node": {
+                  "id": "e12",
+                  "role": "button",
+                  "name": "Submit application",
+                  "domRef": {
+                    "selector": "#submit"
+                  },
+                  "evidence": {
+                    "kind": "OBSERVED",
+                    "frameId": "transport-0dd78b8a-a2c3-436b-9741-38e373805998",
+                    "viewportBox": {
+                      "x": 34.79999923706055,
+                      "y": 572.4000244140625,
+                      "w": 153.4250030517578,
+                      "h": 38
+                    },
+                    "documentBox": {
+                      "x": 34.79999923706055,
+                      "y": 572.4000244140625,
+                      "w": 153.4250030517578,
+                      "h": 38
+                    }
+                  },
+                  "enabled": true,
+                  "parent": null,
+                  "children": []
+                },
+                "frameId": "transport-0dd78b8a-a2c3-436b-9741-38e373805998",
+                "viewportBox": {
+                  "x": 34.79999923706055,
+                  "y": 572.4000244140625,
+                  "w": 153.4250030517578,
+                  "h": 38
+                },
+                "movedCssPx": 0,
+                "boxIou": 1,
+                "structurallyCurrent": true,
+                "point": {
+                  "x": 112,
+                  "y": 591
+                }
+              },
+              "hit": {
+                "agreement": "MATCH",
+                "point": {
+                  "x": 112,
+                  "y": 591
+                },
+                "observed": {
+                  "frameId": "transport-0dd78b8a-a2c3-436b-9741-38e373805998",
+                  "selector": "#submit",
+                  "role": "button",
+                  "name": "Submit application",
+                  "box": {
+                    "x": 34.79999923706055,
+                    "y": 572.4000244140625,
+                    "w": 153.4250030517578,
+                    "h": 38
+                  }
+                },
+                "boxIou": 1,
+                "elapsedMs": 1
+              },
+              "result": {
+                "status": "EXECUTED",
+                "kind": "click",
+                "target": {
+                  "nodeId": "e12",
+                  "role": "button",
+                  "name": "Submit application",
+                  "point": {
+                    "x": 112,
+                    "y": 591
+                  },
+                  "box": {
+                    "x": 34.79999923706055,
+                    "y": 572.4000244140625,
+                    "w": 153.4250030517578,
+                    "h": 38
+                  }
+                },
+                "dispatchMs": 1
+              },
+              "verification": {
+                "verification": "CONFIRMED",
+                "postcondition": "TARGET_ENABLED",
+                "evidence": "#submit is disabled, as expected."
+              }
+            },
+            "declaredDone": false,
+            "postcondition": {
+              "kind": "TARGET_ENABLED",
+              "expected": false
+            },
+            "fill": {
+              "fillable": [
+                {
+                  "target": "#mobile_confirm",
+                  "ref": "<PII:PHONE:1>"
+                }
+              ],
+              "withheld": []
+            }
+          },
+          "binding": {
+            "origin": "http://127.0.0.1:8975",
+            "documentId": "E5B35972DC813DCF6E0F089B823B21D8",
+            "tabId": 1795533811,
+            "frameId": 0,
+            "swBootId": "7a9b3f6f-0846-46dc-b2f7-2dfca1d8146e"
+          },
+          "ports": {
+            "observations": 3,
+            "structureReads": 1,
+            "inserts": 0,
+            "insertRefusals": [],
+            "cycle": {
+              "cycleId": "e081a5bb-53f4-4e01-9312-43369592c6bd",
+              "hitTest": {
+                "point": {
+                  "x": 112,
+                  "y": 591
+                },
+                "topmost": "#submit",
+                "receivedAt": 1792700608014.2,
+                "sampledAt": 1792700608014.3
+              },
+              "dispatch": {
+                "deliveryId": "44942bb9-122c-4688-b39c-e6943854c056",
+                "point": {
+                  "x": 112,
+                  "y": 591
+                },
+                "dispatchedTo": "#submit",
+                "receivedAt": 1792700608015,
+                "dispatchedAt": 1792700608015.1
+              },
+              "refusals": []
+            },
+            "cycles": [
+              {
+                "cycleId": "e081a5bb-53f4-4e01-9312-43369592c6bd",
+                "hitTest": {
+                  "point": {
+                    "x": 112,
+                    "y": 591
+                  },
+                  "topmost": "#submit",
+                  "receivedAt": 1792700608014.2,
+                  "sampledAt": 1792700608014.3
+                },
+                "dispatch": {
+                  "deliveryId": "44942bb9-122c-4688-b39c-e6943854c056",
+                  "point": {
+                    "x": 112,
+                    "y": 591
+                  },
+                  "dispatchedTo": "#submit",
+                  "receivedAt": 1792700608015,
+                  "dispatchedAt": 1792700608015.1
+                },
+                "refusals": []
+              }
+            ],
+            "perception": [
+              {
+                "ran": false,
+                "refusal": {
+                  "code": "NO_ACTIVE_TAB_GRANT",
+                  "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+                },
+                "route": null,
+                "workerSawPixels": false,
+                "capture": null,
+                "detector": {
+                  "modelId": "none",
+                  "revision": "none",
+                  "backend": "wasm",
+                  "ran": false,
+                  "detections": 0,
+                  "byClass": {},
+                  "refusal": null
+                },
+                "fusion": null,
+                "text": {
+                  "available": false,
+                  "refusal": {
+                    "code": "TEXT_PERCEPTION_UNAVAILABLE",
+                    "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+                  },
+                  "findings": [],
+                  "ms": 0
+                },
+                "redaction": {
+                  "outcome": "NOT_RUN",
+                  "failClosed": null,
+                  "reason": null,
+                  "refusal": null,
+                  "detector": {
+                    "modelId": "PP-OCRv4_mobile_det",
+                    "ran": false,
+                    "code": null,
+                    "detections": 0
+                  },
+                  "regions": 0,
+                  "maskRects": 0,
+                  "pixelWrites": 0,
+                  "rawBitmapClosed": null,
+                  "frameKept": false,
+                  "ms": {
+                    "detector": 0,
+                    "mapping": 0,
+                    "plan": 0,
+                    "pixelMapping": 0,
+                    "fill": 0
+                  }
+                },
+                "elements": [],
+                "sourceBySelector": {},
+                "ms": {
+                  "capture": 0,
+                  "decode": 0,
+                  "encode": 0,
+                  "preprocess": 0,
+                  "infer": 0,
+                  "fuse": 0,
+                  "total": 0
+                }
+              },
+              {
+                "ran": false,
+                "refusal": {
+                  "code": "NO_ACTIVE_TAB_GRANT",
+                  "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+                },
+                "route": null,
+                "workerSawPixels": false,
+                "capture": null,
+                "detector": {
+                  "modelId": "none",
+                  "revision": "none",
+                  "backend": "wasm",
+                  "ran": false,
+                  "detections": 0,
+                  "byClass": {},
+                  "refusal": null
+                },
+                "fusion": null,
+                "text": {
+                  "available": false,
+                  "refusal": {
+                    "code": "TEXT_PERCEPTION_UNAVAILABLE",
+                    "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+                  },
+                  "findings": [],
+                  "ms": 0
+                },
+                "redaction": {
+                  "outcome": "NOT_RUN",
+                  "failClosed": null,
+                  "reason": null,
+                  "refusal": null,
+                  "detector": {
+                    "modelId": "PP-OCRv4_mobile_det",
+                    "ran": false,
+                    "code": null,
+                    "detections": 0
+                  },
+                  "regions": 0,
+                  "maskRects": 0,
+                  "pixelWrites": 0,
+                  "rawBitmapClosed": null,
+                  "frameKept": false,
+                  "ms": {
+                    "detector": 0,
+                    "mapping": 0,
+                    "plan": 0,
+                    "pixelMapping": 0,
+                    "fill": 0
+                  }
+                },
+                "elements": [],
+                "sourceBySelector": {},
+                "ms": {
+                  "capture": 0,
+                  "decode": 0,
+                  "encode": 0,
+                  "preprocess": 0,
+                  "infer": 0,
+                  "fuse": 0,
+                  "total": 0
+                }
+              },
+              {
+                "ran": false,
+                "refusal": {
+                  "code": "NO_ACTIVE_TAB_GRANT",
+                  "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+                },
+                "route": null,
+                "workerSawPixels": false,
+                "capture": null,
+                "detector": {
+                  "modelId": "none",
+                  "revision": "none",
+                  "backend": "wasm",
+                  "ran": false,
+                  "detections": 0,
+                  "byClass": {},
+                  "refusal": null
+                },
+                "fusion": null,
+                "text": {
+                  "available": false,
+                  "refusal": {
+                    "code": "TEXT_PERCEPTION_UNAVAILABLE",
+                    "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+                  },
+                  "findings": [],
+                  "ms": 0
+                },
+                "redaction": {
+                  "outcome": "NOT_RUN",
+                  "failClosed": null,
+                  "reason": null,
+                  "refusal": null,
+                  "detector": {
+                    "modelId": "PP-OCRv4_mobile_det",
+                    "ran": false,
+                    "code": null,
+                    "detections": 0
+                  },
+                  "regions": 0,
+                  "maskRects": 0,
+                  "pixelWrites": 0,
+                  "rawBitmapClosed": null,
+                  "frameKept": false,
+                  "ms": {
+                    "detector": 0,
+                    "mapping": 0,
+                    "plan": 0,
+                    "pixelMapping": 0,
+                    "fill": 0
+                  }
+                },
+                "elements": [],
+                "sourceBySelector": {},
+                "ms": {
+                  "capture": 0,
+                  "decode": 0,
+                  "encode": 0,
+                  "preprocess": 0,
+                  "infer": 0,
+                  "fuse": 0,
+                  "total": 0
+                }
+              }
+            ]
+          },
+          "perceptionBoot": {
+            "ok": true,
+            "error": null,
+            "ms": 417,
+            "pin": {
+              "artifact": "ort-wasm-simd-threaded.jsep.wasm",
+              "sha256": "db816fadbab47a755170c08f933961e231412ac17f5981f9a62e519708a44dea",
+              "bytes": 27797172,
+              "installedAt": "2026-10-22T20:23:24.354Z"
+            }
+          },
+          "boundary": {
+            "classifications": 1,
+            "fieldsSeenByThePageRealm": 6,
+            "referencesIssued": 4,
+            "questions": 2,
+            "textsAsked": 2,
+            "capabilitiesArmed": 3,
+            "releases": 1,
+            "writes": 1,
+            "refusals": []
+          },
+          "egress": [
+            {
+              "refusal": {
+                "requestId": "m2-outage-request",
+                "sessionId": "m2-outage-session",
+                "destination": "http://127.0.0.1:8995/v1/chat/completions",
+                "at": 1792700607758,
+                "stage": "TRANSPORT",
+                "cause": "TRANSPORT_FAILED",
+                "severity": "REFUSED",
+                "detail": "the request could not be completed."
+              }
+            }
+          ],
+          "grant": {
+            "asked": true,
+            "granted": true
+          }
+        }
+      },
+      "error": null,
+      "grantAsked": {
+        "ref": "<PII:PHONE:1>",
+        "piiClass": "PHONE",
+        "target": "#mobile_confirm",
+        "targetLabel": "Confirm mobile number",
+        "fingerprint": "#mobile_confirm|textbox|Confirm mobile number",
+        "origin": "http://127.0.0.1:8975",
+        "sessionId": "m2-outage-session",
+        "purpose": "Allow PratiBimb to use your phone for \"Confirm mobile number\" on this page",
+        "actionContext": "restore it into #mobile_confirm, then click #submit (\"Submit application\")",
+        "action": {
+          "target": "#submit",
+          "label": "Submit application"
+        }
+      },
+      "page": {
+        "confirmValue": "9000000001",
+        "submitted": "true",
+        "statusText": "Application submitted",
+        "submitEvents": [
+          "pointerdown@112,591",
+          "mousedown@112,591",
+          "pointerup@112,591",
+          "mouseup@112,591",
+          "click@112,591"
+        ],
+        "submitDisabled": true,
+        "probeInstalls": 1,
+        "probe": {
+          "events": [
+            {
+              "type": "pointerdown",
+              "trusted": false,
+              "at": 1792700608015,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "mousedown",
+              "trusted": false,
+              "at": 1792700608015,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "pointerup",
+              "trusted": false,
+              "at": 1792700608015,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "mouseup",
+              "trusted": false,
+              "at": 1792700608015,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            },
+            {
+              "type": "click",
+              "trusted": false,
+              "at": 1792700608015,
+              "x": 112,
+              "y": 591,
+              "detail": 0
+            }
+          ],
+          "objectSeenTwice": 0,
+          "listenersOnSubmit": 6,
+          "timeOrigin": 1792700607699.5
+        }
+      },
+      "audit": {
+        "ok": true,
+        "instances": 1,
+        "e6Clicks": 0,
+        "transport": {
+          "hitTests": 1,
+          "dispatchRequests": 1,
+          "firesStarted": 1,
+          "firesCompleted": 1,
+          "refusals": [],
+          "fires": [
+            {
+              "cycleId": "e081a5bb-53f4-4e01-9312-43369592c6bd",
+              "deliveryId": "44942bb9-122c-4688-b39c-e6943854c056",
+              "requestId": "d08a8961-5d8b-44e9-b1fd-ec5f42d2e08d",
+              "to": "#submit",
+              "preparedAt": 1792700608015,
+              "at": 1792700608015.1,
+              "doneAt": 1792700608015.4
+            }
+          ],
+          "structure": {
+            "watching": true,
+            "seq": 1,
+            "nodes": 1,
+            "attributes": 1,
+            "text": 0,
+            "resizes": 0,
+            "tracked": 15,
+            "at": 1792700608015.5
+          },
+          "structuralBatches": 1
+        }
+      },
+      "served": 0,
+      "leaked": []
+    }
+  },
+  "routeCategory": "NO_CAPTURE",
+  "routesSeen": [],
+  "perception": {
+    "SUCCESS": [
+      {
+        "ran": false,
+        "refusal": {
+          "code": "NO_ACTIVE_TAB_GRANT",
+          "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+        },
+        "route": null,
+        "workerSawPixels": false,
+        "capture": null,
+        "detector": {
+          "modelId": "none",
+          "revision": "none",
+          "backend": "wasm",
+          "ran": false,
+          "detections": 0,
+          "byClass": {},
+          "refusal": null
+        },
+        "fusion": null,
+        "text": {
+          "available": false,
+          "refusal": {
+            "code": "TEXT_PERCEPTION_UNAVAILABLE",
+            "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+          },
+          "findings": [],
+          "ms": 0
+        },
+        "redaction": {
+          "outcome": "NOT_RUN",
+          "failClosed": null,
+          "reason": null,
+          "refusal": null,
+          "detector": {
+            "modelId": "PP-OCRv4_mobile_det",
+            "ran": false,
+            "code": null,
+            "detections": 0
+          },
+          "regions": 0,
+          "maskRects": 0,
+          "pixelWrites": 0,
+          "rawBitmapClosed": null,
+          "frameKept": false,
+          "ms": {
+            "detector": 0,
+            "mapping": 0,
+            "plan": 0,
+            "pixelMapping": 0,
+            "fill": 0
+          }
+        },
+        "elements": [],
+        "sourceBySelector": {},
+        "ms": {
+          "capture": 0,
+          "decode": 0,
+          "encode": 0,
+          "preprocess": 0,
+          "infer": 0,
+          "fuse": 0,
+          "total": 0
+        }
+      },
+      {
+        "ran": false,
+        "refusal": {
+          "code": "NO_ACTIVE_TAB_GRANT",
+          "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+        },
+        "route": null,
+        "workerSawPixels": false,
+        "capture": null,
+        "detector": {
+          "modelId": "none",
+          "revision": "none",
+          "backend": "wasm",
+          "ran": false,
+          "detections": 0,
+          "byClass": {},
+          "refusal": null
+        },
+        "fusion": null,
+        "text": {
+          "available": false,
+          "refusal": {
+            "code": "TEXT_PERCEPTION_UNAVAILABLE",
+            "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+          },
+          "findings": [],
+          "ms": 0
+        },
+        "redaction": {
+          "outcome": "NOT_RUN",
+          "failClosed": null,
+          "reason": null,
+          "refusal": null,
+          "detector": {
+            "modelId": "PP-OCRv4_mobile_det",
+            "ran": false,
+            "code": null,
+            "detections": 0
+          },
+          "regions": 0,
+          "maskRects": 0,
+          "pixelWrites": 0,
+          "rawBitmapClosed": null,
+          "frameKept": false,
+          "ms": {
+            "detector": 0,
+            "mapping": 0,
+            "plan": 0,
+            "pixelMapping": 0,
+            "fill": 0
+          }
+        },
+        "elements": [],
+        "sourceBySelector": {},
+        "ms": {
+          "capture": 0,
+          "decode": 0,
+          "encode": 0,
+          "preprocess": 0,
+          "infer": 0,
+          "fuse": 0,
+          "total": 0
+        }
+      },
+      {
+        "ran": false,
+        "refusal": {
+          "code": "NO_ACTIVE_TAB_GRANT",
+          "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+        },
+        "route": null,
+        "workerSawPixels": false,
+        "capture": null,
+        "detector": {
+          "modelId": "none",
+          "revision": "none",
+          "backend": "wasm",
+          "ran": false,
+          "detections": 0,
+          "byClass": {},
+          "refusal": null
+        },
+        "fusion": null,
+        "text": {
+          "available": false,
+          "refusal": {
+            "code": "TEXT_PERCEPTION_UNAVAILABLE",
+            "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+          },
+          "findings": [],
+          "ms": 0
+        },
+        "redaction": {
+          "outcome": "NOT_RUN",
+          "failClosed": null,
+          "reason": null,
+          "refusal": null,
+          "detector": {
+            "modelId": "PP-OCRv4_mobile_det",
+            "ran": false,
+            "code": null,
+            "detections": 0
+          },
+          "regions": 0,
+          "maskRects": 0,
+          "pixelWrites": 0,
+          "rawBitmapClosed": null,
+          "frameKept": false,
+          "ms": {
+            "detector": 0,
+            "mapping": 0,
+            "plan": 0,
+            "pixelMapping": 0,
+            "fill": 0
+          }
+        },
+        "elements": [],
+        "sourceBySelector": {},
+        "ms": {
+          "capture": 0,
+          "decode": 0,
+          "encode": 0,
+          "preprocess": 0,
+          "infer": 0,
+          "fuse": 0,
+          "total": 0
+        }
+      }
+    ],
+    "REFUSAL": [
+      {
+        "ran": false,
+        "refusal": {
+          "code": "NO_ACTIVE_TAB_GRANT",
+          "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+        },
+        "route": null,
+        "workerSawPixels": false,
+        "capture": null,
+        "detector": {
+          "modelId": "none",
+          "revision": "none",
+          "backend": "wasm",
+          "ran": false,
+          "detections": 0,
+          "byClass": {},
+          "refusal": null
+        },
+        "fusion": null,
+        "text": {
+          "available": false,
+          "refusal": {
+            "code": "TEXT_PERCEPTION_UNAVAILABLE",
+            "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+          },
+          "findings": [],
+          "ms": 0
+        },
+        "redaction": {
+          "outcome": "NOT_RUN",
+          "failClosed": null,
+          "reason": null,
+          "refusal": null,
+          "detector": {
+            "modelId": "PP-OCRv4_mobile_det",
+            "ran": false,
+            "code": null,
+            "detections": 0
+          },
+          "regions": 0,
+          "maskRects": 0,
+          "pixelWrites": 0,
+          "rawBitmapClosed": null,
+          "frameKept": false,
+          "ms": {
+            "detector": 0,
+            "mapping": 0,
+            "plan": 0,
+            "pixelMapping": 0,
+            "fill": 0
+          }
+        },
+        "elements": [],
+        "sourceBySelector": {},
+        "ms": {
+          "capture": 0,
+          "decode": 0,
+          "encode": 0,
+          "preprocess": 0,
+          "infer": 0,
+          "fuse": 0,
+          "total": 0
+        }
+      }
+    ],
+    "OUTAGE": [
+      {
+        "ran": false,
+        "refusal": {
+          "code": "NO_ACTIVE_TAB_GRANT",
+          "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+        },
+        "route": null,
+        "workerSawPixels": false,
+        "capture": null,
+        "detector": {
+          "modelId": "none",
+          "revision": "none",
+          "backend": "wasm",
+          "ran": false,
+          "detections": 0,
+          "byClass": {},
+          "refusal": null
+        },
+        "fusion": null,
+        "text": {
+          "available": false,
+          "refusal": {
+            "code": "TEXT_PERCEPTION_UNAVAILABLE",
+            "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+          },
+          "findings": [],
+          "ms": 0
+        },
+        "redaction": {
+          "outcome": "NOT_RUN",
+          "failClosed": null,
+          "reason": null,
+          "refusal": null,
+          "detector": {
+            "modelId": "PP-OCRv4_mobile_det",
+            "ran": false,
+            "code": null,
+            "detections": 0
+          },
+          "regions": 0,
+          "maskRects": 0,
+          "pixelWrites": 0,
+          "rawBitmapClosed": null,
+          "frameKept": false,
+          "ms": {
+            "detector": 0,
+            "mapping": 0,
+            "plan": 0,
+            "pixelMapping": 0,
+            "fill": 0
+          }
+        },
+        "elements": [],
+        "sourceBySelector": {},
+        "ms": {
+          "capture": 0,
+          "decode": 0,
+          "encode": 0,
+          "preprocess": 0,
+          "infer": 0,
+          "fuse": 0,
+          "total": 0
+        }
+      },
+      {
+        "ran": false,
+        "refusal": {
+          "code": "NO_ACTIVE_TAB_GRANT",
+          "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+        },
+        "route": null,
+        "workerSawPixels": false,
+        "capture": null,
+        "detector": {
+          "modelId": "none",
+          "revision": "none",
+          "backend": "wasm",
+          "ran": false,
+          "detections": 0,
+          "byClass": {},
+          "refusal": null
+        },
+        "fusion": null,
+        "text": {
+          "available": false,
+          "refusal": {
+            "code": "TEXT_PERCEPTION_UNAVAILABLE",
+            "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+          },
+          "findings": [],
+          "ms": 0
+        },
+        "redaction": {
+          "outcome": "NOT_RUN",
+          "failClosed": null,
+          "reason": null,
+          "refusal": null,
+          "detector": {
+            "modelId": "PP-OCRv4_mobile_det",
+            "ran": false,
+            "code": null,
+            "detections": 0
+          },
+          "regions": 0,
+          "maskRects": 0,
+          "pixelWrites": 0,
+          "rawBitmapClosed": null,
+          "frameKept": false,
+          "ms": {
+            "detector": 0,
+            "mapping": 0,
+            "plan": 0,
+            "pixelMapping": 0,
+            "fill": 0
+          }
+        },
+        "elements": [],
+        "sourceBySelector": {},
+        "ms": {
+          "capture": 0,
+          "decode": 0,
+          "encode": 0,
+          "preprocess": 0,
+          "infer": 0,
+          "fuse": 0,
+          "total": 0
+        }
+      },
+      {
+        "ran": false,
+        "refusal": {
+          "code": "NO_ACTIVE_TAB_GRANT",
+          "detail": "No live activeTab grant for this tab. A frame is obtained only after a person invokes this extension on it; there is no permission that substitutes for that, which was measured rather than assumed."
+        },
+        "route": null,
+        "workerSawPixels": false,
+        "capture": null,
+        "detector": {
+          "modelId": "none",
+          "revision": "none",
+          "backend": "wasm",
+          "ran": false,
+          "detections": 0,
+          "byClass": {},
+          "refusal": null
+        },
+        "fusion": null,
+        "text": {
+          "available": false,
+          "refusal": {
+            "code": "TEXT_PERCEPTION_UNAVAILABLE",
+            "detail": "No local text model is adopted. PP-OCRv5_mobile_det fails the S-04a-1 correctness criterion on WASM (4.12e-02 against a 2e-02 bound), and model-adoption rule 2 is frozen: a model that fails the WASM columns is not shipped whatever it does on WebGPU. See artifacts/experiments/M4-gesture-text-perception/ocr-audit.md."
+          },
+          "findings": [],
+          "ms": 0
+        },
+        "redaction": {
+          "outcome": "NOT_RUN",
+          "failClosed": null,
+          "reason": null,
+          "refusal": null,
+          "detector": {
+            "modelId": "PP-OCRv4_mobile_det",
+            "ran": false,
+            "code": null,
+            "detections": 0
+          },
+          "regions": 0,
+          "maskRects": 0,
+          "pixelWrites": 0,
+          "rawBitmapClosed": null,
+          "frameKept": false,
+          "ms": {
+            "detector": 0,
+            "mapping": 0,
+            "plan": 0,
+            "pixelMapping": 0,
+            "fill": 0
+          }
+        },
+        "elements": [],
+        "sourceBySelector": {},
+        "ms": {
+          "capture": 0,
+          "decode": 0,
+          "encode": 0,
+          "preprocess": 0,
+          "infer": 0,
+          "fuse": 0,
+          "total": 0
+        }
+      }
+    ],
+    "boot": {
+      "ok": true,
+      "error": null,
+      "ms": 417,
+      "pin": {
+        "artifact": "ort-wasm-simd-threaded.jsep.wasm",
+        "sha256": "db816fadbab47a755170c08f933961e231412ac17f5981f9a62e519708a44dea",
+        "bytes": 27797172,
+        "installedAt": "2026-10-22T20:23:24.354Z"
+      }
+    }
+  },
+  "bundle": {
+    "bytes": 27462,
+    "pointerEventSites": 2,
+    "mouseEventSites": 3,
+    "elementClickCalls": 0,
+    "e6Surface": []
+  },
+  "singleAction": {
+    "SUCCESS": {
+      "contentInstances": 1,
+      "e6Clicks": 0,
+      "dispatchRequests": 1,
+      "firesStarted": 1,
+      "firesCompleted": 1,
+      "agentRefusals": [],
+      "seen": {
+        "total": 5,
+        "untrusted": 5,
+        "trusted": 0,
+        "unattributed": 0,
+        "objectSeenTwice": 0,
+        "listenersOnSubmit": 6,
+        "offsets": [
+          {
+            "type": "pointerdown",
+            "ms": 0.2
+          },
+          {
+            "type": "mousedown",
+            "ms": 0.2
+          },
+          {
+            "type": "pointerup",
+            "ms": 0.2
+          },
+          {
+            "type": "mouseup",
+            "ms": 0.2
+          },
+          {
+            "type": "click",
+            "ms": 0.2
+          }
+        ]
+      }
+    },
+    "REFUSAL": {
+      "contentInstances": 1,
+      "e6Clicks": 0,
+      "dispatchRequests": 0,
+      "firesStarted": 0,
+      "firesCompleted": 0,
+      "agentRefusals": [],
+      "seen": {
+        "total": 0,
+        "untrusted": 0,
+        "trusted": 0,
+        "unattributed": 0,
+        "objectSeenTwice": 0,
+        "listenersOnSubmit": 6,
+        "offsets": []
+      }
+    },
+    "OUTAGE": {
+      "contentInstances": 1,
+      "e6Clicks": 0,
+      "dispatchRequests": 1,
+      "firesStarted": 1,
+      "firesCompleted": 1,
+      "agentRefusals": [],
+      "seen": {
+        "total": 5,
+        "untrusted": 5,
+        "trusted": 0,
+        "unattributed": 0,
+        "objectSeenTwice": 0,
+        "listenersOnSubmit": 6,
+        "offsets": [
+          {
+            "type": "pointerdown",
+            "ms": 0
+          },
+          {
+            "type": "mousedown",
+            "ms": 0
+          },
+          {
+            "type": "pointerup",
+            "ms": 0
+          },
+          {
+            "type": "mouseup",
+            "ms": 0
+          },
+          {
+            "type": "click",
+            "ms": 0
+          }
+        ]
+      }
+    }
+  },
+  "releaseTests": {
+    "forgedNonce": {
+      "ok": false,
+      "refused": "UNKNOWN_OR_CONSUMED_NONCE"
+    },
+    "firstUse": {
+      "ok": false,
+      "refused": "NO_VAULT"
+    },
+    "secondUse": {
+      "ok": false,
+      "refused": "UNKNOWN_OR_CONSUMED_NONCE"
+    },
+    "wrongTarget": {
+      "ok": false,
+      "refused": "TARGET_MISMATCH"
+    },
+    "wrongDocument": {
+      "armedFor": "507C44A33F9DB4659BF52C1343883BBD",
+      "presentedBy": "68208745F292E84F23C2A42EBFB7A484",
+      "documentChanged": true,
+      "ok": false,
+      "refused": "SENDER_DOCUMENT_MISMATCH"
+    },
+    "wrongTab": {
+      "armedForTab": 1795533812,
+      "presentedByTab": 1795533811,
+      "differentTab": true,
+      "ok": false,
+      "refused": "SENDER_DOCUMENT_MISMATCH"
+    }
+  },
+  "pageForgery": {
+    "reachable": false,
+    "why": "NO_SEND_MESSAGE_IN_PAGE_WORLD"
+  },
+  "workerTraffic": {
+    "messages": 121,
+    "bytes": 87154,
+    "kinds": {
+      "port:ATTACHED": 7,
+      "in:HELLO": 7,
+      "in:RELAY": 16,
+      "port:OBSERVE": 20,
+      "in:CAPTURE_FRAME": 7,
+      "to-tab:CAPTURE_TICKET": 7,
+      "in:TO_PAGE_BOUNDARY": 15,
+      "to-tab:CLASSIFY": 3,
+      "to-tab:CAPABILITY": 9,
+      "in:BOUNDARY_COLLECT": 15,
+      "port:STRUCTURE": 4,
+      "port:HIT_TEST": 4,
+      "port:DISPATCH": 4,
+      "to-tab:FORGET": 3
+    },
+    "matchedValueIndexes": [],
+    "pixels": {
+      "pngSignature": false,
+      "dataImageUrl": false,
+      "longestBase64Run": 0
+    }
+  },
+  "recordedAt": "2026-10-22T20:23:29.797Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0",
+    "playwright": "1.63.0",
+    "browserBinary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "headless": false,
+    "extensionPath": "D:\\PratiBimb\\apps\\extension\\.output\\chrome-mv3",
+    "reasonerAddress": "http://127.0.0.1:8995/v1/chat/completions"
+  }
+}

@@ -14,7 +14,8 @@ import { type GrantDecision, type GrantRequest } from "@pratibimb/orchestrator";
 import { bootstrapOrtRealm, createPinnedInferenceSession, resolvePackagedAsset } from "../../entrypoints/ortRuntime";
 import { type BoundaryReply, type BoundaryRequest, type CapabilityPayload } from "../../host-lib/boundary-protocol";
 import { runExtensionTask, type ExtensionRunRequest, type ExtensionRunResult } from "../../host-lib/extension-run";
-import { identityOf, isFromThisExtension, type ToOffscreen } from "../../host-lib/messages";
+import { identityOf, isFromExtensionUi, isFromThisExtension, type ToOffscreen } from "../../host-lib/messages";
+import { createClarificationDesk } from "../../host-lib/clarification-desk";
 import { chromeRelay } from "../../host-lib/transport-chrome";
 import { installTransportControlPlane } from "../../host-lib/transport-control-plane";
 import { type CaptureTicket } from "../../host-lib/capture-authority";
@@ -258,6 +259,8 @@ const collect = (
  */
 let running: Promise<ExtensionRunResult> | null = null;
 let pendingGrant: { request: GrantRequest; answer: (decision: GrantDecision) => void } | null = null;
+/** M17: a "which stored value?" question waiting for the side panel. Same discipline as the grant. */
+const clarificationDesk = createClarificationDesk();
 
 /** Answer the approval currently outstanding. `false` means there was nothing to answer. */
 function decideGrant(granted: boolean): boolean {
@@ -300,6 +303,7 @@ async function runTask(request: ExtensionRunRequest): Promise<ExtensionRunResult
         new Promise<GrantDecision>((resolve) => {
           pendingGrant = { request: grantRequest, answer: resolve };
         }),
+      askPerson: (question) => clarificationDesk.ask(question),
     },
     request
   );
@@ -312,6 +316,7 @@ async function runTask(request: ExtensionRunRequest): Promise<ExtensionRunResult
     captureDocumentId = null;
     // An approval nobody answered does not outlive the run it belonged to.
     pendingGrant = null;
+    clarificationDesk.clear();
   }
 }
 
@@ -325,6 +330,8 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
     | { target: "offscreen"; kind: "RUN_TASK"; request: ExtensionRunRequest }
     | { target: "offscreen"; kind: "GRANT_PEEK" }
     | { target: "offscreen"; kind: "GRANT_DECIDE"; granted: boolean }
+    | { target: "offscreen"; kind: "CLARIFY_PEEK" }
+    | { target: "offscreen"; kind: "CLARIFY_DECIDE"; answer: unknown }
     | { target: "offscreen"; kind: "REALM_PROBE" }
     | { target: "offscreen"; kind: "STREAM_CONSUME"; streamId: string; maxWidth?: number; maxHeight?: number }
     | { target: "offscreen"; kind: "PERCEIVE_ONCE"; tabId: number; frameId: number }
@@ -553,6 +560,24 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
       return false;
     }
     sendResponse({ answered: decideGrant(msg.granted) });
+    return false;
+  }
+  /**
+   * M17 — the side panel reads the question waiting, and answers it.
+   *
+   * Only an extension page may do either: the sender's URL must be this extension's own. A content
+   * script's sender URL is its page's, so a page cannot read the question or answer it — the page
+   * choosing which of the person's values it receives would be the page deciding for them. The desk
+   * then accepts one answer, for the question waiting; the orchestrator and privacy decide whether
+   * it means anything.
+   */
+  if (msg.kind === "CLARIFY_PEEK" || msg.kind === "CLARIFY_DECIDE") {
+    if (!isFromExtensionUi(sender)) {
+      sendResponse({ refused: "NOT_FROM_AN_EXTENSION_PAGE" });
+      return false;
+    }
+    if (msg.kind === "CLARIFY_PEEK") sendResponse({ pending: clarificationDesk.peek() });
+    else sendResponse(clarificationDesk.decide(msg.answer));
     return false;
   }
   /**

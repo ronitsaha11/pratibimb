@@ -22,6 +22,14 @@
     <button id="grant-use" type="button" disabled>Approve one use</button>
   </fieldset>
   <fieldset><legend>Payload Inspector (placeholder)</legend><pre id="payload">No payload: there is no egress path in this host.</pre></fieldset>
+  <fieldset id="clarify" hidden>
+    <legend>Which stored value?</legend>
+    <p id="clarify-question"></p>
+    <div id="clarify-options"></div>
+    <button id="clarify-use" type="button" disabled>Use this value</button>
+    <button id="clarify-decline" type="button">Don't use either</button>
+  </fieldset>
+  <div id="clarify-result"></div>
   <fieldset><legend>Capture</legend><div id="capture">…</div></fieldset>
   <fieldset><legend>Status</legend><pre id="status">…</pre><div id="needs-user">NEEDS_USER: none</div></fieldset>
   <script type="module" src="./main.ts"></script>

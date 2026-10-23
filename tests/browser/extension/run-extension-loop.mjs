@@ -135,6 +135,11 @@ const acts = {};
 const bundle = scanBundle();
 const releaseTests = {};
 let pageForgery = null;
+/**
+ * M17 — WHICH BUILD IS LOADED, asked of the build itself (`captureState().workerFrameEnabled`).
+ * `null` when it could not be read; the evidence-build checks then apply unchanged.
+ */
+let workerFrameEnabled = null;
 let workerTraffic = null;
 
 try {
@@ -151,6 +156,7 @@ try {
   const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker", { timeout: 30_000 }));
   await worker.evaluate(() => globalThis.__host.ensureOffscreen());
   const extensionId = await worker.evaluate(() => chrome.runtime.id);
+  workerFrameEnabled = await worker.evaluate(() => globalThis.__host.captureState?.().workerFrameEnabled ?? null).catch(() => null);
 
   const page = await context.newPage();
   /**
@@ -206,6 +212,9 @@ try {
       endpoint,
       sessionId: `m2-${act.toLowerCase()}-session`,
       requestId: `m2-${act.toLowerCase()}-request`,
+      // M15: what the fixture's one clickable control does when it works — the application page
+      // disables its own submit button. Declared by the task, never assumed by the orchestrator.
+      postconditions: { "#submit": { kind: "TARGET_ENABLED", expected: false } },
     };
     await worker.evaluate((req) => {
       globalThis.__m1 = null;
@@ -694,6 +703,49 @@ const checks = {
   ),
 };
 
+/**
+ * M17 — THE PRODUCT BUILD IS JUDGED BY WHAT THE PRODUCT BUILD MUST DO.
+ *
+ * Eight checks above require a frame. Only the `M3_WORKER_FRAME=1` evidence build can take one
+ * without a person: in the product build a frame exists only after someone invokes the extension on
+ * the tab (ADR-0009, APPROVED), and no harness can make that gesture. On the product build those
+ * eight are therefore not evidence of anything, and they are not counted as passes either: they
+ * are set aside by name, with what they read, and replaced by what the product must do instead —
+ * refuse every pass with a typed `NO_ACTIVE_TAB_GRANT`, hold no pixels, and declare the structural
+ * floor rather than a tier that did not run. On the evidence build nothing here changes.
+ */
+const EVIDENCE_BUILD_ONLY = [
+  "perceptionRanForRealAtLeastOnce",
+  "aRealFrameWasCaptured",
+  "theDetectorRanOnThePinnedArtifact",
+  "fusionJoinedDomAndVision",
+  "theCoordinateContractIsDerivedNotAssumed",
+  "theRouteCategoryIsRecorded",
+  "theHandoffDeclaresTheVisualTier",
+  "elementsCarryFusionProvenance",
+];
+const build = workerFrameEnabled === false ? "PRODUCT" : workerFrameEnabled === true ? "EVIDENCE_WORKER_FRAME" : "UNKNOWN";
+const notApplicableOnThisBuild = {};
+if (build === "PRODUCT") {
+  for (const name of EVIDENCE_BUILD_ONLY) {
+    notApplicableOnThisBuild[name] = checks[name];
+    delete checks[name];
+  }
+  checks.productRefusedEveryCaptureWithoutAGesture = ["SUCCESS", "REFUSAL", "OUTAGE"].every((act) => {
+    const passes = perceptionOf(act);
+    return (
+      passes.length > 0 &&
+      passes.every((p) => p.ran === false && p.refusal?.code === "NO_ACTIVE_TAB_GRANT" && p.route === null && p.workerSawPixels === false && p.capture === null)
+    );
+  });
+  checks.productHandoffDeclaresTheStructuralFloor = ["SUCCESS", "REFUSAL", "OUTAGE"].every(
+    (act) => handoffOf(act) === null || JSON.stringify(handoffOf(act)?.capability?.tiers_fired) === JSON.stringify(["T0", "T2"])
+  );
+  checks.productElementsClaimNoVision = ["SUCCESS", "REFUSAL", "OUTAGE"].every((act) =>
+    (handoffOf(act)?.elements ?? []).every((e) => e.source === "dom")
+  );
+}
+
 const passed = failure === null && Object.values(checks).every(Boolean);
 
 const record = {
@@ -715,6 +767,9 @@ const record = {
   ],
   loopExercisedThroughExtension: true,
   checks,
+  /** M17: which build ran, and the frame-requiring checks set aside on the product build (read, not counted). */
+  build,
+  notApplicableOnThisBuild,
   failure,
   acts,
   /** See `routeCategory` above: this runner is automated, so it is the degraded route by design. */
@@ -770,6 +825,7 @@ for (const act of ["SUCCESS", "REFUSAL", "OUTAGE"]) {
   );
 }
 console.log(`  route category: ${routeCategory} (${routesSeen.join(", ") || "none"})`);
+console.log(`  build: ${build}${build === "PRODUCT" ? ` — ${EVIDENCE_BUILD_ONLY.length} frame-requiring checks set aside, not counted (see notApplicableOnThisBuild)` : ""}`);
 console.log(
   `  bundle: ${bundle.bytes} bytes, ${bundle.pointerEventSites + bundle.mouseEventSites} click-event sites, E6 surface: ${bundle.e6Surface.length === 0 ? "none" : bundle.e6Surface.join(",")}`
 );

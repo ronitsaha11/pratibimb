@@ -21,6 +21,35 @@ export {
 } from "./machine.js";
 
 export {
+  MAX_DECLARED_POSTCONDITIONS,
+  PostconditionsError,
+  checkPostconditions,
+  type ClickPostconditions,
+} from "./postconditions.js";
+
+export {
+  MAX_TASK_TURNS,
+  TurnBudgetError,
+  checkTurnBudget,
+  runTaskLoop,
+  turnRequestId,
+  type LoopOptions,
+  type LoopOutcome,
+  type LoopRecord,
+} from "./loop.js";
+
+export {
+  CLARIFICATION_DETAIL,
+  checkClarificationAnswer,
+  prepareClarification,
+  type ClarificationAnswer,
+  type ClarificationCandidate,
+  type ClarificationRefusal,
+  type ClarificationRequest,
+  type PreparedClarification,
+} from "./clarification.js";
+
+export {
   type ClientPorts,
   type GrantDecision,
   type GrantRequest,
