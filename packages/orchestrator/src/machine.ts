@@ -82,6 +82,12 @@ import {
   type ReasonerResponse,
 } from "@pratibimb/reasoner";
 
+import {
+  CLARIFICATION_DETAIL,
+  checkClarificationAnswer,
+  prepareClarification,
+  type ClarificationRefusal,
+} from "./clarification.js";
 import { type ClientPorts, type GrantDecision, type Observation, type StructuralStatus } from "./ports.js";
 import { type ClickPostconditions } from "./postconditions.js";
 import { createLocalPrivacyBoundary } from "./privacyBoundary.js";
@@ -101,6 +107,12 @@ export type RunState =
   | "OBSERVE"
   | "SANITIZE"
   | "VERIFY_PAYLOAD"
+  /**
+   * M17 — a person is choosing which stored value goes into a field privacy could not decide.
+   * Entered only when it withheld one as `CONFLICTING_REFERENCES`; a human decision, like
+   * AWAIT_GRANT, not a pipeline stage. Nothing has been sent, planned, restored or clicked yet.
+   */
+  | "AWAIT_CLARIFICATION"
   | "SEND"
   | "VALIDATE_PLAN"
   | "AWAIT_GRANT"
@@ -117,6 +129,7 @@ export type RefusalStage =
   | "OBSERVE"
   | "SANITIZE"
   | "VERIFY_PAYLOAD"
+  | "AWAIT_CLARIFICATION"
   | "SEND"
   | "PARSE_PLAN"
   | "VALIDATE_PLAN"
@@ -145,6 +158,8 @@ export interface RunTimings {
   observeMs?: number;
   /** Time spent asking the page whether its structure moved. No capture in it. */
   structureMs?: number;
+  /** M17: time a person spent choosing which stored value a field takes. */
+  clarifyMs?: number;
   sanitizeMs?: number;
   verifyPayloadMs?: number;
   sendMs?: number;
@@ -223,7 +238,19 @@ export interface RunRecord {
   readonly fill: {
     readonly fillable: readonly { readonly target: string; readonly ref: string }[];
     readonly withheld: FillGrounding["withheld"];
+    /** Fields whose reference a person chose (M17). */
+    readonly chosenByPerson: readonly string[];
   } | null;
+  /**
+   * M17 — every question a person was asked about which stored value a field takes, and what came
+   * of it. Field ids, counts, opaque candidate ids and codes; no label, no token, no value.
+   */
+  readonly clarifications: readonly {
+    readonly target: string;
+    readonly candidates: number;
+    readonly outcome: "CHOSEN" | ClarificationRefusal | "CANDIDATES_INDISTINGUISHABLE" | "CLARIFICATION_UNAVAILABLE" | "CLARIFICATION_FAILED";
+    readonly candidateId?: string;
+  }[];
 }
 
 export interface RunOptions {
@@ -291,6 +318,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let declaredDone = false;
   let postcondition: ExpectedPostcondition | null = null;
   let fillRecord: RunRecord["fill"] = null;
+  const clarifications: RunRecord["clarifications"][number][] = [];
 
   /** The only way `state` changes. Refuses to move once the run has ended. */
   const go = (to: RunState): void => {
@@ -329,6 +357,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     declaredDone,
     postcondition,
     fill: fillRecord,
+    clarifications,
   });
 
   const stop = (stage: RefusalStage, cause: string, detail: string, planRefusal?: PlanRefusal): RunRecord => {
@@ -418,8 +447,82 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   // private value belongs in which field is this client's decision, not the reasoner's.
   const redactedTargets = new Set(handoff.redactions.map((r) => r.targetId));
   const emptyFields = handoff.elements.filter((e) => e.role === "textbox" && !redactedTargets.has(e.id)).map((e) => e.id);
-  const fill = groundFill(view, handoff.redactions, emptyFields);
-  fillRecord = { fillable: [...fill.fillable].map(([target, ref]) => ({ target, ref })), withheld: fill.withheld };
+  const recordFill = (grounded: FillGrounding): void => {
+    fillRecord = {
+      fillable: [...grounded.fillable].map(([target, ref]) => ({ target, ref })),
+      withheld: grounded.withheld,
+      chosenByPerson: grounded.chosenByPerson,
+    };
+  };
+  let fill = groundFill(view, handoff.redactions, emptyFields);
+  recordFill(fill);
+
+  // ── AWAIT CLARIFICATION (M17) ────────────────────────────────────────────────────────────
+  // A field more than one stored value fits is the person's to decide. They are asked before anything
+  // is sent or planned, one field at a time; any field left undecided stops the run here, so no
+  // value is restored into it and nothing that depends on it is submitted. A choice is evidence of
+  // intent and nothing more: privacy re-grounds with it, and every later gate still runs.
+  const conflicts = fill.withheld.filter((entry) => entry.cause === "CONFLICTING_REFERENCES");
+  if (conflicts.length > 0) {
+    go("AWAIT_CLARIFICATION");
+    const choices = new Map<string, string>();
+    for (const [index, conflict] of conflicts.entries()) {
+      const candidates = conflict.candidates?.length ?? 0;
+      const prepared = prepareClarification(conflict, handoff, {
+        clarificationId: `${options.requestId}.clarify.${index + 1}`,
+        sessionId: options.sessionId,
+        requestId: options.requestId,
+        origin: options.origin,
+        viewId,
+        documentId: observation.documentId,
+        expiresAt: clock() + options.grantTtlMs,
+      });
+      if (!prepared.ok) {
+        clarifications.push({ target: conflict.target, candidates, outcome: "CANDIDATES_INDISTINGUISHABLE" });
+        return stop("AWAIT_CLARIFICATION", "CANDIDATES_INDISTINGUISHABLE", CLARIFICATION_DETAIL.CANDIDATES_INDISTINGUISHABLE);
+      }
+      if (!ports.clarify) {
+        clarifications.push({ target: conflict.target, candidates, outcome: "CLARIFICATION_UNAVAILABLE" });
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_UNAVAILABLE", CLARIFICATION_DETAIL.CLARIFICATION_UNAVAILABLE);
+      }
+      let answer: unknown;
+      try {
+        answer = await timed("clarifyMs", () => ports.clarify!(prepared.prepared.request));
+      } catch {
+        clarifications.push({ target: conflict.target, candidates, outcome: "CLARIFICATION_FAILED" });
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_FAILED", CLARIFICATION_DETAIL.CLARIFICATION_FAILED);
+      }
+      const checked = checkClarificationAnswer(prepared.prepared, answer, clock());
+      if (!checked.ok) {
+        clarifications.push({ target: conflict.target, candidates, outcome: checked.cause });
+        return stop("AWAIT_CLARIFICATION", checked.cause, CLARIFICATION_DETAIL[checked.cause]);
+      }
+      clarifications.push({ target: conflict.target, candidates, outcome: "CHOSEN", candidateId: checked.candidateId });
+      choices.set(conflict.target, checked.token);
+    }
+
+    // The person may have taken a while. If the page can say whether its structure moved, ask it:
+    // a choice made about one page is not applied to another. Without the signal, REFRESH and the
+    // execution gate's freshness checks still stand before any click.
+    if (ports.structure && observation.structure) {
+      let now: StructuralStatus;
+      try {
+        now = await ports.structure();
+      } catch {
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_STALE", CLARIFICATION_DETAIL.CLARIFICATION_STALE);
+      }
+      if (!now.watching || now.seq !== observation.structure.seq) {
+        return stop("AWAIT_CLARIFICATION", "CLARIFICATION_STALE", CLARIFICATION_DETAIL.CLARIFICATION_STALE);
+      }
+    }
+
+    // Privacy decides again, with the choice as an input it may refuse.
+    fill = groundFill(view, handoff.redactions, emptyFields, choices);
+    recordFill(fill);
+    if (fill.withheld.some((entry) => entry.cause === "CHOICE_NOT_A_CANDIDATE" || entry.cause === "CONFLICTING_REFERENCES")) {
+      return stop("AWAIT_CLARIFICATION", "CHOICE_NOT_A_CANDIDATE", CLARIFICATION_DETAIL.CHOICE_NOT_A_CANDIDATE);
+    }
+  }
 
   // ── SEND ─────────────────────────────────────────────────────────────────────────────────
   //

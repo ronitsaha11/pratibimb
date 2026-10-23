@@ -37,6 +37,7 @@ import {
   checkTurnBudget,
   runTask,
   runTaskLoop,
+  type ClarificationRequest,
   type GrantDecision,
   type GrantRequest,
   type LoopOutcome,
@@ -142,6 +143,8 @@ export interface ExtensionRunResult {
   /** M3: how the perception realm came up. Null when this build ran the DOM-only floor. */
   readonly perceptionBoot: unknown;
   readonly grant: { readonly asked: boolean; readonly granted: boolean | null };
+  /** M17: how many "which stored value?" questions a person was asked. The answers are in the record. */
+  readonly clarificationsAsked: number;
 }
 
 /** How the offscreen realm asks the page to come and collect, and how a human answers. */
@@ -159,6 +162,12 @@ export interface ExtensionRunDeps {
   sendToBoundary(binding: TransportBinding, body: BoundaryRequest): Promise<BoundaryReply>;
   /** Park the request until someone outside this realm decides. Never resolved from in here. */
   askHuman(request: GrantRequest): Promise<GrantDecision>;
+  /**
+   * M17 — park a "which stored value?" question until a person answers it in the side panel.
+   * Never resolved from in here; what comes back is checked by the orchestrator, then by privacy.
+   * Absent, a field two stored values fit stops the run.
+   */
+  askPerson?(request: ClarificationRequest): Promise<unknown>;
   /**
    * M3 — the local perception pass, or nothing.
    *
@@ -225,6 +234,7 @@ export async function runExtensionTask(
     request.endpoint === null ? deterministic : localModelReasoner({ endpoint: request.endpoint, onEgress });
 
   const grant = { asked: false, granted: null as boolean | null };
+  let clarificationsAsked = 0;
 
   /**
    * M3 — the most recent perception pass, for the manifest the core realm assembles.
@@ -277,6 +287,14 @@ export async function runExtensionTask(
       grant.granted = decision.granted;
       return decision;
     },
+    ...(deps.askPerson
+      ? {
+          clarify: (question: ClarificationRequest) => {
+            clarificationsAsked += 1;
+            return deps.askPerson!(question);
+          },
+        }
+      : {}),
   });
 
   try {
@@ -326,6 +344,7 @@ export async function runExtensionTask(
       boundary: privacy.report,
       egress,
       grant,
+      clarificationsAsked,
     };
   } finally {
     // However the run ended — success, refusal, or a throw — no capability outlives it.

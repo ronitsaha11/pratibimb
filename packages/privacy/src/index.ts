@@ -140,7 +140,7 @@ export {
   type ViewField,
 } from "./bind.js";
 
-export { fieldFit, groundFill, type FieldFit, type FillCause, type FillGrounding, type FillReference } from "./fill.js";
+export { fieldFit, groundFill, type FieldFit, type FillCause, type FillGrounding, type FillReference, type FillWithheld } from "./fill.js";
 
 export {
   checkLiteral,

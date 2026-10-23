@@ -129,7 +129,8 @@ function fillIsFromHandoff(request: ReasonerRequest): boolean {
   for (const [target, ref] of fill.fillable) {
     if (!ids.has(target) || !tokens.has(ref)) return false;
   }
-  return fill.withheld.every((entry) => ids.has(entry.target));
+  if (!Array.isArray(fill.chosenByPerson) || !fill.chosenByPerson.every((target) => fill.fillable!.has(target))) return false;
+  return fill.withheld.every((entry) => ids.has(entry.target) && ((entry as { candidates?: readonly string[] }).candidates ?? []).every((token: string) => tokens.has(token)));
 }
 
 export async function sendToReasoner(

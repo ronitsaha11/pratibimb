@@ -18,6 +18,7 @@
  * a port that returned an approval nobody gave would be fabricating consent — the same trust boundary
  * `recordHumanConfirmation` names, in the same place: the UI that asks.
  */
+import { type ClarificationRequest } from "./clarification.js";
 import { type GuardedBridges } from "@pratibimb/agent";
 import { type ElementGraph } from "@pratibimb/perception";
 import { type ObservedField, type PiiClass } from "@pratibimb/privacy";
@@ -125,6 +126,14 @@ export interface ClientPorts {
   readonly fallback?: ReasonerClient;
   /** Ask a human. The only source of consent. */
   requestGrant(request: GrantRequest): Promise<GrantDecision>;
+  /**
+   * M17 — ask a person which stored value goes into a field more than one fits.
+   *
+   * OPTIONAL. Absent, a page with such a field stops at AWAIT_CLARIFICATION: nothing is guessed.
+   * What it resolves with is untrusted until `checkClarificationAnswer` has checked it, and a valid
+   * answer authorises nothing — it names a candidate, which privacy then re-checks.
+   */
+  clarify?(request: ClarificationRequest): Promise<unknown>;
   /**
    * Restore one value into one target, locally. Resolves `true` only if the page took it.
    *

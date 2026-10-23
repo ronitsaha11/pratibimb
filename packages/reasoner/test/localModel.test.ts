@@ -185,7 +185,7 @@ describe("the request that goes out", () => {
     await sendToReasoner(localModelReasoner({ endpoint }), {
       handoff,
       vault,
-      fill: { fillable: new Map(), withheld: [{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }] },
+      fill: { fillable: new Map(), withheld: [{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }], chosenByPerson: [] },
       goal: GOAL,
       requestId: REQUEST,
       sessionId: SESSION,

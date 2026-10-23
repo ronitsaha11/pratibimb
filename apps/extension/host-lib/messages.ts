@@ -103,6 +103,14 @@ export function isFromContentScript(sender: chrome.runtime.MessageSender): boole
   );
 }
 
+/**
+ * M17 — one of this extension's own pages, wherever it is shown: the side panel, or the same page
+ * opened in a tab. Decided by the sender's URL, which the browser sets: a content script's is the
+ * page it runs in, never this extension's.
+ */
+export const isFromExtensionUi = (sender: chrome.runtime.MessageSender): boolean =>
+  isFromThisExtension(sender) && typeof sender.url === "string" && sender.url.startsWith(chrome.runtime.getURL(""));
+
 /** An extension page (offscreen document, side panel): this extension, and no tab. */
 export const isFromExtensionPage = (sender: chrome.runtime.MessageSender): boolean =>
   isFromThisExtension(sender) && !sender.tab && typeof sender.url === "string" && sender.url.startsWith(chrome.runtime.getURL(""));

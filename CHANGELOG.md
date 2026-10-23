@@ -64,6 +64,21 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     fallback (M15 recorded 0 of 3). The two-step control was unchanged at 3 of 3. Not a
     reliability rate
     ([M16](artifacts/experiments/M16-field-grounding/README.md)).
+- **M17 — the person decides when two stored values fit one field.** The run stops at
+  `AWAIT_CLARIFICATION` before anything is sent or planned. The side panel asks which value, naming
+  each candidate only by the label of the field it came from.
+  - `checkClarificationAnswer` binds the answer to the question: id, session, origin, view, document,
+    field and candidate set, plus expiry. Strict keys mean an answer cannot carry an action, a value
+    or a reference.
+  - `groundFill` re-checks the choice, and the validator, binder, grant, REFRESH, permit gate and
+    VERIFY RESULT all still run.
+  - Declining, or any invalid or stale answer, stops the run with nothing filled. Candidates the
+    labels cannot tell apart are not offered ("enter the value yourself").
+  - W1, product build, real Qwen: one run per scenario (choose first, choose second, decline), all
+    as expected ([M17](artifacts/experiments/M17-clarification/README.md)).
+  - The eight "failing" product-build perception checks from M16 are the product correctly refusing
+    capture without a person's invocation (ADR-0009). `run-extension-loop.mjs` now judges each build
+    by its own contract; the evidence build is unchanged at 72/72.
 - Week-1 capability spikes (in progress).
 
 **The first complete product loop** — `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN →

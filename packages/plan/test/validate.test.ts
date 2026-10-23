@@ -466,7 +466,7 @@ describe("the pairing privacy grounded (M16)", () => {
   });
 
   it("refuses the pairing when privacy withheld the field, and says why", async () => {
-    const s = await scenario({ fill: { fillable: new Map(), withheld: [{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }] } });
+    const s = await scenario({ fill: { fillable: new Map(), withheld: [{ target: "#mobile_confirm", cause: "CONFLICTING_REFERENCES" }], chosenByPerson: [] } });
     const result = validatePlan(parse(rawPlan([insertRef(s.phoneRef), clickStep])), s.ctx);
     expect(result.ok).toBe(false);
     if (result.ok) return;

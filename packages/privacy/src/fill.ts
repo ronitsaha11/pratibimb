@@ -54,7 +54,12 @@ export type FillCause =
   /** No reference of the class the field accepts was issued. */
   | "NO_MATCHING_REFERENCE"
   /** More than one was, and choosing between them is the person's decision. */
-  | "CONFLICTING_REFERENCES";
+  | "CONFLICTING_REFERENCES"
+  /**
+   * A person's choice was given for this field and is not one of the references that fit it — or
+   * the field was not one a person was asked about (M17). The choice is refused, not corrected.
+   */
+  | "CHOICE_NOT_A_CANDIDATE";
 
 /** The parts of a handoff redaction this reads: no span, no hint, no geometry. */
 export interface FillReference {
@@ -63,11 +68,25 @@ export interface FillReference {
   readonly method: "token_reference" | "masked_no_token";
 }
 
+/** An empty field nothing may fill, and why. */
+export interface FillWithheld {
+  readonly target: string;
+  readonly cause: FillCause;
+  /**
+   * For `CONFLICTING_REFERENCES` and `CHOICE_NOT_A_CANDIDATE`: every reference that fits the field,
+   * in issue order. Tokens the handoff already carries; never a value. This is what a person may be
+   * asked to choose between (M17).
+   */
+  readonly candidates?: readonly string[];
+}
+
 export interface FillGrounding {
   /** Empty field → the one reference the client allows into it. */
   readonly fillable: ReadonlyMap<string, string>;
   /** Empty fields nothing may fill, each with its reason. */
-  readonly withheld: readonly { readonly target: string; readonly cause: FillCause }[];
+  readonly withheld: readonly FillWithheld[];
+  /** Fields in `fillable` whose reference a person chose among candidates (M17). Targets only. */
+  readonly chosenByPerson: readonly string[];
 }
 
 /**
@@ -75,31 +94,69 @@ export interface FillGrounding {
  *
  * `emptyFields` is the caller's list of text-entry elements that carry no redaction. Which elements
  * those are is a fact about the reading; what may go into them is decided here.
+ *
+ * `choices` (M17) is what a person chose for a field privacy withheld as `CONFLICTING_REFERENCES`:
+ * target → one of its candidates. It is evidence of the person's intent and nothing more. It is
+ * applied only if the chosen reference still fits the field on THIS view, and only to a field that
+ * is still conflicting; anything else withholds the field as `CHOICE_NOT_A_CANDIDATE`. It never
+ * makes a field fillable that the class rule refuses, and never picks a different reference.
  */
-export function groundFill(view: BindView, references: readonly FillReference[], emptyFields: readonly string[]): FillGrounding {
+export function groundFill(
+  view: BindView,
+  references: readonly FillReference[],
+  emptyFields: readonly string[],
+  choices: ReadonlyMap<string, string> = new Map()
+): FillGrounding {
   const issued = references.filter((reference) => reference.method === "token_reference" && reference.token !== "");
   const fillable = new Map<string, string>();
-  const withheld: { readonly target: string; readonly cause: FillCause }[] = [];
+  const withheld: FillWithheld[] = [];
+  const chosenByPerson: string[] = [];
+  const empty = new Set(emptyFields);
 
-  for (const target of new Set(emptyFields)) {
+  // A choice for a field that is not an empty field of this reading was never asked about here.
+  for (const target of choices.keys()) {
+    if (!empty.has(target)) withheld.push({ target, cause: "CHOICE_NOT_A_CANDIDATE" });
+  }
+
+  for (const target of empty) {
     const field = view.fields.get(target);
+    const choice = choices.get(target);
+    const refuseChoice = (candidates?: readonly string[]): void => {
+      withheld.push({ target, cause: "CHOICE_NOT_A_CANDIDATE", ...(candidates ? { candidates } : {}) });
+    };
     if (!field) {
+      if (choice !== undefined) {
+        refuseChoice();
+        continue;
+      }
       withheld.push({ target, cause: "UNKNOWN_TARGET" });
       continue;
     }
+    // A choice is refused for a field whose type the client could not establish: a person picking a
+    // value does not tell the binder what the field accepts.
     if (field.accepts === "OTP") {
-      withheld.push({ target, cause: "CRITICAL_FIELD" });
+      if (choice !== undefined) refuseChoice();
+      else withheld.push({ target, cause: "CRITICAL_FIELD" });
       continue;
     }
     if (field.accepts === "UNKNOWN" || field.accepts === "FREE_TEXT") {
-      withheld.push({ target, cause: "AMBIGUOUS_FIELD" });
+      if (choice !== undefined) refuseChoice();
+      else withheld.push({ target, cause: "AMBIGUOUS_FIELD" });
       continue;
     }
     const matching = [...new Set(issued.filter((reference) => fieldFit(field.accepts, reference.class) === "FITS").map((reference) => reference.token))];
-    if (matching.length === 0) withheld.push({ target, cause: "NO_MATCHING_REFERENCE" });
-    else if (matching.length > 1) withheld.push({ target, cause: "CONFLICTING_REFERENCES" });
+    if (matching.length > 1) {
+      if (choice === undefined) withheld.push({ target, cause: "CONFLICTING_REFERENCES", candidates: matching });
+      else if (matching.includes(choice)) {
+        fillable.set(target, choice);
+        chosenByPerson.push(target);
+      } else refuseChoice(matching);
+    } else if (choice !== undefined) {
+      // Nothing to choose between: no person was asked, so no answer is taken.
+      refuseChoice();
+    } else if (matching.length === 0) withheld.push({ target, cause: "NO_MATCHING_REFERENCE" });
     else fillable.set(target, matching[0]!);
   }
 
-  return { fillable, withheld };
+  return { fillable, withheld, chosenByPerson };
 }
