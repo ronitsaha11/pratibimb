@@ -52,6 +52,12 @@ export const DEFAULT_MODEL_ENDPOINT = "http://127.0.0.1:8977/v1/chat/completions
 /** What the model is allowed to name. Everything else is unrepresentable in its output. */
 interface Grounding {
   readonly targets: readonly string[];
+  /**
+   * What may be CLICKED: CONTROLS (`CLICKABLE_ROLES`) the handoff reports as visible and enabled.
+   * A disabled control cannot be acted on, so the decoder is not offered it (M15) — the validator
+   * still refuses one regardless; this only stops the model wasting its one plan on it.
+   */
+  readonly clickable: readonly string[];
   readonly refs: readonly string[];
   /**
    * The only inserts the model may write: each empty field privacy paired with a reference, and that
@@ -62,8 +68,16 @@ interface Grounding {
   readonly inserts: readonly { readonly target: string; readonly ref: string }[];
 }
 
+/**
+ * Roles that are controls a click operates. Not a text field, a label, a status line or a generic
+ * container: on the first real two-step run the model was offered a `status` region and proposed
+ * clicking it (M15). The validator and the declared postconditions would refuse such a click anyway.
+ */
+const CLICKABLE_ROLES = new Set(["button", "link", "checkbox", "radio", "tab", "menuitem", "switch"]);
+
 const groundingOf = (request: ReasonerRequest): Grounding => ({
   targets: request.handoff.elements.map((element) => element.id),
+  clickable: request.handoff.elements.filter((element) => element.visible && element.enabled && CLICKABLE_ROLES.has(element.role)).map((element) => element.id),
   refs: request.handoff.redactions.filter((redaction) => redaction.token !== "").map((redaction) => redaction.token),
   inserts: [...request.fill.fillable].map(([target, ref]) => ({ target, ref })),
 });
@@ -84,22 +98,30 @@ const planSchema = (grounding: Grounding): Record<string, unknown> => ({
     steps: {
       type: "array",
       minItems: 1,
-      // Every grounded fill, then one click; with nothing to fill, one step (M16).
+      // A plan is the NEXT action: the grounded fills (if any) then one click, or `done`. With nothing
+      // to fill, that is exactly one step (M15, M16). The validator refuses a second click either way.
       maxItems: Math.min(4, grounding.inserts.length + 1),
       items: {
         oneOf: [
+          // Each `insert` is one of privacy's pairings, target and reference together (M16). None when
+          // privacy paired nothing: a page with no fillable field still has controls to click and may
+          // still be finished.
           ...grounding.inserts.map((insert) => ({
             type: "object",
             properties: { op: { const: "insert" }, target: { enum: [insert.target] }, ref: { enum: [insert.ref] } },
             required: ["op", "target", "ref"],
             additionalProperties: false,
           })),
-          {
-            type: "object",
-            properties: { op: { const: "click" }, target: { enum: grounding.targets } },
-            required: ["op", "target"],
-            additionalProperties: false,
-          },
+          ...(grounding.clickable.length === 0
+            ? []
+            : [
+                {
+                  type: "object",
+                  properties: { op: { const: "click" }, target: { enum: grounding.clickable } },
+                  required: ["op", "target"],
+                  additionalProperties: false,
+                },
+              ]),
           {
             // The goal is already met. The client accepts it only as the plan's sole step.
             type: "object",
@@ -118,7 +140,8 @@ const planSchema = (grounding: Grounding): Record<string, unknown> => ({
 const SYSTEM = [
   "Plan the fewest browser steps that achieve the goal.",
   "- 'insert' puts a stored value into an EMPTY text field. Never into a button, never into a field that already has a value.",
-  "- 'click' presses a button. Never a text field.",
+  "- 'click' presses a button. Never a text field. Only a button whose 'enabled' is true.",
+  "- Plan only the NEXT click. After it, you are shown the page again and can plan the step after.",
   "- Pick the reference whose class matches the field.",
   "- 'done', alone, means the goal is already achieved on this page. Never combine it with other steps.",
 ].join("\n");
@@ -139,7 +162,7 @@ const EXAMPLE = {
       { id: "#email", name: "Email", empty: false },
       { id: "#email2", name: "Confirm email", empty: true },
     ],
-    buttons: [{ id: "#go", name: "Register" }],
+    buttons: [{ id: "#go", name: "Register", enabled: true }],
     references: [{ token: "REF_A", class: "EMAIL" }],
   }),
   assistant: JSON.stringify({
@@ -162,9 +185,10 @@ function contextFor(handoff: VerifiedHandoff, goal: string): Record<string, unkn
   const fields = handoff.elements
     .filter((element) => element.role === "textbox")
     .map((element) => ({ id: element.id, name: element.name, empty: !redactedTargets.has(element.id) }));
+  // `enabled` is the manifest's own field (manifest-schema.md): a structural fact, never a value.
   const buttons = handoff.elements
     .filter((element) => element.role === "button")
-    .map((element) => ({ id: element.id, name: element.name }));
+    .map((element) => ({ id: element.id, name: element.name, enabled: element.enabled }));
   const references = handoff.redactions
     .filter((redaction) => redaction.token !== "")
     .map((redaction) => ({ token: redaction.token, class: redaction.class, hint: redaction.hint }));
@@ -185,7 +209,9 @@ export function localModelReasoner(options: LocalModelOptions = {}): ReasonerCli
     transport: "LOOPBACK_HTTP",
     async propose(request: ReasonerRequest): Promise<unknown> {
       const grounding = groundingOf(request);
-      if (grounding.targets.length === 0 || grounding.refs.length === 0) return undefined;
+      // Nothing to point at means nothing to plan. A page with controls but no references is still a
+      // page the model can act on — by clicking, or by saying it is finished (M15).
+      if (grounding.targets.length === 0) return undefined;
 
       const body = {
         ...(options.model ? { model: options.model } : {}),

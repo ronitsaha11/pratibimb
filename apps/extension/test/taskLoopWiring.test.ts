@@ -32,12 +32,28 @@ describe("stage 12 in the extension run", () => {
   });
 
   it("revokes every capability between turns", () => {
-    expect(code).toMatch(/betweenTurns: async \(\) => \{\s*deps\.capabilities\.revokeAll\(\);\s*\}/);
+    expect(code).toMatch(/betweenTurns: async \(\) => \{\s*deps\.capabilities\.revokeAll\(\);\s*nextTurn\(\);\s*\}/);
   });
 
   it("projects every turn exactly as a single run is projected before it crosses the worker", () => {
     expect(code).toContain("turns: result.turns.map(crossable)");
     expect(code).toContain("record: crossable(record)");
+  });
+
+  it("M15: the task's postcondition table is checked before the page is even observed, and every turn uses it", () => {
+    const checked = code.indexOf("const postconditions = checkPostconditions(request.postconditions);");
+    const observed = code.indexOf("const observation = await observePage(");
+    expect(checked).toBeGreaterThan(-1);
+    expect(observed).toBeGreaterThan(checked);
+    expect(code).toMatch(/grantTtlMs: TTL\.grantMs,\s*postconditions,\s*\};/);
+  });
+
+  it("M15: each turn acts through its own transport cycle — the spent one is dropped between turns", () => {
+    const ports = readFileSync(join(ROOT, "apps/extension/host-lib/extension-ports.ts"), "utf8");
+    expect(ports).toMatch(/nextTurn: \(\) => \{\s*cycle = null;\s*\}/);
+    // `nextTurn` is the only place a cycle is discarded, and extension-run calls it between turns only.
+    expect(ports.match(/cycle = null;/g)).toHaveLength(1);
+    expect(code.match(/nextTurn\(\)/g)).toHaveLength(1);
   });
 
   it("still revokes and forgets once at the end, however the task ended", () => {

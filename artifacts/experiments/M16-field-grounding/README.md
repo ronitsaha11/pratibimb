@@ -1,7 +1,7 @@
 # M16 — the client decides which stored value goes into which field
 
-> **Status: the fix is in; on W1 the real local model completed the M2 page in every run recorded
-> here, with no fallback.** That is the result of a handful of runs at temperature 0. **It is not a
+> **Status: the fix is in.** On W1 the real local model completed the M2 page in every run recorded
+> here, with no fallback: 4 runs on the M14 branch, then 7 more on the M15 branch after the merge. That is the result of a handful of runs at temperature 0. **It is not a
 > reliability rate**, and it is not a J7 experiment: no gate, specification or J7/B5 decision is
 > touched by it.
 
@@ -105,8 +105,57 @@ The product build captures no frame (frame egress disabled), and the committed M
 (`a330526`) was made with the frame-capture evidence build. The evidence-build run shows that every
 other check holds with this change.
 
-**Not run here:** the M15 application task and the two-step control, because they need M15's code.
-They are recorded on the M15 branch after this fix is merged into it.
+### On the M15 branch, after the merge
+
+Run with `feature/action-result-verification`, after `feature/bounded-task-loop` was merged into it
+(merge `0fdd000`): product build, same machine, browser and model.
+
+**The M2 page as a multi-turn task:**
+- harness `M15_TASK=application M15_RUNS=5 node tests/browser/extension/run-two-step-task.mjs`;
+- `maxTurns` 2;
+- `#submit` → `TARGET_ENABLED false`.
+
+| Run | Turn 1 (model's raw proposal) | Turn 2 | Page | Classification |
+|---|---|---|---|---|
+| 1–5 | `insert #mobile_confirm <PII:PHONE:1>`, `click #submit` → CONFIRMED | `done` | "Application submitted", submit disabled | **model-completed** (5 of 5) |
+
+In every run:
+- every turn was answered by `LOCAL_MODEL`, with no fallback;
+- one grant was answered;
+- the front's tripwire found no value-shaped text in any model request;
+- egress went only to `127.0.0.1:8995`.
+
+Record: `w1-cft153-application-task-after-merge.json`.
+
+The harness's `firstStepConfirmedByThePage` and `second…` properties read the **two-step page's**
+counters, so on this page they are `false` by construction. The page truth above is what counts.
+
+Compare M15's three runs on the same page: 1 fallback-completed, 2 privacy-refused.
+
+**The M2 loop harness on the merged code:** 2 runs, both **model-completed**. The SUCCESS act was
+the same plan as above → CONFIRMED, and `record.fill` paired `#mobile_confirm` with `<PII:PHONE:1>`.
+The same 8 perception checks fail on the product build, as above.
+
+Records: `w1-cft153-m2-loop-after-merge-run{1,2}.json`.
+
+**Control — the M15 two-step page:**
+- `M15_RUNS=3 node tests/browser/extension/run-two-step-task.mjs`;
+- 3 of 3 runs, each `click #confirm-slot` → CONFIRMED, then `click #book` → CONFIRMED, then `done`;
+- all nine harness properties held;
+- every turn was answered by `LOCAL_MODEL`.
+
+This is unchanged from M15. The page has no fillable field, so privacy paired nothing and the
+grammar offered no `insert`.
+
+Record: `w1-cft153-two-step-control-after-merge.json`.
+
+### Totals
+
+| | Model-completed | Privacy-refused | Fallback-completed |
+|---|---|---|---|
+| M2 page, M14 branch | 4 | 0 | 0 |
+| M2 page, M15 branch (loop harness and application task) | 7 | 0 | 0 |
+| Two-step control | 3 | 0 | 0 |
 
 **The only fixture value in these logs** is the harness's own read-back of the synthetic confirm
 field (`page.confirmValue`), exactly as in the committed M2 record. Nothing the extension sent
@@ -115,11 +164,12 @@ contains one: the harness's `leaks` checks PASS.
 ## Conclusion
 
 On W1, with the client deciding the pairing, the real local model completed the M2 task in every
-recorded run, and every refusal path behaved as before.
+recorded run. That is 11 of 11 across both branches, against 0 of 3 in M15. Every refusal path
+behaved as before, and the two-step control was unchanged.
 
 **Not claimed:**
 
-- **Any reliability rate.** Four runs at temperature 0, on one page and one machine. M15 saw this
+- **Any reliability rate.** Fourteen runs at temperature 0, on two pages and one machine. M15 saw this
   model's output vary between runs at temperature 0.
 - **That the model now "understands" field types.** It does not have to: it is offered only
   pairings the client made, and anything else it writes is refused.
@@ -132,5 +182,12 @@ npm run build -w @pratibimb/extension
 CHROME_PATH=<chrome for testing> node tests/browser/extension/run-extension-loop.mjs
 ```
 
-The harness writes its record into `M2-page-value-boundary/logs/`. Those records were copied here,
-and the historical file was restored with `git checkout --`.
+On the M15 branch, the application task and the two-step control:
+
+```bash
+M15_TASK=application M15_RUNS=5 node tests/browser/extension/run-two-step-task.mjs
+M15_RUNS=3 node tests/browser/extension/run-two-step-task.mjs
+```
+
+Each harness writes into the historical `M2-…/logs/` or `M15-…/logs/` files. Those records were
+copied here, and the historical files were restored with `git checkout --`.

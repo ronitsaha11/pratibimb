@@ -31,6 +31,25 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` Â
   record, and every capability is revoked between turns.
 - **Not yet shown:** a multi-turn task in the browser against a real model. The loop is tested against
   the real gates in Node (`packages/orchestrator/test/loop.test.ts`) with a scripted test reasoner.
+- **M15 â€” action-specific result verification.** Every click's expected effect is now declared by
+  the client with the task: `postconditions`, target â†’ an ADR-0007 postcondition, checked by
+  `checkPostconditions`. Nothing assumes "submit disables itself" any more.
+  - **Refused before any grant, value restoration or click:** a click with no declaration
+    (`NO_DECLARED_POSTCONDITION`), and one whose postcondition already holds
+    (`POSTCONDITION_ALREADY_HOLDS`).
+  - **Model-supplied success conditions are dropped** by the parser.
+  - **A post-action read-back that fails** is `UNKNOWN` (`OBSERVATION_FAILED`), not an escaped
+    exception.
+  - **One click per plan** (`MORE_THAN_ONE_CLICK`).
+  - **The local model:**
+    - is now asked on pages with no references;
+    - sees each button's `enabled` state;
+    - has its clicks grounded to enabled controls.
+  - **Each turn acts through its own transport cycle**, fixing an M14 defect that refused every second
+    turn in the real extension.
+  - `RUN_TASK` requires `postconditions`.
+  - Demonstrated on W1 with the real extension and Qwen2.5-0.5B on a synthetic two-step page:
+    [M15-two-step-task](artifacts/experiments/M15-two-step-task/README.md).
 - **M16 â€” which stored value goes into which field is the client's decision.** On the M2 page the
   local model put the NAME reference into the mobile field. The binder refused it, and the task
   stopped.
@@ -41,8 +60,9 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` Â
     `HOSTILE`: no fallback, no substitution).
   - The local model's grammar offers only the pairing.
   - Manifest, schema, ADRs, gates, CSP and pins unchanged.
-  - W1, real Qwen, M2 page: the model completed the task in 4 of 4 recorded runs, with no fallback.
-    Not a reliability rate
+  - W1, real Qwen, M2 page: the model completed the task in 11 of 11 recorded runs, with no
+    fallback (M15 recorded 0 of 3). The two-step control was unchanged at 3 of 3. Not a
+    reliability rate
     ([M16](artifacts/experiments/M16-field-grounding/README.md)).
 - Week-1 capability spikes (in progress).
 

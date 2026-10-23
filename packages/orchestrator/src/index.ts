@@ -21,6 +21,13 @@ export {
 } from "./machine.js";
 
 export {
+  MAX_DECLARED_POSTCONDITIONS,
+  PostconditionsError,
+  checkPostconditions,
+  type ClickPostconditions,
+} from "./postconditions.js";
+
+export {
   MAX_TASK_TURNS,
   TurnBudgetError,
   checkTurnBudget,

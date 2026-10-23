@@ -61,6 +61,7 @@ export type PlanRefusalCause =
   | "TARGET_NOT_ACTIONABLE"
   | "DUPLICATE_TARGET"
   | "NO_EXECUTABLE_STEP"
+  | "MORE_THAN_ONE_CLICK"
   | "CLICK_BEFORE_INSERT"
   | "PRIVACY_REFUSED"
   | "LITERAL_REFUSED"
@@ -258,6 +259,14 @@ export function validatePlan(plan: Plan, ctx: PlanValidationContext): PlanValida
     seen.add(`${step.op}:${target}`);
 
     if (step.op === "click") {
+      // One action per turn (stage 12 repeats the loop for the next one). A second click would be
+      // silently dropped by the orchestrator, which acts once — so it is refused here, by name.
+      if (checked.some((s) => s.op === "click")) {
+        return refuse(
+          { cause: "MORE_THAN_ONE_CLICK", at: index, target, detail: "a plan performs one action; the next one is planned on the page that action produces." },
+          checked
+        );
+      }
       if (!ctx.actionableTargets.has(target)) {
         return refuse(
           {

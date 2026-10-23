@@ -90,8 +90,10 @@ export interface ExtensionPortsReport {
   /** Literal inserts the plan asked for. Every one of them is refused; see `insert` below. */
   inserts: number;
   readonly insertRefusals: string[];
-  /** The transport's own account of the one action cycle, or `null` if no action was reached. */
+  /** The transport's own account of the latest action cycle, or `null` if no action was reached. */
   cycle: CycleReport | null;
+  /** Every action cycle the task used, in order: one per turn that reached ACT (M15). */
+  cycles: CycleReport[];
   /** M3: what each perception pass produced. Counts, geometry, codes and timings only. */
   readonly perception: PerceptionSummary[];
 }
@@ -99,6 +101,15 @@ export interface ExtensionPortsReport {
 export interface ExtensionPorts {
   readonly ports: ClientPorts;
   readonly report: ExtensionPortsReport;
+  /**
+   * End a turn: the next ACT builds a NEW transport cycle (M15).
+   *
+   * A cycle "looks once and acts once" (`coreTransport.ts`) and its bridges name the frame REFRESH
+   * produced for THAT turn. A second turn reusing it would be a replay against a stale frame, which
+   * the execution gate refuses as `BRIDGE_FRAME_MISMATCH` — measured on the first real two-turn run.
+   * So each turn gets its own cycle, built after its own REFRESH. Called between turns only.
+   */
+  readonly nextTurn: () => void;
 }
 
 export function createExtensionPorts(options: ExtensionPortsOptions): ExtensionPorts {
@@ -108,6 +119,7 @@ export function createExtensionPorts(options: ExtensionPortsOptions): ExtensionP
     inserts: 0,
     insertRefusals: [],
     cycle: null,
+    cycles: [],
     perception: [],
   };
 
@@ -123,7 +135,8 @@ export function createExtensionPorts(options: ExtensionPortsOptions): ExtensionP
    */
   let latestFrame = options.binding.observationFrameId;
 
-  // One cycle for the run, built on first use — which is after REFRESH, so it inherits that frame.
+  // One cycle per TURN, built on first use — which is after that turn's REFRESH, so it inherits that
+  // frame. `nextTurn()` discards a spent cycle; nothing else does.
   // `guardedAct` reads both bridges from the same object, and they must belong to the same cycle or
   // the hit test would not be the one the dispatch honours.
   let cycle: ReturnType<typeof createTransportCycle> | null = null;
@@ -131,6 +144,7 @@ export function createExtensionPorts(options: ExtensionPortsOptions): ExtensionP
     if (cycle === null) {
       cycle = createTransportCycle(options.relay, { ...options.binding, observationFrameId: latestFrame });
       report.cycle = cycle.report;
+      report.cycles.push(cycle.report);
     }
     return cycle;
   };
@@ -260,6 +274,9 @@ export function createExtensionPorts(options: ExtensionPortsOptions): ExtensionP
 
   return {
     report,
+    nextTurn: () => {
+      cycle = null;
+    },
     ports: {
       observe,
       structure: structurePort,

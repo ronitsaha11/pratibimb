@@ -169,6 +169,9 @@ try {
       endpoint: REASONER_URL,
       sessionId: `m2exec-${index}-session`,
       requestId: `m2exec-${index}-request`,
+      // M15: what the fixture's one clickable control does when it works — the application page
+      // disables its own submit button. Declared by the task, never assumed by the orchestrator.
+      postconditions: { "#submit": { kind: "TARGET_ENABLED", expected: false } },
     };
     await worker.evaluate((req) => {
       globalThis.__m1 = null;

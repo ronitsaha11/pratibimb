@@ -216,7 +216,25 @@ export async function guardedAct(
   // authorisationPreflight established both.
   const node = decision.node!;
   const frame = decision.frameId!;
-  const observation = await options.verify.observe();
+  // A reading that fails is not evidence either way. The action was dispatched; whether it worked is
+  // UNKNOWN — recorded with the dispatch, never thrown past it and never read as success.
+  let observation: Awaited<ReturnType<typeof options.verify.observe>>;
+  try {
+    observation = await options.verify.observe();
+  } catch {
+    return {
+      reached: "VERIFY_RESULT",
+      decision,
+      hit,
+      result,
+      verification: {
+        verification: "UNKNOWN",
+        postcondition: options.verify.expect.kind,
+        cause: "OBSERVATION_FAILED",
+        detail: "the page could not be read back after the action, so whether the expected result occurred is unestablished.",
+      },
+    };
+  }
   const verification = verifyActionResult({
     result,
     acted: node,
