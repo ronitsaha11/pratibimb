@@ -103,6 +103,48 @@ PHONE.
   - ten malformed forms that still fail closed.
 - No fixture or golden file contained a 91-prefixed ten-digit number.
 
+## Addendum: the real Chrome side panel, operated by a person (2026-10-23/24, W1)
+
+Record: [`logs/w1-cft-real-sidepanel-smoke.json`](logs/w1-cft-real-sidepanel-smoke.json).
+Harness: `tests/browser/extension/run-sidepanel-smoke.mjs`.
+- **Human-in-the-loop.** The owner opened PratiBimb in **Chrome's own side panel** and made every
+  click. The harness only launched the product build and the local model, and observed: it sent no
+  answer and pressed nothing.
+- **Verdict PASS, 31/31 checks.** Chrome for Testing 153.0.8010.12, product build, real Qwen.
+
+| Scenario | Questions | Consent | Restored | Field after | Submit clicks | Outcome |
+|---|---|---|---|---|---|---|
+| Allow once | consent | `ALLOWED_ONCE` | `#mobile_confirm` | registered | 1, CONFIRMED | COMPLETED_AS_DECLARED |
+| Deny | consent | `CONSENT_DENIED` | — | empty | 0 | STOPPED_REFUSED |
+| Stale (page reloaded while the consent waited, then Allow once) | consent | `CONSENT_STALE` | — | empty | 0 | STOPPED_REFUSED |
+| Two numbers | which-number (chose `c1`, "Mobile number"), then consent | `ALLOWED_ONCE` | `#mobile_confirm` | registered | 1, CONFIRMED | COMPLETED_AS_DECLARED |
+
+In every scenario:
+- the consent was asked in the panel, and the control-plane grant path was never asked;
+- the expected result was declared by the person;
+- no value-shaped text reached the model;
+- egress went only to the loopback reasoner;
+- the record holds no stored value and no preview text.
+
+**What the person observed, and what only the record shows:**
+- Scenarios 1–3: the owner saw each final page and panel state, and it matched the record.
+- Scenario 4: the browser closed itself the moment the scenario ended (a harness defect, since
+  fixed), so **its final screen was not seen by the owner**. That scenario is harness-recorded
+  evidence only.
+- The order consent → restore → click is enforced by the run's state machine. This record holds
+  outcomes, not timestamps, so the order was not observed with timestamps.
+
+**Found by the first attempt, fixed before the run above** (`ae6dc28`):
+- The consent and which-number boxes sat below three inert placeholder sections in the real side
+  panel, out of view. The inert "Grants" buttons looked like consent controls.
+- The status line outlived the page it described.
+- The harness reloaded the page the moment a scenario ended.
+
+After the run, the harness was changed once more: it now keeps the browser open until the person
+closes it. The committed record was produced by the version before that change.
+
+**Not claimed:** any reliability rate; other pages or values; anything about J7, B5 or frame egress.
+
 ## Conclusion
 
 On W1, for tasks stated in the extension's panel page, the client asked about each stored-value

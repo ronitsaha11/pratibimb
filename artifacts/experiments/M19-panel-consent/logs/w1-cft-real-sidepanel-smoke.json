@@ -1,0 +1,413 @@
+{
+  "experiment": "M19 — the REAL Chrome side panel, operated by a person (human-in-the-loop smoke test; not a J7 experiment)",
+  "humanInTheLoop": true,
+  "verdict": "PASS",
+  "failure": null,
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-m8177FDykU5Du1Rd/j5mkhTgw4bPCr4KkGCjgcTQlvI='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "browser": {
+    "binary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "model": {
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+  },
+  "runs": [
+    {
+      "scenario": "allow",
+      "finished": true,
+      "taskState": "FINISHED",
+      "outcome": "COMPLETED_AS_DECLARED",
+      "consentsAsked": 1,
+      "clarificationsAsked": 0,
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "ALLOWED_ONCE"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "a5704225-d9be-440e-91e6-8c6a1ab65302",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [
+            {
+              "ref": "<PII:PHONE:1>",
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "inserted": true
+            }
+          ],
+          "verification": "CONFIRMED",
+          "declaredDone": false
+        },
+        {
+          "turn": 2,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [],
+          "consents": [],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "a5704225-d9be-440e-91e6-8c6a1ab65302",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": true
+        }
+      ],
+      "page": {
+        "confirmHolds": "REGISTERED",
+        "submitDisabled": true,
+        "submitClicks": 1
+      },
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "judged": {
+        "finished": true,
+        "noValueShapedTextReachedTheModel": true,
+        "allEgressLoopbackReasoner": true,
+        "askedInThePanelNotTheControlPlane": true,
+        "thePersonDeclaredTheExpectedResult": true,
+        "allowedOnce": true,
+        "restoredIntoTheField": true,
+        "clickVerifiedByThePage": true
+      }
+    },
+    {
+      "scenario": "deny",
+      "finished": true,
+      "taskState": "FINISHED",
+      "outcome": "STOPPED_REFUSED",
+      "consentsAsked": 1,
+      "clarificationsAsked": 0,
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "AWAIT_GRANT",
+            "cause": "CONSENT_DENIED"
+          },
+          "clarifications": [],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "CONSENT_DENIED"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "862184c6-3d51-4b21-ba9e-9bd30c23fd0b",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": false
+        }
+      ],
+      "page": {
+        "confirmHolds": "EMPTY",
+        "submitDisabled": false,
+        "submitClicks": 0
+      },
+      "modelRequestTripwire": [
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "judged": {
+        "finished": true,
+        "noValueShapedTextReachedTheModel": true,
+        "allEgressLoopbackReasoner": true,
+        "askedInThePanelNotTheControlPlane": true,
+        "thePersonDeclaredTheExpectedResult": true,
+        "denied": true,
+        "nothingRestoredOrSubmitted": true
+      }
+    },
+    {
+      "scenario": "stale",
+      "finished": true,
+      "taskState": "FINISHED",
+      "outcome": "STOPPED_REFUSED",
+      "consentsAsked": 1,
+      "clarificationsAsked": 0,
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "AWAIT_GRANT",
+            "cause": "CONSENT_STALE"
+          },
+          "clarifications": [],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "CONSENT_STALE"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "65da7833-ebd7-4d56-9d33-48050e3c1cb2",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": false
+        }
+      ],
+      "page": {
+        "confirmHolds": "EMPTY",
+        "submitDisabled": false,
+        "submitClicks": 0
+      },
+      "modelRequestTripwire": [
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "judged": {
+        "finished": true,
+        "noValueShapedTextReachedTheModel": true,
+        "allEgressLoopbackReasoner": true,
+        "askedInThePanelNotTheControlPlane": true,
+        "thePersonDeclaredTheExpectedResult": true,
+        "theRunStoppedWithoutAConfirmedAction": true,
+        "notRestoredAfterReload": true
+      }
+    },
+    {
+      "scenario": "clarify",
+      "finished": true,
+      "taskState": "FINISHED",
+      "outcome": "COMPLETED_AS_DECLARED",
+      "consentsAsked": 1,
+      "clarificationsAsked": 1,
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [
+            {
+              "target": "#mobile_confirm",
+              "candidates": 2,
+              "outcome": "CHOSEN",
+              "candidateId": "c1"
+            }
+          ],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "ALLOWED_ONCE"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "e41d9163-c0c7-4eea-b572-2c3e1b2eac10",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [
+            {
+              "ref": "<PII:PHONE:1>",
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "inserted": true
+            }
+          ],
+          "verification": "CONFIRMED",
+          "declaredDone": false
+        },
+        {
+          "turn": 2,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [],
+          "consents": [],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "e41d9163-c0c7-4eea-b572-2c3e1b2eac10",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": true
+        }
+      ],
+      "page": {
+        "confirmHolds": "REGISTERED",
+        "submitDisabled": true,
+        "submitClicks": 1
+      },
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "judged": {
+        "finished": true,
+        "noValueShapedTextReachedTheModel": true,
+        "allEgressLoopbackReasoner": true,
+        "askedInThePanelNotTheControlPlane": true,
+        "thePersonDeclaredTheExpectedResult": true,
+        "chosenNotGuessed": true,
+        "allowedOnce": true,
+        "restoredIntoTheField": true,
+        "clickVerifiedByThePage": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "synthetic pages and values only; one run per scenario; no reliability claim",
+    "the harness observed only; every click was the person's"
+  ],
+  "recordedAt": "2026-10-23T19:42:14.752Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0"
+  }
+}
