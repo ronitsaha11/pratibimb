@@ -271,7 +271,10 @@ describe("fail closed: any detector or report failure masks every visual region 
     expect(out.failClosed).toBe(false);
     expect(out.regions.every((r) => r.cssMask.length === 0 && r.pixelRects.length === 0)).toBe(true);
     expect(out.frame.rgba).toEqual(before);
-  });
+    // The whole-frame `toEqual` is ~99% of this test: vitest compares the 384 000 bytes one by one and
+    // then again through `Object.entries`. Measured on W1 (2026-10-23): ~0.5 s for that one assertion,
+    // 0.84 s for the test alone, 1.7–2.5 s under the parallel suite. The default 5 s was being crossed.
+  }, 30_000);
 
   it("a geometry that cannot convert a detector box makes the report MALFORMED, not empty", () => {
     const bad = { ...geometry(), captureSize: { w: 0, h: HEIGHT } };
