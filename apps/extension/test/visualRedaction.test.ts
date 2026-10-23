@@ -71,10 +71,59 @@ function verify(before: Uint8ClampedArray, after: RgbaFrame, masked: Set<number>
   return { covered, notCovered, accidental, changed, unchanged: after.width * after.height - changed };
 }
 
+/**
+ * Why `actual` is not exactly `expected` — a different typed-array type, a different length, or the first
+ * differing byte — or null when every byte matches. Every byte is compared. `toEqual` checked the same
+ * type, length and bytes, but costs ~0.5 s on a 384 000-byte frame.
+ */
+function byteDiff(actual: unknown, expected: Uint8ClampedArray | Uint8Array): string | null {
+  if (!ArrayBuffer.isView(actual) || Object.getPrototypeOf(actual) !== Object.getPrototypeOf(expected))
+    return `type: expected ${expected.constructor.name}, got ${ArrayBuffer.isView(actual) ? actual.constructor.name : typeof actual}`;
+  const a = actual as Uint8ClampedArray | Uint8Array;
+  if (a.length !== expected.length) return `length: expected ${expected.length}, got ${a.length}`;
+  for (let i = 0; i < expected.length; i++) if (a[i] !== expected[i]) return `byte ${i}: expected ${expected[i]}, got ${a[i]}`;
+  return null;
+}
+
 const sanitized = (o: SanitizeOutcome) => {
   if (o.outcome !== "SANITIZED") throw new Error(`expected SANITIZED, got REFUSED ${o.code}: ${o.detail}`);
   return o;
 };
+
+// ───────────────────────────── the exact byte comparison ─────────────────────────────
+
+describe("byteDiff — the exact frame comparison the empty-mask test relies on", () => {
+  const frame = () => generateFrame(EXPECTED).rgba;
+
+  it("an identical copy is no difference", () => {
+    const f = frame();
+    expect(byteDiff(f.slice(), f)).toBeNull();
+  });
+
+  it.each([0, 1, WIDTH * HEIGHT * 4 / 2, WIDTH * HEIGHT * 4 - 1])("a single changed byte at %i is caught", (i) => {
+    const f = frame();
+    const changed = f.slice();
+    changed[i] = changed[i]! ^ 1;
+    expect(byteDiff(changed, f)).toBe(`byte ${i}: expected ${f[i]}, got ${changed[i]}`);
+  });
+
+  it("a length mismatch is caught, shorter or longer", () => {
+    const f = frame();
+    expect(byteDiff(f.slice(0, -1), f)).toBe(`length: expected ${f.length}, got ${f.length - 1}`);
+    const longer = new Uint8ClampedArray(f.length + 1);
+    longer.set(f);
+    expect(byteDiff(longer, f)).toBe(`length: expected ${f.length}, got ${f.length + 1}`);
+  });
+
+  it("the same bytes in another representation are caught", () => {
+    const f = frame();
+    expect(byteDiff(new Uint8Array(f), f)).toMatch(/^type: expected Uint8ClampedArray, got Uint8Array/);
+    expect(byteDiff(Buffer.from(f), f)).toMatch(/^type: expected Uint8ClampedArray, got Buffer/);
+    expect(byteDiff(new DataView(f.buffer), f)).toMatch(/^type: /);
+    expect(byteDiff(Array.from(f), f)).toMatch(/^type: /);
+    expect(byteDiff(undefined, f)).toMatch(/^type: /);
+  });
+});
 
 // ───────────────────────────── the pure fill ─────────────────────────────
 
@@ -270,11 +319,8 @@ describe("fail closed: any detector or report failure masks every visual region 
     const out = sanitized(sanitizeFrame({ frame, geometry: geometry(), regions: REGIONS, report }));
     expect(out.failClosed).toBe(false);
     expect(out.regions.every((r) => r.cssMask.length === 0 && r.pixelRects.length === 0)).toBe(true);
-    expect(out.frame.rgba).toEqual(before);
-    // The whole-frame `toEqual` is ~99% of this test: vitest compares the 384 000 bytes one by one and
-    // then again through `Object.entries`. Measured on W1 (2026-10-23): ~0.5 s for that one assertion,
-    // 0.84 s for the test alone, 1.7–2.5 s under the parallel suite. The default 5 s was being crossed.
-  }, 30_000);
+    expect(byteDiff(out.frame.rgba, before)).toBeNull();
+  });
 
   it("a geometry that cannot convert a detector box makes the report MALFORMED, not empty", () => {
     const bad = { ...geometry(), captureSize: { w: 0, h: HEIGHT } };
