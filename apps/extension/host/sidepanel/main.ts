@@ -1,9 +1,20 @@
 /**
- * Minimal host — side panel shell. Displays host status. Every control is inert except one (M17):
- * answering a "which stored value?" question a run is waiting on.
+ * Minimal host — side panel shell. Displays host status, and has two working parts: answering a
+ * "which stored value?" question a run is waiting on (M17), and stating a task with what each click
+ * must do (M18). Every other control is inert.
  * No settings, no history, no telemetry, no state management.
  */
 import { panelAnswer, panelViewOf } from "../../host-lib/clarification-panel";
+import {
+  OFFER_TEXT,
+  addExpectation,
+  describeExpectation,
+  panelFormOf,
+  summariseTask,
+  taskAnswer,
+  type Expectation,
+  type PanelForm,
+} from "../../host-lib/task-panel";
 
 // NOT `status`: `window.status` is a DOM global of type `string`, so a module-scope `const status`
 // collides with it. The build never noticed because nothing type-checked this file.
@@ -138,3 +149,143 @@ async function pollClarification(): Promise<void> {
 
 void pollClarification();
 setInterval(() => void pollClarification(), 1_000);
+
+/**
+ * M18 — THE TASK, AND WHAT EACH CLICK MUST DO, STATED BY THE PERSON.
+ *
+ * "Read this page" asks the offscreen document for a form: the page's controls and, for each, the
+ * ADR-0007 results that are not already true. The person picks a control and a result, adds as many
+ * as the task needs, and presses "Start task". The answer is built by `taskAnswer` from the form's
+ * own bindings, so nothing typed here is a selector or a rule; `checkDeclaration` and then the run
+ * itself decide what it is worth.
+ */
+const goalInput = document.getElementById("goal") as HTMLInputElement | null;
+const taskRead = document.getElementById("task-read") as HTMLButtonElement | null;
+const taskControls = document.getElementById("task-controls");
+const taskExpect = document.getElementById("task-expect") as HTMLSelectElement | null;
+const taskName = document.getElementById("task-name") as HTMLInputElement | null;
+const taskAdd = document.getElementById("task-add") as HTMLButtonElement | null;
+const taskDeclared = document.getElementById("task-declared");
+const taskStart = document.getElementById("task-start") as HTMLButtonElement | null;
+const taskStatus = document.getElementById("task-status");
+
+let taskForm: PanelForm | null = null;
+let expectations: readonly Expectation[] = [];
+
+const say = (text: string): void => {
+  if (taskStatus) taskStatus.textContent = text;
+};
+const chosenControl = (): string | null =>
+  taskControls?.querySelector<HTMLInputElement>('input[name="task-control"]:checked')?.value ?? null;
+
+function renderExpectOptions(): void {
+  if (!taskExpect || !taskForm) return;
+  const control = taskForm.controls.find((c) => c.controlId === chosenControl());
+  taskExpect.replaceChildren(
+    ...(control?.offers ?? []).map((offer) => {
+      const option = document.createElement("option");
+      option.value = offer;
+      option.textContent = OFFER_TEXT[offer];
+      return option;
+    })
+  );
+  taskExpect.disabled = !control;
+  if (taskAdd) taskAdd.disabled = !control;
+  if (taskName) taskName.hidden = taskExpect.value !== "TARGET_RENAMED";
+}
+
+function renderDeclared(): void {
+  if (!taskDeclared || !taskForm) return;
+  const form = taskForm;
+  taskDeclared.replaceChildren(
+    ...expectations.map((e) => {
+      const item = document.createElement("li");
+      item.textContent = describeExpectation(form, e);
+      return item;
+    })
+  );
+  if (taskStart) taskStart.disabled = expectations.length === 0;
+}
+
+async function activeTabId(): Promise<number | null> {
+  // The page the person is looking at: the active tab of the last focused ordinary window, so a
+  // panel shown in its own window still names the page and not itself.
+  const window = await chrome.windows.getLastFocused({ windowTypes: ["normal"], populate: true });
+  return window.tabs?.find((tab) => tab.active)?.id ?? null;
+}
+
+taskRead?.addEventListener("click", () => {
+  void (async () => {
+    taskForm = null;
+    expectations = [];
+    taskControls?.replaceChildren();
+    renderDeclared();
+    const tabId = await activeTabId();
+    if (tabId === null) return say("No page to read.");
+    const reply = await chrome.runtime.sendMessage({ target: "offscreen", kind: "TASK_PREPARE", tabId });
+    const form = panelFormOf(reply);
+    if (form === null) return say(`Could not read the page (${(reply as { refused?: string } | undefined)?.refused ?? "no reply"}).`);
+    taskForm = form;
+    taskControls?.replaceChildren(
+      ...form.controls.map((control) => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "task-control";
+        input.value = control.controlId;
+        input.addEventListener("change", renderExpectOptions);
+        label.append(input, document.createTextNode(` ${control.text}`));
+        const row = document.createElement("div");
+        row.append(label);
+        return row;
+      })
+    );
+    renderExpectOptions();
+    document.documentElement.dataset.task = "form";
+    say(form.controls.length === 0 ? "This page has no control PratiBimb could click." : `Read ${form.origin}. Choose a control and what clicking it should do.`);
+  })();
+});
+
+taskExpect?.addEventListener("change", () => {
+  if (taskName) taskName.hidden = taskExpect.value !== "TARGET_RENAMED";
+});
+
+taskAdd?.addEventListener("click", () => {
+  if (!taskForm) return;
+  const added = addExpectation(taskForm, expectations, chosenControl(), taskExpect?.value ?? null, taskName?.value ?? "");
+  if (!added.ok) return say(added.reason);
+  expectations = added.list;
+  if (taskName) taskName.value = "";
+  renderDeclared();
+  say("Added. Add another, or start the task.");
+});
+
+taskStart?.addEventListener("click", () => {
+  void (async () => {
+    if (!taskForm) return;
+    const answer = taskAnswer(taskForm, goalInput?.value ?? "", expectations);
+    if (taskStart) taskStart.disabled = true; // one press, one answer; the desk refuses a second
+    const reply = (await chrome.runtime.sendMessage({ target: "offscreen", kind: "TASK_START", answer })) as { ok?: boolean; refused?: string; at?: number } | undefined;
+    if (reply?.ok) {
+      document.documentElement.dataset.task = "started";
+      say("Started.");
+    } else {
+      document.documentElement.dataset.task = "refused";
+      say(`Not started: ${reply?.refused ?? "no reply"}${reply?.at === undefined ? "" : ` (expected result ${reply.at + 1})`}. Read the page again.`);
+    }
+  })();
+});
+
+async function pollTask(): Promise<void> {
+  if (document.documentElement.dataset.task !== "started") return;
+  try {
+    const status = await chrome.runtime.sendMessage({ target: "offscreen", kind: "TASK_STATUS" });
+    const task = (status as { task?: { state?: string } } | undefined)?.task;
+    if (task && task.state !== "RUNNING") document.documentElement.dataset.task = "finished";
+    say(summariseTask(status));
+  } catch {
+    /* the next poll will say */
+  }
+}
+
+setInterval(() => void pollTask(), 1_000);

@@ -73,7 +73,7 @@ interface Grounding {
  * container: on the first real two-step run the model was offered a `status` region and proposed
  * clicking it (M15). The validator and the declared postconditions would refuse such a click anyway.
  */
-const CLICKABLE_ROLES = new Set(["button", "link", "checkbox", "radio", "tab", "menuitem", "switch"]);
+export const CLICKABLE_ROLES: ReadonlySet<string> = new Set(["button", "link", "checkbox", "radio", "tab", "menuitem", "switch"]);
 
 const groundingOf = (request: ReasonerRequest): Grounding => ({
   targets: request.handoff.elements.map((element) => element.id),

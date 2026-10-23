@@ -25,6 +25,7 @@ export { deterministicReasoner, type DeterministicOptions, type ReasonerMode } f
 
 export {
   DEFAULT_MODEL_ENDPOINT,
+  CLICKABLE_ROLES,
   localModelReasoner,
   type LocalModelOptions,
 } from "./localModel.js";

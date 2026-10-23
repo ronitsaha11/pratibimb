@@ -16,6 +16,17 @@
   <h1>PratiBimb minimal host</h1>
   <p class="warn">Experiment shell. Not the product: no sanitizer, no verifier, no server, no real values.</p>
   <fieldset><legend>Goal</legend><input id="goal" placeholder="Synthetic goal text"></fieldset>
+  <fieldset id="task">
+    <legend>What should each click do?</legend>
+    <button id="task-read" type="button">Read this page</button>
+    <div id="task-controls"></div>
+    <select id="task-expect" disabled></select>
+    <input id="task-name" placeholder="The label it should change to" hidden>
+    <button id="task-add" type="button" disabled>Add expected result</button>
+    <ul id="task-declared"></ul>
+    <button id="task-start" type="button" disabled>Start task</button>
+    <div id="task-status"></div>
+  </fieldset>
   <fieldset><legend>Synthetic profile</legend><textarea id="profile" rows="3" placeholder="Synthetic values only"></textarea></fieldset>
   <fieldset><legend>Grants (inert placeholders)</legend>
     <button id="grant-class" type="button" disabled>Allow PHONE on this origin</button>

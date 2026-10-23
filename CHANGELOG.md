@@ -79,6 +79,19 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
   - The eight "failing" product-build perception checks from M16 are the product correctly refusing
     capture without a person's invocation (ADR-0009). `run-extension-loop.mjs` now judges each build
     by its own contract; the evidence build is unchanged at 72/72.
+- **M18 — the person declares what each click must do.** The side panel reads the page and offers
+  each visible control with only the ADR-0007 results not already true: becomes unavailable, its
+  label changes to a typed label, or takes focus. The person picks, then presses Start.
+  - `checkDeclaration` binds the answer to the form's session, origin, document, the goal and each
+    control's identity.
+  - The run re-checks that binding on every turn and immediately before the click, then verifies the
+    declared result on a fresh reading. It continues only on CONFIRMED.
+  - A click the person did not declare is refused. A control-plane run cannot carry a "person's"
+    declaration.
+  - No new action, timeout, manifest, CSP or permission change.
+  - W1, product build, real Qwen: two declared results CONFIRMED by the page; one NOT_CONFIRMED,
+    which stopped the task; two model proposals outside the declaration refused with nothing clicked
+    ([M18](artifacts/experiments/M18-declared-outcomes/README.md)).
 - Week-1 capability spikes (in progress).
 
 **The first complete product loop** — `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN →
