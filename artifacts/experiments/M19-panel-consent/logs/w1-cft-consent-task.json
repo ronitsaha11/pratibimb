@@ -1,0 +1,639 @@
+{
+  "experiment": "M19 — just-in-time, one-time consent in the extension's panel, with a masked preview (not a J7 experiment)",
+  "notAJ7Experiment": true,
+  "verdict": "PASS",
+  "goal": "Submit my application with my registered mobile number.",
+  "scenarios": [
+    "allow",
+    "deny",
+    "stale",
+    "clarify-allow"
+  ],
+  "failure": null,
+  "model": {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956"
+  },
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-m8177FDykU5Du1Rd/j5mkhTgw4bPCr4KkGCjgcTQlvI='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "browser": {
+    "binary": "C:/Users/RONIT/AppData/Local/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "scenario": "allow",
+      "fixture": {
+        "path": "tests/browser/demo/fixture/application.html",
+        "sha256": "8a0a3e83fda5677a8e99caf6163d9c4d719dbe5898bfc19e79d4c177709a680e"
+      },
+      "clarified": null,
+      "consentScreen": {
+        "heading": "Allow PratiBimb to use your phone number?",
+        "site": "http://127.0.0.1:8975",
+        "field": "Confirm mobile number",
+        "statement": "PratiBimb is about to put your phone number into “Confirm mobile number” on http://127.0.0.1:8975.",
+        "then": "If you allow it, PratiBimb will then click “Submit application”, and check the page shows the expected result.",
+        "buttons": [
+          "Allow once",
+          "Deny"
+        ],
+        "previewShape": "SUFFIX_2_OF_10",
+        "previewIsTheRegisteredNumbersLastTwoDigits": true,
+        "previewContainsAFullStoredValue": false
+      },
+      "answered": "allow",
+      "stale": null,
+      "panelSays": {
+        "task": "COMPLETED_AS_DECLARED — turn 1: clicked #submit → CONFIRMED; turn 2: the model said the task is done",
+        "consent": "Allowed once. PratiBimb will check the field before restoring it."
+      },
+      "consentsAsked": 1,
+      "taskState": "FINISHED",
+      "outcome": "COMPLETED_AS_DECLARED",
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "ALLOWED_ONCE"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "33742ec0-690a-477f-bf99-22d133d7ec46",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [
+            {
+              "ref": "<PII:PHONE:1>",
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "inserted": true
+            }
+          ],
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false
+        },
+        {
+          "turn": 2,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [],
+          "consents": [],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "33742ec0-690a-477f-bf99-22d133d7ec46",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": true
+        }
+      ],
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "perception": [
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        }
+      ],
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "page": {
+        "confirmHolds": "REGISTERED",
+        "submitDisabled": true,
+        "submitClicks": 1,
+        "status": "Application submitted"
+      },
+      "judged": {
+        "theConsentScreenWasShownBeforeRestoration": true,
+        "itNamedTheSiteFieldAndKind": true,
+        "itShowedOnlyAMaskedPreview": true,
+        "itOfferedOnlyAllowOnceAndDeny": true,
+        "theControlPlaneWasNotAsked": true,
+        "theModelPlannedFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "noStoredValueOrPreviewInTheRecord": true,
+        "allEgressLoopbackReasoner": true,
+        "productBuildCapturedNoFrame": true,
+        "allowedOnce": true,
+        "restoredIntoTheIntendedField": true,
+        "theClickWasVerifiedByThePage": true
+      }
+    },
+    {
+      "run": 2,
+      "scenario": "deny",
+      "fixture": {
+        "path": "tests/browser/demo/fixture/application.html",
+        "sha256": "8a0a3e83fda5677a8e99caf6163d9c4d719dbe5898bfc19e79d4c177709a680e"
+      },
+      "clarified": null,
+      "consentScreen": {
+        "heading": "Allow PratiBimb to use your phone number?",
+        "site": "http://127.0.0.1:8975",
+        "field": "Confirm mobile number",
+        "statement": "PratiBimb is about to put your phone number into “Confirm mobile number” on http://127.0.0.1:8975.",
+        "then": "If you allow it, PratiBimb will then click “Submit application”, and check the page shows the expected result.",
+        "buttons": [
+          "Allow once",
+          "Deny"
+        ],
+        "previewShape": "SUFFIX_2_OF_10",
+        "previewIsTheRegisteredNumbersLastTwoDigits": true,
+        "previewContainsAFullStoredValue": false
+      },
+      "answered": "deny",
+      "stale": null,
+      "panelSays": {
+        "task": "STOPPED_REFUSED — turn 1: the model proposed clicking #submit; refused (CONSENT_DENIED), nothing clicked",
+        "consent": "Denied. Nothing was restored."
+      },
+      "consentsAsked": 1,
+      "taskState": "FINISHED",
+      "outcome": "STOPPED_REFUSED",
+      "turns": [
+        {
+          "turn": 1,
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "AWAIT_GRANT",
+            "cause": "CONSENT_DENIED"
+          },
+          "clarifications": [],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "CONSENT_DENIED"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "0d18affb-3b81-483e-a507-6f5c75e61939",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": false
+        }
+      ],
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}"
+      ],
+      "modelRequestTripwire": [
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "perception": [
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        }
+      ],
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "page": {
+        "confirmHolds": "EMPTY",
+        "submitDisabled": false,
+        "submitClicks": 0,
+        "status": "Not submitted"
+      },
+      "judged": {
+        "theConsentScreenWasShownBeforeRestoration": true,
+        "itNamedTheSiteFieldAndKind": true,
+        "itShowedOnlyAMaskedPreview": true,
+        "itOfferedOnlyAllowOnceAndDeny": true,
+        "theControlPlaneWasNotAsked": true,
+        "theModelPlannedFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "noStoredValueOrPreviewInTheRecord": true,
+        "allEgressLoopbackReasoner": true,
+        "productBuildCapturedNoFrame": true,
+        "denied": true,
+        "nothingRestoredNothingSubmitted": true
+      }
+    },
+    {
+      "run": 3,
+      "scenario": "stale",
+      "fixture": {
+        "path": "tests/browser/demo/fixture/application.html",
+        "sha256": "8a0a3e83fda5677a8e99caf6163d9c4d719dbe5898bfc19e79d4c177709a680e"
+      },
+      "clarified": null,
+      "consentScreen": {
+        "heading": "Allow PratiBimb to use your phone number?",
+        "site": "http://127.0.0.1:8975",
+        "field": "Confirm mobile number",
+        "statement": "PratiBimb is about to put your phone number into “Confirm mobile number” on http://127.0.0.1:8975.",
+        "then": "If you allow it, PratiBimb will then click “Submit application”, and check the page shows the expected result.",
+        "buttons": [
+          "Allow once",
+          "Deny"
+        ],
+        "previewShape": "SUFFIX_2_OF_10",
+        "previewIsTheRegisteredNumbersLastTwoDigits": true,
+        "previewContainsAFullStoredValue": false
+      },
+      "answered": "stale",
+      "stale": {
+        "previousRequest": {
+          "answered": false,
+          "refused": "NOT_THIS_CONSENT"
+        },
+        "stillWaitingAfterIt": true,
+        "previousDocument": {
+          "answered": true
+        }
+      },
+      "panelSays": {
+        "task": "STOPPED_REFUSED — turn 1: the model proposed clicking #submit; refused (DOCUMENT_CHANGED), nothing clicked",
+        "consent": ""
+      },
+      "consentsAsked": 1,
+      "taskState": "FINISHED",
+      "outcome": "STOPPED_REFUSED",
+      "turns": [
+        {
+          "turn": 1,
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "AWAIT_GRANT",
+            "cause": "DOCUMENT_CHANGED"
+          },
+          "clarifications": [],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "DOCUMENT_CHANGED"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "af2addc8-f57d-4f6a-9e6f-8689b547358a",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": false
+        }
+      ],
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}"
+      ],
+      "modelRequestTripwire": [
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "perception": [
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        }
+      ],
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "page": {
+        "confirmHolds": "EMPTY",
+        "submitDisabled": false,
+        "submitClicks": 0,
+        "status": "Not submitted"
+      },
+      "judged": {
+        "theConsentScreenWasShownBeforeRestoration": true,
+        "itNamedTheSiteFieldAndKind": true,
+        "itShowedOnlyAMaskedPreview": true,
+        "itOfferedOnlyAllowOnceAndDeny": true,
+        "theControlPlaneWasNotAsked": true,
+        "theModelPlannedFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "noStoredValueOrPreviewInTheRecord": true,
+        "allEgressLoopbackReasoner": true,
+        "productBuildCapturedNoFrame": true,
+        "theDeskRefusedTheAnswerToThePreviousRequest": true,
+        "theOrchestratorRefusedTheAnswerForThePreviousDocument": true,
+        "nothingRestoredNothingSubmitted": true
+      }
+    },
+    {
+      "run": 4,
+      "scenario": "clarify-allow",
+      "fixture": {
+        "path": "tests/browser/extension/fixture/two-phones.html",
+        "sha256": "c69e4152d6e421273aecc98e50d321adb76cba9f6e9ab07b5da89be21669db54"
+      },
+      "clarified": {
+        "options": [
+          "The number from “Mobile number”",
+          "The number from “Alternate mobile number”"
+        ]
+      },
+      "consentScreen": {
+        "heading": "Allow PratiBimb to use your phone number?",
+        "site": "http://127.0.0.1:8975",
+        "field": "Confirm mobile number",
+        "statement": "PratiBimb is about to put your phone number into “Confirm mobile number” on http://127.0.0.1:8975.",
+        "then": "If you allow it, PratiBimb will then click “Submit application”, and check the page shows the expected result.",
+        "buttons": [
+          "Allow once",
+          "Deny"
+        ],
+        "previewShape": "SUFFIX_2_OF_10",
+        "previewIsTheRegisteredNumbersLastTwoDigits": true,
+        "previewContainsAFullStoredValue": false
+      },
+      "answered": "allow",
+      "stale": null,
+      "panelSays": {
+        "task": "COMPLETED_AS_DECLARED — turn 1: clicked #submit → CONFIRMED; turn 2: the model said the task is done",
+        "consent": "Allowed once. PratiBimb will check the field before restoring it."
+      },
+      "consentsAsked": 1,
+      "taskState": "FINISHED",
+      "outcome": "COMPLETED_AS_DECLARED",
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [
+            {
+              "target": "#mobile_confirm",
+              "candidates": 2,
+              "outcome": "CHOSEN",
+              "candidateId": "c1"
+            }
+          ],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "ALLOWED_ONCE"
+            }
+          ],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "80958a70-7362-481a-b7e9-dcd27505aa09",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm",
+              "ref": "<PII:PHONE:1>"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "rehydrated": [
+            {
+              "ref": "<PII:PHONE:1>",
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "inserted": true
+            }
+          ],
+          "verification": {
+            "verification": "CONFIRMED",
+            "postcondition": "TARGET_ENABLED",
+            "evidence": "#submit is disabled, as expected."
+          },
+          "declaredDone": false
+        },
+        {
+          "turn": 2,
+          "state": "DONE",
+          "refusal": null,
+          "clarifications": [],
+          "consents": [],
+          "declaration": {
+            "source": "PERSON",
+            "formId": "80958a70-7362-481a-b7e9-dcd27505aa09",
+            "targets": [
+              "#submit"
+            ]
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "plan": [
+            {
+              "op": "done"
+            }
+          ],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": true
+        }
+      ],
+      "modelProposals": [
+        "{\"steps\":[{\"op\":\"insert\",\"target\":\"#mobile_confirm\",\"ref\":\"<PII:PHONE:1>\"},{\"op\":\"click\",\"target\":\"#submit\"}]}",
+        "{\"steps\":[{\"op\":\"done\" }]\n}"
+      ],
+      "modelRequestTripwire": [
+        [],
+        []
+      ],
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "perception": [
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        },
+        {
+          "ran": false,
+          "refusal": "NO_ACTIVE_TAB_GRANT"
+        }
+      ],
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "page": {
+        "confirmHolds": "REGISTERED",
+        "submitDisabled": true,
+        "submitClicks": 1,
+        "status": "Application submitted"
+      },
+      "judged": {
+        "theConsentScreenWasShownBeforeRestoration": true,
+        "itNamedTheSiteFieldAndKind": true,
+        "itShowedOnlyAMaskedPreview": true,
+        "itOfferedOnlyAllowOnceAndDeny": true,
+        "theControlPlaneWasNotAsked": true,
+        "theModelPlannedFromTheLocalModel": true,
+        "noValueShapedTextReachedTheModel": true,
+        "noStoredValueOrPreviewInTheRecord": true,
+        "allEgressLoopbackReasoner": true,
+        "productBuildCapturedNoFrame": true,
+        "thePersonChoseTheNumberFirst": true,
+        "allowedOnce": true,
+        "restoredIntoTheIntendedField": true,
+        "theClickWasVerifiedByThePage": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "a HARNESS DEMONSTRATION: the shipped panel page ran in its own popup window, because a harness cannot open Chrome's side panel; Chrome's side-panel surface itself was not exercised",
+    "the harness pressed the panel's controls and, in the stale scenario, sent two crafted answers from the panel page; no person was in the loop",
+    "one run per scenario on synthetic pages; no reliability claim",
+    "the preview's text and every stored value are deliberately absent from this record; only the preview's shape is kept",
+    "perception ran the product's no-gesture floor; no frame was captured and none left the client"
+  ],
+  "recordedAt": "2026-10-23T10:23:56.119Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0",
+    "playwright": "1.63.0",
+    "headless": false
+  }
+}

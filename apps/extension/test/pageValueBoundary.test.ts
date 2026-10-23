@@ -109,6 +109,7 @@ function boundaryPair() {
     let reply: BoundaryReply;
     if (request.kind === "CLASSIFY") reply = pageRealm.classify(request.ask);
     else if (request.kind === "FORGET") reply = pageRealm.forget();
+    else if (request.kind === "PREVIEW") reply = pageRealm.preview(request.ref, request.target);
     else {
       // The page realm collects the capability directly. This exchange is the one the service
       // worker does not see, so it is deliberately NOT recorded as a crossing.
@@ -348,5 +349,44 @@ describe("the page-value boundary", () => {
       await core.forget();
       expect(pageRealm.state()).toEqual({ refs: 0, open: false });
     });
+  });
+});
+
+describe("M19: the consent preview, computed in the page realm", () => {
+  const refOf = (answer: Awaited<ReturnType<ReturnType<typeof boundaryPair>["core"]["sanitize"]>>, cls: string): string => {
+    if (!answer.ok) throw new Error("test setup: sanitize refused");
+    return answer.handoff.redactions.find((r) => r.class === cls && r.method === "token_reference")!.token;
+  };
+
+  it("a validated mobile number into the confirm field: eight dots and its last two digits, and no more crossed", async () => {
+    const { core, ask, traffic } = boundaryPair();
+    const phone = refOf(await core.sanitize(ask), "PHONE");
+    const preview = await core.preview(phone, "#mobile_confirm");
+    expect(preview?.style).toBe("SUFFIX");
+    expect(preview?.text === `••••••••${PHONE.slice(-2)}`).toBe(true);
+    expect(traffic().includes(PHONE)).toBe(false);
+  });
+
+  it("a name has no approved mask: the generic indicator, and no character of it crossed", async () => {
+    const { core, ask, traffic } = boundaryPair();
+    const name = refOf(await core.sanitize(ask), "NAME");
+    const preview = await core.preview(name, "#name");
+    expect(preview).toEqual({ style: "GENERIC", text: "••••••" });
+    expect(traffic().includes(NAME)).toBe(false);
+  });
+
+  it("no preview for a use the binder could not allow, or a field this view does not have", async () => {
+    const { core, ask } = boundaryPair();
+    const answer = await core.sanitize(ask);
+    expect(await core.preview(refOf(answer, "NAME"), "#mobile_confirm")).toBeNull();
+    expect(await core.preview(refOf(answer, "PHONE"), "#nowhere")).toBeNull();
+    expect(await core.preview("<PII:PHONE:9>", "#mobile_confirm")).toBeNull();
+  });
+
+  it("no preview once the run is over and the vault destroyed", async () => {
+    const { core, ask } = boundaryPair();
+    const phone = refOf(await core.sanitize(ask), "PHONE");
+    await core.forget();
+    expect(await core.preview(phone, "#mobile_confirm")).toBeNull();
   });
 });

@@ -92,6 +92,25 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
   - W1, product build, real Qwen: two declared results CONFIRMED by the page; one NOT_CONFIRMED,
     which stopped the task; two model proposals outside the declaration refused with nothing clicked
     ([M18](artifacts/experiments/M18-declared-outcomes/README.md)).
+- **M19 — the person allows one stored-value restoration, in the side panel** (ADR-0014,
+  owner-directed).
+  - **When:** for a panel-started task, the run asks before each restoration, showing:
+    - the site;
+    - the field's label;
+    - the kind of value;
+    - a masked preview, computed in the page realm by `consentPreview`: the last two digits of a
+      validated mobile number, otherwise a fixed generic indicator.
+  - **Choices:** Allow once or Deny; no reveal and no "always".
+  - **The check:** `checkConsentAnswer` binds the answer to the consent id, session, origin,
+    document and field, with strict keys. An allow becomes the same one-shot grant; the binder,
+    REFRESH, the permit gate and VERIFY RESULT still decide.
+  - **Who can answer:** only the side-panel page. Deny, a closed panel, or a forged, replayed or
+    stale answer restores nothing and submits nothing.
+  - **Normaliser fix:** `normaliseIndianMobile` no longer strips a leading 91 from a bare ten-digit
+    mobile, which had been rejecting valid numbers.
+  - **Evidence:** W1, product build, real Qwen, harness-operated panel page: allow, deny, stale and
+    clarify-then-allow all as expected
+    ([M19](artifacts/experiments/M19-panel-consent/README.md)).
 - Week-1 capability spikes (in progress).
 
 **The first complete product loop** — `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN →

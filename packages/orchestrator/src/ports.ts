@@ -19,6 +19,7 @@
  * `recordHumanConfirmation` names, in the same place: the UI that asks.
  */
 import { type ClarificationRequest } from "./clarification.js";
+import { type ConsentRequest } from "./consent.js";
 import { type GuardedBridges } from "@pratibimb/agent";
 import { type ElementGraph } from "@pratibimb/perception";
 import { type ObservedField, type PiiClass } from "@pratibimb/privacy";
@@ -134,6 +135,13 @@ export interface ClientPorts {
    * answer authorises nothing — it names a candidate, which privacy then re-checks.
    */
   clarify?(request: ClarificationRequest): Promise<unknown>;
+  /**
+   * M19 — ask the person, in their own panel, whether this exact stored value may go into this exact
+   * field. OPTIONAL: present, it is asked INSTEAD of `requestGrant`, and what it resolves with is
+   * untrusted until `checkConsentAnswer` has checked it against this request. An allow becomes the
+   * same one-shot grant `requestGrant`'s did; it authorises no click.
+   */
+  consent?(request: ConsentRequest): Promise<unknown>;
   /**
    * Restore one value into one target, locally. Resolves `true` only if the page took it.
    *

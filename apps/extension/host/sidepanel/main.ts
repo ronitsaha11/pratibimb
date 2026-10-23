@@ -1,10 +1,12 @@
 /**
- * Minimal host — side panel shell. Displays host status, and has two working parts: answering a
- * "which stored value?" question a run is waiting on (M17), and stating a task with what each click
- * must do (M18). Every other control is inert.
+ * Minimal host — side panel shell. Displays host status, and has three working parts: answering a
+ * "which stored value?" question a run is waiting on (M17), stating a task with what each click must
+ * do (M18), and allowing — once — or denying a stored value's restoration (M19). Every other
+ * control is inert.
  * No settings, no history, no telemetry, no state management.
  */
 import { panelAnswer, panelViewOf } from "../../host-lib/clarification-panel";
+import { consentAnswer, consentViewOf } from "../../host-lib/consent-panel";
 import {
   OFFER_TEXT,
   addExpectation,
@@ -289,3 +291,80 @@ async function pollTask(): Promise<void> {
 }
 
 setInterval(() => void pollTask(), 1_000);
+
+/**
+ * M19 — "ALLOW PRATIBIMB TO USE YOUR …?", asked here, just before a stored value is restored.
+ *
+ * Shown: the site, the field's label, the kind of value, and the masked preview the page realm
+ * produced — never the value, and there is no control that reveals it. Answered: "Allow once" or
+ * "Deny", built by `consentAnswer` from the question's own fields. The answer covers this one
+ * restoration; the orchestrator and the binder check it, and every gate after it still runs.
+ */
+const consentBox = document.getElementById("consent");
+const consentAllow = document.getElementById("consent-allow") as HTMLButtonElement | null;
+const consentDeny = document.getElementById("consent-deny") as HTMLButtonElement | null;
+const consentResult = document.getElementById("consent-result");
+let consentShown: { readonly raw: unknown; readonly id: string } | null = null;
+
+const setText = (id: string, text: string): void => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+};
+
+function renderConsent(raw: unknown): void {
+  const screen = consentViewOf(raw);
+  if (screen === null) {
+    consentShown = null;
+    if (consentBox) consentBox.hidden = true;
+    if (document.documentElement.dataset.consent === "pending") document.documentElement.dataset.consent = "none";
+    return;
+  }
+  if (consentShown?.id === screen.consentId) return;
+  consentShown = { raw, id: screen.consentId };
+  setText("consent-heading", screen.heading);
+  setText("consent-site", screen.site);
+  setText("consent-field", screen.field);
+  setText("consent-preview", screen.preview);
+  setText("consent-statement", screen.statement);
+  setText("consent-then", screen.then);
+  if (consentResult) consentResult.textContent = "";
+  if (consentAllow) consentAllow.disabled = false;
+  if (consentDeny) consentDeny.disabled = false;
+  if (consentBox) consentBox.hidden = false;
+  document.documentElement.dataset.consent = "pending";
+}
+
+async function answerConsent(allow: boolean): Promise<void> {
+  if (consentShown === null) return;
+  const answer = consentAnswer(consentShown.raw, allow);
+  if (answer === null) return;
+  // One press, one answer: both buttons go dark until the next question.
+  if (consentAllow) consentAllow.disabled = true;
+  if (consentDeny) consentDeny.disabled = true;
+  const reply = (await chrome.runtime.sendMessage({ target: "offscreen", kind: "CONSENT_DECIDE", answer })) as { answered?: boolean; refused?: string } | undefined;
+  if (consentResult) {
+    consentResult.textContent = reply?.answered
+      ? allow
+        ? "Allowed once. PratiBimb will check the field before restoring it."
+        : "Denied. Nothing was restored."
+      : `Not sent (${reply?.refused ?? "no reply"}).`;
+  }
+  document.documentElement.dataset.consent = reply?.answered ? (allow ? "allowed" : "denied") : "refused";
+  consentShown = null;
+  if (consentBox) consentBox.hidden = true;
+}
+
+consentAllow?.addEventListener("click", () => void answerConsent(true));
+consentDeny?.addEventListener("click", () => void answerConsent(false));
+
+async function pollConsent(): Promise<void> {
+  try {
+    const reply = (await chrome.runtime.sendMessage({ target: "offscreen", kind: "CONSENT_PEEK" })) as { pending?: unknown } | undefined;
+    renderConsent(reply?.pending ?? null);
+  } catch {
+    renderConsent(null);
+  }
+}
+
+void pollConsent();
+setInterval(() => void pollConsent(), 1_000);

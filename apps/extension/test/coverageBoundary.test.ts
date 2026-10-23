@@ -46,6 +46,8 @@ const EXERCISED_BY_TESTS = [
   "host-lib/capture-authority.ts",
   "host-lib/clarification-desk.ts",
   "host-lib/clarification-panel.ts",
+  "host-lib/consent-desk.ts",
+  "host-lib/consent-panel.ts",
   "host-lib/extension-csp.ts",
   "host-lib/page-privacy-boundary.ts",
   "host-lib/perception-realm.ts",

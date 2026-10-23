@@ -33,6 +33,18 @@
     <button id="grant-use" type="button" disabled>Approve one use</button>
   </fieldset>
   <fieldset><legend>Payload Inspector (placeholder)</legend><pre id="payload">No payload: there is no egress path in this host.</pre></fieldset>
+  <fieldset id="consent" hidden>
+    <legend>Allow a stored value?</legend>
+    <p id="consent-heading"></p>
+    <div>Site: <span id="consent-site"></span></div>
+    <div>Field: <span id="consent-field"></span></div>
+    <div>Value: <span id="consent-preview"></span> (hidden; only this preview is shown)</div>
+    <p id="consent-statement"></p>
+    <p id="consent-then"></p>
+    <button id="consent-allow" type="button">Allow once</button>
+    <button id="consent-deny" type="button">Deny</button>
+  </fieldset>
+  <div id="consent-result"></div>
   <fieldset id="clarify" hidden>
     <legend>Which stored value?</legend>
     <p id="clarify-question"></p>

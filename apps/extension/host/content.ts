@@ -26,6 +26,7 @@ import { connectPageTransport } from "../host-lib/transport-chrome";
 async function serveBoundary(boundary: PagePrivacyBoundary, request: BoundaryRequest): Promise<BoundaryReply> {
   if (request.kind === "CLASSIFY") return boundary.classify(request.ask);
   if (request.kind === "FORGET") return boundary.forget();
+  if (request.kind === "PREVIEW") return boundary.preview(request.ref, request.target);
 
   const collected = (await chrome.runtime.sendMessage({
     target: "offscreen",

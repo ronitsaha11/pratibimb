@@ -39,6 +39,16 @@ export {
 } from "./loop.js";
 
 export {
+  CATEGORY_OF,
+  CONSENT_DETAIL,
+  checkConsentAnswer,
+  prepareConsent,
+  type ConsentAnswer,
+  type ConsentRefusal,
+  type ConsentRequest,
+} from "./consent.js";
+
+export {
   MAX_DECLARATIONS,
   MAX_EXPECTED_NAME,
   MAX_GOAL,

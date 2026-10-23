@@ -28,6 +28,7 @@
 import { frameId, type ElementGraph, type ElementNode, type SanitizedElement } from "@pratibimb/perception";
 import {
   type HeldLiteral,
+  type ConsentPreview,
   type PiiClass,
   type RefDescriptor,
   type Redaction,
@@ -123,6 +124,11 @@ export type BoundaryRequest =
   | { readonly kind: "CLASSIFY"; readonly ask: WireClassifyAsk }
   /** "A capability is waiting." A nonce and a field name; nothing else, and nothing secret. */
   | { readonly kind: "CAPABILITY"; readonly nonce: string; readonly target: string }
+  /**
+   * M19: "what may the person be shown of this reference, before allowing it into this field?" A
+   * reference and a field; the answer is privacy's `consentPreview`, computed where the value is.
+   */
+  | { readonly kind: "PREVIEW"; readonly ref: string; readonly target: string }
   | { readonly kind: "FORGET" };
 
 /** Page realm → core realm, carried by the worker. Counts, classes, booleans and refusals. */
@@ -131,6 +137,8 @@ export type BoundaryReply =
   | { readonly ok: true; readonly kind: "RELEASED"; readonly ref: string; readonly piiClass: PiiClass; readonly inserted: boolean }
   | { readonly ok: true; readonly kind: "ANSWERED"; readonly answers: readonly HeldLiteral[] }
   | { readonly ok: true; readonly kind: "FORGOTTEN"; readonly refs: number }
+  /** M19: a masked preview for the consent panel only — two digits of a validated mobile, or a generic mark. */
+  | { readonly ok: true; readonly kind: "PREVIEWED"; readonly ref: string; readonly preview: ConsentPreview }
   | { readonly ok: false; readonly refused: string };
 
 /** The capability the target field is named with when the payload is a question, not a field. */

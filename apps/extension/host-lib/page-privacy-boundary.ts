@@ -30,6 +30,7 @@ import {
   createVault,
   fingerprintOf,
   classifyField,
+  consentPreview,
   rehydrate,
   type HeldLiteral,
   type ObservedField,
@@ -127,6 +128,11 @@ export interface PagePrivacyBoundary {
   /** Answer the vault's one question about some text. Classes and booleans, never the text. */
   answer(texts: readonly string[]): BoundaryReply;
   release(ask: WireReleaseAsk): BoundaryReply;
+  /**
+   * M19: the masked preview for a pending consent — privacy's `consentPreview`, for a reference
+   * this vault holds going into a field of this view that it fits. Never the value.
+   */
+  preview(ref: string, target: string): BoundaryReply;
   /** End the run: destroy the vault. Unconditional and irreversible (INV-06). */
   forget(): BoundaryReply;
   /** Sizes only, for a status reply. Never contents. */
@@ -238,6 +244,16 @@ export function createPagePrivacyBoundary(deps: PageBoundaryDeps = {}): PagePriv
         piiClass: outcome.piiClass,
         inserted: written.written,
       });
+    },
+
+    preview(ref, target) {
+      if (vault === null || view === null) return { ok: false, refused: "NO_VAULT" };
+      const field = view.fields.get(target);
+      if (!field) return { ok: false, refused: "UNKNOWN_TARGET" };
+      const outcome = consentPreview(vault, ref, field.accepts);
+      if (!outcome.ok) return { ok: false, refused: outcome.cause };
+      // The same last check as every other reply: a preview that somehow held a value is withheld.
+      return withoutHeldValues({ ok: true, kind: "PREVIEWED", ref, preview: outcome.preview });
     },
 
     forget() {

@@ -31,6 +31,7 @@
  * `auto` mode does — and M1 does not claim to have built a human-facing grant surface.
  */
 import { type EgressRecord, type EgressRefusal } from "@pratibimb/egress";
+import { type ConsentPreview } from "@pratibimb/privacy";
 import { observePage, type TransportBinding, type TransportRelay } from "@pratibimb/extension-transport";
 import {
   checkPostconditions,
@@ -38,6 +39,7 @@ import {
   runTask,
   runTaskLoop,
   type ClarificationRequest,
+  type ConsentRequest,
   type GrantDecision,
   type TaskDeclaration,
   type GrantRequest,
@@ -152,6 +154,8 @@ export interface ExtensionRunResult {
   readonly grant: { readonly asked: boolean; readonly granted: boolean | null };
   /** M17: how many "which stored value?" questions a person was asked. The answers are in the record. */
   readonly clarificationsAsked: number;
+  /** M19: how many restorations the person was asked about in their panel. The answers are in the record. */
+  readonly consentsAsked: number;
 }
 
 /** How the offscreen realm asks the page to come and collect, and how a human answers. */
@@ -175,6 +179,12 @@ export interface ExtensionRunDeps {
    * Absent, a field two stored values fit stops the run.
    */
   askPerson?(request: ClarificationRequest): Promise<unknown>;
+  /**
+   * M19 — park a consent request, with the masked preview the page realm produced, until the person
+   * answers in the side panel. Present only for a task the person started there; a control-plane
+   * run keeps `askHuman`. The preview goes to the desk and nowhere else.
+   */
+  askConsent?(request: ConsentRequest, preview: ConsentPreview | null): Promise<unknown>;
   /**
    * M3 — the local perception pass, or nothing.
    *
@@ -242,6 +252,7 @@ export async function runExtensionTask(
 
   const grant = { asked: false, granted: null as boolean | null };
   let clarificationsAsked = 0;
+  let consentsAsked = 0;
 
   /**
    * M3 — the most recent perception pass, for the manifest the core realm assembles.
@@ -294,6 +305,16 @@ export async function runExtensionTask(
       grant.granted = decision.granted;
       return decision;
     },
+    ...(deps.askConsent
+      ? {
+          consent: async (request: ConsentRequest) => {
+            consentsAsked += 1;
+            // Produced where the value is; `null` (shown as the generic indicator) if it cannot be.
+            const preview = await privacy.preview(request.ref, request.target).catch(() => null);
+            return deps.askConsent!(request, preview);
+          },
+        }
+      : {}),
     ...(deps.askPerson
       ? {
           clarify: (question: ClarificationRequest) => {
@@ -353,6 +374,7 @@ export async function runExtensionTask(
       egress,
       grant,
       clarificationsAsked,
+      consentsAsked,
     };
   } finally {
     // However the run ended — success, refusal, or a throw — no capability outlives it.

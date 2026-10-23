@@ -10,7 +10,7 @@
 
 ## Recorded ADRs
 
-**Count: 5 approved/accepted (ADR-0001, 0002, 0009, 0010, 0013), 1 partially approved (ADR-0012), 7 proposed (ADR-0003–0008, 0011).**
+**Count: 6 approved/accepted (ADR-0001, 0002, 0009, 0010, 0013, 0014), 1 partially approved (ADR-0012), 7 proposed (ADR-0003–0008, 0011).**
 
 | ID | Title | Status | Date | Supersedes |
 |---|---|---|---|---|
@@ -27,6 +27,7 @@
 | [ADR-0011](ADR-0011-text-region-detector-contract.md) | A detector-only text-region contract: `TextRegionDetector`, fail-closed `TextFinding`, and the adoption boundary for TR-01 / TR-02 (M9) | **PROPOSED — OWNER DECISION REQUIRED. Not implemented; constitution §3/§8 amendment drafted, not applied; product visual-only PII protection NOT VERIFIED** | 2026-09-30 | — |
 | [ADR-0012](ADR-0012-production-frame-handoff.md) | Production frame handoff: the QG-04 artifact, its admissible verification state, the single egress authority and the structure-only fallback (M11) | **PARTIALLY APPROVED (M12, §16): taxonomy, VERIFIED-only, manifest v1.2, multipart approved; origin and authentication deliberately unconfigured. Enforcement implemented (M12). B2 and B5 undecided. Production frame egress BLOCKED; no frame leaves the client** | 2026-10-01 | — |
 | [ADR-0013](ADR-0013-extension-pages-csp-v2.md) | Extension-pages CSP v2: every fetch directive closed by default; the product pinned to the reasoner endpoint (M13) | **ACCEPTED 2026-10-01 (owner-directed, M13 brief) — implemented; amends ADR-0001 §7 (v1 → v2). F-M13-1 (top-level navigation, outside CSP) OPEN** | 2026-10-01 | ADR-0001 §7 (amends) |
+| [ADR-0014](ADR-0014-panel-consent-with-masked-preview.md) | Just-in-time, one-time consent in the extension's side panel, with a masked local preview (M19) | **ACCEPTED 2026-10-23 (owner-directed, M19 brief) — implemented; local consent UI only; no TTL added (ADR-0008 §5 untouched); masks beyond a validated mobile's last two digits NOT adopted** | 2026-10-23 | — |
 
 > **ADR-0001 covers issues #17 and #5 in one decision**, because S-02a-2a-4 measured that
 > the CSP directive and the `connect-src` egress pin live in the same manifest and constrain
