@@ -7,6 +7,11 @@
  * client: every guarantee the client makes (sanitize, verify, egress guard, validate, bind, consent)
  * already happened before a byte reached it.
  *
+ * WHAT IT GUARDS, AND WHAT IT DOES NOT. These checks guard this port only. The model server's port
+ * is locked separately, by a per-launch key (`upstream.mjs`). `forward` is handed the path and the
+ * body and nothing else, so no header of an incoming request — an `Authorization` header included —
+ * can reach the model server; the launcher's forwarder attaches the key itself.
+ *
  * WHAT IT ACCEPTS. `POST /v1/chat/completions` with a JSON body under a size limit, addressed to the
  * loopback host, from an extension page or from no browser page at all. `GET /health` for readiness.
  * `OPTIONS` preflights from an extension origin. Everything else is refused: other paths and methods

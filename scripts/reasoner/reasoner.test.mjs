@@ -42,7 +42,8 @@ describe("the pin and the address", () => {
       expect(/::\b|"::"|'::'/.test(code), f).toBe(false);
     }
     const launcher = readFileSync(join(HERE, "reasoner.mjs"), "utf8");
-    expect(launcher).toContain('"--host", PIN.upstream.host');
+    // The model server's address comes from `upstreamArgs`, tested with the pin in upstream.test.mjs.
+    expect(launcher).toContain("upstreamArgs(verified.model.path, PIN)");
     expect(launcher).toContain("front.server.listen(PIN.endpoint.port, PIN.endpoint.host, ok)");
   });
 
@@ -56,7 +57,7 @@ describe("the pin and the address", () => {
 
   it("discards the model server's output rather than logging it", () => {
     const launcher = readFileSync(join(HERE, "reasoner.mjs"), "utf8");
-    expect(launcher).toMatch(/\{ stdio: "ignore", windowsHide: true \}/);
+    expect(launcher).toMatch(/\{ stdio: "ignore", windowsHide: true, env: upstreamEnv\(key\) \}/);
   });
 });
 

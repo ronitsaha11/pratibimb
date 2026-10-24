@@ -7,19 +7,24 @@
  *      `.exe`/`.dll` against the same file inside that archive.
  *   3. Check both loopback ports are free. A busy port is reported and left alone: nothing that is
  *      not ours is ever stopped.
- *   4. Start `llama-server` on 127.0.0.1:8977 (output discarded: it may echo prompts) and wait until
- *      it reports healthy.
+ *   4. Start `llama-server` on 127.0.0.1:8977 with a per-launch key (`upstream.mjs`) and `--no-slots`
+ *      (output discarded: it may echo prompts), wait until it reports healthy, then check it refuses
+ *      a keyless and a wrong-keyed request and has `/slots` off. If not, stop it and refuse.
  *   5. Serve the extension's one permitted endpoint, http://127.0.0.1:8995/v1/chat/completions,
- *      through `front.mjs` — loopback only, extension origins only, tripwire on, no bodies logged.
+ *      through `front.mjs` — loopback only, extension origins only, tripwire on, no bodies logged —
+ *      which forwards to the model server with the key it attaches itself.
  *
  *   npm run reasoner           start, and stay in the foreground (Ctrl+C stops both processes)
  *   npm run reasoner -- --check   verify the pins and the ports, then exit; starts nothing
  *   npm run reasoner:stop      stop an instance this launcher started (recorded in its state file),
  *                              checking each process is ours before stopping it
  *
- * Not a production server: one user, one machine, loopback only, no authentication because nothing
- * off this machine can reach it. Frame egress does not exist here — this service receives the
- * sanitized structure-only handoff and nothing else (ADR-0012 keeps frame egress blocked).
+ * Not a production server: one user, one machine. Loopback binding keeps other machines out, and
+ * nothing more: local processes and web pages in the person's browser can still reach both ports.
+ * So 8995 (the front) admits only extension origins or no browser origin, its own Host and the one
+ * path, and 8977 (the model server) admits only requests carrying the key this launcher generated
+ * and only the front holds. Frame egress does not exist here — this service receives the sanitized
+ * structure-only handoff and nothing else (ADR-0012 keeps frame egress blocked).
  */
 import { execFileSync, spawn } from "node:child_process";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -28,6 +33,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { createFront } from "./front.mjs";
+import { assertUpstreamLocked, newApiKey, upstreamArgs, upstreamEnv, upstreamForwarder } from "./upstream.mjs";
 import { PinError, verifyModel, verifyRuntime } from "./verify.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -86,12 +92,14 @@ async function start() {
   const verified = await verifyAll();
   await checkPorts();
 
+  // The model server's key: per launch, in this process's memory and the child's environment only.
+  const key = newApiKey();
   const modelBegan = mono();
   const child = spawn(
     verified.runtime.binary,
-    ["-m", verified.model.path, "--host", PIN.upstream.host, "--port", String(PIN.upstream.port), ...PIN.upstream.args],
+    upstreamArgs(verified.model.path, PIN),
     // Its output is discarded, not logged: a model server's diagnostics can contain request text.
-    { stdio: "ignore", windowsHide: true }
+    { stdio: "ignore", windowsHide: true, env: upstreamEnv(key) }
   );
   let stopping = false;
   const front = { server: null };
@@ -119,20 +127,26 @@ async function start() {
 
   await waitHealthy(PIN.upstream.port, 120_000, child);
   const modelLoadMs = Math.round(mono() - modelBegan);
+  // Fail closed: no front in front of a model server that would answer without the key.
+  try {
+    await assertUpstreamLocked({ host: PIN.upstream.host, port: PIN.upstream.port, key });
+  } catch (error) {
+    stopping = true;
+    if (child.exitCode === null) child.kill();
+    throw error;
+  }
 
   const startedAt = new Date().toISOString();
   const coldStart = { verifyMs: verified.verifyMs, modelLoadMs, totalMs: Math.round(mono() - launchedAt) };
   front.server = createFront({
     endpoint: PIN.endpoint,
-    forward: async (path, body) => {
-      const reply = await fetch(`http://${PIN.upstream.host}:${PIN.upstream.port}${path}`, { method: "POST", headers: { "content-type": "application/json" }, body });
-      return { status: reply.status, text: await reply.text() };
-    },
+    forward: upstreamForwarder({ host: PIN.upstream.host, port: PIN.upstream.port, key }),
     health: () => ({
       status: "ok",
       service: "pratibimb-reasoner",
       model: { repo: PIN.model.repo, revision: PIN.model.revision, file: PIN.model.file, sha256: PIN.model.sha256 },
       runtime: { build: PIN.runtime.build },
+      modelServer: { authentication: "per-launch key", slots: "disabled" },
       endpoint: `http://${PIN.endpoint.host}:${PIN.endpoint.port}${PIN.endpoint.path}`,
       startedAt,
       coldStart,
