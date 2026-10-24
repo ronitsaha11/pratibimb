@@ -1,0 +1,805 @@
+{
+  "runId": "20261023T203123Z",
+  "label": "measured",
+  "clock": "PowerShell Stopwatch, ms since the sampler started",
+  "groups": [
+    "browser",
+    "model",
+    "launcher"
+  ],
+  "samples": [
+    {
+      "tMs": 0.7,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 549629952,
+          "pv": 236322816,
+          "peakWs": 549629952,
+          "cpuMs": 2687.5
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 64524288,
+          "pv": 67174400,
+          "peakWs": 169947136,
+          "cpuMs": 1218.8
+        }
+      ]
+    },
+    {
+      "tMs": 698.9,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 549629952,
+          "pv": 236322816,
+          "peakWs": 549629952,
+          "cpuMs": 2703.1
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 64524288,
+          "pv": 67174400,
+          "peakWs": 169947136,
+          "cpuMs": 1218.8
+        }
+      ]
+    },
+    {
+      "tMs": 1229,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 549629952,
+          "pv": 236322816,
+          "peakWs": 549629952,
+          "cpuMs": 2703.1
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 64524288,
+          "pv": 67174400,
+          "peakWs": 169947136,
+          "cpuMs": 1218.8
+        }
+      ]
+    },
+    {
+      "tMs": 1757.2,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 587333632,
+          "pv": 239075328,
+          "peakWs": 587333632,
+          "cpuMs": 4968.8
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65576960,
+          "pv": 68747264,
+          "peakWs": 169947136,
+          "cpuMs": 1218.8
+        }
+      ]
+    },
+    {
+      "tMs": 2286,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 587333632,
+          "pv": 239075328,
+          "peakWs": 587333632,
+          "cpuMs": 9203.1
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65576960,
+          "pv": 68747264,
+          "peakWs": 169947136,
+          "cpuMs": 1218.8
+        }
+      ]
+    },
+    {
+      "tMs": 2815.4,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 587333632,
+          "pv": 239075328,
+          "peakWs": 587333632,
+          "cpuMs": 13453.1
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65576960,
+          "pv": 68747264,
+          "peakWs": 169947136,
+          "cpuMs": 1218.8
+        }
+      ]
+    },
+    {
+      "tMs": 3345.7,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 590938112,
+          "pv": 241889280,
+          "peakWs": 611135488,
+          "cpuMs": 17734.4
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65576960,
+          "pv": 68747264,
+          "peakWs": 169947136,
+          "cpuMs": 1218.8
+        }
+      ]
+    },
+    {
+      "tMs": 3903.7,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 588980224,
+          "pv": 241512448,
+          "peakWs": 611184640,
+          "cpuMs": 21781.2
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65708032,
+          "pv": 68820992,
+          "peakWs": 169947136,
+          "cpuMs": 1250
+        }
+      ]
+    },
+    {
+      "tMs": 4433,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 591343616,
+          "pv": 241950720,
+          "peakWs": 611225600,
+          "cpuMs": 26000
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65708032,
+          "pv": 68820992,
+          "peakWs": 169947136,
+          "cpuMs": 1250
+        }
+      ]
+    },
+    {
+      "tMs": 4978.9,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598048768,
+          "pv": 248991744,
+          "peakWs": 619405312,
+          "cpuMs": 30343.8
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65732608,
+          "pv": 68820992,
+          "peakWs": 169947136,
+          "cpuMs": 1250
+        }
+      ]
+    },
+    {
+      "tMs": 5524.9,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596209664,
+          "pv": 247341056,
+          "peakWs": 619405312,
+          "cpuMs": 34515.6
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65851392,
+          "pv": 68833280,
+          "peakWs": 169947136,
+          "cpuMs": 1250
+        }
+      ]
+    },
+    {
+      "tMs": 6054.4,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596426752,
+          "pv": 247484416,
+          "peakWs": 619405312,
+          "cpuMs": 38640.6
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65863680,
+          "pv": 68833280,
+          "peakWs": 169947136,
+          "cpuMs": 1250
+        }
+      ]
+    },
+    {
+      "tMs": 6597.3,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596426752,
+          "pv": 247484416,
+          "peakWs": 619405312,
+          "cpuMs": 42890.6
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65863680,
+          "pv": 68833280,
+          "peakWs": 169947136,
+          "cpuMs": 1250
+        }
+      ]
+    },
+    {
+      "tMs": 7123.5,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598048768,
+          "pv": 249155584,
+          "peakWs": 619405312,
+          "cpuMs": 47265.6
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65863680,
+          "pv": 68833280,
+          "peakWs": 169947136,
+          "cpuMs": 1250
+        }
+      ]
+    },
+    {
+      "tMs": 7669.1,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596426752,
+          "pv": 248872960,
+          "peakWs": 619405312,
+          "cpuMs": 51390.6
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65867776,
+          "pv": 68833280,
+          "peakWs": 169947136,
+          "cpuMs": 1281.2
+        }
+      ]
+    },
+    {
+      "tMs": 8195.8,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598175744,
+          "pv": 250621952,
+          "peakWs": 626302976,
+          "cpuMs": 55578.1
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 65867776,
+          "pv": 68833280,
+          "peakWs": 169947136,
+          "cpuMs": 1281.2
+        }
+      ]
+    },
+    {
+      "tMs": 8726.1,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598241280,
+          "pv": 250470400,
+          "peakWs": 626302976,
+          "cpuMs": 59750
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 66011136,
+          "pv": 68861952,
+          "peakWs": 169947136,
+          "cpuMs": 1281.2
+        }
+      ]
+    },
+    {
+      "tMs": 9256.3,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 612663296,
+          "pv": 263262208,
+          "peakWs": 626302976,
+          "cpuMs": 63968.8
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 66011136,
+          "pv": 69468160,
+          "peakWs": 169947136,
+          "cpuMs": 1281.2
+        }
+      ]
+    },
+    {
+      "tMs": 9799.5,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596652032,
+          "pv": 248463360,
+          "peakWs": 626302976,
+          "cpuMs": 68062.5
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 66011136,
+          "pv": 69468160,
+          "peakWs": 169947136,
+          "cpuMs": 1296.9
+        }
+      ]
+    },
+    {
+      "tMs": 10329,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598478848,
+          "pv": 250294272,
+          "peakWs": 626302976,
+          "cpuMs": 72562.5
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 66011136,
+          "pv": 69468160,
+          "peakWs": 169947136,
+          "cpuMs": 1296.9
+        }
+      ]
+    },
+    {
+      "tMs": 10889.4,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596709376,
+          "pv": 249978880,
+          "peakWs": 626302976,
+          "cpuMs": 76734.4
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 66011136,
+          "pv": 69468160,
+          "peakWs": 169947136,
+          "cpuMs": 1312.5
+        }
+      ]
+    },
+    {
+      "tMs": 11420,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596709376,
+          "pv": 249978880,
+          "peakWs": 626302976,
+          "cpuMs": 80906.2
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 66011136,
+          "pv": 69468160,
+          "peakWs": 169947136,
+          "cpuMs": 1312.5
+        }
+      ]
+    },
+    {
+      "tMs": 11961.9,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 596668416,
+          "pv": 250064896,
+          "peakWs": 626384896,
+          "cpuMs": 85125
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 66015232,
+          "pv": 69468160,
+          "peakWs": 169947136,
+          "cpuMs": 1312.5
+        }
+      ]
+    },
+    {
+      "tMs": 12490.1,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598429696,
+          "pv": 251002880,
+          "peakWs": 626384896,
+          "cpuMs": 89468.8
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 63283200,
+          "pv": 67215360,
+          "peakWs": 169947136,
+          "cpuMs": 1359.4
+        }
+      ]
+    },
+    {
+      "tMs": 13051.3,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598396928,
+          "pv": 249249792,
+          "peakWs": 626384896,
+          "cpuMs": 93718.8
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 61882368,
+          "pv": 65392640,
+          "peakWs": 169947136,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 13594.9,
+      "procs": [
+        {
+          "group": "model",
+          "pid": 5080,
+          "ws": 598396928,
+          "pv": 249249792,
+          "peakWs": 626384896,
+          "cpuMs": 94703.1
+        },
+        {
+          "group": "launcher",
+          "pid": 27692,
+          "ws": 61882368,
+          "pv": 65392640,
+          "peakWs": 169947136,
+          "cpuMs": 1375
+        }
+      ]
+    }
+  ],
+  "jsHeap": {
+    "clock": "ms since the browser launch began",
+    "offscreen": [
+      {
+        "tMs": 1034.8,
+        "usedBytes": 1931928,
+        "totalBytes": 2621440
+      },
+      {
+        "tMs": 1561.7,
+        "usedBytes": 4232076,
+        "totalBytes": 6713344
+      },
+      {
+        "tMs": 2105.2,
+        "usedBytes": 4464168,
+        "totalBytes": 6713344
+      },
+      {
+        "tMs": 2620.1,
+        "usedBytes": 4497064,
+        "totalBytes": 6713344
+      },
+      {
+        "tMs": 3132.6,
+        "usedBytes": 4532056,
+        "totalBytes": 6975488
+      },
+      {
+        "tMs": 3646.8,
+        "usedBytes": 4564952,
+        "totalBytes": 6975488
+      },
+      {
+        "tMs": 4159.3,
+        "usedBytes": 5122244,
+        "totalBytes": 7237632
+      },
+      {
+        "tMs": 4660.2,
+        "usedBytes": 5157196,
+        "totalBytes": 7237632
+      },
+      {
+        "tMs": 5171.6,
+        "usedBytes": 5416580,
+        "totalBytes": 7499776
+      },
+      {
+        "tMs": 5674.2,
+        "usedBytes": 5070896,
+        "totalBytes": 8286208
+      },
+      {
+        "tMs": 6186.6,
+        "usedBytes": 5431392,
+        "totalBytes": 8548352
+      },
+      {
+        "tMs": 6697.8,
+        "usedBytes": 5466344,
+        "totalBytes": 8548352
+      },
+      {
+        "tMs": 7209.5,
+        "usedBytes": 5499240,
+        "totalBytes": 8548352
+      },
+      {
+        "tMs": 7722.7,
+        "usedBytes": 5872224,
+        "totalBytes": 8810496
+      },
+      {
+        "tMs": 8235.6,
+        "usedBytes": 5905120,
+        "totalBytes": 8810496
+      },
+      {
+        "tMs": 8747.6,
+        "usedBytes": 6108884,
+        "totalBytes": 9072640
+      },
+      {
+        "tMs": 9262.7,
+        "usedBytes": 5451724,
+        "totalBytes": 7237632
+      },
+      {
+        "tMs": 9775.2,
+        "usedBytes": 5464948,
+        "totalBytes": 7761920
+      },
+      {
+        "tMs": 10288.7,
+        "usedBytes": 5499900,
+        "totalBytes": 7761920
+      },
+      {
+        "tMs": 10803.9,
+        "usedBytes": 5532796,
+        "totalBytes": 7761920
+      },
+      {
+        "tMs": 11317,
+        "usedBytes": 5898984,
+        "totalBytes": 8024064
+      },
+      {
+        "tMs": 11829.9,
+        "usedBytes": 5931880,
+        "totalBytes": 8024064
+      },
+      {
+        "tMs": 12341.6,
+        "usedBytes": 6122128,
+        "totalBytes": 8286208
+      },
+      {
+        "tMs": 12855.2,
+        "usedBytes": 6306328,
+        "totalBytes": 8548352
+      }
+    ],
+    "serviceWorker": [
+      {
+        "tMs": 1034.8,
+        "usedBytes": 686980,
+        "totalBytes": 1048576
+      },
+      {
+        "tMs": 1561.7,
+        "usedBytes": 932572,
+        "totalBytes": 2097152
+      },
+      {
+        "tMs": 2105.2,
+        "usedBytes": 1149388,
+        "totalBytes": 2359296
+      },
+      {
+        "tMs": 2620.1,
+        "usedBytes": 1314732,
+        "totalBytes": 2359296
+      },
+      {
+        "tMs": 3132.6,
+        "usedBytes": 821112,
+        "totalBytes": 2097152
+      },
+      {
+        "tMs": 3646.8,
+        "usedBytes": 985148,
+        "totalBytes": 2359296
+      },
+      {
+        "tMs": 4159.3,
+        "usedBytes": 1376656,
+        "totalBytes": 2883584
+      },
+      {
+        "tMs": 4660.2,
+        "usedBytes": 909256,
+        "totalBytes": 2621440
+      },
+      {
+        "tMs": 5171.6,
+        "usedBytes": 1243732,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 5674.2,
+        "usedBytes": 1620740,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 6186.6,
+        "usedBytes": 1743528,
+        "totalBytes": 4718592
+      },
+      {
+        "tMs": 6697.8,
+        "usedBytes": 1910012,
+        "totalBytes": 4718592
+      },
+      {
+        "tMs": 7209.5,
+        "usedBytes": 2071804,
+        "totalBytes": 4718592
+      },
+      {
+        "tMs": 7722.7,
+        "usedBytes": 1699552,
+        "totalBytes": 4718592
+      },
+      {
+        "tMs": 8235.6,
+        "usedBytes": 1861904,
+        "totalBytes": 4718592
+      },
+      {
+        "tMs": 8747.6,
+        "usedBytes": 2779500,
+        "totalBytes": 5242880
+      },
+      {
+        "tMs": 9262.7,
+        "usedBytes": 3045924,
+        "totalBytes": 5505024
+      },
+      {
+        "tMs": 9775.2,
+        "usedBytes": 1781396,
+        "totalBytes": 6815744
+      },
+      {
+        "tMs": 10288.7,
+        "usedBytes": 1947792,
+        "totalBytes": 6815744
+      },
+      {
+        "tMs": 10803.9,
+        "usedBytes": 2109560,
+        "totalBytes": 6815744
+      },
+      {
+        "tMs": 11317,
+        "usedBytes": 2453840,
+        "totalBytes": 6815744
+      },
+      {
+        "tMs": 11829.9,
+        "usedBytes": 2615608,
+        "totalBytes": 6815744
+      },
+      {
+        "tMs": 12341.6,
+        "usedBytes": 2571664,
+        "totalBytes": 7077888
+      },
+      {
+        "tMs": 12855.2,
+        "usedBytes": 2837980,
+        "totalBytes": 7077888
+      }
+    ]
+  }
+}

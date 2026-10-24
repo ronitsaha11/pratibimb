@@ -1,0 +1,614 @@
+{
+  "experiment": "M20 — the product, run by a person: product reasoner launcher + product build in Chrome's real side panel (human-in-the-loop; not a J7 experiment)",
+  "runId": "20261023T213953Z",
+  "humanInTheLoop": true,
+  "verdict": "PASS",
+  "failure": null,
+  "scenarios": [
+    "allow",
+    "deny"
+  ],
+  "build": {
+    "flags": "none (product build)",
+    "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-ZYRp1TbYj9bPuYCw1S2y0R5L4r911NcNjTciEbHTsAo='; object-src 'none'; base-uri 'none'; form-action 'none'",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ]
+  },
+  "reasoner": {
+    "startedBy": "the person, with `npm run reasoner`",
+    "endpoint": "http://127.0.0.1:8995/v1/chat/completions",
+    "model": {
+      "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+      "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+    },
+    "runtime": {
+      "build": "b10956"
+    },
+    "coldStart": {
+      "verifyMs": 642,
+      "modelLoadMs": 1330,
+      "totalMs": 1987
+    }
+  },
+  "browser": {
+    "binary": "chrome.exe",
+    "version": "153.0.8010.12"
+  },
+  "timeline": {
+    "clock": "monotonic, ms since the harness started",
+    "events": [
+      {
+        "event": "HARNESS_STARTED",
+        "atMs": 0.06
+      },
+      {
+        "event": "REASONER_HEALTH_OK",
+        "atMs": 15.23
+      },
+      {
+        "event": "EXTENSION_BUILT",
+        "atMs": 2410.81
+      },
+      {
+        "event": "DEMO_PAGE_READY",
+        "atMs": 2416.16
+      },
+      {
+        "event": "BROWSER_READY",
+        "atMs": 3431.99
+      },
+      {
+        "event": "SCENARIO_PROMPTED",
+        "atMs": 3438.42,
+        "code": "ALLOW"
+      },
+      {
+        "event": "TASK_SEEN_RUNNING",
+        "atMs": 1586445.74
+      },
+      {
+        "event": "TASK_SEEN_FINISHED",
+        "atMs": 1593104.72,
+        "code": "COMPLETED_AS_DECLARED"
+      },
+      {
+        "event": "PAGE_CHECKED",
+        "atMs": 1593108.98,
+        "code": "REGISTERED"
+      },
+      {
+        "event": "PAGE_RELOADED_BY_PERSON",
+        "atMs": 4436492.54
+      },
+      {
+        "event": "SCENARIO_PROMPTED",
+        "atMs": 4436492.79,
+        "code": "DENY"
+      },
+      {
+        "event": "TASK_SEEN_RUNNING",
+        "atMs": 4467714.93
+      },
+      {
+        "event": "TASK_SEEN_FINISHED",
+        "atMs": 4471691.37,
+        "code": "STOPPED_REFUSED"
+      },
+      {
+        "event": "PAGE_CHECKED",
+        "atMs": 4471694,
+        "code": "EMPTY"
+      },
+      {
+        "event": "ALL_SCENARIOS_RECORDED",
+        "atMs": 4471694.25
+      },
+      {
+        "event": "BROWSER_CLOSED",
+        "atMs": 4723544.55
+      },
+      {
+        "event": "SHUTDOWN",
+        "atMs": 4723545.04,
+        "code": "FINISHED"
+      }
+    ]
+  },
+  "runEventClock": "each run's events and transitions: monotonic, ms since that run started (offscreen document clock)",
+  "runs": [
+    {
+      "scenario": "allow",
+      "finished": true,
+      "taskState": "FINISHED",
+      "outcome": "COMPLETED_AS_DECLARED",
+      "consentsAsked": 1,
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "planOps": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "ALLOWED_ONCE"
+            }
+          ],
+          "clarifications": [],
+          "rehydrated": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "inserted": true
+            }
+          ],
+          "verification": "CONFIRMED",
+          "declaredDone": false,
+          "declarationSource": "PERSON",
+          "events": [
+            {
+              "event": "RUN_STARTED",
+              "atMs": 0
+            },
+            {
+              "event": "OBSERVED",
+              "atMs": 1809.7
+            },
+            {
+              "event": "SANITIZED",
+              "atMs": 1818.2
+            },
+            {
+              "event": "HANDOFF_VERIFIED",
+              "atMs": 1818.2
+            },
+            {
+              "event": "PLAN_REQUESTED",
+              "atMs": 1818.4,
+              "code": "LOCAL_MODEL"
+            },
+            {
+              "event": "PLAN_RECEIVED",
+              "atMs": 2978.5,
+              "code": "USABLE"
+            },
+            {
+              "event": "PLAN_VALIDATED",
+              "atMs": 2979,
+              "code": "OK"
+            },
+            {
+              "event": "CONSENT_REQUESTED",
+              "atMs": 2979.1,
+              "code": "PHONE"
+            },
+            {
+              "event": "CONSENT_ANSWERED",
+              "atMs": 4564.9,
+              "code": "ALLOWED_ONCE"
+            },
+            {
+              "event": "BINDER_REVALIDATED",
+              "atMs": 4566,
+              "code": "OK"
+            },
+            {
+              "event": "VALUE_RESTORED",
+              "atMs": 4567.9,
+              "code": "PHONE"
+            },
+            {
+              "event": "PAGE_REFRESHED",
+              "atMs": 4962.4
+            },
+            {
+              "event": "CLICK_AUTHORIZED",
+              "atMs": 4966.9
+            },
+            {
+              "event": "CLICK_DISPATCHED",
+              "atMs": 4968.1
+            },
+            {
+              "event": "RESULT_OBSERVED",
+              "atMs": 5385.5
+            },
+            {
+              "event": "RESULT_VERIFIED",
+              "atMs": 5385.7,
+              "code": "CONFIRMED"
+            },
+            {
+              "event": "RUN_ENDED",
+              "atMs": 5385.7,
+              "code": "DONE:CONFIRMED"
+            }
+          ],
+          "transitions": [
+            {
+              "from": "IDLE",
+              "to": "OBSERVE",
+              "elapsedMs": 0
+            },
+            {
+              "from": "OBSERVE",
+              "to": "SANITIZE",
+              "elapsedMs": 1809.7
+            },
+            {
+              "from": "SANITIZE",
+              "to": "VERIFY_PAYLOAD",
+              "elapsedMs": 1818.2
+            },
+            {
+              "from": "VERIFY_PAYLOAD",
+              "to": "SEND",
+              "elapsedMs": 1818.4
+            },
+            {
+              "from": "SEND",
+              "to": "VALIDATE_PLAN",
+              "elapsedMs": 2978.5
+            },
+            {
+              "from": "VALIDATE_PLAN",
+              "to": "AWAIT_GRANT",
+              "elapsedMs": 2979
+            },
+            {
+              "from": "AWAIT_GRANT",
+              "to": "REHYDRATE",
+              "elapsedMs": 4566
+            },
+            {
+              "from": "REHYDRATE",
+              "to": "ACT",
+              "elapsedMs": 4962.5
+            },
+            {
+              "from": "ACT",
+              "to": "VERIFY_RESULT",
+              "elapsedMs": 4963.4
+            },
+            {
+              "from": "VERIFY_RESULT",
+              "to": "DONE",
+              "elapsedMs": 5385.7
+            }
+          ],
+          "timings": {
+            "observeMs": 1809.6,
+            "sanitizeMs": 8.5,
+            "verifyPayloadMs": 0,
+            "sendMs": 1160.1,
+            "validatePlanMs": 0.3,
+            "grantMs": 1586,
+            "rehydrateMs": 1.9,
+            "refreshMs": 394.4,
+            "structureMs": 0.8,
+            "verifyResultMs": 417.3,
+            "actMs": 422.3,
+            "totalMs": 5385.8
+          }
+        },
+        {
+          "turn": 2,
+          "state": "DONE",
+          "refusal": null,
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "planOps": [
+            {
+              "op": "done"
+            }
+          ],
+          "consents": [],
+          "clarifications": [],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": true,
+          "declarationSource": "PERSON",
+          "events": [
+            {
+              "event": "RUN_STARTED",
+              "atMs": 0
+            },
+            {
+              "event": "OBSERVED",
+              "atMs": 404.7
+            },
+            {
+              "event": "SANITIZED",
+              "atMs": 410.8
+            },
+            {
+              "event": "HANDOFF_VERIFIED",
+              "atMs": 410.8
+            },
+            {
+              "event": "PLAN_REQUESTED",
+              "atMs": 410.8,
+              "code": "LOCAL_MODEL"
+            },
+            {
+              "event": "PLAN_RECEIVED",
+              "atMs": 1363.7,
+              "code": "USABLE"
+            },
+            {
+              "event": "PLAN_VALIDATED",
+              "atMs": 1363.8,
+              "code": "DONE_DECLARED"
+            },
+            {
+              "event": "RUN_ENDED",
+              "atMs": 1363.8,
+              "code": "DONE:DECLARED_DONE"
+            }
+          ],
+          "transitions": [
+            {
+              "from": "IDLE",
+              "to": "OBSERVE",
+              "elapsedMs": 0.1
+            },
+            {
+              "from": "OBSERVE",
+              "to": "SANITIZE",
+              "elapsedMs": 404.7
+            },
+            {
+              "from": "SANITIZE",
+              "to": "VERIFY_PAYLOAD",
+              "elapsedMs": 410.8
+            },
+            {
+              "from": "VERIFY_PAYLOAD",
+              "to": "SEND",
+              "elapsedMs": 410.8
+            },
+            {
+              "from": "SEND",
+              "to": "VALIDATE_PLAN",
+              "elapsedMs": 1363.7
+            },
+            {
+              "from": "VALIDATE_PLAN",
+              "to": "DONE",
+              "elapsedMs": 1363.8
+            }
+          ],
+          "timings": {
+            "observeMs": 404.6,
+            "sanitizeMs": 6.1,
+            "verifyPayloadMs": 0,
+            "sendMs": 952.9,
+            "validatePlanMs": 0.1,
+            "totalMs": 1363.8
+          }
+        }
+      ],
+      "page": {
+        "confirmHolds": "REGISTERED",
+        "submitDisabled": true,
+        "submitClicks": 2
+      },
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        },
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "judged": {
+        "finished": true,
+        "runEventsOrdered": true,
+        "allEgressToTheOneEndpoint": true,
+        "askedInThePanelNotTheControlPlane": true,
+        "thePersonDeclaredTheExpectedResult": true,
+        "allowedOnce": true,
+        "consentBeforeRestoreBeforeClickBeforeVerify": true,
+        "restoredIntoTheField": true,
+        "clickVerifiedByThePage": true
+      }
+    },
+    {
+      "scenario": "deny",
+      "finished": true,
+      "taskState": "FINISHED",
+      "outcome": "STOPPED_REFUSED",
+      "consentsAsked": 1,
+      "grantViaControlPlane": {
+        "asked": false,
+        "granted": null
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "state": "REFUSED",
+          "refusal": {
+            "stage": "AWAIT_GRANT",
+            "cause": "CONSENT_DENIED"
+          },
+          "reasonerKind": "LOCAL_MODEL",
+          "fallback": null,
+          "planOps": [
+            {
+              "op": "insert",
+              "target": "#mobile_confirm"
+            },
+            {
+              "op": "click",
+              "target": "#submit"
+            }
+          ],
+          "consents": [
+            {
+              "target": "#mobile_confirm",
+              "piiClass": "PHONE",
+              "outcome": "CONSENT_DENIED"
+            }
+          ],
+          "clarifications": [],
+          "rehydrated": [],
+          "verification": null,
+          "declaredDone": false,
+          "declarationSource": "PERSON",
+          "events": [
+            {
+              "event": "RUN_STARTED",
+              "atMs": 0
+            },
+            {
+              "event": "OBSERVED",
+              "atMs": 412.3
+            },
+            {
+              "event": "SANITIZED",
+              "atMs": 421
+            },
+            {
+              "event": "HANDOFF_VERIFIED",
+              "atMs": 421
+            },
+            {
+              "event": "PLAN_REQUESTED",
+              "atMs": 421.3,
+              "code": "LOCAL_MODEL"
+            },
+            {
+              "event": "PLAN_RECEIVED",
+              "atMs": 1509,
+              "code": "USABLE"
+            },
+            {
+              "event": "PLAN_VALIDATED",
+              "atMs": 1509.3,
+              "code": "OK"
+            },
+            {
+              "event": "CONSENT_REQUESTED",
+              "atMs": 1509.4,
+              "code": "PHONE"
+            },
+            {
+              "event": "CONSENT_ANSWERED",
+              "atMs": 4087.6,
+              "code": "CONSENT_DENIED"
+            },
+            {
+              "event": "RUN_ENDED",
+              "atMs": 4087.7,
+              "code": "REFUSED:CONSENT_DENIED"
+            }
+          ],
+          "transitions": [
+            {
+              "from": "IDLE",
+              "to": "OBSERVE",
+              "elapsedMs": 0
+            },
+            {
+              "from": "OBSERVE",
+              "to": "SANITIZE",
+              "elapsedMs": 412.3
+            },
+            {
+              "from": "SANITIZE",
+              "to": "VERIFY_PAYLOAD",
+              "elapsedMs": 421
+            },
+            {
+              "from": "VERIFY_PAYLOAD",
+              "to": "SEND",
+              "elapsedMs": 421.2
+            },
+            {
+              "from": "SEND",
+              "to": "VALIDATE_PLAN",
+              "elapsedMs": 1509
+            },
+            {
+              "from": "VALIDATE_PLAN",
+              "to": "AWAIT_GRANT",
+              "elapsedMs": 1509.4
+            },
+            {
+              "from": "AWAIT_GRANT",
+              "to": "REFUSED",
+              "elapsedMs": 4087.7
+            }
+          ],
+          "timings": {
+            "observeMs": 412.3,
+            "sanitizeMs": 8.7,
+            "verifyPayloadMs": 0,
+            "sendMs": 1087.7,
+            "validatePlanMs": 0.2,
+            "grantMs": 2578.3,
+            "totalMs": 4087.9
+          }
+        }
+      ],
+      "page": {
+        "confirmHolds": "EMPTY",
+        "submitDisabled": false,
+        "submitClicks": 0
+      },
+      "egress": [
+        {
+          "sent": true,
+          "destination": "http://127.0.0.1:8995/v1/chat/completions"
+        }
+      ],
+      "judged": {
+        "finished": true,
+        "runEventsOrdered": true,
+        "allEgressToTheOneEndpoint": true,
+        "askedInThePanelNotTheControlPlane": true,
+        "thePersonDeclaredTheExpectedResult": true,
+        "denied": true,
+        "nothingRestoredOrClicked": true,
+        "nothingRestoredOrSubmitted": true
+      }
+    }
+  ],
+  "notAClaim": [
+    "synthetic pages and values only; one run per scenario; no reliability or latency claim — the benchmark is separate",
+    "the harness observed only; every click in the panel and the page was the person's"
+  ],
+  "recordedAt": "2026-10-23T22:58:36.578Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0"
+  }
+}
