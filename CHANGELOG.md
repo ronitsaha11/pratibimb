@@ -56,6 +56,9 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` Â
     - It runs with `--no-slots`.
     - The launcher refuses to start unless the server refuses keyless and wrong-keyed requests and
       reports `/slots` off.
+    - The person-run smoke test was repeated through the keyed server: PASS, 18 of 18 checks. The
+      harness now refuses to run unless the model server is locked, counts the run's clicks across
+      all turns, and records Submit's pointer events.
   - **Not changed:** CSP, manifest permissions, the model pin, the single endpoint, gates, ADRs,
     frozen schemas, the 5-turn cap, and consent or grant timing. J7/B5 and D1â€“D4 remain open.
     Production frame egress remains blocked.

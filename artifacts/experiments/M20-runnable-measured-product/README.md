@@ -116,8 +116,8 @@ reach it directly, bypassing the front.
   its state file, or any test output. The scan detects 1000 of 1000 real keys.
 
 **The person-run smoke test (section 3) ran before the fix,** with the earlier, unkeyed model
-server, and was not repeated. The front, the endpoint, the CSP and the extension are unchanged, so
-its verdict describes the same client path, but it is a record of the earlier server configuration.
+server. It was repeated after the fix, through the keyed model server: see section 3b, PASS 18 of
+18. The section 3 record is kept unchanged as the pre-fix run.
 
 **The benchmark was re-run after the fix.** Two runs completed 6/6 tasks and 15 steps through the
 keyed model server, which shows the product path works with the key. Their warm reasoner time is
@@ -244,6 +244,68 @@ The record is not edited, and this diagnostic is not part of it.
   browser destroyed the page state, so that run is **not** counted.
 - **The fix.** The harness no longer times out or closes the browser on the person. It waits until
   the person closes it or presses Ctrl+C.
+
+### 3b. After the B1 fix: a person, Chrome's real side panel again — PASS (18 of 18 checks)
+
+Record: [`logs/w1-cft-product-sidepanel-smoke-20261024T211526Z.json`](logs/w1-cft-product-sidepanel-smoke-20261024T211526Z.json). Same harness, with three additions for this run (below). Same
+product build (no evidence flags), Chrome for Testing 153.0.8010.12, the same synthetic page and the
+same two scenarios.
+
+**Who did what.**
+- **Claude** typed `npm run reasoner` and then the harness command into two tabs of the person's
+  Terminal panel. The record says the reasoner was started outside the harness; the harness never
+  starts or stops it.
+- **The person** opened Chrome's real side panel, typed the goal, read the page, declared the
+  expected result, started each task, pressed **Allow once**, reloaded the page, pressed **Deny**,
+  and closed the browser.
+- **The harness** pressed nothing, answered nothing and injected nothing. The control plane's grant
+  path was not used (`grantViaControlPlane.asked: false` in both runs).
+
+**The model server was locked for the whole run.** Before opening the browser the harness checked
+that `/health` reports `modelServer.authentication: "per-launch key"` and that the model server on
+8977 refuses, without a key, both inference and `/slots` (401 and 401, recorded in
+`reasoner.modelServerLock`). It refuses to run otherwise. The extension's 3 requests all went to
+`http://127.0.0.1:8995/v1/chat/completions`; the front's log shows exactly 3 inference requests,
+all 200 (sizes only, no bodies). Since the model server answers only with the key, those answers
+came through the front's keyed connection (inference from these facts). The key appears nowhere in
+the record.
+
+**Allow once** — 10 of 10 checks. Outcome `COMPLETED_AS_DECLARED`; the page holds the registered
+number, Submit is disabled, and the verifier says `CONFIRMED`. Turn 1, in ms since the run started:
+`CONSENT_REQUESTED(PHONE)@3297.5 → CONSENT_ANSWERED(ALLOWED_ONCE)@5625.0 →
+BINDER_REVALIDATED(OK)@5628.3 → VALUE_RESTORED(PHONE)@5630.6 → PAGE_REFRESHED@6051.2 →
+CLICK_AUTHORIZED@6054.3 → CLICK_DISPATCHED@6055.5 → RESULT_OBSERVED@6468.0 →
+RESULT_VERIFIED(CONFIRMED)@6468.3 → RUN_ENDED(DONE:CONFIRMED)@6468.3`. Turn 2 ended
+`DONE:DECLARED_DONE`. Across both turns the run authorised and dispatched exactly one click.
+
+**Deny** — 8 of 8 checks. Outcome `STOPPED_REFUSED`, refusal `AWAIT_GRANT / CONSENT_DENIED`. The
+trail ends `CONSENT_REQUESTED(PHONE)@969.1 → CONSENT_ANSWERED(CONSENT_DENIED)@3659.4 →
+RUN_ENDED(REFUSED:CONSENT_DENIED)@3659.6`. No restore, click-authorisation, click-dispatch or result
+event in any turn. The confirmation field stayed empty and Submit stayed enabled.
+
+**Submit's pointer events, as the page logged them.** Allow: one sequence, `pointerdown`,
+`mousedown`, `pointerup`, `mouseup`, `click`, all at (112, 610). Deny: none. The second, unexplained
+sequence seen in section 3 did not occur in this run. That says nothing about its source, which
+remains unexplained.
+
+**Harness additions for this run** (`run-product-smoke.mjs`):
+- the model-server lock check above, recorded in `reasoner.modelServerLock`;
+- an Allow check that the run authorised and dispatched exactly one click across all turns, and a
+  Deny check that it authorised none;
+- `page.submitEvents`: each pointer/mouse event on Submit as `[type, x, y]`, recorded and not
+  interpreted.
+
+**Validation of the saved record.** It matches the harness's in-memory runs (judgements, page,
+egress and every event), read through Node's inspector before the browser closed. The harness's own
+scan finds none of the fixture's values in it; a scan for 43-character base64url tokens finds only
+the model hash, the CSP hash and two check names. It holds no prompt, no model output, no page text
+and no local path.
+
+**Two earlier post-fix attempts are not committed.** In both, the browser closed before any task
+ran. Each record says FAIL with no runs; one also carries a local install path in its error text.
+Both harnesses had been started as background tasks of a Claude session, and the likely cause is
+that they stopped when that session ended (inference; not confirmed). This run started the reasoner
+and the harness in the person's Terminal panel instead.
 
 ## Conclusion
 
