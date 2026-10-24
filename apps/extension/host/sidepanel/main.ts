@@ -13,6 +13,7 @@ import {
   describeExpectation,
   panelFormOf,
   summariseTask,
+  timingRows,
   taskAnswer,
   taskHeadline,
   type Expectation,
@@ -291,8 +292,39 @@ async function pollTask(): Promise<void> {
     const task = (status as { task?: { state?: string } } | undefined)?.task;
     if (task && task.state !== "RUNNING") document.documentElement.dataset.task = "finished";
     say(taskHeadline(taskStarted, summariseTask(status)));
+    renderTimings(status);
   } catch {
     /* the next poll will say */
+  }
+}
+
+/** M20: the finished task's measured stage timings. Built with `textContent`; nothing is markup. */
+const taskTimings = document.getElementById("task-timings");
+function renderTimings(status: unknown): void {
+  if (!taskTimings) return;
+  const turns = timingRows(status);
+  taskTimings.replaceChildren();
+  if (turns.length === 0) return;
+  const note = document.createElement("div");
+  note.textContent = "Measured on this machine, in milliseconds. \"not measured\": the stage did not run.";
+  taskTimings.append(note);
+  for (const turn of turns) {
+    const heading = document.createElement("div");
+    heading.textContent = turn.heading;
+    const table = document.createElement("table");
+    for (const row of turn.rows) {
+      const tr = document.createElement("tr");
+      if (row.person) tr.className = "person";
+      if (row.ms === null) tr.classList.add("missing");
+      const label = document.createElement("td");
+      label.textContent = row.label;
+      const ms = document.createElement("td");
+      ms.className = "ms";
+      ms.textContent = row.text;
+      tr.append(label, ms);
+      table.append(tr);
+    }
+    taskTimings.append(heading, table);
   }
 }
 
