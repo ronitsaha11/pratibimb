@@ -15,6 +15,8 @@ export default defineConfig({
       "packages/*/test/**/*.test.ts",
       "apps/*/test/**/*.test.ts",
       "tests/browser/support/**/*.test.mjs",
+      // M20: the product reasoner launcher (`npm run reasoner`) and its front.
+      "scripts/**/*.test.mjs",
     ],
     reporters: ["default"],
   },

@@ -71,19 +71,11 @@ const CAPTURE_DIR = join(ROOT, "artifacts", "experiments", "LOOP-2-local-reasone
 const sha256 = (text) => createHash("sha256").update(text, "utf8").digest("hex");
 
 /**
- * Metadata-only shapes. Deliberately crude and deliberately not the client's detectors — an
- * independent observer that agreed with the thing it is observing would be worth less.
+ * The tripwire lives with the product reasoner launcher (M20), so the product and this test front
+ * share one implementation. Re-exported for the harnesses that import it from here.
  */
-const SHAPES = [
-  { class: "PHONE", re: /\b[6-9]\d{9}\b/ },
-  { class: "AADHAAR", re: /\b[2-9]\d{3}\s?\d{4}\s?\d{4}\b/ },
-  { class: "DOB", re: /\b(?:19|20)\d{2}-\d{2}-\d{2}\b/ },
-  { class: "OTP", re: /\b\d{6}\b/ },
-];
-
-/** Classes only. The matched text is never captured, logged or returned. */
-export const tripwire = (body) =>
-  SHAPES.filter((shape) => shape.re.test(body)).map((shape) => ({ class: shape.class, source: "server-tripwire" }));
+import { tripwire } from "../../../scripts/reasoner/tripwire.mjs";
+export { tripwire };
 
 /** A plan the client will refuse: it carries a value the client never sent. */
 const hostilePlan = (literal) =>
