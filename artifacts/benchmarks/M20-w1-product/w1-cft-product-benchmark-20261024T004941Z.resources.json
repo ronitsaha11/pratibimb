@@ -1,0 +1,3235 @@
+{
+  "runId": "20261024T004941Z",
+  "label": "measured",
+  "clock": "PowerShell Stopwatch, ms since the sampler started",
+  "groups": [
+    "browser",
+    "model",
+    "launcher"
+  ],
+  "samples": [
+    {
+      "tMs": 0.9,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 37392384,
+          "pv": 14106624,
+          "peakWs": 37392384,
+          "cpuMs": 312.5
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11743232,
+          "pv": 2605056,
+          "peakWs": 11743232,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 549298176,
+          "pv": 235667456,
+          "peakWs": 549298176,
+          "cpuMs": 2968.8
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65036288,
+          "pv": 68108288,
+          "peakWs": 161284096,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 743.9,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21409792,
+          "pv": 9793536,
+          "peakWs": 21409792,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 61526016,
+          "pv": 27963392,
+          "peakWs": 61689856,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 128782336,
+          "pv": 40583168,
+          "peakWs": 129662976,
+          "cpuMs": 921.9
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52756480,
+          "pv": 22499328,
+          "peakWs": 52756480,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 36282368,
+          "pv": 17252352,
+          "peakWs": 36282368,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 41738240,
+          "pv": 15589376,
+          "peakWs": 41738240,
+          "cpuMs": 250
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11796480,
+          "pv": 2674688,
+          "peakWs": 11796480,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95404032,
+          "pv": 50364416,
+          "peakWs": 95404032,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 145842176,
+          "pv": 126345216,
+          "peakWs": 151900160,
+          "cpuMs": 578.1
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 549298176,
+          "pv": 235667456,
+          "peakWs": 549298176,
+          "cpuMs": 2968.8
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65101824,
+          "pv": 68108288,
+          "peakWs": 161284096,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 1281.8,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21618688,
+          "pv": 9822208,
+          "peakWs": 21618688,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36253696,
+          "pv": 17203200,
+          "peakWs": 36253696,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 152707072,
+          "pv": 141508608,
+          "peakWs": 152707072,
+          "cpuMs": 531.2
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 135925760,
+          "pv": 43393024,
+          "peakWs": 171995136,
+          "cpuMs": 1171.9
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52867072,
+          "pv": 22593536,
+          "peakWs": 52867072,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 70737920,
+          "pv": 24973312,
+          "peakWs": 70737920,
+          "cpuMs": 140.6
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42311680,
+          "pv": 15753216,
+          "peakWs": 42315776,
+          "cpuMs": 250
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11796480,
+          "pv": 2674688,
+          "peakWs": 11796480,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96542720,
+          "pv": 51060736,
+          "peakWs": 96542720,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 163217408,
+          "pv": 142929920,
+          "peakWs": 165281792,
+          "cpuMs": 718.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 549298176,
+          "pv": 235667456,
+          "peakWs": 549298176,
+          "cpuMs": 2968.8
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65101824,
+          "pv": 68108288,
+          "peakWs": 161284096,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 1822.7,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21618688,
+          "pv": 9822208,
+          "peakWs": 21618688,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36253696,
+          "pv": 17203200,
+          "peakWs": 36253696,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 245669888,
+          "pv": 228810752,
+          "peakWs": 277274624,
+          "cpuMs": 1437.5
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 136138752,
+          "pv": 43524096,
+          "peakWs": 171995136,
+          "cpuMs": 1203.1
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52887552,
+          "pv": 22593536,
+          "peakWs": 52891648,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 75902976,
+          "pv": 28487680,
+          "peakWs": 75956224,
+          "cpuMs": 156.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42352640,
+          "pv": 15757312,
+          "peakWs": 42352640,
+          "cpuMs": 265.6
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11796480,
+          "pv": 2674688,
+          "peakWs": 11796480,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96542720,
+          "pv": 51060736,
+          "peakWs": 96542720,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 163229696,
+          "pv": 142942208,
+          "peakWs": 165281792,
+          "cpuMs": 718.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 586928128,
+          "pv": 238399488,
+          "peakWs": 586928128,
+          "cpuMs": 4312.5
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66220032,
+          "pv": 69357568,
+          "peakWs": 161284096,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 2350.3,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21618688,
+          "pv": 9822208,
+          "peakWs": 21618688,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36253696,
+          "pv": 17203200,
+          "peakWs": 36253696,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 192024576,
+          "pv": 160313344,
+          "peakWs": 277274624,
+          "cpuMs": 1578.1
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 136179712,
+          "pv": 43536384,
+          "peakWs": 171995136,
+          "cpuMs": 1218.8
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52891648,
+          "pv": 22597632,
+          "peakWs": 52891648,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 76054528,
+          "pv": 28487680,
+          "peakWs": 76054528,
+          "cpuMs": 156.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42352640,
+          "pv": 15757312,
+          "peakWs": 42352640,
+          "cpuMs": 265.6
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11796480,
+          "pv": 2674688,
+          "peakWs": 11796480,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96542720,
+          "pv": 51060736,
+          "peakWs": 96542720,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 163311616,
+          "pv": 142942208,
+          "peakWs": 165281792,
+          "cpuMs": 718.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 586977280,
+          "pv": 238428160,
+          "peakWs": 586977280,
+          "cpuMs": 8250
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65380352,
+          "pv": 68460544,
+          "peakWs": 161284096,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 2873.9,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21696512,
+          "pv": 9822208,
+          "peakWs": 21696512,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36368384,
+          "pv": 17203200,
+          "peakWs": 36368384,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 192294912,
+          "pv": 161153024,
+          "peakWs": 277274624,
+          "cpuMs": 1593.8
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 152764416,
+          "pv": 47448064,
+          "peakWs": 171995136,
+          "cpuMs": 1875
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52948992,
+          "pv": 22605824,
+          "peakWs": 52948992,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 76095488,
+          "pv": 28487680,
+          "peakWs": 76095488,
+          "cpuMs": 156.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42508288,
+          "pv": 15790080,
+          "peakWs": 42508288,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96616448,
+          "pv": 51064832,
+          "peakWs": 96616448,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 163041280,
+          "pv": 142393344,
+          "peakWs": 165281792,
+          "cpuMs": 718.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 586977280,
+          "pv": 238428160,
+          "peakWs": 586977280,
+          "cpuMs": 12390.6
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65384448,
+          "pv": 68460544,
+          "peakWs": 161284096,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 3426.9,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21696512,
+          "pv": 9822208,
+          "peakWs": 21696512,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36368384,
+          "pv": 17203200,
+          "peakWs": 36368384,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 192720896,
+          "pv": 161439744,
+          "peakWs": 277274624,
+          "cpuMs": 1640.6
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 157167616,
+          "pv": 51376128,
+          "peakWs": 171995136,
+          "cpuMs": 2093.8
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52948992,
+          "pv": 22605824,
+          "peakWs": 52948992,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 76095488,
+          "pv": 28487680,
+          "peakWs": 76095488,
+          "cpuMs": 156.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42835968,
+          "pv": 15982592,
+          "peakWs": 42840064,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96616448,
+          "pv": 51064832,
+          "peakWs": 96616448,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 163041280,
+          "pv": 142393344,
+          "peakWs": 165281792,
+          "cpuMs": 718.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 591024128,
+          "pv": 241803264,
+          "peakWs": 610889728,
+          "cpuMs": 16734.4
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65384448,
+          "pv": 68460544,
+          "peakWs": 161284096,
+          "cpuMs": 1375
+        }
+      ]
+    },
+    {
+      "tMs": 3984.1,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21696512,
+          "pv": 9822208,
+          "peakWs": 21696512,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36368384,
+          "pv": 17203200,
+          "peakWs": 36368384,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 194277376,
+          "pv": 161812480,
+          "peakWs": 277274624,
+          "cpuMs": 1671.9
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 157487104,
+          "pv": 51666944,
+          "peakWs": 171995136,
+          "cpuMs": 2125
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52961280,
+          "pv": 22618112,
+          "peakWs": 52961280,
+          "cpuMs": 78.1
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 80183296,
+          "pv": 28946432,
+          "peakWs": 80240640,
+          "cpuMs": 156.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42852352,
+          "pv": 15982592,
+          "peakWs": 42856448,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96616448,
+          "pv": 51064832,
+          "peakWs": 96616448,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 163115008,
+          "pv": 142426112,
+          "peakWs": 165281792,
+          "cpuMs": 718.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 589336576,
+          "pv": 240197632,
+          "peakWs": 610889728,
+          "cpuMs": 20781.2
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65679360,
+          "pv": 68644864,
+          "peakWs": 161284096,
+          "cpuMs": 1421.9
+        }
+      ]
+    },
+    {
+      "tMs": 4521.3,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21696512,
+          "pv": 9822208,
+          "peakWs": 21696512,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36368384,
+          "pv": 17203200,
+          "peakWs": 36368384,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 194437120,
+          "pv": 162082816,
+          "peakWs": 277274624,
+          "cpuMs": 1687.5
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 157577216,
+          "pv": 51675136,
+          "peakWs": 171995136,
+          "cpuMs": 2140.6
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52961280,
+          "pv": 22618112,
+          "peakWs": 52961280,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 80191488,
+          "pv": 28954624,
+          "peakWs": 80240640,
+          "cpuMs": 156.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42856448,
+          "pv": 15986688,
+          "peakWs": 42856448,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96616448,
+          "pv": 51064832,
+          "peakWs": 96616448,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 163115008,
+          "pv": 142426112,
+          "peakWs": 165281792,
+          "cpuMs": 718.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 589336576,
+          "pv": 240197632,
+          "peakWs": 610889728,
+          "cpuMs": 24828.1
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65679360,
+          "pv": 68644864,
+          "peakWs": 161284096,
+          "cpuMs": 1421.9
+        }
+      ]
+    },
+    {
+      "tMs": 5060.4,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36368384,
+          "pv": 17203200,
+          "peakWs": 36368384,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 197791744,
+          "pv": 165343232,
+          "peakWs": 277274624,
+          "cpuMs": 1734.4
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 159465472,
+          "pv": 53268480,
+          "peakWs": 171995136,
+          "cpuMs": 2250
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52961280,
+          "pv": 22618112,
+          "peakWs": 52961280,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 81948672,
+          "pv": 30015488,
+          "peakWs": 81948672,
+          "cpuMs": 203.1
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42938368,
+          "pv": 15994880,
+          "peakWs": 42938368,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96731136,
+          "pv": 51068928,
+          "peakWs": 96731136,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 173633536,
+          "pv": 152821760,
+          "peakWs": 173633536,
+          "cpuMs": 796.9
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 596103168,
+          "pv": 248639488,
+          "peakWs": 619163648,
+          "cpuMs": 28671.9
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65843200,
+          "pv": 68706304,
+          "peakWs": 161284096,
+          "cpuMs": 1453.1
+        }
+      ]
+    },
+    {
+      "tMs": 5598.6,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36368384,
+          "pv": 17203200,
+          "peakWs": 36368384,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 198811648,
+          "pv": 166354944,
+          "peakWs": 277274624,
+          "cpuMs": 1750
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 158253056,
+          "pv": 51929088,
+          "peakWs": 171995136,
+          "cpuMs": 2296.9
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52977664,
+          "pv": 22626304,
+          "peakWs": 52977664,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 82247680,
+          "pv": 30167040,
+          "peakWs": 82247680,
+          "cpuMs": 203.1
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42958848,
+          "pv": 15994880,
+          "peakWs": 42962944,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96747520,
+          "pv": 51068928,
+          "peakWs": 96747520,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 177270784,
+          "pv": 156463104,
+          "peakWs": 177270784,
+          "cpuMs": 843.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 595271680,
+          "pv": 246099968,
+          "peakWs": 619163648,
+          "cpuMs": 33031.2
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65912832,
+          "pv": 68706304,
+          "peakWs": 161284096,
+          "cpuMs": 1453.1
+        }
+      ]
+    },
+    {
+      "tMs": 6136.2,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 198971392,
+          "pv": 166420480,
+          "peakWs": 277274624,
+          "cpuMs": 1796.9
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 158281728,
+          "pv": 51949568,
+          "peakWs": 171995136,
+          "cpuMs": 2406.2
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52977664,
+          "pv": 22626304,
+          "peakWs": 52977664,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 82386944,
+          "pv": 30326784,
+          "peakWs": 82386944,
+          "cpuMs": 203.1
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42958848,
+          "pv": 15994880,
+          "peakWs": 42962944,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96747520,
+          "pv": 51068928,
+          "peakWs": 96747520,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 177295360,
+          "pv": 156225536,
+          "peakWs": 177295360,
+          "cpuMs": 843.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 603074560,
+          "pv": 256241664,
+          "peakWs": 619163648,
+          "cpuMs": 37062.5
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65933312,
+          "pv": 68706304,
+          "peakWs": 161284096,
+          "cpuMs": 1453.1
+        }
+      ]
+    },
+    {
+      "tMs": 6674.8,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 200040448,
+          "pv": 167063552,
+          "peakWs": 277274624,
+          "cpuMs": 1843.8
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 159371264,
+          "pv": 52912128,
+          "peakWs": 171995136,
+          "cpuMs": 2437.5
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52977664,
+          "pv": 22626304,
+          "peakWs": 52977664,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 84242432,
+          "pv": 32092160,
+          "peakWs": 84307968,
+          "cpuMs": 234.4
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42962944,
+          "pv": 15994880,
+          "peakWs": 42967040,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 97112064,
+          "pv": 51257344,
+          "peakWs": 97112064,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 177307648,
+          "pv": 156233728,
+          "peakWs": 177307648,
+          "cpuMs": 843.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 596418560,
+          "pv": 248061952,
+          "peakWs": 619163648,
+          "cpuMs": 41187.5
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65941504,
+          "pv": 68706304,
+          "peakWs": 161284096,
+          "cpuMs": 1453.1
+        }
+      ]
+    },
+    {
+      "tMs": 7211.2,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 200114176,
+          "pv": 167137280,
+          "peakWs": 277274624,
+          "cpuMs": 1843.8
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 159387648,
+          "pv": 52920320,
+          "peakWs": 171995136,
+          "cpuMs": 2484.4
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52981760,
+          "pv": 22630400,
+          "peakWs": 52981760,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 84246528,
+          "pv": 32092160,
+          "peakWs": 84307968,
+          "cpuMs": 234.4
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42962944,
+          "pv": 15994880,
+          "peakWs": 42967040,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 97112064,
+          "pv": 51257344,
+          "peakWs": 97112064,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 177307648,
+          "pv": 156233728,
+          "peakWs": 177307648,
+          "cpuMs": 843.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 598245376,
+          "pv": 249892864,
+          "peakWs": 619163648,
+          "cpuMs": 45656.2
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 65941504,
+          "pv": 68706304,
+          "peakWs": 161284096,
+          "cpuMs": 1453.1
+        }
+      ]
+    },
+    {
+      "tMs": 7763.2,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 200187904,
+          "pv": 167145472,
+          "peakWs": 277274624,
+          "cpuMs": 1890.6
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 159453184,
+          "pv": 52920320,
+          "peakWs": 171995136,
+          "cpuMs": 2484.4
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52981760,
+          "pv": 22630400,
+          "peakWs": 52981760,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 84242432,
+          "pv": 32092160,
+          "peakWs": 84307968,
+          "cpuMs": 234.4
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42962944,
+          "pv": 15994880,
+          "peakWs": 42967040,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 97112064,
+          "pv": 51257344,
+          "peakWs": 97112064,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176209920,
+          "pv": 155140096,
+          "peakWs": 177311744,
+          "cpuMs": 843.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 598016000,
+          "pv": 248156160,
+          "peakWs": 619163648,
+          "cpuMs": 50000
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66015232,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1453.1
+        }
+      ]
+    },
+    {
+      "tMs": 8312.5,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 200347648,
+          "pv": 167202816,
+          "peakWs": 277274624,
+          "cpuMs": 1921.9
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 159498240,
+          "pv": 53018624,
+          "peakWs": 171995136,
+          "cpuMs": 2515.6
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52985856,
+          "pv": 22634496,
+          "peakWs": 52985856,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 84791296,
+          "pv": 32862208,
+          "peakWs": 84791296,
+          "cpuMs": 250
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 42967040,
+          "pv": 15998976,
+          "peakWs": 42967040,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 97116160,
+          "pv": 51261440,
+          "peakWs": 97116160,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176181248,
+          "pv": 155140096,
+          "peakWs": 177311744,
+          "cpuMs": 843.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 596279296,
+          "pv": 247357440,
+          "peakWs": 619163648,
+          "cpuMs": 54203.1
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66056192,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1453.1
+        }
+      ]
+    },
+    {
+      "tMs": 8847,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 200454144,
+          "pv": 167268352,
+          "peakWs": 277274624,
+          "cpuMs": 1968.8
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 159518720,
+          "pv": 53039104,
+          "peakWs": 171995136,
+          "cpuMs": 2593.8
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52985856,
+          "pv": 22634496,
+          "peakWs": 52985856,
+          "cpuMs": 93.8
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 84795392,
+          "pv": 32866304,
+          "peakWs": 84795392,
+          "cpuMs": 250
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43081728,
+          "pv": 16076800,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 97116160,
+          "pv": 51261440,
+          "peakWs": 97116160,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176078848,
+          "pv": 154980352,
+          "peakWs": 177311744,
+          "cpuMs": 843.8
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 597782528,
+          "pv": 250519552,
+          "peakWs": 626282496,
+          "cpuMs": 58312.5
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66056192,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1468.8
+        }
+      ]
+    },
+    {
+      "tMs": 9387.2,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 201232384,
+          "pv": 167911424,
+          "peakWs": 277274624,
+          "cpuMs": 1984.4
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 159821824,
+          "pv": 53252096,
+          "peakWs": 171995136,
+          "cpuMs": 2640.6
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52985856,
+          "pv": 22634496,
+          "peakWs": 52985856,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 86061056,
+          "pv": 33832960,
+          "peakWs": 86061056,
+          "cpuMs": 265.6
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43085824,
+          "pv": 16080896,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 97247232,
+          "pv": 51265536,
+          "peakWs": 97247232,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176103424,
+          "pv": 154984448,
+          "peakWs": 177311744,
+          "cpuMs": 859.4
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 597217280,
+          "pv": 248963072,
+          "peakWs": 626282496,
+          "cpuMs": 62515.6
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66146304,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1484.4
+        }
+      ]
+    },
+    {
+      "tMs": 9926,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21729280,
+          "pv": 9826304,
+          "peakWs": 21729280,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 201805824,
+          "pv": 168787968,
+          "peakWs": 277274624,
+          "cpuMs": 2015.6
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 160243712,
+          "pv": 53989376,
+          "peakWs": 171995136,
+          "cpuMs": 2656.2
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52989952,
+          "pv": 22638592,
+          "peakWs": 52989952,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 86298624,
+          "pv": 34271232,
+          "peakWs": 86306816,
+          "cpuMs": 265.6
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43085824,
+          "pv": 16080896,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 97247232,
+          "pv": 51265536,
+          "peakWs": 97247232,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176107520,
+          "pv": 154898432,
+          "peakWs": 177311744,
+          "cpuMs": 859.4
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 597184512,
+          "pv": 248176640,
+          "peakWs": 626282496,
+          "cpuMs": 66718.8
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66215936,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1484.4
+        }
+      ]
+    },
+    {
+      "tMs": 10479.8,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 190894080,
+          "pv": 156123136,
+          "peakWs": 277274624,
+          "cpuMs": 2078.1
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 160677888,
+          "pv": 54243328,
+          "peakWs": 171995136,
+          "cpuMs": 2796.9
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 53006336,
+          "pv": 22638592,
+          "peakWs": 53006336,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 89149440,
+          "pv": 37228544,
+          "peakWs": 89214976,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43106304,
+          "pv": 16080896,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95858688,
+          "pv": 49713152,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176132096,
+          "pv": 154902528,
+          "peakWs": 177311744,
+          "cpuMs": 890.6
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 595644416,
+          "pv": 246669312,
+          "peakWs": 626282496,
+          "cpuMs": 70671.9
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66215936,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1500
+        }
+      ]
+    },
+    {
+      "tMs": 11014.6,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36380672,
+          "pv": 17203200,
+          "peakWs": 36380672,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 190926848,
+          "pv": 156123136,
+          "peakWs": 277274624,
+          "cpuMs": 2078.1
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 160694272,
+          "pv": 54251520,
+          "peakWs": 171995136,
+          "cpuMs": 2796.9
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52367360,
+          "pv": 22036480,
+          "peakWs": 53006336,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 88113152,
+          "pv": 36134912,
+          "peakWs": 89214976,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43106304,
+          "pv": 16080896,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95858688,
+          "pv": 49713152,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176132096,
+          "pv": 154902528,
+          "peakWs": 177311744,
+          "cpuMs": 890.6
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 595644416,
+          "pv": 246669312,
+          "peakWs": 626282496,
+          "cpuMs": 74906.2
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66215936,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1500
+        }
+      ]
+    },
+    {
+      "tMs": 11550.6,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36085760,
+          "pv": 16924672,
+          "peakWs": 36405248,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 190967808,
+          "pv": 156131328,
+          "peakWs": 277274624,
+          "cpuMs": 2093.8
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 160706560,
+          "pv": 54259712,
+          "peakWs": 171995136,
+          "cpuMs": 2843.8
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52383744,
+          "pv": 22052864,
+          "peakWs": 53006336,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 88117248,
+          "pv": 36139008,
+          "peakWs": 89214976,
+          "cpuMs": 281.2
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43106304,
+          "pv": 16080896,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95858688,
+          "pv": 49713152,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176091136,
+          "pv": 154865664,
+          "peakWs": 177311744,
+          "cpuMs": 890.6
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 598282240,
+          "pv": 248737792,
+          "peakWs": 626282496,
+          "cpuMs": 79265.6
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66215936,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1500
+        }
+      ]
+    },
+    {
+      "tMs": 12103.8,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36085760,
+          "pv": 16924672,
+          "peakWs": 36405248,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 191561728,
+          "pv": 156561408,
+          "peakWs": 277274624,
+          "cpuMs": 2156.2
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 160731136,
+          "pv": 54280192,
+          "peakWs": 171995136,
+          "cpuMs": 3000
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52383744,
+          "pv": 22052864,
+          "peakWs": 53006336,
+          "cpuMs": 125
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 88588288,
+          "pv": 36769792,
+          "peakWs": 89214976,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43106304,
+          "pv": 16080896,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95858688,
+          "pv": 49713152,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 176001024,
+          "pv": 154800128,
+          "peakWs": 177311744,
+          "cpuMs": 890.6
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 596561920,
+          "pv": 248655872,
+          "peakWs": 626282496,
+          "cpuMs": 83484.4
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66220032,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1500
+        }
+      ]
+    },
+    {
+      "tMs": 12645.4,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36085760,
+          "pv": 16924672,
+          "peakWs": 36405248,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 191631360,
+          "pv": 156565504,
+          "peakWs": 277274624,
+          "cpuMs": 2156.2
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 160825344,
+          "pv": 54300672,
+          "peakWs": 171995136,
+          "cpuMs": 3015.6
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52383744,
+          "pv": 22052864,
+          "peakWs": 53006336,
+          "cpuMs": 125
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 88588288,
+          "pv": 36769792,
+          "peakWs": 89214976,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43114496,
+          "pv": 16084992,
+          "peakWs": 43147264,
+          "cpuMs": 296.9
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95858688,
+          "pv": 49713152,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 175071232,
+          "pv": 153870336,
+          "peakWs": 177311744,
+          "cpuMs": 890.6
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 603795456,
+          "pv": 261140480,
+          "peakWs": 626282496,
+          "cpuMs": 87765.6
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66220032,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1500
+        }
+      ]
+    },
+    {
+      "tMs": 13181.5,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36085760,
+          "pv": 16924672,
+          "peakWs": 36405248,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 193413120,
+          "pv": 158605312,
+          "peakWs": 277274624,
+          "cpuMs": 2203.1
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 160976896,
+          "pv": 54423552,
+          "peakWs": 171995136,
+          "cpuMs": 3125
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52383744,
+          "pv": 22052864,
+          "peakWs": 53006336,
+          "cpuMs": 125
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 89792512,
+          "pv": 37453824,
+          "peakWs": 89792512,
+          "cpuMs": 312.5
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43122688,
+          "pv": 16093184,
+          "peakWs": 43147264,
+          "cpuMs": 328.1
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95936512,
+          "pv": 49991680,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 175095808,
+          "pv": 153874432,
+          "peakWs": 177311744,
+          "cpuMs": 906.2
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 598360064,
+          "pv": 252252160,
+          "peakWs": 626450432,
+          "cpuMs": 91843.8
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66224128,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1500
+        }
+      ]
+    },
+    {
+      "tMs": 13738.5,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36085760,
+          "pv": 16924672,
+          "peakWs": 36405248,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 193781760,
+          "pv": 158752768,
+          "peakWs": 277274624,
+          "cpuMs": 2218.8
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 161034240,
+          "pv": 54427648,
+          "peakWs": 171995136,
+          "cpuMs": 3156.2
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52383744,
+          "pv": 22052864,
+          "peakWs": 53006336,
+          "cpuMs": 125
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 89804800,
+          "pv": 37453824,
+          "peakWs": 89804800,
+          "cpuMs": 312.5
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43122688,
+          "pv": 16093184,
+          "peakWs": 43147264,
+          "cpuMs": 359.4
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95936512,
+          "pv": 49991680,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 175095808,
+          "pv": 153874432,
+          "peakWs": 177311744,
+          "cpuMs": 906.2
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 601395200,
+          "pv": 261480448,
+          "peakWs": 626450432,
+          "cpuMs": 95796.9
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 66228224,
+          "pv": 68825088,
+          "peakWs": 161284096,
+          "cpuMs": 1531.2
+        }
+      ]
+    },
+    {
+      "tMs": 14278.9,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21749760,
+          "pv": 9826304,
+          "peakWs": 21749760,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 7176,
+          "ws": 36085760,
+          "pv": 16924672,
+          "peakWs": 36405248,
+          "cpuMs": 109.4
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 194945024,
+          "pv": 160387072,
+          "peakWs": 277274624,
+          "cpuMs": 2250
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 161116160,
+          "pv": 54444032,
+          "peakWs": 171995136,
+          "cpuMs": 3203.1
+        },
+        {
+          "group": "browser",
+          "pid": 11980,
+          "ws": 52383744,
+          "pv": 22052864,
+          "peakWs": 53006336,
+          "cpuMs": 125
+        },
+        {
+          "group": "browser",
+          "pid": 13908,
+          "ws": 89903104,
+          "pv": 37453824,
+          "peakWs": 89903104,
+          "cpuMs": 343.8
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43126784,
+          "pv": 16097280,
+          "peakWs": 43147264,
+          "cpuMs": 359.4
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 95936512,
+          "pv": 49991680,
+          "peakWs": 97361920,
+          "cpuMs": 421.9
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 175091712,
+          "pv": 153874432,
+          "peakWs": 177311744,
+          "cpuMs": 906.2
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 598425600,
+          "pv": 251252736,
+          "peakWs": 626450432,
+          "cpuMs": 99734.4
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 64090112,
+          "pv": 66830336,
+          "peakWs": 161284096,
+          "cpuMs": 1531.2
+        }
+      ]
+    },
+    {
+      "tMs": 14812.3,
+      "procs": [
+        {
+          "group": "browser",
+          "pid": 5532,
+          "ws": 21860352,
+          "pv": 9830400,
+          "peakWs": 21860352,
+          "cpuMs": 62.5
+        },
+        {
+          "group": "browser",
+          "pid": 8860,
+          "ws": 194965504,
+          "pv": 160387072,
+          "peakWs": 277274624,
+          "cpuMs": 2265.6
+        },
+        {
+          "group": "browser",
+          "pid": 11760,
+          "ws": 162627584,
+          "pv": 55119872,
+          "peakWs": 171995136,
+          "cpuMs": 3234.4
+        },
+        {
+          "group": "browser",
+          "pid": 16552,
+          "ws": 10743808,
+          "pv": 2424832,
+          "peakWs": 10743808,
+          "cpuMs": 31.2
+        },
+        {
+          "group": "browser",
+          "pid": 17156,
+          "ws": 43180032,
+          "pv": 16097280,
+          "peakWs": 43180032,
+          "cpuMs": 359.4
+        },
+        {
+          "group": "browser",
+          "pid": 20700,
+          "ws": 11800576,
+          "pv": 2678784,
+          "peakWs": 11800576,
+          "cpuMs": 46.9
+        },
+        {
+          "group": "browser",
+          "pid": 21956,
+          "ws": 96145408,
+          "pv": 50110464,
+          "peakWs": 97361920,
+          "cpuMs": 468.8
+        },
+        {
+          "group": "browser",
+          "pid": 30492,
+          "ws": 175013888,
+          "pv": 153870336,
+          "peakWs": 177311744,
+          "cpuMs": 906.2
+        },
+        {
+          "group": "model",
+          "pid": 33564,
+          "ws": 598425600,
+          "pv": 251252736,
+          "peakWs": 626450432,
+          "cpuMs": 99953.1
+        },
+        {
+          "group": "launcher",
+          "pid": 17372,
+          "ws": 63037440,
+          "pv": 66670592,
+          "peakWs": 161284096,
+          "cpuMs": 1531.2
+        }
+      ]
+    }
+  ],
+  "jsHeap": {
+    "clock": "ms since the browser launch began",
+    "offscreen": [
+      {
+        "tMs": 1152.6,
+        "usedBytes": 1931928,
+        "totalBytes": 2621440
+      },
+      {
+        "tMs": 1689.7,
+        "usedBytes": 4254372,
+        "totalBytes": 6713344
+      },
+      {
+        "tMs": 2314.9,
+        "usedBytes": 4469400,
+        "totalBytes": 6713344
+      },
+      {
+        "tMs": 2820,
+        "usedBytes": 4502296,
+        "totalBytes": 6713344
+      },
+      {
+        "tMs": 3327.3,
+        "usedBytes": 4537252,
+        "totalBytes": 6975488
+      },
+      {
+        "tMs": 3835.5,
+        "usedBytes": 4570148,
+        "totalBytes": 6975488
+      },
+      {
+        "tMs": 4345,
+        "usedBytes": 5125612,
+        "totalBytes": 7237632
+      },
+      {
+        "tMs": 4852,
+        "usedBytes": 5158508,
+        "totalBytes": 7237632
+      },
+      {
+        "tMs": 5358.9,
+        "usedBytes": 5418716,
+        "totalBytes": 7499776
+      },
+      {
+        "tMs": 5867.5,
+        "usedBytes": 4853492,
+        "totalBytes": 6451200
+      },
+      {
+        "tMs": 6373.6,
+        "usedBytes": 5063156,
+        "totalBytes": 6451200
+      },
+      {
+        "tMs": 6877,
+        "usedBytes": 4970716,
+        "totalBytes": 7499776
+      },
+      {
+        "tMs": 7388.3,
+        "usedBytes": 5005668,
+        "totalBytes": 7499776
+      },
+      {
+        "tMs": 7895,
+        "usedBytes": 5038564,
+        "totalBytes": 7499776
+      },
+      {
+        "tMs": 8397.8,
+        "usedBytes": 5411300,
+        "totalBytes": 7761920
+      },
+      {
+        "tMs": 8902.6,
+        "usedBytes": 5444196,
+        "totalBytes": 7761920
+      },
+      {
+        "tMs": 9409.8,
+        "usedBytes": 5647332,
+        "totalBytes": 8024064
+      },
+      {
+        "tMs": 9918.7,
+        "usedBytes": 5903080,
+        "totalBytes": 8286208
+      },
+      {
+        "tMs": 10424.7,
+        "usedBytes": 6387492,
+        "totalBytes": 8548352
+      },
+      {
+        "tMs": 10932.6,
+        "usedBytes": 6484408,
+        "totalBytes": 8810496
+      },
+      {
+        "tMs": 11448.5,
+        "usedBytes": 6519360,
+        "totalBytes": 8810496
+      },
+      {
+        "tMs": 11956.3,
+        "usedBytes": 6884616,
+        "totalBytes": 9072640
+      },
+      {
+        "tMs": 12466.2,
+        "usedBytes": 6917512,
+        "totalBytes": 9072640
+      },
+      {
+        "tMs": 12975,
+        "usedBytes": 7012076,
+        "totalBytes": 9072640
+      },
+      {
+        "tMs": 13482.2,
+        "usedBytes": 7134344,
+        "totalBytes": 9334784
+      },
+      {
+        "tMs": 13991.7,
+        "usedBytes": 7317468,
+        "totalBytes": 9334784
+      }
+    ],
+    "serviceWorker": [
+      {
+        "tMs": 1152.6,
+        "usedBytes": 686980,
+        "totalBytes": 1048576
+      },
+      {
+        "tMs": 1689.7,
+        "usedBytes": 948500,
+        "totalBytes": 2097152
+      },
+      {
+        "tMs": 2314.9,
+        "usedBytes": 1157592,
+        "totalBytes": 2359296
+      },
+      {
+        "tMs": 2820,
+        "usedBytes": 1324152,
+        "totalBytes": 2359296
+      },
+      {
+        "tMs": 3327.3,
+        "usedBytes": 827576,
+        "totalBytes": 2097152
+      },
+      {
+        "tMs": 3835.5,
+        "usedBytes": 993000,
+        "totalBytes": 2359296
+      },
+      {
+        "tMs": 4345,
+        "usedBytes": 1382140,
+        "totalBytes": 2883584
+      },
+      {
+        "tMs": 4852,
+        "usedBytes": 956200,
+        "totalBytes": 2621440
+      },
+      {
+        "tMs": 5358.9,
+        "usedBytes": 1149840,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 5867.5,
+        "usedBytes": 1423800,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 6373.6,
+        "usedBytes": 1684408,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 6877,
+        "usedBytes": 1824388,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 7388.3,
+        "usedBytes": 1990188,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 7895,
+        "usedBytes": 1444624,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 8397.8,
+        "usedBytes": 1792496,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 8902.6,
+        "usedBytes": 1954264,
+        "totalBytes": 4456448
+      },
+      {
+        "tMs": 9409.8,
+        "usedBytes": 2880472,
+        "totalBytes": 5242880
+      },
+      {
+        "tMs": 9918.7,
+        "usedBytes": 1617444,
+        "totalBytes": 5767168
+      },
+      {
+        "tMs": 10424.7,
+        "usedBytes": 1784280,
+        "totalBytes": 7077888
+      },
+      {
+        "tMs": 10932.6,
+        "usedBytes": 1953540,
+        "totalBytes": 7077888
+      },
+      {
+        "tMs": 11448.5,
+        "usedBytes": 2122032,
+        "totalBytes": 7077888
+      },
+      {
+        "tMs": 11956.3,
+        "usedBytes": 2465388,
+        "totalBytes": 7077888
+      },
+      {
+        "tMs": 12466.2,
+        "usedBytes": 2626524,
+        "totalBytes": 7077888
+      },
+      {
+        "tMs": 12975,
+        "usedBytes": 2520880,
+        "totalBytes": 7340032
+      },
+      {
+        "tMs": 13482.2,
+        "usedBytes": 2746716,
+        "totalBytes": 7340032
+      },
+      {
+        "tMs": 13991.7,
+        "usedBytes": 3011908,
+        "totalBytes": 7340032
+      }
+    ]
+  }
+}

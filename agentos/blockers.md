@@ -91,19 +91,6 @@ documentation asserting a thing is fixed is not evidence that it is fixed.
 | **Interim mitigation** | Every CI job is reproduced locally on each PR head and the verbatim output is posted as a PR comment, so a reviewer has the evidence even while the hosted run is held. **This is a substitute for visibility, not for CI**, and it is not represented as a passing hosted run anywhere. |
 | **Explicitly not done** | No attempt to route around the permission model, no use of a second identity to obtain access it does not have, and **no PR reported as merged that was not merged**. |
 
-### B-05 · `main` has no branch protection, and `agentos/state.md` claims otherwise
-
-| Field | Value |
-|---|---|
-| **Status** | `OPEN` |
-| **Owner** | Human — repository owner (`ronitsaha11`) |
-| **Dependency** | Repository settings; requires admin |
-| **Impact** | **Major.** `docs/operations/git-workflow.md` §2 says *"`main` is protected and release-quality"* and PR #1 adds a line to `agentos/state.md` asserting *"protected: PRs required, force-push and deletion blocked, `Governance and secret hygiene` a required check"*. **None of that is configured.** A claimed control that does not exist is worse than a known absent one, because reviewers stop checking. The same `state.md` line also calls the repository **private**; it is **public**. |
-| **Evidence** | `gh api repos/ronitsaha11/pratibimb/branches/main/protection` → **HTTP 404 Not Found**. `gh repo view --json isPrivate,visibility` → `{"isPrivate":false,"visibility":"PUBLIC"}`. |
-| **Resolution path** | Owner enables branch protection on `main` (require a PR, require the `Governance and secret hygiene` check, block force-push and deletion) **and** the two false claims in `state.md` are corrected in a follow-up PR once PR #1 merges. |
-| **Update 2026-09-07** | PR #1 was merged at `2fb4e82` with the two false claims still in it, so they reached `main`. They are now corrected forward in a follow-up PR — the original wording stays in the file's history, and the correction says what was wrong and how it was verified. **The documentation half is therefore closing. The substantive half is not: `main` is still unprotected**, and that needs admin. Re-verified after the merges: `gh api repos/ronitsaha11/pratibimb/branches/main/protection` → **404**. |
-| **Explicitly not done** | The claims were **not** corrected by rewriting PR #1's branch or its merged commits. Forward-moving correction only, per `docs/operations/git-workflow.md` §5. |
-
 ### B-06 · Line endings are unmanaged; a `.sh` file committed from Windows will break CI
 
 | Field | Value |
@@ -118,6 +105,23 @@ documentation asserting a thing is fixed is not evidence that it is fixed.
 ---
 
 ## Resolved
+
+### B-05 · `main` has no branch protection, and `agentos/state.md` claims otherwise
+
+| Field | Value |
+|---|---|
+| **Status** | `RESOLVED` 2026-10-23 (UTC) — moved here from Active |
+| **Owner** | Human — repository owner (`ronitsaha11`) |
+| **Dependency** | Repository settings; requires admin |
+| **Impact** | **Major.** `docs/operations/git-workflow.md` §2 says *"`main` is protected and release-quality"* and PR #1 adds a line to `agentos/state.md` asserting *"protected: PRs required, force-push and deletion blocked, `Governance and secret hygiene` a required check"*. **None of that is configured.** A claimed control that does not exist is worse than a known absent one, because reviewers stop checking. The same `state.md` line also calls the repository **private**; it is **public**. |
+| **Evidence** | `gh api repos/ronitsaha11/pratibimb/branches/main/protection` → **HTTP 404 Not Found**. `gh repo view --json isPrivate,visibility` → `{"isPrivate":false,"visibility":"PUBLIC"}`. |
+| **Resolution path** | Owner enables branch protection on `main` (require a PR, require the `Governance and secret hygiene` check, block force-push and deletion) **and** the two false claims in `state.md` are corrected in a follow-up PR once PR #1 merges. |
+| **Update 2026-09-07** | PR #1 was merged at `2fb4e82` with the two false claims still in it, so they reached `main`. They are now corrected forward in a follow-up PR — the original wording stays in the file's history, and the correction says what was wrong and how it was verified. **The documentation half is therefore closing. The substantive half is not: `main` is still unprotected**, and that needs admin. Re-verified after the merges: `gh api repos/ronitsaha11/pratibimb/branches/main/protection` → **404**. |
+| **Explicitly not done** | The claims were **not** corrected by rewriting PR #1's branch or its merged commits. Forward-moving correction only, per `docs/operations/git-workflow.md` §5. |
+| **Update 2026-10-23 — resolved, with evidence** | `main` is now protected. `gh api repos/ronitsaha11/pratibimb/branches/main/protection` → **HTTP 200**: a pull request is required (0 approvals), `Governance and secret hygiene` is a required check in strict mode (the branch must be up to date), and force-push and deletion are blocked. Recorded in [`artifacts/governance/B-05-main-branch-protection-2026-10-23.json`](../artifacts/governance/B-05-main-branch-protection-2026-10-23.json). Every merge from #85 to #90 went through it. **Residual, stated rather than hidden:** `enforce_admins` is **off**, so an administrator can still bypass the rule. The repository is still **public**. |
+
+
+---
 
 ### B-00 · Workspace was not a git repository
 
@@ -135,7 +139,7 @@ Recorded so they are not re-raised:
 
 | Item | Why it is not a blocker |
 |---|---|
-| No product code exists | Intended. CI actively asserts `apps/` and `packages/` do not exist during the spike phase. |
+| No product code exists | **Superseded.** True during the spike phase; product code has existed since ADR-0001 (2026-09-10), and M20 (2026-10-23 UTC) made it runnable from a clean checkout. Kept as a record of the earlier phase. |
 | 20 feasibility cells `UNKNOWN` | Intended. They are filled by S-08…S-27, and nothing has been claimed about them. |
 | Playwright's browser CDN returns HTTP 400 here | An obstacle to *local* egress-suite runs on one workstation, not to the project. Recorded in `W1-S01b/environment.json`; folded into B-02's evidence. |
 | Chrome 152 refuses `--load-extension` | A measured browser behaviour, recorded in S-01 and reproduced in S-01b. It constrains tooling choices; it does not stop defined work. |
