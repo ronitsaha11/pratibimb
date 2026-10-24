@@ -7,6 +7,51 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 ## [Unreleased]
 
 ### Added
+- **M20 — a runnable product, measured.**
+  - **`npm run reasoner`** (`scripts/reasoner/`): a product-owned launcher for the pinned local
+    reasoner.
+    - It verifies the model's size and full SHA-256, the llama.cpp b10956 archive's SHA-256, and
+      every installed `.exe`/`.dll` against that archive.
+    - It binds 127.0.0.1 only and serves exactly the CSP's endpoint,
+      `http://127.0.0.1:8995/v1/chat/completions`.
+    - It refuses web-page origins, a foreign Host, other paths and methods, non-JSON, oversized
+      bodies, and value-shaped text (the shared server tripwire, now in
+      `scripts/reasoner/tripwire.mjs`).
+    - It logs a line per request and never a body.
+    - On a busy port it says so and stops nothing.
+    - `--check` verifies and exits; `--stop` stops only the processes it recorded, model first,
+      after checking each is still its own.
+  - **`RunRecord.events`**: every run's value-free event trail, in order, on the monotonic clock:
+    - task start, observation, handoff verified, plan requested and received, plan validated;
+    - clarification and consent requested and answered, binder revalidated, value restored, page
+      refreshed;
+    - click authorised, dispatched or failed; result observed and verified; run ended.
+
+    `RUN_ENDED` carries the verifier's answer, so `DONE` is never read as success.
+    `RunTimings` and `Transition.elapsedMs` now use the monotonic clock (`RunOptions.monotonic`,
+    default `performance.now()`), kept to 0.01 ms.
+  - **Side panel timings** (`timingRows`, `#task-timings`): each turn's measured stages in pipeline
+    order, in ms.
+    - "not measured" is distinct from 0.
+    - A person's waiting time is labelled as theirs.
+    - Each turn is headed by what it actually did.
+    - Rendered with `textContent` only.
+  - **W1 benchmark of the shipped path** (`tests/browser/extension/run-product-benchmark.mjs` →
+    `artifacts/benchmarks/M20-w1-product/`).
+    - Measured: per-stage p50/p95 (nearest rank, raw samples kept), cold vs warm, peak working set
+      and private bytes and CPU per process group, JS heap, sizes on disk, tier firing, and
+      network-free steps.
+    - Workload: 6 bounded tasks, 15 steps. The 5-turn cap is not raised.
+  - **Human-in-the-loop smoke test on the product launcher**
+    (`tests/browser/extension/run-product-smoke.mjs`).
+    - It requires the person's own `npm run reasoner` and records each run's event trail and timings.
+    - It writes a new record per run and never overwrites one.
+    - Ctrl+C shuts down safely.
+  - **Docs:** `README.md` status and run instructions; `agentos/state.md` current state;
+    B-05 resolved with evidence.
+  - **Not changed:** CSP, manifest permissions, the model pin, the single endpoint, gates, ADRs,
+    frozen schemas, the 5-turn cap, and consent or grant timing. J7/B5 and D1–D4 remain open.
+    Production frame egress remains blocked.
 - **M14 — stage 12, "repeat, or stop and ask"** (constitution §1). A task can now take more than one
   turn. `runTaskLoop` (`@pratibimb/orchestrator`, `src/loop.ts`) runs each turn as one complete
   `runTask`, through every gate:
