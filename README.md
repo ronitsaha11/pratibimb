@@ -43,7 +43,12 @@ What runs today, on Windows x64 (W1), against **synthetic pages on `127.0.0.1` o
   locally, replaces every stored value with a typed reference, and sends only that sanitized,
   verified handoff to the reasoner.
 - **Local reasoner.** Qwen2.5-0.5B-Instruct (Q4_K_M) under llama.cpp b10956, started by
-  `npm run reasoner` and reachable only on the extension's one permitted endpoint.
+  `npm run reasoner`. Both of its ports are bound to 127.0.0.1. That keeps other machines out, but
+  not local processes or web pages in your browser, so each port has its own guard:
+  - **8995, the extension's one permitted endpoint:** accepts only the extension's origin, its own
+    Host and the one path.
+  - **8977, the model server:** answers only requests carrying a key generated at each launch,
+    which only the launcher's front holds.
 - **Every model plan stays untrusted.** It is parsed, validated, re-checked by the privacy binder,
   and refreshed before anything happens. A stored value is restored only after the person allows
   that one restoration in the side panel. A click goes through the execution gate and is verified
@@ -105,7 +110,9 @@ npm run reasoner
 
 It prints `ready: http://127.0.0.1:8995/v1/chat/completions`. If the model or runtime on disk is not
 exactly what [`scripts/reasoner/pin.json`](scripts/reasoner/pin.json) pins, it refuses to start and
-says why (exit 2). If port 8995 or 8977 is busy, it says so and stops nothing. Ctrl+C stops it;
+says why (exit 2). If port 8995 or 8977 is busy, it says so and stops nothing. The model server
+behind it on 8977 requires a key generated for this launch and never shown; if it does not refuse a
+request without that key, the launcher stops it and refuses to start. Ctrl+C stops it;
 from another terminal, `npm run reasoner:stop` stops an instance it started, after checking each
 process is still its own.
 

@@ -34,7 +34,7 @@ involved**. Its wait is `grantMs` (polled every 20 ms). It is excluded from `mac
 | Machine | W1 `LAPTOP-6E14K34L`: Intel Core 7 240H, 16 logical cores, 25.4 GB RAM, Windows 10.0.26300 |
 | Browser | Chrome for Testing **153.0.8010.12**, headed |
 | Extension | Product build. CSP `connect-src 'self' http://127.0.0.1:8995/v1/chat/completions`. Permissions unchanged. |
-| Reasoner backend | llama.cpp **b10956 CPU x64**, `-c 4096 -t 8 --no-webui`. Qwen2.5-0.5B-Instruct Q4_K_M @ `9217f5db79a2`, SHA-256 `74a4da8c…d7a9db`, verified in full by the launcher. |
+| Reasoner backend | llama.cpp **b10956 CPU x64**, `-c 4096 -t 8 --no-webui`. The tables below were recorded before the B1 fix (PR #91 review), when the model server had no key and its slots endpoint was on. It now requires a per-launch key and runs with `--no-slots`. The post-fix runs are listed under "Runs in this directory". Qwen2.5-0.5B-Instruct Q4_K_M @ `9217f5db79a2`, SHA-256 `74a4da8c…d7a9db`, verified in full by the launcher. |
 | Perception in this workload | DOM/text structure only. Without the person's toolbar gesture the product build captures no frame (ADR-0009), and this harness makes none: all 33 visual passes were refused `NO_ACTIVE_TAB_GRANT`. |
 | Node | v24.19.0 |
 
@@ -128,10 +128,20 @@ DOM/text structure observations: 33. Structure reads: 9. Visual perception passe
 |---|---|
 | `20261023T203123Z` | Complete, **but the browser group was not measured**: the harness passed the browser path with forward slashes, and Windows reports image paths with backslashes, so no Chrome process matched. Fixed in the harness (`resolve`). Kept as written. |
 | `20261023T203221Z` | Complete and valid. Its record does not say where the cold task's 3 non-endpoint requests went. |
-| **`20261023T203520Z`** | **Reference.** Adds the origins of non-endpoint requests (origin only). |
+| **`20261023T203520Z`** | **Reference for the tables above.** Adds the origins of non-endpoint requests (origin only). Model server **without** a key (before B1). |
+| `20261024T004816Z` | After the B1 fix (keyed model server, `--no-slots`): complete, 6/6. **Its backend label is wrong**: it was built from `pin.json` and omits `--no-slots` and the key. Fixed in the harness. Kept as written. |
+| **`20261024T004941Z`** | **After the B1 fix, correctly labelled:** `-c 4096 -t 8 --no-webui --no-slots`, per-launch key (never recorded). Complete, 6/6, 15 steps. |
 
-All three agree within run-to-run noise on every stage figure (warm `sendMs` p50 442.8 / 440.8 /
-438.0 ms).
+The three pre-fix runs agree within run-to-run noise on every stage figure (warm `sendMs` p50
+442.8 / 440.8 / 438.0 ms).
+
+The two post-fix runs measured warm `sendMs` p50 507.8 and 476.4 ms. Warm step totals were p50
+520.5 and 488.2 ms, and p95 1606.2 and 1503.4 ms. All of these are higher than before.
+
+**This difference is not attributed.** The key adds one header comparison per request to the model
+server. The post-fix runs came hours later, on a machine that had been under load. Two runs on each
+side cannot separate the two causes. The tables above stay the pre-fix reference; a like-for-like
+comparison would need interleaved runs on a rested machine.
 
 ## Not comparable with the projected budgets
 

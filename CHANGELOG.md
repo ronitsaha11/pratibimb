@@ -49,6 +49,13 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` Â
     - Ctrl+C shuts down safely.
   - **Docs:** `README.md` status and run instructions; `agentos/state.md` current state;
     B-05 resolved with evidence.
+  - **The model server on 8977 is locked (B1, PR #91 review).** Loopback binding alone had left it
+    open to any local process and, through its default all-origins CORS, to web pages.
+    - It now requires a per-launch 256-bit key, given only through the child's environment and
+      attached only by the front, which never forwards incoming headers.
+    - It runs with `--no-slots`.
+    - The launcher refuses to start unless the server refuses keyless and wrong-keyed requests and
+      reports `/slots` off.
   - **Not changed:** CSP, manifest permissions, the model pin, the single endpoint, gates, ADRs,
     frozen schemas, the 5-turn cap, and consent or grant timing. J7/B5 and D1â€“D4 remain open.
     Production frame egress remains blocked.

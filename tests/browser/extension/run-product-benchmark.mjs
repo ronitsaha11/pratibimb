@@ -35,6 +35,7 @@ import { cpus, release as osRelease, tmpdir, totalmem } from "node:os";
 import { createInterface } from "node:readline";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
+import { upstreamArgs } from "../../../scripts/reasoner/upstream.mjs";
 import { Cdp } from "../support/cdp-offscreen.mjs";
 import { resourcePeaks, stageTable, summarise } from "../support/bench-stats.mjs";
 import { createTimeline, leaksIn, projectTurn, runIdOf, writeNewRecord } from "../support/smoke-record.mjs";
@@ -333,7 +334,16 @@ const record = {
     memoryBytes: totalmem(),
     browser: { binary: basename(executablePath), version: browserVersion, headed: true },
     extension: { build: "product (no evidence flags)", csp: manifest.content_security_policy?.extension_pages ?? null, permissions: manifest.permissions },
-    reasoner: { backend: `llama.cpp ${PIN.runtime.build} CPU (x64), ${PIN.upstream.args.join(" ")}`, model: `${PIN.model.repo} ${PIN.model.file} @ ${PIN.model.revision.slice(0, 12)}`, sha256: PIN.model.sha256, endpoint: ENDPOINT },
+    // The arguments the launcher actually passes (minus model path and address), and how the model
+    // server is locked. Built from `upstreamArgs`, not `pin.json`: run 20261024T004816Z's label came
+    // from the pin and so omitted `--no-slots` and the key.
+    reasoner: {
+      backend: `llama.cpp ${PIN.runtime.build} CPU (x64), ${upstreamArgs("<model>", PIN).slice(6).join(" ")}`,
+      modelServer: "per-launch key via LLAMA_API_KEY (never recorded); slots endpoint disabled",
+      model: `${PIN.model.repo} ${PIN.model.file} @ ${PIN.model.revision.slice(0, 12)}`,
+      sha256: PIN.model.sha256,
+      endpoint: ENDPOINT,
+    },
     perception: "DOM/text structure only in this workload: the product build captures no frame without the person's toolbar gesture (ADR-0009), and this harness makes none",
     node: process.version,
     date: startedAt.toISOString(),

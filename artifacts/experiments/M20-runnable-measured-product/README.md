@@ -75,6 +75,55 @@ produced by [`harness/launcher-lifecycle.mjs`](harness/launcher-lifecycle.mjs). 
 
 Cold start in that run, measured: verify 651 ms, model load 3169 ms, total 3839 ms.
 
+#### 1b. The model server's lock (B1, found in the PR #91 review) — PASS
+
+Re-run after the fix:
+[`logs/w1-launcher-lifecycle-20261024T004450Z.json`](logs/w1-launcher-lifecycle-20261024T004450Z.json),
+13 of 13 checks.
+
+**What was wrong.** The checks in section 1 guard the front on 8995. The model server on 8977 had
+no key. The pinned b10956 build answers CORS for every origin (`--cors-origins` defaults to `*`)
+and exposes `/slots` by default; both are from its own `--help`. Loopback binding keeps other
+machines out, and nothing more. Any local process, or a web page in the person's browser, could
+reach it directly, bypassing the front.
+
+**The fix** (`scripts/reasoner/upstream.mjs`):
+- **A per-launch key.** It is 256 bits from the OS's secure source and reaches the child only
+  through `LLAMA_API_KEY` in its environment, with every other inherited `LLAMA_*` variable
+  removed.
+- **The front attaches the key itself.** It forwards the path and the body only, so no incoming
+  header reaches the model.
+- **`--no-slots`.**
+- **Fail closed.** After the model server is healthy, the launcher checks that it refuses a keyless
+  and a wrong-keyed request and reports `/slots` off. Otherwise it stops the server and refuses to
+  start.
+- **Never printed or stored.** The key is not printed, logged, written to the state file or put in
+  an error message.
+
+**Measured on the pinned binary:**
+
+| Request | Status |
+|---|---|
+| Inference without the key, also with a web origin | 401 |
+| Inference with a wrong key | 401 |
+| `/slots` without the key | 401 |
+| `/slots` with the key | 501 |
+| `/health` | 200 (public) |
+
+- **An unkeyed server is refused.** Started without the key, the same binary answers anyone (200),
+  and the launcher's lock check refuses it.
+- **No key leaked.** No 43-character base64url token appears in anything the launcher printed,
+  its state file, or any test output. The scan detects 1000 of 1000 real keys.
+
+**The person-run smoke test (section 3) ran before the fix,** with the earlier, unkeyed model
+server, and was not repeated. The front, the endpoint, the CSP and the extension are unchanged, so
+its verdict describes the same client path, but it is a record of the earlier server configuration.
+
+**The benchmark was re-run after the fix.** Two runs completed 6/6 tasks and 15 steps through the
+keyed model server, which shows the product path works with the key. Their warm reasoner time is
+higher than the pre-fix runs (p50 507.8 and 476.4 against 438.0–442.8 ms). That difference is
+**not attributed**; see the benchmark README. The section 2 figures remain the pre-fix reference.
+
 **Found and fixed while building this: stop order.** `--stop` first stopped the launcher, then the
 model. On Windows, `process.kill` ends the launcher outright and its signal handlers do not run.
 `--stop` now stops the model first, and the launcher follows it down (`reasoner.mjs`, `stopRecorded`).

@@ -1,0 +1,102 @@
+{
+  "experiment": "M20 — product reasoner launcher lifecycle",
+  "runId": "20261024T004450Z",
+  "verdict": "PASS",
+  "launcher": "node scripts/reasoner/reasoner.mjs (what `npm run reasoner` runs)",
+  "pin": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF qwen2.5-0.5b-instruct-q4_k_m.gguf @ 9217f5db79a29953eb74d5343926648285ec7e67",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956",
+    "endpoint": "http://127.0.0.1:8995/v1/chat/completions",
+    "upstream": "127.0.0.1:8977"
+  },
+  "coldStart": {
+    "label": "measured",
+    "verifyMs": 857,
+    "modelLoadMs": 1069,
+    "totalMs": 1958
+  },
+  "checks": {
+    "healthReportsThePin": true,
+    "modelServer": {
+      "inferenceWithoutKey": 401,
+      "inferenceWithoutKeyFromWebOrigin": 401,
+      "inferenceWithWrongKey": 401,
+      "slotsWithoutKey": 401,
+      "healthIsPublic": 200
+    },
+    "modelServerRefusesWithoutTheKey": true,
+    "stateFileHoldsOnlyProcesses": true,
+    "pinnedBinaryLockedAndUnkeyedRefused": true,
+    "inferenceThroughLocalModelReasoner": true,
+    "refusals": {
+      "webPageOrigin": 403,
+      "remoteOrigin": 403,
+      "rebindingHost": 421,
+      "otherPath": 404,
+      "getOnEndpoint": 405,
+      "notJson": 400,
+      "valueShapedText": 422
+    },
+    "everyRefusalAsSpecified": true,
+    "requestLogCarriesNoBody": true,
+    "secondStartRefused": true,
+    "firstStillServing": true,
+    "noProcessLeft": true,
+    "noListenerLeft": true,
+    "noStateFileLeft": true,
+    "noKeyShapedTokenInAnyOutput": true
+  },
+  "timeline": {
+    "clock": "monotonic, ms since the harness started",
+    "events": [
+      {
+        "event": "PORTS_FREE",
+        "atMs": 18.11
+      },
+      {
+        "event": "READY",
+        "atMs": 2073.86
+      },
+      {
+        "event": "MODEL_SERVER_LOCK_CHECKED",
+        "atMs": 2100.06,
+        "code": "PASS"
+      },
+      {
+        "event": "PINNED_BINARY_CHECKED",
+        "atMs": 5792.74,
+        "code": "PASS"
+      },
+      {
+        "event": "INFERENCE_CHECKED",
+        "atMs": 9683.9,
+        "code": "PASS"
+      },
+      {
+        "event": "REFUSALS_CHECKED",
+        "atMs": 9696.74,
+        "code": "PASS"
+      },
+      {
+        "event": "SECOND_START_REFUSED",
+        "atMs": 10531.26,
+        "code": "PASS"
+      },
+      {
+        "event": "STOPPED",
+        "atMs": 12042.79,
+        "code": "CLEAN"
+      }
+    ]
+  },
+  "recordedAt": "2026-10-24T00:45:03.021Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0"
+  }
+}
