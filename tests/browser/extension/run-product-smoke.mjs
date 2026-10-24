@@ -87,6 +87,27 @@ if (health?.service !== "pratibimb-reasoner" || health?.model?.sha256 !== PIN.mo
 }
 line.mark("REASONER_HEALTH_OK");
 
+// B1 (PR #91 review): the model server behind the front must be locked by its per-launch key. This
+// harness never learns the key; it knocks without one and must be refused, or it will not run.
+const upstreamStatus = async (method, path, body) => {
+  try {
+    const reply = await fetch(`http://${PIN.upstream.host}:${PIN.upstream.port}${path}`, { method, ...(body ? { headers: { "content-type": "application/json" }, body } : {}) });
+    await reply.arrayBuffer();
+    return reply.status;
+  } catch {
+    return null;
+  }
+};
+const modelServerLock = {
+  inferenceWithoutKey: await upstreamStatus("POST", "/v1/chat/completions", JSON.stringify({ messages: [{ role: "user", content: "probe" }], max_tokens: 1 })),
+  slotsWithoutKey: await upstreamStatus("GET", "/slots"),
+};
+if (health?.modelServer?.authentication !== "per-launch key" || modelServerLock.inferenceWithoutKey !== 401 || modelServerLock.slotsWithoutKey !== 401) {
+  console.error(`REFUSING: the model server on ${PIN.upstream.host}:${PIN.upstream.port} is not locked (${JSON.stringify(modelServerLock)}). Start the current launcher.`);
+  process.exit(2);
+}
+line.mark("MODEL_SERVER_LOCKED");
+
 console.log("building the PRODUCT extension (no evidence flags)…");
 execSync("npm run build", { cwd: APP, env: { ...process.env, TR01_PROBE: "", M3_WORKER_FRAME: "", STRUCTURAL_PROBE: "", E6_PROBE: "", EGRESS_EVIDENCE_PROBE: "" }, stdio: "pipe" });
 const manifest = JSON.parse(readFileSync(join(EXT, "manifest.json"), "utf8"));
@@ -114,6 +135,8 @@ const judge = (r) => {
     askedInThePanelNotTheControlPlane: r.consentsAsked === 1 && r.grantViaControlPlane?.asked === false,
     thePersonDeclaredTheExpectedResult: first?.declarationSource === "PERSON",
   };
+  // Across every turn: how many clicks the run itself authorised and dispatched.
+  const across = (name) => r.turns.flatMap((t) => t.events).filter((e) => e.event === name).length;
   if (r.scenario === "allow") {
     const order = ["CONSENT_REQUESTED", "CONSENT_ANSWERED", "BINDER_REVALIDATED", "VALUE_RESTORED", "PAGE_REFRESHED", "CLICK_AUTHORIZED", "CLICK_DISPATCHED", "RESULT_OBSERVED", "RESULT_VERIFIED"];
     return {
@@ -121,13 +144,14 @@ const judge = (r) => {
       allowedOnce: consent === "ALLOWED_ONCE",
       consentBeforeRestoreBeforeClickBeforeVerify: order.every((n) => at(n) >= 0) && order.every((n, i) => i === 0 || at(n) > at(order[i - 1])),
       restoredIntoTheField: r.page.confirmHolds === "REGISTERED",
+      agentAuthorisedAndDispatchedExactlyOneClick: across("CLICK_AUTHORIZED") === 1 && across("CLICK_DISPATCHED") === 1 && across("CLICK_DISPATCH_FAILED") === 0,
       clickVerifiedByThePage: first?.verification === "CONFIRMED" && r.page.submitDisabled === true,
     };
   }
   return {
     ...base,
     denied: consent === "CONSENT_DENIED",
-    nothingRestoredOrClicked: ["VALUE_RESTORED", "CLICK_AUTHORIZED", "CLICK_DISPATCHED"].every((n) => at(n) < 0),
+    nothingRestoredOrClicked: ["VALUE_RESTORED", "CLICK_AUTHORIZED", "CLICK_DISPATCHED"].every((n) => at(n) < 0) && across("CLICK_AUTHORIZED") === 0,
     nothingRestoredOrSubmitted: r.page.confirmHolds === "EMPTY" && r.page.submitClicks === 0,
   };
 };
@@ -147,7 +171,15 @@ const shutdown = onceOnly(async (reason) => {
     failure,
     scenarios: chosen,
     build: { flags: "none (product build)", csp: manifest.content_security_policy?.extension_pages ?? null, permissions: manifest.permissions },
-    reasoner: { startedBy: "the person, with `npm run reasoner`", endpoint: health.endpoint, model: health.model, runtime: health.runtime, coldStart: health.coldStart },
+    reasoner: {
+      startedBy: "outside this harness, with `npm run reasoner` (this harness never starts or stops it)",
+      endpoint: health.endpoint,
+      model: health.model,
+      runtime: health.runtime,
+      modelServer: health.modelServer ?? null,
+      modelServerLock,
+      coldStart: health.coldStart,
+    },
     browser: { binary: basename(executablePath), version: browserVersion },
     timeline: { clock: "monotonic, ms since the harness started", events: line.events },
     runEventClock: "each run's events and transitions: monotonic, ms since that run started (offscreen document clock)",
@@ -249,9 +281,13 @@ try {
           confirmHolds: v === "" ? "EMPTY" : v === registered ? "REGISTERED" : v === alternate ? "ALTERNATE" : "OTHER",
           submitDisabled: document.getElementById("submit")?.disabled ?? null,
           submitClicks: (window.__submitEvents ?? []).filter((e) => e.type === "click").length,
+          // Every pointer/mouse event the page saw on Submit, as the page logged it: type and
+          // coordinates only. Recorded, not interpreted: which ones the agent dispatched is in the
+          // run's own trail, and anything else stays unexplained.
+          submitEvents: (window.__submitEvents ?? []).map((e) => [e.type, e.x, e.y]),
         };
       }, { registered: REGISTERED, alternate: ALTERNATE })
-      .catch(() => ({ confirmHolds: "UNREADABLE", submitDisabled: null, submitClicks: null }));
+      .catch(() => ({ confirmHolds: "UNREADABLE", submitDisabled: null, submitClicks: null, submitEvents: null }));
     line.mark("PAGE_CHECKED", truth.confirmHolds);
     runs.push({
       scenario: name,
