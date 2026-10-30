@@ -1,0 +1,538 @@
+{
+  "experiment": "M21 — letterbox diagnostic: where labelled elements are lost as the screen's shape changes",
+  "classification": "ENGINEERING DIAGNOSTIC. Not a J7 experiment, not detector adoption evidence, not an accuracy claim. DEV synthetic screens only.",
+  "runId": "20261030T144553Z",
+  "fixtures": {
+    "generator": "@pratibimb/evaluation makeSpec/specToHtml (generator 1.0.0)",
+    "specs": "W1/Track B DEV specs: specIdFor(i), seedFor(i) = 20260913 + i, i = 0..19; viewport overridden per cell",
+    "split": "dev only; no TEST sample generated, rendered or scored",
+    "labels": "getBoundingClientRect of the rendered document; only labels wholly inside the viewport are attributed"
+  },
+  "heldFixed": "long side 1280 CSS px, DPR 1: 2.0 CSS px per model px in every cell",
+  "path": "Chromium PNG decode (createImageBitmap + canvas) → geometryFrom → preprocessToTensor → assertRasterMatchesInverse → ORT Web wasm → decodeHeadOutputAccounted → projectToCaptureAccounted → captureToCss",
+  "model": {
+    "modelId": "pratibimb-t1-ui-head",
+    "revision": "ba6d9e93695b",
+    "sha256": "ba6d9e93695b22d17d9dc2b8193966132af85a6a031b08eb453d1d20a05179d0",
+    "verified": "full SHA-256 and size, before the session was created"
+  },
+  "decode": {
+    "scoreFloor": 0.25,
+    "nmsIou": 0.5,
+    "maxDetections": 300,
+    "note": "the shipped decode, PROVISIONAL thresholds; not the 0.55 evaluation operating point"
+  },
+  "matching": "class-agnostic IoU > 0.5 (the frozen fusion threshold); class agreement counted separately",
+  "environment": {
+    "browser": "Chromium 153.0.8010.12 (headless; renders and decodes only)",
+    "ort": "onnxruntime-web 1.29.0 in Node, wasm, 1 thread",
+    "node": "v24.22.1"
+  },
+  "determinism": {
+    "cell": "landscape-16x9",
+    "sample": 0,
+    "sameOutputTwice": true
+  },
+  "cells": [
+    {
+      "id": "landscape-16x9",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "cssPerModelPx": 2,
+      "letterbox": {
+        "axis": "vertical (top and bottom)",
+        "continuousPad": {
+          "x": 0,
+          "y": 140
+        },
+        "rasterPad": {
+          "left": 0,
+          "top": 140,
+          "right": 0,
+          "bottom": 140
+        },
+        "contentShareOfSquare": 0.5625
+      },
+      "screens": 20,
+      "decode": {
+        "anchors": 128000,
+        "belowScore": 121535,
+        "nonPositiveExtent": 0,
+        "suppressedByNms": 5512,
+        "cappedByLimit": 0,
+        "kept": 953
+      },
+      "projection": {
+        "offered": 953,
+        "droppedInPadding": 0,
+        "degenerateAfterInverse": 0,
+        "insideContent": 771,
+        "clippedAtContentEdge": 182,
+        "boundedToFrame": 0
+      },
+      "validation": {
+        "unboundedBoxesOutsideFrame": 0,
+        "unboundedFrameRefused": 0,
+        "shippedBoxesOutsideFrame": 0,
+        "shippedFrameRefused": 0
+      },
+      "preprocessing": {
+        "sourceCropped": 0,
+        "padIntact": 20
+      },
+      "labels": {
+        "visible": 362,
+        "partial": 25,
+        "offscreen": 44,
+        "DETECTED": 350,
+        "LOST_IN_PROJECTION": 0,
+        "NOT_EMITTED": 12,
+        "classAgrees": 310,
+        "minSideModelPx": {
+          "DETECTED": {
+            "n": 350,
+            "p50": 14,
+            "p95": 18,
+            "min": 6.5,
+            "max": 20
+          },
+          "LOST_IN_PROJECTION": {
+            "n": 0,
+            "p50": null,
+            "p95": null,
+            "min": null,
+            "max": null
+          },
+          "NOT_EMITTED": {
+            "n": 12,
+            "p50": 8.77,
+            "p95": 10.13,
+            "min": 6.5,
+            "max": 10.13
+          }
+        }
+      }
+    },
+    {
+      "id": "landscape-16x10",
+      "viewport": {
+        "w": 1280,
+        "h": 800
+      },
+      "cssPerModelPx": 2,
+      "letterbox": {
+        "axis": "vertical (top and bottom)",
+        "continuousPad": {
+          "x": 0,
+          "y": 120
+        },
+        "rasterPad": {
+          "left": 0,
+          "top": 120,
+          "right": 0,
+          "bottom": 120
+        },
+        "contentShareOfSquare": 0.625
+      },
+      "screens": 20,
+      "decode": {
+        "anchors": 128000,
+        "belowScore": 121102,
+        "nonPositiveExtent": 0,
+        "suppressedByNms": 5913,
+        "cappedByLimit": 0,
+        "kept": 985
+      },
+      "projection": {
+        "offered": 985,
+        "droppedInPadding": 0,
+        "degenerateAfterInverse": 0,
+        "insideContent": 839,
+        "clippedAtContentEdge": 146,
+        "boundedToFrame": 0
+      },
+      "validation": {
+        "unboundedBoxesOutsideFrame": 0,
+        "unboundedFrameRefused": 0,
+        "shippedBoxesOutsideFrame": 0,
+        "shippedFrameRefused": 0
+      },
+      "preprocessing": {
+        "sourceCropped": 0,
+        "padIntact": 20
+      },
+      "labels": {
+        "visible": 386,
+        "partial": 25,
+        "offscreen": 20,
+        "DETECTED": 383,
+        "LOST_IN_PROJECTION": 0,
+        "NOT_EMITTED": 3,
+        "classAgrees": 340,
+        "minSideModelPx": {
+          "DETECTED": {
+            "n": 383,
+            "p50": 14,
+            "p95": 18,
+            "min": 6.5,
+            "max": 20
+          },
+          "LOST_IN_PROJECTION": {
+            "n": 0,
+            "p50": null,
+            "p95": null,
+            "min": null,
+            "max": null
+          },
+          "NOT_EMITTED": {
+            "n": 3,
+            "p50": 7.5,
+            "p95": 8.77,
+            "min": 6.5,
+            "max": 8.77
+          }
+        }
+      }
+    },
+    {
+      "id": "landscape-2x1",
+      "viewport": {
+        "w": 1280,
+        "h": 640
+      },
+      "cssPerModelPx": 2,
+      "letterbox": {
+        "axis": "vertical (top and bottom)",
+        "continuousPad": {
+          "x": 0,
+          "y": 160
+        },
+        "rasterPad": {
+          "left": 0,
+          "top": 160,
+          "right": 0,
+          "bottom": 160
+        },
+        "contentShareOfSquare": 0.5
+      },
+      "screens": 20,
+      "decode": {
+        "anchors": 128000,
+        "belowScore": 121947,
+        "nonPositiveExtent": 0,
+        "suppressedByNms": 5203,
+        "cappedByLimit": 0,
+        "kept": 850
+      },
+      "projection": {
+        "offered": 850,
+        "droppedInPadding": 0,
+        "degenerateAfterInverse": 0,
+        "insideContent": 707,
+        "clippedAtContentEdge": 143,
+        "boundedToFrame": 0
+      },
+      "validation": {
+        "unboundedBoxesOutsideFrame": 0,
+        "unboundedFrameRefused": 0,
+        "shippedBoxesOutsideFrame": 0,
+        "shippedFrameRefused": 0
+      },
+      "preprocessing": {
+        "sourceCropped": 0,
+        "padIntact": 20
+      },
+      "labels": {
+        "visible": 318,
+        "partial": 39,
+        "offscreen": 74,
+        "DETECTED": 315,
+        "LOST_IN_PROJECTION": 0,
+        "NOT_EMITTED": 3,
+        "classAgrees": 290,
+        "minSideModelPx": {
+          "DETECTED": {
+            "n": 315,
+            "p50": 13.5,
+            "p95": 17,
+            "min": 6.5,
+            "max": 20
+          },
+          "LOST_IN_PROJECTION": {
+            "n": 0,
+            "p50": null,
+            "p95": null,
+            "min": null,
+            "max": null
+          },
+          "NOT_EMITTED": {
+            "n": 3,
+            "p50": 7.5,
+            "p95": 8.77,
+            "min": 6.5,
+            "max": 8.77
+          }
+        }
+      }
+    },
+    {
+      "id": "square",
+      "viewport": {
+        "w": 1280,
+        "h": 1280
+      },
+      "cssPerModelPx": 2,
+      "letterbox": {
+        "axis": "none",
+        "continuousPad": {
+          "x": 0,
+          "y": 0
+        },
+        "rasterPad": {
+          "left": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "contentShareOfSquare": 1
+      },
+      "screens": 20,
+      "decode": {
+        "anchors": 128000,
+        "belowScore": 121155,
+        "nonPositiveExtent": 0,
+        "suppressedByNms": 5857,
+        "cappedByLimit": 0,
+        "kept": 988
+      },
+      "projection": {
+        "offered": 988,
+        "droppedInPadding": 0,
+        "degenerateAfterInverse": 0,
+        "insideContent": 825,
+        "clippedAtContentEdge": 163,
+        "boundedToFrame": 0
+      },
+      "validation": {
+        "unboundedBoxesOutsideFrame": 0,
+        "unboundedFrameRefused": 0,
+        "shippedBoxesOutsideFrame": 0,
+        "shippedFrameRefused": 0
+      },
+      "preprocessing": {
+        "sourceCropped": 0,
+        "padIntact": 20
+      },
+      "labels": {
+        "visible": 391,
+        "partial": 20,
+        "offscreen": 20,
+        "DETECTED": 386,
+        "LOST_IN_PROJECTION": 0,
+        "NOT_EMITTED": 5,
+        "classAgrees": 345,
+        "minSideModelPx": {
+          "DETECTED": {
+            "n": 386,
+            "p50": 14,
+            "p95": 18,
+            "min": 6.5,
+            "max": 20
+          },
+          "LOST_IN_PROJECTION": {
+            "n": 0,
+            "p50": null,
+            "p95": null,
+            "min": null,
+            "max": null
+          },
+          "NOT_EMITTED": {
+            "n": 5,
+            "p50": 8.77,
+            "p95": 10.8,
+            "min": 6.5,
+            "max": 10.8
+          }
+        }
+      }
+    },
+    {
+      "id": "portrait-3x4",
+      "viewport": {
+        "w": 960,
+        "h": 1280
+      },
+      "cssPerModelPx": 2,
+      "letterbox": {
+        "axis": "horizontal (left and right)",
+        "continuousPad": {
+          "x": 80,
+          "y": 0
+        },
+        "rasterPad": {
+          "left": 80,
+          "top": 0,
+          "right": 80,
+          "bottom": 0
+        },
+        "contentShareOfSquare": 0.75
+      },
+      "screens": 20,
+      "decode": {
+        "anchors": 128000,
+        "belowScore": 121414,
+        "nonPositiveExtent": 0,
+        "suppressedByNms": 5640,
+        "cappedByLimit": 0,
+        "kept": 946
+      },
+      "projection": {
+        "offered": 946,
+        "droppedInPadding": 0,
+        "degenerateAfterInverse": 0,
+        "insideContent": 789,
+        "clippedAtContentEdge": 157,
+        "boundedToFrame": 0
+      },
+      "validation": {
+        "unboundedBoxesOutsideFrame": 0,
+        "unboundedFrameRefused": 0,
+        "shippedBoxesOutsideFrame": 0,
+        "shippedFrameRefused": 0
+      },
+      "preprocessing": {
+        "sourceCropped": 0,
+        "padIntact": 20
+      },
+      "labels": {
+        "visible": 377,
+        "partial": 20,
+        "offscreen": 20,
+        "DETECTED": 374,
+        "LOST_IN_PROJECTION": 0,
+        "NOT_EMITTED": 3,
+        "classAgrees": 334,
+        "minSideModelPx": {
+          "DETECTED": {
+            "n": 374,
+            "p50": 14,
+            "p95": 18,
+            "min": 6.5,
+            "max": 20
+          },
+          "LOST_IN_PROJECTION": {
+            "n": 0,
+            "p50": null,
+            "p95": null,
+            "min": null,
+            "max": null
+          },
+          "NOT_EMITTED": {
+            "n": 3,
+            "p50": 7.5,
+            "p95": 8.77,
+            "min": 6.5,
+            "max": 8.77
+          }
+        }
+      }
+    },
+    {
+      "id": "portrait-9x16",
+      "viewport": {
+        "w": 720,
+        "h": 1280
+      },
+      "cssPerModelPx": 2,
+      "letterbox": {
+        "axis": "horizontal (left and right)",
+        "continuousPad": {
+          "x": 140,
+          "y": 0
+        },
+        "rasterPad": {
+          "left": 140,
+          "top": 0,
+          "right": 140,
+          "bottom": 0
+        },
+        "contentShareOfSquare": 0.5625
+      },
+      "screens": 20,
+      "decode": {
+        "anchors": 128000,
+        "belowScore": 121689,
+        "nonPositiveExtent": 0,
+        "suppressedByNms": 5287,
+        "cappedByLimit": 0,
+        "kept": 1024
+      },
+      "projection": {
+        "offered": 1024,
+        "droppedInPadding": 0,
+        "degenerateAfterInverse": 0,
+        "insideContent": 840,
+        "clippedAtContentEdge": 184,
+        "boundedToFrame": 0
+      },
+      "validation": {
+        "unboundedBoxesOutsideFrame": 0,
+        "unboundedFrameRefused": 0,
+        "shippedBoxesOutsideFrame": 0,
+        "shippedFrameRefused": 0
+      },
+      "preprocessing": {
+        "sourceCropped": 0,
+        "padIntact": 20
+      },
+      "labels": {
+        "visible": 355,
+        "partial": 20,
+        "offscreen": 20,
+        "DETECTED": 344,
+        "LOST_IN_PROJECTION": 0,
+        "NOT_EMITTED": 11,
+        "classAgrees": 300,
+        "minSideModelPx": {
+          "DETECTED": {
+            "n": 344,
+            "p50": 14,
+            "p95": 17.5,
+            "min": 6.5,
+            "max": 19.5
+          },
+          "LOST_IN_PROJECTION": {
+            "n": 0,
+            "p50": null,
+            "p95": null,
+            "min": null,
+            "max": null
+          },
+          "NOT_EMITTED": {
+            "n": 11,
+            "p50": 7.5,
+            "p95": 9.5,
+            "min": 6.5,
+            "max": 9.5
+          }
+        }
+      }
+    }
+  ],
+  "notAClaim": [
+    "synthetic DEV screens from this project's own generator; nothing about real websites",
+    "one machine; no other browser or backend",
+    "the detector is UNADOPTED; a detection count here is not an accuracy figure",
+    "not a J7 experiment and not a D1–D4 or B5 input"
+  ],
+  "recordedAt": "2026-10-30T14:46:46.053Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H"
+  }
+}
