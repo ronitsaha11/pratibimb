@@ -307,6 +307,35 @@ describe("REFUSED is terminal, and no raw frame outlives the pass", () => {
     expect(text).not.toMatch(/iVBORw0KGgo|data:image|[A-Za-z0-9+/]{200,}/);
     expect(JSON.stringify(summary.redaction)).not.toMatch(/rgba|pixels"|bitmap/);
   });
+
+  it("M21: an evaluation gets the head's per-stage counts; an ordinary pass gets no detail at all", async () => {
+    const collected = await perceive(realm(), REGIONS, measurement(), { collect: true });
+    // The stub head emits 10 anchors scoring 0 on every class: all 10 fall below the score floor.
+    expect(collected.detail?.accounting).toEqual({
+      decode: { anchors: 10, belowScore: 10, nonPositiveExtent: 0, suppressedByNms: 0, cappedByLimit: 0, kept: 0 },
+      projection: { offered: 0, droppedInPadding: 0, degenerateAfterInverse: 0, insideContent: 0, clippedAtContentEdge: 0, boundedToFrame: 0 },
+    });
+    expect(collected.detail?.afterFiltering).toBe(0);
+    const ordinary = await perceive(realm());
+    expect(ordinary.detail).toBeUndefined();
+  });
+
+  it("M21: a pass whose head refused carries no stale counts from an earlier pass", async () => {
+    let fail = false;
+    const flaky = {
+      ...uiHead,
+      async run() {
+        if (fail) throw new Error("wasm trap");
+        return uiHead.run();
+      },
+    };
+    const r = realm({ session: flaky as never });
+    expect((await perceive(r, REGIONS, measurement(), { collect: true })).detail?.accounting).not.toBeNull();
+    fail = true;
+    const second = await perceive(r, REGIONS, measurement(), { collect: true });
+    expect(second.detector.ran).toBe(false);
+    expect(second.detail?.accounting).toBeNull();
+  });
 });
 
 describe("the TR-01 worker scrubs the pixels it was lent (M10.6)", () => {

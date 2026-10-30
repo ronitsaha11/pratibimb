@@ -74,9 +74,13 @@ async function ortSmoke() {
  *
  * THE BACKENDS THIS ARTIFACT IS ACCEPTED ON ARE AN EVIDENCE CLAIM, NOT A SETTING. W1-QG03 measured
  * `wasm` for `ba6d9e93695b`: it executes correctly, deterministically and cheaply through the
- * pinned runtime, and its detections are NOT robust to the preprocessing a browser can perform
- * (16-34% move). That is why the feasibility cell is CONDITIONAL, and why M3 records what the
- * detector produced without asserting that it is right.
+ * pinned runtime. W1-QG03 also found its detections moved 16-34% under canvas resampling; W1-QG03b
+ * traced that to the resampling kernel and replaced it, and the shipped `preprocessToTensor` now
+ * matches the Python reference byte for byte (100% detection agreement). The feasibility matrix
+ * accepts both wasm cells; its one CONDITIONAL cell is Firefox WebGPU headless (no GPU adapter).
+ * The detector is still UNADOPTED — adoption items 11 and 14 are open, and Track B measured it
+ * scale-fragile — which is why M3 records what the detector produced without asserting that it
+ * is right.
  */
 const MODEL_ID = "pratibimb-t1-ui-head";
 const MODEL_REVISION = "ba6d9e93695b";
@@ -448,6 +452,7 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
           viewport: { w: observed.viewport.w, h: observed.viewport.h },
           anchors: summary.detail?.anchors ?? 0,
           afterFiltering: summary.detail?.afterFiltering ?? 0,
+          accounting: summary.detail?.accounting ?? null,
           threshold: summary.detail?.threshold ?? null,
           detections: summary.detail?.detections ?? [],
         });
