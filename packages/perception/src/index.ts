@@ -76,18 +76,19 @@ export {
 
 export {
   type LetterboxTransform,
-  computeLetterbox, modelToCapture, captureToModel, isInsideContent, clipToContent,
+  computeLetterbox, modelToCapture, captureToModel, isInsideContent, clipToContent, boundToFrame,
 } from "./letterbox.js";
 
 export {
   type DecodedImage, type RasterLetterbox, type PreprocessStages,
-  rasterLetterbox, preprocessToTensor, rgbaToRgb, rgbaToRgbWithAlpha,
+  rasterLetterbox, assertRasterMatchesInverse, preprocessToTensor, rgbaToRgb, rgbaToRgbWithAlpha,
 } from "./preprocess.js";
 
 export {
   type UiClass, type HeadTensorContract, type HeadOutput, type HeadRuntime,
+  type DecodedDetection, type HeadDecodeAccounting, type ProjectionAccounting, type HeadAccounting,
   UI_CLASSES, HEAD_CONTRACT, PROVISIONAL_THRESHOLDS, UI_DETECTOR_ROLE,
-  decodeHeadOutput, projectToCapture, createUiElementDetector,
+  decodeHeadOutput, decodeHeadOutputAccounted, projectToCapture, projectToCaptureAccounted, createUiElementDetector,
 } from "./uiDetectorHead.js";
 
 export {
