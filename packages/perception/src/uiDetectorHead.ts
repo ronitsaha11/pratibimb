@@ -42,6 +42,7 @@ import type { CaptureFrame } from "./capture.js";
 import { type ModelBox, modelBox } from "./space.js";
 import {
   type LetterboxTransform,
+  boundToFrame,
   computeLetterbox,
   modelToCapture,
   clipToContent,
@@ -141,6 +142,53 @@ export interface HeadOutput {
   readonly dims: readonly number[];
 }
 
+/** A decoded, model-space detection: the output of decode, the input of projection. */
+export type DecodedDetection = { box: ModelBox; label: UiClass; score: number };
+
+/**
+ * Where each anchor went in decode. COUNTS ONLY: no box, no score, nothing about the page.
+ *
+ * Every anchor ends in exactly one bucket, so `anchors = belowScore + nonPositiveExtent +
+ * suppressedByNms + cappedByLimit + kept`. That identity is what makes these stage
+ * measurements rather than one number reported under several names.
+ */
+export interface HeadDecodeAccounting {
+  readonly anchors: number;
+  /** No class reached the score floor. A model judgement, not a geometry loss. */
+  readonly belowScore: number;
+  /** Scored, but with a zero or negative width or height. */
+  readonly nonPositiveExtent: number;
+  /** Merged into a higher-scoring same-class box by NMS. */
+  readonly suppressedByNms: number;
+  /** Survived NMS but fell past `maxDetections`. */
+  readonly cappedByLimit: number;
+  readonly kept: number;
+}
+
+/**
+ * Where each decoded detection went in projection, the letterbox inverse. COUNTS ONLY.
+ *
+ * `offered = droppedInPadding + degenerateAfterInverse + insideContent + clippedAtContentEdge`.
+ */
+export interface ProjectionAccounting {
+  readonly offered: number;
+  /** Entirely in the padding: describes nothing on the page, dropped. */
+  readonly droppedInPadding: number;
+  /** Inside the content, but nothing of it was left inside the frame after the inverse. */
+  readonly degenerateAfterInverse: number;
+  /** Wholly inside the content; inverted unchanged. */
+  readonly insideContent: number;
+  /** Straddled the content edge; clipped to the content, then inverted. */
+  readonly clippedAtContentEdge: number;
+  /** Of those projected, how many the inverse placed past the frame by rounding (`boundToFrame`). */
+  readonly boundedToFrame: number;
+}
+
+export interface HeadAccounting {
+  readonly decode: HeadDecodeAccounting;
+  readonly projection: ProjectionAccounting;
+}
+
 /**
  * Decode raw head output into model-space boxes.
  *
@@ -152,7 +200,16 @@ export interface HeadOutput {
 export function decodeHeadOutput(
   out: HeadOutput,
   contract: HeadTensorContract = HEAD_CONTRACT
-): Perceived<readonly { box: ModelBox; label: UiClass; score: number }[]> {
+): Perceived<readonly DecodedDetection[]> {
+  const r = decodeHeadOutputAccounted(out, contract);
+  return r.ok ? ok(r.value.detections) : r;
+}
+
+/** `decodeHeadOutput`, also saying where every anchor went. Same detections, same refusals. */
+export function decodeHeadOutputAccounted(
+  out: HeadOutput,
+  contract: HeadTensorContract = HEAD_CONTRACT
+): Perceived<{ readonly detections: readonly DecodedDetection[]; readonly accounting: HeadDecodeAccounting }> {
   const numClasses = contract.classes.length;
 
   if (out.dims.length !== 3 || out.dims[0] !== 1) {
@@ -181,7 +238,9 @@ export function decodeHeadOutput(
   }
 
   const at = (c: number, a: number) => out.data[c * anchors + a]!;
-  const results: { box: ModelBox; label: UiClass; score: number }[] = [];
+  const results: DecodedDetection[] = [];
+  let belowScore = 0;
+  let nonPositiveExtent = 0;
 
   for (let a = 0; a < anchors; a += 1) {
     // Best class for this anchor. Anchor-free heads emit no objectness channel, so the
@@ -195,7 +254,10 @@ export function decodeHeadOutput(
         best = c;
       }
     }
-    if (best < 0 || bestScore < PROVISIONAL_THRESHOLDS.score) continue;
+    if (best < 0 || bestScore < PROVISIONAL_THRESHOLDS.score) {
+      belowScore += 1;
+      continue;
+    }
 
     const cx = at(0, a);
     const cy = at(1, a);
@@ -207,7 +269,10 @@ export function decodeHeadOutput(
     if (![cx, cy, w, h, bestScore].every(Number.isFinite)) {
       return refuse("MODEL_OUTPUT_MALFORMED", `Anchor ${a} produced a non-finite value.`);
     }
-    if (w <= 0 || h <= 0) continue;
+    if (w <= 0 || h <= 0) {
+      nonPositiveExtent += 1;
+      continue;
+    }
     if (bestScore > 1) {
       return refuse(
         "MODEL_OUTPUT_MALFORMED",
@@ -223,7 +288,18 @@ export function decodeHeadOutput(
     });
   }
 
-  return ok(nms(results));
+  const { kept, suppressed } = nms(results);
+  return ok({
+    detections: kept,
+    accounting: {
+      anchors,
+      belowScore,
+      nonPositiveExtent,
+      suppressedByNms: suppressed,
+      cappedByLimit: results.length - kept.length - suppressed,
+      kept: kept.length,
+    },
+  });
 }
 
 /** IoU over model-space boxes. Local to decode; fusion has its own over CSS boxes. */
@@ -248,7 +324,7 @@ function boxIou(a: ModelBox, b: ModelBox): number {
  * clickable region is two genuinely different targets at high overlap, and suppressing one
  * would remove a control a plan needs.
  */
-function nms<T extends { box: ModelBox; label: UiClass; score: number }>(items: T[]): T[] {
+function nms<T extends { box: ModelBox; label: UiClass; score: number }>(items: T[]): { kept: T[]; suppressed: number } {
   const indexed = items.map((v, i) => ({ v, i }));
   indexed.sort((p, q) => q.v.score - p.v.score || p.i - q.i);
 
@@ -265,7 +341,7 @@ function nms<T extends { box: ModelBox; label: UiClass; score: number }>(items: 
       if (boxIou(v.box, other.box) > PROVISIONAL_THRESHOLDS.nmsIou) suppressed.add(j);
     }
   }
-  return kept;
+  return { kept, suppressed: suppressed.size };
 }
 
 /**
@@ -275,18 +351,59 @@ function nms<T extends { box: ModelBox; label: UiClass; score: number }>(items: 
  * The padding is grey bars this code invented, not page content. A detection entirely
  * inside it describes nothing real, and after the transform it becomes a negative or
  * out-of-frame coordinate that still looks like a number.
+ *
+ * Every box returned lies inside the frame (`boundToFrame`), so the output always satisfies
+ * the package's own `validateDetections`. Before M21 an edge-flush box could end a rounding
+ * error past it.
  */
-export function projectToCapture(
-  decoded: readonly { box: ModelBox; label: UiClass; score: number }[],
+export function projectToCapture(decoded: readonly DecodedDetection[], transform: LetterboxTransform): readonly Detection[] {
+  return projectToCaptureAccounted(decoded, transform).detections;
+}
+
+/** `projectToCapture`, also saying where every decoded detection went. Same detections. */
+export function projectToCaptureAccounted(
+  decoded: readonly DecodedDetection[],
   transform: LetterboxTransform
-): readonly Detection[] {
+): { readonly detections: readonly Detection[]; readonly accounting: ProjectionAccounting } {
   const out: Detection[] = [];
+  let droppedInPadding = 0;
+  let degenerateAfterInverse = 0;
+  let insideContent = 0;
+  let clippedAtContentEdge = 0;
+  let boundedToFrame = 0;
   for (const d of decoded) {
     const clipped = clipToContent(d.box, transform);
-    if (!clipped) continue; // entirely in the padding
-    out.push({ box: modelToCapture(clipped, transform), label: d.label, score: d.score });
+    if (!clipped) {
+      droppedInPadding += 1; // entirely in the padding
+      continue;
+    }
+    const inverted = modelToCapture(clipped, transform);
+    const bounded = boundToFrame(inverted, transform.source);
+    if (!bounded) {
+      degenerateAfterInverse += 1;
+      continue;
+    }
+    // By containment, not by comparing boxes: `clipToContent` rebuilds the extent as `(x + w) − x`,
+    // which can differ from `w` by a rounding unit even when nothing was clipped.
+    const b = d.box;
+    const t = transform;
+    const within = b.x >= t.padX && b.y >= t.padY && b.x + b.w <= t.padX + t.contentSize.w && b.y + b.h <= t.padY + t.contentSize.h;
+    if (!within) clippedAtContentEdge += 1;
+    else insideContent += 1;
+    if (bounded !== inverted) boundedToFrame += 1;
+    out.push({ box: bounded, label: d.label, score: d.score });
   }
-  return out;
+  return {
+    detections: out,
+    accounting: {
+      offered: decoded.length,
+      droppedInPadding,
+      degenerateAfterInverse,
+      insideContent,
+      clippedAtContentEdge,
+      boundedToFrame,
+    },
+  };
 }
 
 /** Everything needed to run the head, injected so the module stays runtime-agnostic. */
@@ -310,6 +427,13 @@ export interface HeadRuntime {
   readonly revision: string;
   /** Backends this weight file is MEASURED correct on. Empty until measured. */
   readonly acceptedBackends: readonly Backend[];
+  /**
+   * Optional: told, once per successful pass, where every anchor and every decoded detection went.
+   * Counts only. The `Detector` interface is unchanged — `detect` still returns boxes — so this is
+   * how an evaluation sees the stages without the product's contract growing. A callback that
+   * throws does not change the pass.
+   */
+  readonly onAccounting?: (accounting: HeadAccounting) => void;
 }
 
 export const UI_DETECTOR_ROLE: DetectorRole = "UIElementDetector";
@@ -370,10 +494,16 @@ export function createUiElementDetector(runtime: HeadRuntime | null): Detector {
         );
       }
 
-      const decoded = decodeHeadOutput(raw);
+      const decoded = decodeHeadOutputAccounted(raw);
       if (!decoded.ok) return decoded;
 
-      return ok(projectToCapture(decoded.value, transform));
+      const projected = projectToCaptureAccounted(decoded.value.detections, transform);
+      try {
+        runtime.onAccounting?.({ decode: decoded.value.accounting, projection: projected.accounting });
+      } catch {
+        // An observer must not be able to change what the detector returns.
+      }
+      return ok(projected.detections);
     },
   };
 }
