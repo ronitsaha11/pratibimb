@@ -1,0 +1,2923 @@
+{
+  "benchmark": "M20 — W1 product benchmark: the shipped path (product launcher + product extension build), measured",
+  "runId": "20261023T203520Z",
+  "verdict": "COMPLETE",
+  "failure": null,
+  "labels": {
+    "measured": "read from a clock or an OS/browser counter during this run, on this machine",
+    "derived": "arithmetic on measured figures in this record (named in each field)",
+    "projected": "none in this record: the contract's projected budgets (benchmark-contract.md Rule 5) describe a different architecture (a server VLM over redacted frames) and are not compared here"
+  },
+  "environment": {
+    "machine": "W1",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "logicalCores": 16,
+    "memoryBytes": 25378177024,
+    "browser": {
+      "binary": "chrome.exe",
+      "version": "153.0.8010.12",
+      "headed": true
+    },
+    "extension": {
+      "build": "product (no evidence flags)",
+      "csp": "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-ZYRp1TbYj9bPuYCw1S2y0R5L4r911NcNjTciEbHTsAo='; object-src 'none'; base-uri 'none'; form-action 'none'",
+      "permissions": [
+        "offscreen",
+        "sidePanel",
+        "activeTab",
+        "tabCapture"
+      ]
+    },
+    "reasoner": {
+      "backend": "llama.cpp b10956 CPU (x64), -c 4096 -t 8 --no-webui",
+      "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF qwen2.5-0.5b-instruct-q4_k_m.gguf @ 9217f5db79a2",
+      "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+      "endpoint": "http://127.0.0.1:8995/v1/chat/completions"
+    },
+    "perception": "DOM/text structure only in this workload: the product build captures no frame without the person's toolbar gesture (ADR-0009), and this harness makes none",
+    "node": "v24.19.0",
+    "date": "2026-10-23T20:35:20.655Z"
+  },
+  "workload": {
+    "tasks": {
+      "application": {
+        "path": "/fixture/",
+        "maxTurns": 2
+      },
+      "two-step": {
+        "path": "/two-step/",
+        "maxTurns": 3
+      }
+    },
+    "order": [
+      "application",
+      "two-step",
+      "application",
+      "two-step",
+      "application",
+      "two-step"
+    ],
+    "runsPerTask": 3,
+    "stepsMeasured": 15,
+    "tenStepNote": "A step is one pipeline pass (one turn). A single task is capped at MAX_TASK_TURNS = 5 and that cap is not raised here; the contract's \"ten-step task\" is met as 6 bounded tasks run back to back in one browser and one model process, 15 steps in all.",
+    "approvals": "answered by this harness through the control plane's grant path, not by a person; the wait is reported as grantMs and excluded from machineMs"
+  },
+  "outcomes": {
+    "label": "measured",
+    "tasks": 6,
+    "completedAsDeclared": 6,
+    "byOutcome": {
+      "COMPLETED_AS_DECLARED": 6
+    },
+    "note": "every task is included in the latency tables whatever its outcome; a failed or refused turn contributes the stages it reached"
+  },
+  "latency": {
+    "label": "measured (stage timings: RunRecord.timings, monotonic clock in the offscreen document); machineMs is derived = totalMs − grantMs − clarifyMs",
+    "percentileMethod": "nearest rank: the sample at 1-based rank ⌈p/100 · n⌉ of the n sorted samples; n is given per stage; a stage with no samples is null",
+    "coldFirstStep": {
+      "note": "the first step after the launcher and the browser started: first model inference, first extension run",
+      "stages": {
+        "observeMs": {
+          "n": 1,
+          "p50": 483.4,
+          "p95": 483.4,
+          "min": 483.4,
+          "max": 483.4
+        },
+        "sanitizeMs": {
+          "n": 1,
+          "p50": 11.1,
+          "p95": 11.1,
+          "min": 11.1,
+          "max": 11.1
+        },
+        "verifyPayloadMs": {
+          "n": 1,
+          "p50": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "clarifyMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "sendMs": {
+          "n": 1,
+          "p50": 2171.2,
+          "p95": 2171.2,
+          "min": 2171.2,
+          "max": 2171.2
+        },
+        "fallbackMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "validatePlanMs": {
+          "n": 1,
+          "p50": 0.3,
+          "p95": 0.3,
+          "min": 0.3,
+          "max": 0.3
+        },
+        "grantMs": {
+          "n": 1,
+          "p50": 2.5,
+          "p95": 2.5,
+          "min": 2.5,
+          "max": 2.5
+        },
+        "rehydrateMs": {
+          "n": 1,
+          "p50": 2.1,
+          "p95": 2.1,
+          "min": 2.1,
+          "max": 2.1
+        },
+        "refreshMs": {
+          "n": 1,
+          "p50": 1.9,
+          "p95": 1.9,
+          "min": 1.9,
+          "max": 1.9
+        },
+        "structureMs": {
+          "n": 1,
+          "p50": 1,
+          "p95": 1,
+          "min": 1,
+          "max": 1
+        },
+        "actMs": {
+          "n": 1,
+          "p50": 5.9,
+          "p95": 5.9,
+          "min": 5.9,
+          "max": 5.9
+        },
+        "verifyResultMs": {
+          "n": 1,
+          "p50": 1.9,
+          "p95": 1.9,
+          "min": 1.9,
+          "max": 1.9
+        },
+        "totalMs": {
+          "n": 1,
+          "p50": 2680.6,
+          "p95": 2680.6,
+          "min": 2680.6,
+          "max": 2680.6
+        },
+        "machineMs": {
+          "n": 1,
+          "p50": 2678.1,
+          "p95": 2678.1,
+          "min": 2678.1,
+          "max": 2678.1
+        }
+      }
+    },
+    "warmSteps": {
+      "note": "every other step",
+      "stages": {
+        "observeMs": {
+          "n": 14,
+          "p50": 1.6,
+          "p95": 3.4,
+          "min": 1.1,
+          "max": 3.4
+        },
+        "sanitizeMs": {
+          "n": 14,
+          "p50": 2.9,
+          "p95": 7,
+          "min": 2.4,
+          "max": 7
+        },
+        "verifyPayloadMs": {
+          "n": 14,
+          "p50": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "clarifyMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "sendMs": {
+          "n": 14,
+          "p50": 438,
+          "p95": 1391.4,
+          "min": 275.5,
+          "max": 1391.4
+        },
+        "fallbackMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "validatePlanMs": {
+          "n": 14,
+          "p50": 0,
+          "p95": 0.1,
+          "min": 0,
+          "max": 0.1
+        },
+        "grantMs": {
+          "n": 8,
+          "p50": 0,
+          "p95": 28.7,
+          "min": 0,
+          "max": 28.7
+        },
+        "rehydrateMs": {
+          "n": 8,
+          "p50": 0,
+          "p95": 2,
+          "min": 0,
+          "max": 2
+        },
+        "refreshMs": {
+          "n": 8,
+          "p50": 1.7,
+          "p95": 2,
+          "min": 1.5,
+          "max": 2
+        },
+        "structureMs": {
+          "n": 8,
+          "p50": 0.7,
+          "p95": 0.9,
+          "min": 0.6,
+          "max": 0.9
+        },
+        "actMs": {
+          "n": 8,
+          "p50": 3.5,
+          "p95": 4.4,
+          "min": 2.7,
+          "max": 4.4
+        },
+        "verifyResultMs": {
+          "n": 8,
+          "p50": 1.5,
+          "p95": 2.3,
+          "min": 1.1,
+          "max": 2.3
+        },
+        "totalMs": {
+          "n": 14,
+          "p50": 448.7,
+          "p95": 1438.8,
+          "min": 279.2,
+          "max": 1438.8
+        },
+        "machineMs": {
+          "n": 14,
+          "p50": 448.7,
+          "p95": 1410.1,
+          "min": 279.2,
+          "max": 1410.1
+        }
+      }
+    },
+    "byTask": {
+      "application": {
+        "observeMs": {
+          "n": 5,
+          "p50": 1.9,
+          "p95": 3.2,
+          "min": 1.4,
+          "max": 3.2
+        },
+        "sanitizeMs": {
+          "n": 5,
+          "p50": 5.8,
+          "p95": 7,
+          "min": 4.7,
+          "max": 7
+        },
+        "verifyPayloadMs": {
+          "n": 5,
+          "p50": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "clarifyMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "sendMs": {
+          "n": 5,
+          "p50": 943.2,
+          "p95": 1391.4,
+          "min": 929.5,
+          "max": 1391.4
+        },
+        "fallbackMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "validatePlanMs": {
+          "n": 5,
+          "p50": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "grantMs": {
+          "n": 2,
+          "p50": 22.1,
+          "p95": 28.7,
+          "min": 22.1,
+          "max": 28.7
+        },
+        "rehydrateMs": {
+          "n": 2,
+          "p50": 1.9,
+          "p95": 2,
+          "min": 1.9,
+          "max": 2
+        },
+        "refreshMs": {
+          "n": 2,
+          "p50": 1.5,
+          "p95": 1.6,
+          "min": 1.5,
+          "max": 1.6
+        },
+        "structureMs": {
+          "n": 2,
+          "p50": 0.7,
+          "p95": 0.9,
+          "min": 0.7,
+          "max": 0.9
+        },
+        "actMs": {
+          "n": 2,
+          "p50": 4,
+          "p95": 4.4,
+          "min": 4,
+          "max": 4.4
+        },
+        "verifyResultMs": {
+          "n": 2,
+          "p50": 1.8,
+          "p95": 2.3,
+          "min": 1.8,
+          "max": 2.3
+        },
+        "totalMs": {
+          "n": 5,
+          "p50": 950.5,
+          "p95": 1438.8,
+          "min": 936.7,
+          "max": 1438.8
+        },
+        "machineMs": {
+          "n": 5,
+          "p50": 950.5,
+          "p95": 1410.1,
+          "min": 936.7,
+          "max": 1410.1
+        }
+      },
+      "two-step": {
+        "observeMs": {
+          "n": 9,
+          "p50": 1.5,
+          "p95": 3.4,
+          "min": 1.1,
+          "max": 3.4
+        },
+        "sanitizeMs": {
+          "n": 9,
+          "p50": 2.8,
+          "p95": 3.3,
+          "min": 2.4,
+          "max": 3.3
+        },
+        "verifyPayloadMs": {
+          "n": 9,
+          "p50": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "clarifyMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "sendMs": {
+          "n": 9,
+          "p50": 369,
+          "p95": 464.8,
+          "min": 275.5,
+          "max": 464.8
+        },
+        "fallbackMs": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "min": null,
+          "max": null
+        },
+        "validatePlanMs": {
+          "n": 9,
+          "p50": 0,
+          "p95": 0.1,
+          "min": 0,
+          "max": 0.1
+        },
+        "grantMs": {
+          "n": 6,
+          "p50": 0,
+          "p95": 0.1,
+          "min": 0,
+          "max": 0.1
+        },
+        "rehydrateMs": {
+          "n": 6,
+          "p50": 0,
+          "p95": 0,
+          "min": 0,
+          "max": 0
+        },
+        "refreshMs": {
+          "n": 6,
+          "p50": 1.7,
+          "p95": 2,
+          "min": 1.7,
+          "max": 2
+        },
+        "structureMs": {
+          "n": 6,
+          "p50": 0.7,
+          "p95": 0.9,
+          "min": 0.6,
+          "max": 0.9
+        },
+        "actMs": {
+          "n": 6,
+          "p50": 3.3,
+          "p95": 4.1,
+          "min": 2.7,
+          "max": 4.1
+        },
+        "verifyResultMs": {
+          "n": 6,
+          "p50": 1.2,
+          "p95": 1.7,
+          "min": 1.1,
+          "max": 1.7
+        },
+        "totalMs": {
+          "n": 9,
+          "p50": 378.6,
+          "p95": 477.7,
+          "min": 279.2,
+          "max": 477.7
+        },
+        "machineMs": {
+          "n": 9,
+          "p50": 378.6,
+          "p95": 477.6,
+          "min": 279.2,
+          "max": 477.6
+        }
+      }
+    },
+    "taskWallMs": {
+      "label": "measured by the harness around each control-plane task, including messaging and approval polling",
+      "warm": {
+        "n": 5,
+        "p50": 1192.61,
+        "p95": 2446.9,
+        "min": 1163.92,
+        "max": 2446.9
+      },
+      "cold": {
+        "n": 1,
+        "p50": 3673.97,
+        "p95": 3673.97,
+        "min": 3673.97,
+        "max": 3673.97
+      }
+    },
+    "networkFreeSteps": {
+      "label": "derived: steps minus POSTs to the reasoner endpoint seen by CDP in the offscreen document",
+      "value": 0,
+      "ofSteps": 15
+    },
+    "cacheHitRate": {
+      "label": "not applicable",
+      "value": null,
+      "note": "no screen-state cache exists in this build"
+    }
+  },
+  "coldStart": {
+    "label": "measured",
+    "launcher": {
+      "verifyMs": 641,
+      "modelLoadMs": 1867,
+      "totalMs": 2526,
+      "wallMsUntilReady": 2610.65,
+      "note": "verifyMs: full SHA-256 of weights and runtime; modelLoadMs: llama-server spawn to healthy. The OS file cache may already hold the weights: this is a cold PROCESS start, not a cold disk."
+    },
+    "browserUntilOffscreenReadyMs": 970.4
+  },
+  "resources": {
+    "label": "measured (OS counters via Get-Process, every ~500 ms; JS heap via CDP Runtime.getHeapUsage, every ~500 ms); peaks are the largest sample unless named otherwise",
+    "samples": 26,
+    "processes": {
+      "browser": {
+        "sampledPeakWorkingSetBytes": 888762368,
+        "sampledPeakPrivateBytes": 537206784,
+        "sumOfProcessPeakWorkingSetBytes": 974520320,
+        "processesSeen": 10,
+        "peakCpuCoresBusy": 1.864
+      },
+      "model": {
+        "sampledPeakWorkingSetBytes": 610086912,
+        "sampledPeakPrivateBytes": 261324800,
+        "sumOfProcessPeakWorkingSetBytes": 626249728,
+        "processesSeen": 1,
+        "peakCpuCoresBusy": 8.54
+      },
+      "launcher": {
+        "sampledPeakWorkingSetBytes": 65777664,
+        "sampledPeakPrivateBytes": 69369856,
+        "sumOfProcessPeakWorkingSetBytes": 167305216,
+        "processesSeen": 1,
+        "peakCpuCoresBusy": 0.059
+      }
+    },
+    "jsHeapPeakUsedBytes": {
+      "offscreenDocument": 7258388,
+      "serviceWorker": 3007132,
+      "samples": 48
+    },
+    "gpuMemory": {
+      "label": "not measured",
+      "note": "no GPU backend is in this path: the model runs on llama.cpp's CPU build and no ONNX/WebGPU session is created in this workload"
+    },
+    "rawSamplesFile": "w1-cft-product-benchmark-20261023T203520Z.resources.json"
+  },
+  "disk": {
+    "label": "measured (bytes on disk)",
+    "modelWeights": 491400032,
+    "runtimeInstalled": 65156411,
+    "runtimeArchive": 18426398,
+    "extensionBuild": 33975912
+  },
+  "tierFiring": {
+    "label": "measured (counts from the extension's own port report)",
+    "domStructureObservations": 33,
+    "structureReads": 9,
+    "visualPerceptionPasses": 33,
+    "visualPerceptionRan": 0,
+    "detectorRan": 0
+  },
+  "shutdown": {
+    "modelProcessLeftRunning": false,
+    "launcherLeftRunning": false
+  },
+  "timeline": {
+    "clock": "monotonic, ms since the harness started",
+    "events": [
+      {
+        "event": "EXTENSION_BUILT",
+        "atMs": 2334.04
+      },
+      {
+        "event": "REASONER_READY",
+        "atMs": 4944.76
+      },
+      {
+        "event": "BROWSER_READY",
+        "atMs": 5931.39
+      },
+      {
+        "event": "TASK_STARTED",
+        "atMs": 6038.15,
+        "code": "1"
+      },
+      {
+        "event": "TASK_FINISHED",
+        "atMs": 9712.66,
+        "code": "1"
+      },
+      {
+        "event": "TASK_STARTED",
+        "atMs": 9744.54,
+        "code": "2"
+      },
+      {
+        "event": "TASK_FINISHED",
+        "atMs": 10908.62,
+        "code": "2"
+      },
+      {
+        "event": "TASK_STARTED",
+        "atMs": 10936.19,
+        "code": "3"
+      },
+      {
+        "event": "TASK_FINISHED",
+        "atMs": 13383.25,
+        "code": "3"
+      },
+      {
+        "event": "TASK_STARTED",
+        "atMs": 13414.73,
+        "code": "4"
+      },
+      {
+        "event": "TASK_FINISHED",
+        "atMs": 14607.54,
+        "code": "4"
+      },
+      {
+        "event": "TASK_STARTED",
+        "atMs": 14639.21,
+        "code": "5"
+      },
+      {
+        "event": "TASK_FINISHED",
+        "atMs": 17021.98,
+        "code": "5"
+      },
+      {
+        "event": "TASK_STARTED",
+        "atMs": 17048.71,
+        "code": "6"
+      },
+      {
+        "event": "TASK_FINISHED",
+        "atMs": 18219.72,
+        "code": "6"
+      },
+      {
+        "event": "SHUTDOWN",
+        "atMs": 21783.24
+      }
+    ]
+  },
+  "rawSamples": {
+    "label": "measured",
+    "turns": [
+      {
+        "turn": 1,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "insert",
+            "target": "#mobile_confirm"
+          },
+          {
+            "op": "click",
+            "target": "#submit"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [
+          {
+            "target": "#mobile_confirm",
+            "piiClass": "PHONE",
+            "inserted": true
+          }
+        ],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 483.4
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 494.5
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 494.5
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 494.8,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 2666,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 2666.5,
+            "code": "OK"
+          },
+          {
+            "event": "GRANT_REQUESTED",
+            "atMs": 2666.8,
+            "code": "PHONE"
+          },
+          {
+            "event": "GRANT_ANSWERED",
+            "atMs": 2669.1,
+            "code": "GRANTED"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 2669.2,
+            "code": "OK"
+          },
+          {
+            "event": "VALUE_RESTORED",
+            "atMs": 2671.3,
+            "code": "PHONE"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 2673.2
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 2676.8
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 2678.4
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 2680.3
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 2680.5,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 2680.5,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 483.4
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 494.5
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 494.8
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 2666
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 2666.6
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 2669.2
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 2673.4
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 2674.6
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 2680.5
+          }
+        ],
+        "timings": {
+          "observeMs": 483.4,
+          "sanitizeMs": 11.1,
+          "verifyPayloadMs": 0,
+          "sendMs": 2171.2,
+          "validatePlanMs": 0.3,
+          "grantMs": 2.5,
+          "rehydrateMs": 2.1,
+          "refreshMs": 1.9,
+          "structureMs": 1,
+          "verifyResultMs": 1.9,
+          "actMs": 5.9,
+          "totalMs": 2680.6,
+          "machineMs": 2678.1
+        },
+        "task": "application",
+        "start": "COLD",
+        "run": 1
+      },
+      {
+        "turn": 2,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "done"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": null,
+        "declaredDone": true,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.4
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 7.2
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 7.2
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 7.2,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 936.7,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 936.7,
+            "code": "DONE_DECLARED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 936.7,
+            "code": "DONE:DECLARED_DONE"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.4
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 7.2
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 7.2
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 936.7
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "DONE",
+            "elapsedMs": 936.7
+          }
+        ],
+        "timings": {
+          "observeMs": 1.4,
+          "sanitizeMs": 5.8,
+          "verifyPayloadMs": 0,
+          "sendMs": 929.5,
+          "validatePlanMs": 0,
+          "totalMs": 936.7,
+          "machineMs": 936.7
+        },
+        "task": "application",
+        "start": "COLD",
+        "run": 1
+      },
+      {
+        "turn": 1,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "click",
+            "target": "#confirm-slot"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 3.1
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 5.9
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 5.9
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 5.9,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 447,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 447,
+            "code": "OK"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 447.2,
+            "code": "OK"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 448.9
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 451.2
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 452.2
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 453.9
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 453.9,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 453.9,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 3.1
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 5.9
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 5.9
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 447
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 447
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 447.2
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 449
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 449.8
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 453.9
+          }
+        ],
+        "timings": {
+          "observeMs": 3.1,
+          "sanitizeMs": 2.8,
+          "verifyPayloadMs": 0,
+          "sendMs": 441.1,
+          "validatePlanMs": 0,
+          "grantMs": 0,
+          "rehydrateMs": 0,
+          "refreshMs": 1.7,
+          "structureMs": 0.8,
+          "verifyResultMs": 1.7,
+          "actMs": 4.1,
+          "totalMs": 453.9,
+          "machineMs": 453.9
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 2
+      },
+      {
+        "turn": 2,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "click",
+            "target": "#book"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.6
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 4.8
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 4.8
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 4.8,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 383.5,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 383.5,
+            "code": "OK"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 383.5,
+            "code": "OK"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 385.2
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 386.8
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 387.9
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 389.5
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 389.5,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 389.5,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.6
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 4.8
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 4.8
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 383.5
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 383.5
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 383.5
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 385.3
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 385.9
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 389.5
+          }
+        ],
+        "timings": {
+          "observeMs": 1.6,
+          "sanitizeMs": 3.2,
+          "verifyPayloadMs": 0,
+          "sendMs": 378.7,
+          "validatePlanMs": 0,
+          "grantMs": 0,
+          "rehydrateMs": 0,
+          "refreshMs": 1.7,
+          "structureMs": 0.6,
+          "verifyResultMs": 1.6,
+          "actMs": 3.6,
+          "totalMs": 389.5,
+          "machineMs": 389.5
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 2
+      },
+      {
+        "turn": 3,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "done"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": null,
+        "declaredDone": true,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.1
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 3.5
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 3.5
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 3.6,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 279.1,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 279.2,
+            "code": "DONE_DECLARED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 279.2,
+            "code": "DONE:DECLARED_DONE"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.1
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 3.5
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 3.6
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 279.1
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "DONE",
+            "elapsedMs": 279.2
+          }
+        ],
+        "timings": {
+          "observeMs": 1.1,
+          "sanitizeMs": 2.4,
+          "verifyPayloadMs": 0,
+          "sendMs": 275.5,
+          "validatePlanMs": 0.1,
+          "totalMs": 279.2,
+          "machineMs": 279.2
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 2
+      },
+      {
+        "turn": 1,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "insert",
+            "target": "#mobile_confirm"
+          },
+          {
+            "op": "click",
+            "target": "#submit"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [
+          {
+            "target": "#mobile_confirm",
+            "piiClass": "PHONE",
+            "inserted": true
+          }
+        ],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 2.9
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 9.9
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 9.9
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 9.9,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 1401.3,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 1401.3,
+            "code": "OK"
+          },
+          {
+            "event": "GRANT_REQUESTED",
+            "atMs": 1401.4,
+            "code": "PHONE"
+          },
+          {
+            "event": "GRANT_ANSWERED",
+            "atMs": 1430.1,
+            "code": "GRANTED"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 1430.2,
+            "code": "OK"
+          },
+          {
+            "event": "VALUE_RESTORED",
+            "atMs": 1432.1,
+            "code": "PHONE"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 1433.8
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 1435.8
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 1437
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 1438.8
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 1438.8,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 1438.8,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 2.9
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 9.9
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 9.9
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 1401.3
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 1401.4
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 1430.2
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 1433.9
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 1434.8
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 1438.8
+          }
+        ],
+        "timings": {
+          "observeMs": 2.9,
+          "sanitizeMs": 7,
+          "verifyPayloadMs": 0,
+          "sendMs": 1391.4,
+          "validatePlanMs": 0,
+          "grantMs": 28.7,
+          "rehydrateMs": 2,
+          "refreshMs": 1.6,
+          "structureMs": 0.9,
+          "verifyResultMs": 1.8,
+          "actMs": 4,
+          "totalMs": 1438.8,
+          "machineMs": 1410.1
+        },
+        "task": "application",
+        "start": "WARM",
+        "run": 3
+      },
+      {
+        "turn": 2,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "done"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": null,
+        "declaredDone": true,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.9
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 7.2
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 7.2
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 7.3,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 950.5,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 950.5,
+            "code": "DONE_DECLARED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 950.5,
+            "code": "DONE:DECLARED_DONE"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.9
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 7.2
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 7.3
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 950.5
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "DONE",
+            "elapsedMs": 950.5
+          }
+        ],
+        "timings": {
+          "observeMs": 1.9,
+          "sanitizeMs": 5.3,
+          "verifyPayloadMs": 0,
+          "sendMs": 943.2,
+          "validatePlanMs": 0,
+          "totalMs": 950.5,
+          "machineMs": 950.5
+        },
+        "task": "application",
+        "start": "WARM",
+        "run": 3
+      },
+      {
+        "turn": 1,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "click",
+            "target": "#confirm-slot"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 3.4
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 6.7
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 6.7
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 6.7,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 471.5,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 471.5,
+            "code": "OK"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 471.6,
+            "code": "OK"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 473.6
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 475.5
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 476.6
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 477.7
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 477.7,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 477.7,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 3.4
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 6.7
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 6.7
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 471.5
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 471.5
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 471.6
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 473.6
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 474.6
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 477.7
+          }
+        ],
+        "timings": {
+          "observeMs": 3.4,
+          "sanitizeMs": 3.3,
+          "verifyPayloadMs": 0,
+          "sendMs": 464.8,
+          "validatePlanMs": 0,
+          "grantMs": 0.1,
+          "rehydrateMs": 0,
+          "refreshMs": 2,
+          "structureMs": 0.9,
+          "verifyResultMs": 1.1,
+          "actMs": 3.1,
+          "totalMs": 477.7,
+          "machineMs": 477.6
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 4
+      },
+      {
+        "turn": 2,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "click",
+            "target": "#book"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.5
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 4.1
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 4.1
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 4.1,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 371.2,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 371.2,
+            "code": "OK"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 371.2,
+            "code": "OK"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 373
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 374.5
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 375.3
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 376.5
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 376.5,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 376.5,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.5
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 4.1
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 4.1
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 371.2
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 371.2
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 371.2
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 373
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 373.8
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 376.5
+          }
+        ],
+        "timings": {
+          "observeMs": 1.5,
+          "sanitizeMs": 2.6,
+          "verifyPayloadMs": 0,
+          "sendMs": 367.1,
+          "validatePlanMs": 0,
+          "grantMs": 0,
+          "rehydrateMs": 0,
+          "refreshMs": 1.8,
+          "structureMs": 0.8,
+          "verifyResultMs": 1.2,
+          "actMs": 2.7,
+          "totalMs": 376.5,
+          "machineMs": 376.5
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 4
+      },
+      {
+        "turn": 3,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "done"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": null,
+        "declaredDone": true,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.5
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 4.4
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 4.4
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 4.5,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 283.1,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 283.1,
+            "code": "DONE_DECLARED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 283.1,
+            "code": "DONE:DECLARED_DONE"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.5
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 4.4
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 4.5
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 283.1
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "DONE",
+            "elapsedMs": 283.1
+          }
+        ],
+        "timings": {
+          "observeMs": 1.5,
+          "sanitizeMs": 2.9,
+          "verifyPayloadMs": 0,
+          "sendMs": 278.6,
+          "validatePlanMs": 0,
+          "totalMs": 283.1,
+          "machineMs": 283.1
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 4
+      },
+      {
+        "turn": 1,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "insert",
+            "target": "#mobile_confirm"
+          },
+          {
+            "op": "click",
+            "target": "#submit"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [
+          {
+            "target": "#mobile_confirm",
+            "piiClass": "PHONE",
+            "inserted": true
+          }
+        ],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 3.2
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 9.7
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 9.7
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 9.8,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 1376.9,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 1376.9,
+            "code": "OK"
+          },
+          {
+            "event": "GRANT_REQUESTED",
+            "atMs": 1377,
+            "code": "PHONE"
+          },
+          {
+            "event": "GRANT_ANSWERED",
+            "atMs": 1399,
+            "code": "GRANTED"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 1399,
+            "code": "OK"
+          },
+          {
+            "event": "VALUE_RESTORED",
+            "atMs": 1400.9,
+            "code": "PHONE"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 1402.4
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 1404.1
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 1405.2
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 1407.5
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 1407.5,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 1407.5,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 3.2
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 9.7
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 9.8
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 1376.9
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 1376.9
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 1399
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 1402.4
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 1403.1
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 1407.5
+          }
+        ],
+        "timings": {
+          "observeMs": 3.2,
+          "sanitizeMs": 6.5,
+          "verifyPayloadMs": 0,
+          "sendMs": 1367.1,
+          "validatePlanMs": 0,
+          "grantMs": 22.1,
+          "rehydrateMs": 1.9,
+          "refreshMs": 1.5,
+          "structureMs": 0.7,
+          "verifyResultMs": 2.3,
+          "actMs": 4.4,
+          "totalMs": 1407.5,
+          "machineMs": 1385.4
+        },
+        "task": "application",
+        "start": "WARM",
+        "run": 5
+      },
+      {
+        "turn": 2,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "done"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": null,
+        "declaredDone": true,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.7
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 6.4
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 6.4
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 6.4,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 936.7,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 936.8,
+            "code": "DONE_DECLARED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 936.8,
+            "code": "DONE:DECLARED_DONE"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.7
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 6.4
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 6.4
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 936.7
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "DONE",
+            "elapsedMs": 936.8
+          }
+        ],
+        "timings": {
+          "observeMs": 1.7,
+          "sanitizeMs": 4.7,
+          "verifyPayloadMs": 0,
+          "sendMs": 930.3,
+          "validatePlanMs": 0,
+          "totalMs": 936.8,
+          "machineMs": 936.8
+        },
+        "task": "application",
+        "start": "WARM",
+        "run": 5
+      },
+      {
+        "turn": 1,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "click",
+            "target": "#confirm-slot"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.9
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 4.8
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 4.8
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 4.8,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 442.8,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 442.8,
+            "code": "OK"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 442.8,
+            "code": "OK"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 444.5
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 446.1
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 447
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 448.6
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 448.6,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 448.6,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.9
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 4.8
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 4.8
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 442.8
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 442.8
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 442.8
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 444.5
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 445.1
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 448.6
+          }
+        ],
+        "timings": {
+          "observeMs": 1.9,
+          "sanitizeMs": 2.9,
+          "verifyPayloadMs": 0,
+          "sendMs": 438,
+          "validatePlanMs": 0,
+          "grantMs": 0,
+          "rehydrateMs": 0,
+          "refreshMs": 1.7,
+          "structureMs": 0.6,
+          "verifyResultMs": 1.5,
+          "actMs": 3.5,
+          "totalMs": 448.7,
+          "machineMs": 448.7
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 6
+      },
+      {
+        "turn": 2,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "click",
+            "target": "#book"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": "CONFIRMED",
+        "declaredDone": false,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.2
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 3.8
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 3.8
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 3.8,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 372.8,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 372.8,
+            "code": "OK"
+          },
+          {
+            "event": "BINDER_REVALIDATED",
+            "atMs": 372.8,
+            "code": "OK"
+          },
+          {
+            "event": "PAGE_REFRESHED",
+            "atMs": 374.5
+          },
+          {
+            "event": "CLICK_AUTHORIZED",
+            "atMs": 376.3
+          },
+          {
+            "event": "CLICK_DISPATCHED",
+            "atMs": 377.3
+          },
+          {
+            "event": "RESULT_OBSERVED",
+            "atMs": 378.5
+          },
+          {
+            "event": "RESULT_VERIFIED",
+            "atMs": 378.6,
+            "code": "CONFIRMED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 378.6,
+            "code": "DONE:CONFIRMED"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.2
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 3.8
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 3.8
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 372.8
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "AWAIT_GRANT",
+            "elapsedMs": 372.8
+          },
+          {
+            "from": "AWAIT_GRANT",
+            "to": "REHYDRATE",
+            "elapsedMs": 372.8
+          },
+          {
+            "from": "REHYDRATE",
+            "to": "ACT",
+            "elapsedMs": 374.5
+          },
+          {
+            "from": "ACT",
+            "to": "VERIFY_RESULT",
+            "elapsedMs": 375.3
+          },
+          {
+            "from": "VERIFY_RESULT",
+            "to": "DONE",
+            "elapsedMs": 378.6
+          }
+        ],
+        "timings": {
+          "observeMs": 1.2,
+          "sanitizeMs": 2.6,
+          "verifyPayloadMs": 0,
+          "sendMs": 369,
+          "validatePlanMs": 0,
+          "grantMs": 0,
+          "rehydrateMs": 0,
+          "refreshMs": 1.7,
+          "structureMs": 0.7,
+          "verifyResultMs": 1.2,
+          "actMs": 3.3,
+          "totalMs": 378.6,
+          "machineMs": 378.6
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 6
+      },
+      {
+        "turn": 3,
+        "state": "DONE",
+        "refusal": null,
+        "reasonerKind": "LOCAL_MODEL",
+        "fallback": null,
+        "planOps": [
+          {
+            "op": "done"
+          }
+        ],
+        "consents": [],
+        "clarifications": [],
+        "rehydrated": [],
+        "verification": null,
+        "declaredDone": true,
+        "declarationSource": null,
+        "events": [
+          {
+            "event": "RUN_STARTED",
+            "atMs": 0
+          },
+          {
+            "event": "OBSERVED",
+            "atMs": 1.5
+          },
+          {
+            "event": "SANITIZED",
+            "atMs": 4.3
+          },
+          {
+            "event": "HANDOFF_VERIFIED",
+            "atMs": 4.3
+          },
+          {
+            "event": "PLAN_REQUESTED",
+            "atMs": 4.3,
+            "code": "LOCAL_MODEL"
+          },
+          {
+            "event": "PLAN_RECEIVED",
+            "atMs": 280,
+            "code": "USABLE"
+          },
+          {
+            "event": "PLAN_VALIDATED",
+            "atMs": 280,
+            "code": "DONE_DECLARED"
+          },
+          {
+            "event": "RUN_ENDED",
+            "atMs": 280,
+            "code": "DONE:DECLARED_DONE"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "IDLE",
+            "to": "OBSERVE",
+            "elapsedMs": 0
+          },
+          {
+            "from": "OBSERVE",
+            "to": "SANITIZE",
+            "elapsedMs": 1.5
+          },
+          {
+            "from": "SANITIZE",
+            "to": "VERIFY_PAYLOAD",
+            "elapsedMs": 4.3
+          },
+          {
+            "from": "VERIFY_PAYLOAD",
+            "to": "SEND",
+            "elapsedMs": 4.3
+          },
+          {
+            "from": "SEND",
+            "to": "VALIDATE_PLAN",
+            "elapsedMs": 280
+          },
+          {
+            "from": "VALIDATE_PLAN",
+            "to": "DONE",
+            "elapsedMs": 280
+          }
+        ],
+        "timings": {
+          "observeMs": 1.5,
+          "sanitizeMs": 2.8,
+          "verifyPayloadMs": 0,
+          "sendMs": 275.7,
+          "validatePlanMs": 0,
+          "totalMs": 280,
+          "machineMs": 280
+        },
+        "task": "two-step",
+        "start": "WARM",
+        "run": 6
+      }
+    ],
+    "tasks": [
+      {
+        "run": 1,
+        "task": "application",
+        "start": "COLD",
+        "error": null,
+        "outcome": "COMPLETED_AS_DECLARED",
+        "confirmedActions": 1,
+        "maxTurns": 2,
+        "approvalsAnsweredByHarness": 1,
+        "harnessWallMs": 3673.97,
+        "network": {
+          "endpointRequests": 2,
+          "endpointRequestsFinished": 2,
+          "otherRequests": 3,
+          "otherRequestOrigins": [
+            "chrome-extension://(this extension)"
+          ]
+        },
+        "tiers": {
+          "observations": 4,
+          "structureReads": 1,
+          "visualPerceptionPasses": 4,
+          "visualPerceptionRan": 0,
+          "detectorRan": 0,
+          "visualRefusals": [
+            "NO_ACTIVE_TAB_GRANT"
+          ]
+        }
+      },
+      {
+        "run": 2,
+        "task": "two-step",
+        "start": "WARM",
+        "error": null,
+        "outcome": "COMPLETED_AS_DECLARED",
+        "confirmedActions": 2,
+        "maxTurns": 3,
+        "approvalsAnsweredByHarness": 0,
+        "harnessWallMs": 1163.92,
+        "network": {
+          "endpointRequests": 3,
+          "endpointRequestsFinished": 3,
+          "otherRequests": 0,
+          "otherRequestOrigins": []
+        },
+        "tiers": {
+          "observations": 7,
+          "structureReads": 2,
+          "visualPerceptionPasses": 7,
+          "visualPerceptionRan": 0,
+          "detectorRan": 0,
+          "visualRefusals": [
+            "NO_ACTIVE_TAB_GRANT"
+          ]
+        }
+      },
+      {
+        "run": 3,
+        "task": "application",
+        "start": "WARM",
+        "error": null,
+        "outcome": "COMPLETED_AS_DECLARED",
+        "confirmedActions": 1,
+        "maxTurns": 2,
+        "approvalsAnsweredByHarness": 1,
+        "harnessWallMs": 2446.9,
+        "network": {
+          "endpointRequests": 2,
+          "endpointRequestsFinished": 2,
+          "otherRequests": 0,
+          "otherRequestOrigins": []
+        },
+        "tiers": {
+          "observations": 4,
+          "structureReads": 1,
+          "visualPerceptionPasses": 4,
+          "visualPerceptionRan": 0,
+          "detectorRan": 0,
+          "visualRefusals": [
+            "NO_ACTIVE_TAB_GRANT"
+          ]
+        }
+      },
+      {
+        "run": 4,
+        "task": "two-step",
+        "start": "WARM",
+        "error": null,
+        "outcome": "COMPLETED_AS_DECLARED",
+        "confirmedActions": 2,
+        "maxTurns": 3,
+        "approvalsAnsweredByHarness": 0,
+        "harnessWallMs": 1192.61,
+        "network": {
+          "endpointRequests": 3,
+          "endpointRequestsFinished": 3,
+          "otherRequests": 0,
+          "otherRequestOrigins": []
+        },
+        "tiers": {
+          "observations": 7,
+          "structureReads": 2,
+          "visualPerceptionPasses": 7,
+          "visualPerceptionRan": 0,
+          "detectorRan": 0,
+          "visualRefusals": [
+            "NO_ACTIVE_TAB_GRANT"
+          ]
+        }
+      },
+      {
+        "run": 5,
+        "task": "application",
+        "start": "WARM",
+        "error": null,
+        "outcome": "COMPLETED_AS_DECLARED",
+        "confirmedActions": 1,
+        "maxTurns": 2,
+        "approvalsAnsweredByHarness": 1,
+        "harnessWallMs": 2382.68,
+        "network": {
+          "endpointRequests": 2,
+          "endpointRequestsFinished": 2,
+          "otherRequests": 0,
+          "otherRequestOrigins": []
+        },
+        "tiers": {
+          "observations": 4,
+          "structureReads": 1,
+          "visualPerceptionPasses": 4,
+          "visualPerceptionRan": 0,
+          "detectorRan": 0,
+          "visualRefusals": [
+            "NO_ACTIVE_TAB_GRANT"
+          ]
+        }
+      },
+      {
+        "run": 6,
+        "task": "two-step",
+        "start": "WARM",
+        "error": null,
+        "outcome": "COMPLETED_AS_DECLARED",
+        "confirmedActions": 2,
+        "maxTurns": 3,
+        "approvalsAnsweredByHarness": 0,
+        "harnessWallMs": 1170.93,
+        "network": {
+          "endpointRequests": 3,
+          "endpointRequestsFinished": 3,
+          "otherRequests": 0,
+          "otherRequestOrigins": []
+        },
+        "tiers": {
+          "observations": 7,
+          "structureReads": 2,
+          "visualPerceptionPasses": 7,
+          "visualPerceptionRan": 0,
+          "detectorRan": 0,
+          "visualRefusals": [
+            "NO_ACTIVE_TAB_GRANT"
+          ]
+        }
+      }
+    ]
+  },
+  "notAClaim": [
+    "one machine, one browser, one backend, synthetic pages; a small number of runs — no reliability rate, no cross-machine claim",
+    "not a J7 experiment and not a privacy-metric run; J7/B5 remain open"
+  ],
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "recordedAt": "2026-10-23T20:35:42.445Z"
+  }
+}

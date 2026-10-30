@@ -1,0 +1,31 @@
+{
+  "$comment": "The local reasoner's pin, committed. Not a new pin: the same model and runtime every run since LOOP-2 used. revision/file/runtime from artifacts/experiments/LOOP-2-local-reasoner-egress/harness/fetch-model.mjs; the full weights SHA-256 from the committed M15–M19 run records; bytes and the runtime zip SHA-256 from the acquisition record and the files on W1 (2026-10-24). Changing any value here is a dependency decision (ADR), not a maintenance edit.",
+  "model": {
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "path": "models/qwen2.5-0.5b-instruct-gguf/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "bytes": 491400032,
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+  },
+  "runtime": {
+    "repo": "ggml-org/llama.cpp",
+    "build": "b10956",
+    "asset": "llama-b10956-bin-win-cpu-x64.zip",
+    "dir": "models/llama.cpp-b10956",
+    "zip": "models/llama.cpp-b10956/llama-b10956-bin-win-cpu-x64.zip",
+    "zipBytes": 18426398,
+    "zipSha256": "52d7ac13feab3bb062ee7ff87020d8df3dd2cdbc5a21d45dc005b8a67f0a5135",
+    "binary": "llama-server.exe"
+  },
+  "endpoint": {
+    "host": "127.0.0.1",
+    "port": 8995,
+    "path": "/v1/chat/completions"
+  },
+  "upstream": {
+    "host": "127.0.0.1",
+    "port": 8977,
+    "args": ["-c", "4096", "-t", "8", "--no-webui"]
+  }
+}

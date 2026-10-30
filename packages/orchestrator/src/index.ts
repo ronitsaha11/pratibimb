@@ -16,6 +16,8 @@ export {
   type RunRecord,
   type RunRefusal,
   type RunState,
+  type RunEvent,
+  type RunEventName,
   type RunTimings,
   type Transition,
 } from "./machine.js";

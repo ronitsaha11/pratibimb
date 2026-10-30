@@ -1,0 +1,349 @@
+# M20 — the runnable product, measured, and run by a person
+
+> **Status: DEMONSTRATED on W1 — launcher, benchmark, and a person-operated run in Chrome's real side
+> panel (Allow once, then Deny), PASS.** One run per scenario: no reliability rate.
+>
+> W1 only, synthetic loopback pages, product build. **Not a J7 experiment and not a privacy-metric
+> run; J7/B5 and D1–D4 are unchanged.** Measurements: [`artifacts/benchmarks/M20-w1-product/`](../../benchmarks/M20-w1-product/README.md).
+
+## Hypothesis
+
+From a clean W1 checkout, a person can:
+
+- start the pinned local reasoner with one documented command (`npm run reasoner`), which:
+  - verifies exactly what is pinned;
+  - serves only the CSP's one endpoint, on loopback;
+  - refuses what it must refuse;
+  - logs no content;
+  - leaves no process behind when stopped;
+- run the product build in Chrome's real side panel against that service;
+- see, per turn, what happened and how long each measured stage took.
+
+Every run leaves a value-free, ordered, monotonic record of its state transitions.
+
+## Environment
+
+| Item | Value |
+|---|---|
+| Machine | W1 `LAPTOP-6E14K34L`, Intel Core 7 240H (16 logical), Windows 10.0.26300 |
+| Date | 2026-10-23 (UTC) |
+| Browser | Chrome for Testing 153.0.8010.12 (`chromium-1243`), headed |
+| Extension | **Product build**, no evidence flags. CSP `connect-src 'self' http://127.0.0.1:8995/v1/chat/completions`; permissions `offscreen`, `sidePanel`, `activeTab`, `tabCapture`; host `http://127.0.0.1/*`. All unchanged. |
+| Reasoner | `scripts/reasoner/reasoner.mjs` (what `npm run reasoner` runs). Qwen2.5-0.5B-Instruct Q4_K_M @ `9217f5db79a2`, 491 400 032 B, SHA-256 `74a4da8c…d7a9db`; llama.cpp b10956 CPU x64 on 127.0.0.1:8977, behind the launcher's front on 127.0.0.1:8995 |
+| Node | v24.19.0 |
+
+## Expected result
+
+1. **Launcher.**
+   - `--check` verifies the model (size, then full SHA-256) and the runtime (archive SHA-256, then
+     every installed `.exe`/`.dll` against it) and starts nothing.
+   - A start serves `/health` reporting the pin, and answers a real verified handoff sent through
+     `localModelReasoner`.
+   - It refuses: a web-page origin (403), a remote origin (403), a foreign Host (421), another path
+     (404), GET on the endpoint (405), non-JSON (400), and value-shaped text (422, not forwarded).
+   - Its request log carries no body.
+   - A second start is refused (exit 2) and stops nothing.
+   - `--stop` leaves no process and no listener.
+2. **Benchmark.** Complete stage, cold/warm, resource and disk figures for at least ten steps,
+   without raising the 5-turn cap (`artifacts/benchmarks/M20-w1-product/`).
+3. **Person, real side panel.** For the M2 application page:
+   - **Allow once:** the trail shows `CONSENT_REQUESTED → CONSENT_ANSWERED(ALLOWED_ONCE) →
+     BINDER_REVALIDATED → VALUE_RESTORED → PAGE_REFRESHED → CLICK_AUTHORIZED → CLICK_DISPATCHED →
+     RESULT_OBSERVED → RESULT_VERIFIED(CONFIRMED)`, the page holds the registered number, and Submit
+     is disabled.
+   - **Deny:** the trail ends at `CONSENT_ANSWERED(CONSENT_DENIED)`; nothing is restored, clicked or
+     submitted.
+   - Both records are value-free, ordered and new.
+
+## Actual result
+
+### 1. Launcher lifecycle — PASS
+
+Record: [`logs/w1-launcher-lifecycle-20261023T203334Z.json`](logs/w1-launcher-lifecycle-20261023T203334Z.json),
+produced by [`harness/launcher-lifecycle.mjs`](harness/launcher-lifecycle.mjs). All eight checks held:
+
+| Check | Result |
+|---|---|
+| `/health` reports the pinned model, SHA-256 and endpoint | PASS |
+| Real inference through `localModelReasoner` (Vitest `launcher.live.test.ts`, 2 passed) | PASS |
+| Refusals: web origin 403, remote origin 403, rebinding Host 421, other path 404, GET 405, non-JSON 400, value-shaped text 422 | PASS |
+| The launcher's request log does not contain the value-shaped request's digits | PASS |
+| A second launcher is refused (exit 2, "already in use … Nothing was stopped") | PASS |
+| The first instance still serves afterwards | PASS |
+| After `--stop`: no process left | PASS |
+| After `--stop`: no listener on 8995 or 8977 | PASS |
+
+Cold start in that run, measured: verify 651 ms, model load 3169 ms, total 3839 ms.
+
+#### 1b. The model server's lock (B1, found in the PR #91 review) — PASS
+
+Re-run after the fix:
+[`logs/w1-launcher-lifecycle-20261024T004450Z.json`](logs/w1-launcher-lifecycle-20261024T004450Z.json),
+13 of 13 checks.
+
+**What was wrong.** The checks in section 1 guard the front on 8995. The model server on 8977 had
+no key. The pinned b10956 build answers CORS for every origin (`--cors-origins` defaults to `*`)
+and exposes `/slots` by default; both are from its own `--help`. Loopback binding keeps other
+machines out, and nothing more. Any local process, or a web page in the person's browser, could
+reach it directly, bypassing the front.
+
+**The fix** (`scripts/reasoner/upstream.mjs`):
+- **A per-launch key.** It is 256 bits from the OS's secure source and reaches the child only
+  through `LLAMA_API_KEY` in its environment, with every other inherited `LLAMA_*` variable
+  removed.
+- **The front attaches the key itself.** It forwards the path and the body only, so no incoming
+  header reaches the model.
+- **`--no-slots`.**
+- **Fail closed.** After the model server is healthy, the launcher checks that it refuses a keyless
+  and a wrong-keyed request and reports `/slots` off. Otherwise it stops the server and refuses to
+  start.
+- **Never printed or stored.** The key is not printed, logged, written to the state file or put in
+  an error message.
+
+**Measured on the pinned binary:**
+
+| Request | Status |
+|---|---|
+| Inference without the key, also with a web origin | 401 |
+| Inference with a wrong key | 401 |
+| `/slots` without the key | 401 |
+| `/slots` with the key | 501 |
+| `/health` | 200 (public) |
+
+- **An unkeyed server is refused.** Started without the key, the same binary answers anyone (200),
+  and the launcher's lock check refuses it.
+- **No key leaked.** No 43-character base64url token appears in anything the launcher printed,
+  its state file, or any test output. The scan detects 1000 of 1000 real keys.
+
+**The person-run smoke test (section 3) ran before the fix,** with the earlier, unkeyed model
+server. It was repeated after the fix, through the keyed model server: see section 3b, PASS 18 of
+18. The section 3 record is kept unchanged as the pre-fix run.
+
+**The benchmark was re-run after the fix.** Two runs completed 6/6 tasks and 15 steps through the
+keyed model server, which shows the product path works with the key. Their warm reasoner time is
+higher than the pre-fix runs (p50 507.8 and 476.4 against 438.0–442.8 ms). That difference is
+**not attributed**; see the benchmark README. The section 2 figures remain the pre-fix reference.
+
+**Found and fixed while building this: stop order.** `--stop` first stopped the launcher, then the
+model. On Windows, `process.kill` ends the launcher outright and its signal handlers do not run.
+`--stop` now stops the model first, and the launcher follows it down (`reasoner.mjs`, `stopRecorded`).
+
+### 2. Benchmark — COMPLETE
+
+Reference record: [`../../benchmarks/M20-w1-product/w1-cft-product-benchmark-20261023T203520Z.json`](../../benchmarks/M20-w1-product/w1-cft-product-benchmark-20261023T203520Z.json).
+
+- 6 of 6 tasks `COMPLETED_AS_DECLARED`; 15 steps.
+- Warm step p50 448.7 / p95 1438.8 ms (n = 14). Reasoner round trip p50 438.0 / p95 1391.4 ms.
+  Cold first step 2680.6 ms.
+- 0 of 15 steps network-free.
+
+Details, method and caveats: the benchmark README. Two earlier runs are kept beside it, with what
+each lacks.
+
+**Found and fixed while building this: a floating-point artifact.** An unrounded difference of
+`performance.now()` values printed as `…9000000001`. That matched the synthetic mobile number, and
+the orchestrator's existing "never quotes the secret" test caught it. Durations are now kept to
+0.01 ms. No assertion was changed.
+
+### 3. A person, Chrome's real side panel — PASS (17 of 17 checks)
+
+Record: [`logs/w1-cft-product-sidepanel-smoke-20261023T213953Z.json`](logs/w1-cft-product-sidepanel-smoke-20261023T213953Z.json),
+produced by `tests/browser/extension/run-product-smoke.mjs`.
+
+**Who did what.**
+
+- **The person:**
+  - started the reasoner with `npm run reasoner` in their own terminal;
+  - opened Chrome's real side panel;
+  - typed the goal, read the page, declared the expected result and started each task;
+  - pressed **Allow once**, then reloaded the page, then pressed **Deny**;
+  - closed the browser.
+- **The harness:**
+  - checked `/health` against the pin;
+  - built the product extension;
+  - launched Chrome for Testing with it loaded via `--load-extension` (the person did not use Load
+    unpacked);
+  - served the synthetic page;
+  - observed and wrote the record.
+
+The harness pressed nothing, answered nothing and injected nothing.
+
+**Allow once** — 9 of 9 checks. Outcome `COMPLETED_AS_DECLARED`; the page holds the registered
+number, Submit is disabled, and the verifier says `CONFIRMED`. Turn 1's trail, in ms since the run
+started:
+
+| Event | ms |
+|---|---|
+| `RUN_STARTED` | 0 |
+| `OBSERVED` | 1809.7 |
+| `SANITIZED` | 1818.2 |
+| `HANDOFF_VERIFIED` | 1818.2 |
+| `PLAN_REQUESTED` | 1818.4 |
+| `PLAN_RECEIVED(USABLE)` | 2978.5 |
+| `PLAN_VALIDATED(OK)` | 2979.0 |
+| `CONSENT_REQUESTED(PHONE)` | 2979.1 |
+| `CONSENT_ANSWERED(ALLOWED_ONCE)` | 4564.9 |
+| `BINDER_REVALIDATED(OK)` | 4566.0 |
+| `VALUE_RESTORED(PHONE)` | 4567.9 |
+| `PAGE_REFRESHED` | 4962.4 |
+| `CLICK_AUTHORIZED` | 4966.9 |
+| `CLICK_DISPATCHED` | 4968.1 |
+| `RESULT_OBSERVED` | 5385.5 |
+| `RESULT_VERIFIED(CONFIRMED)` | 5385.7 |
+| `RUN_ENDED(DONE:CONFIRMED)` | 5385.7 |
+
+Turn 2 ended `DONE:DECLARED_DONE`. Consent wait: 1586 ms.
+
+**Deny** — 8 of 8 checks. Outcome `STOPPED_REFUSED`, refusal `AWAIT_GRANT / CONSENT_DENIED`. The
+trail ends `CONSENT_REQUESTED(PHONE)@1509.4 → CONSENT_ANSWERED(CONSENT_DENIED)@4087.6 →
+RUN_ENDED(REFUSED:CONSENT_DENIED)@4087.7`. No `BINDER_REVALIDATED`, `VALUE_RESTORED`,
+`PAGE_REFRESHED`, `CLICK_*` or `RESULT_*` event; no restoration, act or verify-result timing. The
+page: confirmation field empty, Submit enabled, 0 Submit clicks.
+
+**What the person saw.**
+
+- **Allow:** the panel read `COMPLETED_AS_DECLARED — turn 1: clicked #submit → CONFIRMED`, with the
+  timing view. On the page: the confirmation field filled, Submit greyed out, and "Application
+  submitted".
+- **Deny:** the panel read `STOPPED_REFUSED` with `CONSENT_DENIED` and "nothing clicked", and the
+  restore, re-read, click and verify-result rows read "not measured". On the page: the field empty,
+  Submit enabled, and "Not submitted".
+
+**Value-free.** None of the fixture's synthetic values, nor the preview, appears in the record. It
+contains no local path and no user name, only codes, field ids, classes and times.
+
+**An unexplained Submit sequence (Allow scenario), kept as recorded.** The record's
+`page.submitClicks` is **2**, while the run authorised and dispatched exactly **one** click
+(`CLICK_AUTHORIZED → CLICK_DISPATCHED`, once). Before the browser closed, the page's own event log
+(`window.__submitEvents`, event types and coordinates only) was read through the harness's page
+handle, read-only, at about 21:58 UTC. It held two complete
+`pointerdown → mousedown → pointerup → mouseup → click` sequences on Submit:
+
+| # | Coordinates (CSS px) | What it is |
+|---|---|---|
+| 1 | pointer (122.4, 611.4), mouse (122, 611) | **Unexplained.** Its source is not established. |
+| 2 | (112, 610) exactly | **The agent-authorised, dispatched click.** The permit point is rounded to whole pixels by design, and the run recorded exactly one dispatch. |
+
+The page log lists sequence 1 first. **The person's observation:** "I did not intentionally click
+Submit before or during the task." No claim is made about sequence 1's source. What is established:
+- the run's pre-click check found Submit still enabled and the expected result not yet true;
+- the form was submitted only after the agent's click, which the verifier confirmed.
+
+The record is not edited, and this diagnostic is not part of it.
+
+**Earlier session, kept as written:**
+[`logs/w1-cft-product-sidepanel-smoke-20261023T205646Z.json`](logs/w1-cft-product-sidepanel-smoke-20261023T205646Z.json)
+— verdict FAIL, no task recorded.
+
+- **What the harness recorded.** The harness of that version waited 20 minutes for the Allow task,
+  then 20 more for the Deny reload. It then closed the browser itself. Its record shows no task seen
+  in its window.
+- **What else happened.** The reasoner's terminal shows the person's two model requests arriving
+  during that session, so the Allow run most likely completed after the harness had stopped looking
+  for it (inference). The person's panel then showed `COMPLETED_AS_DECLARED`, but closing the
+  browser destroyed the page state, so that run is **not** counted.
+- **The fix.** The harness no longer times out or closes the browser on the person. It waits until
+  the person closes it or presses Ctrl+C.
+
+### 3b. After the B1 fix: a person, Chrome's real side panel again — PASS (18 of 18 checks)
+
+Record: [`logs/w1-cft-product-sidepanel-smoke-20261024T211526Z.json`](logs/w1-cft-product-sidepanel-smoke-20261024T211526Z.json). Same harness, with three additions for this run (below). Same
+product build (no evidence flags), Chrome for Testing 153.0.8010.12, the same synthetic page and the
+same two scenarios.
+
+**Who did what.**
+- **Claude** typed `npm run reasoner` and then the harness command into two tabs of the person's
+  Terminal panel. The record says the reasoner was started outside the harness; the harness never
+  starts or stops it.
+- **The person** opened Chrome's real side panel, typed the goal, read the page, declared the
+  expected result, started each task, pressed **Allow once**, reloaded the page, pressed **Deny**,
+  and closed the browser.
+- **The harness** pressed nothing, answered nothing and injected nothing. The control plane's grant
+  path was not used (`grantViaControlPlane.asked: false` in both runs).
+
+**The model server was locked for the whole run.** Before opening the browser the harness checked
+that `/health` reports `modelServer.authentication: "per-launch key"` and that the model server on
+8977 refuses, without a key, both inference and `/slots` (401 and 401, recorded in
+`reasoner.modelServerLock`). It refuses to run otherwise. The extension's 3 requests all went to
+`http://127.0.0.1:8995/v1/chat/completions`; the front's log shows exactly 3 inference requests,
+all 200 (sizes only, no bodies). Since the model server answers only with the key, those answers
+came through the front's keyed connection (inference from these facts). The key appears nowhere in
+the record.
+
+**Allow once** — 10 of 10 checks. Outcome `COMPLETED_AS_DECLARED`; the page holds the registered
+number, Submit is disabled, and the verifier says `CONFIRMED`. Turn 1, in ms since the run started:
+`CONSENT_REQUESTED(PHONE)@3297.5 → CONSENT_ANSWERED(ALLOWED_ONCE)@5625.0 →
+BINDER_REVALIDATED(OK)@5628.3 → VALUE_RESTORED(PHONE)@5630.6 → PAGE_REFRESHED@6051.2 →
+CLICK_AUTHORIZED@6054.3 → CLICK_DISPATCHED@6055.5 → RESULT_OBSERVED@6468.0 →
+RESULT_VERIFIED(CONFIRMED)@6468.3 → RUN_ENDED(DONE:CONFIRMED)@6468.3`. Turn 2 ended
+`DONE:DECLARED_DONE`. Across both turns the run authorised and dispatched exactly one click.
+
+**Deny** — 8 of 8 checks. Outcome `STOPPED_REFUSED`, refusal `AWAIT_GRANT / CONSENT_DENIED`. The
+trail ends `CONSENT_REQUESTED(PHONE)@969.1 → CONSENT_ANSWERED(CONSENT_DENIED)@3659.4 →
+RUN_ENDED(REFUSED:CONSENT_DENIED)@3659.6`. No restore, click-authorisation, click-dispatch or result
+event in any turn. The confirmation field stayed empty and Submit stayed enabled.
+
+**Submit's pointer events, as the page logged them.** Allow: one sequence, `pointerdown`,
+`mousedown`, `pointerup`, `mouseup`, `click`, all at (112, 610). Deny: none. The second, unexplained
+sequence seen in section 3 did not occur in this run. That says nothing about its source, which
+remains unexplained.
+
+**Harness additions for this run** (`run-product-smoke.mjs`):
+- the model-server lock check above, recorded in `reasoner.modelServerLock`;
+- an Allow check that the run authorised and dispatched exactly one click across all turns, and a
+  Deny check that it authorised none;
+- `page.submitEvents`: each pointer/mouse event on Submit as `[type, x, y]`, recorded and not
+  interpreted.
+
+**Validation of the saved record.** It matches the harness's in-memory runs (judgements, page,
+egress and every event), read through Node's inspector before the browser closed. The harness's own
+scan finds none of the fixture's values in it; a scan for 43-character base64url tokens finds only
+the model hash, the CSP hash and two check names. It holds no prompt, no model output, no page text
+and no local path.
+
+**Two earlier post-fix attempts are not committed.** In both, the browser closed before any task
+ran. Each record says FAIL with no runs; one also carries a local install path in its error text.
+Both harnesses had been started as background tasks of a Claude session, and the likely cause is
+that they stopped when that session ended (inference; not confirmed). This run started the reasoner
+and the harness in the person's Terminal panel instead.
+
+## Conclusion
+
+On W1, from the documented commands, a person ran the shipped product end to end in Chrome's real
+side panel:
+
+- The product launcher served the pinned model on the one CSP endpoint.
+- Allow once restored the value once, then clicked and verified.
+- Deny restored and clicked nothing.
+- Both runs left an ordered, monotonic, value-free trail, and the panel showed measured per-stage
+  timings.
+
+The launcher's lifecycle and the W1 benchmark stand on their own records.
+
+**Not shown:**
+- reliability (one run per scenario);
+- any other machine or browser;
+- loading the build by hand;
+- ordinary websites;
+- frame egress (blocked);
+- anything about J7/B5 or D1–D4.
+
+## Reproducibility
+
+```bash
+npm run reasoner:stop
+```
+```bash
+node artifacts/experiments/M20-runnable-measured-product/harness/launcher-lifecycle.mjs
+```
+```bash
+CHROME_PATH="<CfT 153 chrome.exe>" node tests/browser/extension/run-product-benchmark.mjs
+```
+
+For the human run, start `npm run reasoner` in one terminal, then in another:
+
+```bash
+CHROME_PATH="<CfT 153 chrome.exe>" node tests/browser/extension/run-product-smoke.mjs
+```
+
+Each harness writes a new record named by its start time and refuses to overwrite one.

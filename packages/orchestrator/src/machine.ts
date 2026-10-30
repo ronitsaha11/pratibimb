@@ -151,11 +151,58 @@ export interface RunRefusal {
 export interface Transition {
   readonly from: RunState;
   readonly to: RunState;
+  /** Wall-clock time (`now`), for correlating with other records. Not for durations. */
   readonly at: number;
+  /** Since the run started, on the monotonic clock. */
   readonly elapsedMs: number;
 }
 
-/** Only the timings that mean something. No framework, no sampling, no telemetry. */
+/**
+ * M20 — what happened in a run, in order, and when. Value-free by construction: an event is a fixed
+ * name, a time and at most a code (a state, a cause, a class, a verifier's answer) — never a value,
+ * a label, a preview, page text, a prompt or a model output.
+ */
+export type RunEventName =
+  | "RUN_STARTED"
+  | "OBSERVED"
+  | "SANITIZED"
+  | "HANDOFF_VERIFIED"
+  | "CLARIFICATION_REQUESTED"
+  | "CLARIFICATION_ANSWERED"
+  | "PLAN_REQUESTED"
+  | "PLAN_RECEIVED"
+  | "FALLBACK_REQUESTED"
+  | "PLAN_VALIDATED"
+  | "CONSENT_REQUESTED"
+  | "CONSENT_ANSWERED"
+  | "GRANT_REQUESTED"
+  | "GRANT_ANSWERED"
+  | "BINDER_REVALIDATED"
+  | "VALUE_RESTORED"
+  | "PAGE_REFRESHED"
+  /** Every execution gate passed and a permit was minted: the gate is handing the click to the page. */
+  | "CLICK_AUTHORIZED"
+  | "CLICK_DISPATCHED"
+  | "CLICK_DISPATCH_FAILED"
+  | "RESULT_OBSERVED"
+  | "RESULT_VERIFIED"
+  | "RUN_ENDED";
+
+export interface RunEvent {
+  readonly event: RunEventName;
+  /** Milliseconds since the run started, on the monotonic clock. Non-decreasing within a run. */
+  readonly atMs: number;
+  /** A code, never a value. */
+  readonly code?: string;
+}
+
+/**
+ * Only the timings that mean something. No framework, no sampling, no telemetry.
+ *
+ * Durations come from the monotonic clock (`RunOptions.monotonic`). A key that is absent was not
+ * measured — the stage did not run — which is different from a stage that took 0 ms. `clarifyMs`
+ * and `grantMs` are a person's time, not the machine's.
+ */
 export interface RunTimings {
   observeMs?: number;
   /** Time spent asking the page whether its structure moved. No capture in it. */
@@ -190,6 +237,8 @@ export interface RunRecord {
   readonly state: RunState;
   readonly transitions: readonly Transition[];
   readonly timings: RunTimings;
+  /** M20 — the run's value-free event trail, in order. */
+  readonly events: readonly RunEvent[];
   readonly refusal: RunRefusal | null;
 
   /** The reading the plan was made against. What Pane 2 shows; never overwritten by later reads. */
@@ -283,7 +332,14 @@ export interface RunOptions {
   readonly confirmationTtlMs: number;
   /** Grant lifetime. An instrument value on the same terms. */
   readonly grantTtlMs: number;
+  /** Wall clock, for lifetimes and `Transition.at`. */
   readonly now?: () => number;
+  /**
+   * M20 — the clock durations are measured on. Defaults to `performance.now()`, which a wall-clock
+   * adjustment cannot move; a caller that injects `now` alone gets `now` here too, so a test that
+   * fixes time still gets a deterministic record.
+   */
+  readonly monotonic?: () => number;
   readonly today?: Date;
   readonly reasonerTimeoutMs?: number;
   /** Governs whether the deterministic planner may answer after a model outcome. */
@@ -315,7 +371,10 @@ const labelOf = (observation: Observation, selector: string): string =>
  */
 export async function runTask(ports: ClientPorts, options: RunOptions): Promise<RunRecord> {
   const clock = options.now ?? (() => Date.now());
-  const startedAt = clock();
+  const mono = options.monotonic ?? options.now ?? (() => performance.now());
+  const startedMono = mono();
+  /** A duration, kept to 0.01 ms: finer is below the clock's resolution, and a float tail is noise. */
+  const since = (from: number): number => Math.round((mono() - from) * 100) / 100;
 
   let state: RunState = "IDLE";
   const transitions: Transition[] = [];
@@ -344,25 +403,36 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let fillRecord: RunRecord["fill"] = null;
   const clarifications: RunRecord["clarifications"][number][] = [];
   const consents: RunRecord["consents"][number][] = [];
+  const events: RunEvent[] = [];
+  const emit = (event: RunEventName, code?: string): void => {
+    events.push({ event, atMs: since(startedMono), ...(code === undefined ? {} : { code }) });
+  };
+  emit("RUN_STARTED");
 
   /** The only way `state` changes. Refuses to move once the run has ended. */
   const go = (to: RunState): void => {
     if (state === "REFUSED" || state === "DONE") {
       throw new Error(`orchestrator: attempted ${state} → ${to}; a finished run does not continue.`);
     }
-    const at = clock();
-    transitions.push({ from: state, to, at, elapsedMs: at - startedAt });
+    transitions.push({ from: state, to, at: clock(), elapsedMs: since(startedMono) });
     state = to;
   };
 
-  const record = (): RunRecord => ({
+  const record = (): RunRecord => {
+    // `DONE` is not success: the code carries the verifier's own answer, or that the model declared done.
+    const outcome = refusal !== null ? refusal.cause : act?.verification ? act.verification.verification : declaredDone ? "DECLARED_DONE" : null;
+    if (events.at(-1)?.event !== "RUN_ENDED") emit("RUN_ENDED", outcome === null ? state : `${state}:${outcome}`);
+    return recordNow();
+  };
+  const recordNow = (): RunRecord => ({
     goal: options.goal,
     sessionId: options.sessionId,
     requestId: options.requestId,
     origin: options.origin,
     state,
     transitions,
-    timings: { ...timings, totalMs: clock() - startedAt },
+    timings: { ...timings, totalMs: since(startedMono) },
+    events,
     refusal,
     initialObservation,
     observation,
@@ -396,11 +466,11 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   };
 
   const timed = async <T>(key: keyof RunTimings, work: () => Promise<T>): Promise<T> => {
-    const began = clock();
+    const began = mono();
     try {
       return await work();
     } finally {
-      timings[key] = clock() - began;
+      timings[key] = since(began);
     }
   };
 
@@ -437,6 +507,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   try {
     observation = await timed("observeMs", () => ports.observe());
     initialObservation = observation;
+    emit("OBSERVED");
   } catch {
     return stop("OBSERVE", "OBSERVER_THREW", "the page could not be read; nothing was planned or done.");
   }
@@ -474,11 +545,13 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   // Asked of the verifier, never of `handoff.verified`: the flag type-checks, the membership does
   // not (INV-22). This stage exists so the orchestrator cannot be the thing that declares a payload
   // fit to leave.
+  emit("SANITIZED");
   go("VERIFY_PAYLOAD");
   const verified = await timed("verifyPayloadMs", async () => isVerifiedHandoff(handoff));
   if (!verified) {
     return stop("VERIFY_PAYLOAD", "HANDOFF_NOT_VERIFIED", "the payload is not one the privacy verifier produced.");
   }
+  emit("HANDOFF_VERIFIED");
   handoffSerialized = serializeHandoff(handoff);
 
   // ── WHICH STORED VALUE MAY GO WHERE (M16) ────────────────────────────────────────────────
@@ -526,6 +599,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
         return stop("AWAIT_CLARIFICATION", "CLARIFICATION_UNAVAILABLE", CLARIFICATION_DETAIL.CLARIFICATION_UNAVAILABLE);
       }
       let answer: unknown;
+      emit("CLARIFICATION_REQUESTED");
       try {
         answer = await timed("clarifyMs", () => ports.clarify!(prepared.prepared.request));
       } catch {
@@ -533,6 +607,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
         return stop("AWAIT_CLARIFICATION", "CLARIFICATION_FAILED", CLARIFICATION_DETAIL.CLARIFICATION_FAILED);
       }
       const checked = checkClarificationAnswer(prepared.prepared, answer, clock());
+      emit("CLARIFICATION_ANSWERED", checked.ok ? "CHOSEN" : checked.cause);
       if (!checked.ok) {
         clarifications.push({ target: conflict.target, candidates, outcome: checked.cause });
         return stop("AWAIT_CLARIFICATION", checked.cause, CLARIFICATION_DETAIL[checked.cause]);
@@ -619,7 +694,9 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     return { usable: true, plan: parsedAttempt.plan };
   };
 
+  emit("PLAN_REQUESTED", ports.reasonerKind ?? "LOCAL_MODEL");
   let attempt = await timed("sendMs", () => askReasoner(ports.reasoner, ports.reasonerKind ?? "LOCAL_MODEL"));
+  emit("PLAN_RECEIVED", attempt.usable ? "USABLE" : attempt.cause);
 
   // The model produced nothing usable. Whether the deterministic planner may answer is the
   // policy's decision, and it is recorded either way.
@@ -627,7 +704,9 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     const decision = decideFallback(attempt.outcome, policy);
     fallback = decision;
     if (decision.fellBack) {
+      emit("FALLBACK_REQUESTED", attempt.outcome);
       attempt = await timed("fallbackMs", () => askReasoner(ports.fallback!, "DETERMINISTIC_FALLBACK"));
+      emit("PLAN_RECEIVED", attempt.usable ? "USABLE" : attempt.cause);
     }
   }
   if (!attempt.usable) {
@@ -696,13 +775,17 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     const decision = decideFallback(outcomeOfRefusal(validation.refusal.cause), policy);
     fallback = decision;
     if (decision.fellBack) {
+      emit("PLAN_VALIDATED", validation.refusal.cause);
+      emit("FALLBACK_REQUESTED", outcomeOfRefusal(validation.refusal.cause));
       const retry = await timed("fallbackMs", () => askReasoner(ports.fallback!, "DETERMINISTIC_FALLBACK"));
+      emit("PLAN_RECEIVED", retry.usable ? "USABLE" : retry.cause);
       if (retry.usable) {
         await adopt(retry.plan);
         validation = validateNow();
       }
     }
   }
+  emit("PLAN_VALIDATED", validation.ok ? (validation.declaresDone ? "DONE_DECLARED" : "OK") : validation.refusal.cause);
   if (!validation.ok) {
     return stop("VALIDATE_PLAN", validation.refusal.cause, validation.refusal.detail, validation.refusal);
   }
@@ -801,6 +884,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
           viewId,
         });
         let raw: unknown;
+        emit("CONSENT_REQUESTED", insert.piiClass);
         try {
           raw = await ports.consent(request);
         } catch {
@@ -808,11 +892,14 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
           return { stopped: "CONSENT_FAILED", detail: CONSENT_DETAIL.CONSENT_FAILED };
         }
         const checked = checkConsentAnswer(request, raw);
+        emit("CONSENT_ANSWERED", checked.ok ? "ALLOWED_ONCE" : checked.cause);
         consents.push({ target: insert.target, piiClass: insert.piiClass, outcome: checked.ok ? "ALLOWED_ONCE" : checked.cause });
         if (!checked.ok) return { stopped: checked.cause, detail: CONSENT_DETAIL[checked.cause] };
         decision = { granted: true };
       } else {
+        emit("GRANT_REQUESTED", insert.piiClass);
         decision = await ports.requestGrant(grantRequest);
+        emit("GRANT_ANSWERED", decision.granted ? "GRANTED" : decision.reason);
       }
       grantDecision = decision;
       if (!decision.granted) return { stopped: decision.reason };
@@ -855,6 +942,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   // Re-validate with the grants in hand. The binder must be the thing that says the grant suffices —
   // the orchestrator holding a grant object is not the same as privacy accepting it.
   validation = validateNow();
+  emit("BINDER_REVALIDATED", validation.ok ? (validation.needsHuman.length > 0 ? "NEEDS_HUMAN_GRANT" : "OK") : validation.refusal.cause);
   if (!validation.ok) {
     return stop("VALIDATE_PLAN", validation.refusal.cause, validation.refusal.detail, validation.refusal);
   }
@@ -909,6 +997,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
       if (spent) spent.used = true;
 
       rehydrated.push({ ref: insert.ref, target: insert.target, piiClass: insert.piiClass, inserted: outcome.inserted });
+      emit("VALUE_RESTORED", outcome.inserted ? insert.piiClass : "INSERTION_REFUSED");
       if (!outcome.inserted) return { cause: "INSERTION_REFUSED" };
     }
     return { cause: null };
@@ -923,6 +1012,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
   let fresh: Observation;
   try {
     fresh = await timed("refreshMs", () => ports.observe());
+    emit("PAGE_REFRESHED");
   } catch {
     return stop("ACT", "OBSERVER_THREW", "the page could not be re-read before acting, so nothing was clicked.");
   }
@@ -1007,9 +1097,32 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
       ? undefined
       : { watching: structure.watching, seq: structure.seq, observedAtSeq: fresh.structure.seq };
 
+  /**
+   * The same bridges, observed. The gate calls `clickAtCssPoint` only after every check has passed
+   * and a permit was minted, so its call is the moment the click is authorised; its return is the
+   * dispatch. The click is forwarded exactly once and never initiated here.
+   */
+  const pageAction = ports.bridges.action;
+  const observedBridges = {
+    hitTest: ports.bridges.hitTest,
+    action: {
+      frameId: pageAction.frameId,
+      clickAtCssPoint: async (point: Parameters<typeof pageAction.clickAtCssPoint>[0]): Promise<void> => {
+        emit("CLICK_AUTHORIZED");
+        try {
+          await pageAction.clickAtCssPoint(point);
+        } catch (error) {
+          emit("CLICK_DISPATCH_FAILED");
+          throw error;
+        }
+        emit("CLICK_DISPATCHED");
+      },
+    },
+  };
+
   go("VERIFY_RESULT");
   act = await timed("actMs", () =>
-    guardedAct(fresh.graph, action, ports.bridges, {
+    guardedAct(fresh.graph, action, observedBridges, {
       ...(structuralWitness ? { structure: structuralWitness } : {}),
       verify: {
         // The client's declaration for this control. Nothing here hardcodes CONFIRMED — the verifier
@@ -1017,6 +1130,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
         expect: declared,
         observe: async () => {
           const after = await timed("verifyResultMs", () => ports.observe());
+          emit("RESULT_OBSERVED");
           observation = after;
           return {
             graph: after.graph,
@@ -1030,6 +1144,7 @@ export async function runTask(ports: ClientPorts, options: RunOptions): Promise<
     })
   );
 
+  if (act.verification) emit("RESULT_VERIFIED", act.verification.verification);
   if (act.reached !== "VERIFY_RESULT") {
     const cause =
       act.result && act.result.status !== "EXECUTED" && "cause" in act.result

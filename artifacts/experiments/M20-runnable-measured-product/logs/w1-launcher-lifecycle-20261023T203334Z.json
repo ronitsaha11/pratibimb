@@ -1,0 +1,80 @@
+{
+  "experiment": "M20 — product reasoner launcher lifecycle",
+  "runId": "20261023T203334Z",
+  "verdict": "PASS",
+  "launcher": "node scripts/reasoner/reasoner.mjs (what `npm run reasoner` runs)",
+  "pin": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF qwen2.5-0.5b-instruct-q4_k_m.gguf @ 9217f5db79a29953eb74d5343926648285ec7e67",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "runtime": "llama.cpp b10956",
+    "endpoint": "http://127.0.0.1:8995/v1/chat/completions",
+    "upstream": "127.0.0.1:8977"
+  },
+  "coldStart": {
+    "label": "measured",
+    "verifyMs": 651,
+    "modelLoadMs": 3169,
+    "totalMs": 3839
+  },
+  "checks": {
+    "healthReportsThePin": true,
+    "inferenceThroughLocalModelReasoner": true,
+    "refusals": {
+      "webPageOrigin": 403,
+      "remoteOrigin": 403,
+      "rebindingHost": 421,
+      "otherPath": 404,
+      "getOnEndpoint": 405,
+      "notJson": 400,
+      "valueShapedText": 422
+    },
+    "everyRefusalAsSpecified": true,
+    "requestLogCarriesNoBody": true,
+    "secondStartRefused": true,
+    "firstStillServing": true,
+    "noProcessLeft": true,
+    "noListenerLeft": true
+  },
+  "timeline": {
+    "clock": "monotonic, ms since the harness started",
+    "events": [
+      {
+        "event": "PORTS_FREE",
+        "atMs": 14.3
+      },
+      {
+        "event": "READY",
+        "atMs": 3934.57
+      },
+      {
+        "event": "INFERENCE_CHECKED",
+        "atMs": 7490.6,
+        "code": "PASS"
+      },
+      {
+        "event": "REFUSALS_CHECKED",
+        "atMs": 7501.19,
+        "code": "PASS"
+      },
+      {
+        "event": "SECOND_START_REFUSED",
+        "atMs": 8201.38,
+        "code": "PASS"
+      },
+      {
+        "event": "STOPPED",
+        "atMs": 9451.31,
+        "code": "CLEAN"
+      }
+    ]
+  },
+  "recordedAt": "2026-10-23T20:33:43.969Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H",
+    "node": "v24.19.0"
+  }
+}

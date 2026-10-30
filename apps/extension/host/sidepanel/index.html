@@ -10,6 +10,11 @@
     textarea, input { width: 100%; box-sizing: border-box; font: inherit; }
     pre { background: #f4f5f7; padding: 6px; white-space: pre-wrap; min-height: 40px; }
     .warn { color: #8a2d00; }
+    #task-timings table { border-collapse: collapse; margin: 6px 0; width: 100%; }
+    #task-timings td { padding: 1px 4px; }
+    #task-timings td.ms { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    #task-timings tr.person td { font-style: italic; }
+    #task-timings tr.missing td.ms { color: #666; }
   </style>
 </head>
 <body>
@@ -47,6 +52,8 @@
     <ul id="task-declared"></ul>
     <button id="task-start" type="button" disabled>Start task</button>
     <div id="task-status"></div>
+    <!-- M20: measured per-stage timings of the finished task, per turn. Value-free; textContent only. -->
+    <div id="task-timings"></div>
   </fieldset>
   <fieldset><legend>Capture</legend><div id="capture">…</div></fieldset>
   <fieldset><legend>Status</legend><pre id="status">…</pre><div id="needs-user">NEEDS_USER: none</div></fieldset>

@@ -33,14 +33,130 @@ coordinates, and can plan around it.
 
 ## Status
 
-**Phase 0 — initialization complete. No product code has been written.**
+**A working, measured prototype on one machine. Not a product release.** (Updated in M20, 2026-10-23
+UTC. The previous text here said "no product code has been written", which had been false since
+2026-09-10.)
 
-The repository currently contains the engineering environment: the governing dossier, the
-frozen contracts, the architecture constitution, specialist reviewer contracts, workflows,
-quality gates, and the model registry and feasibility matrix (structures only — every cell
-is `UNKNOWN`).
+What runs today, on Windows x64 (W1), against **synthetic pages on `127.0.0.1` only**:
 
-See `agentos/state.md`.
+- **Browser extension.** A Chrome MV3 extension (`apps/extension`). It reads the page's structure
+  locally, replaces every stored value with a typed reference, and sends only that sanitized,
+  verified handoff to the reasoner.
+- **Local reasoner.** Qwen2.5-0.5B-Instruct (Q4_K_M) under llama.cpp b10956, started by
+  `npm run reasoner`. Both of its ports are bound to 127.0.0.1. That keeps other machines out, but
+  not local processes or web pages in your browser, so each port has its own guard:
+  - **8995, the extension's one permitted endpoint:** accepts only the extension's origin, its own
+    Host and the one path.
+  - **8977, the model server:** answers only requests carrying a key generated at each launch,
+    which only the launcher's front holds.
+- **Every model plan stays untrusted.** It is parsed, validated, re-checked by the privacy binder,
+  and refreshed before anything happens. A stored value is restored only after the person allows
+  that one restoration in the side panel. A click goes through the execution gate and is verified
+  against the result the person declared.
+- **Measured.** Every stage of every run is timed and shown in the side panel. W1 figures are in
+  [`artifacts/benchmarks/M20-w1-product/`](artifacts/benchmarks/M20-w1-product/README.md).
+
+What it is **not** (each is a recorded decision or an open item, not an oversight):
+
+- **No frame leaves the device.** Production frame egress is blocked (ADR-0012), and the reasoner
+  sees structure only.
+- **J7/B5** (frame-handoff authentication) and the owner decisions **D1–D4** are open.
+- **The visual UI detector is not adopted** (QG-03a open).
+- **Synthetic loopback pages only.** Widening to ordinary websites needs an ADR.
+- **Every step calls the model:** there is no cache and no local-decision step yet.
+- **Top-level navigation is outside CSP** (F-M13-1): an open residual, documented.
+
+See [`agentos/state.md`](agentos/state.md) for the current state with evidence, and
+[`agentos/blockers.md`](agentos/blockers.md) for blockers.
+
+---
+
+## Run it (W1, from a clean checkout)
+
+**Prerequisites:**
+
+- Windows x64: the pinned runtime is llama.cpp's `win-cpu-x64` build.
+- Node 20 or later (measured with v24.19.0), git, and Python 3 (for `npm run verify`).
+- About 600 MB free for the model and runtime, and network access for the one-time downloads.
+
+**1. Install dependencies, and Chrome for Testing** (Playwright 1.63.0 installs CfT 153, under
+`%LOCALAPPDATA%\ms-playwright\chromium-1243\chrome-win64\chrome.exe`):
+
+```bash
+npm ci
+```
+```bash
+npx playwright install chromium
+```
+
+**2. Fetch the pinned model and runtime** (once; about 491 MB plus 18 MB; never committed). This
+records each file's SHA-256 and the licence at the pinned revision.
+
+```bash
+node artifacts/experiments/LOOP-2-local-reasoner-egress/harness/fetch-model.mjs
+```
+
+**3. Check the pins and the ports** (starts nothing):
+
+```bash
+npm run reasoner:check
+```
+
+**4. Start the reasoner**, in its own terminal, and leave it running:
+
+```bash
+npm run reasoner
+```
+
+It prints `ready: http://127.0.0.1:8995/v1/chat/completions`. If the model or runtime on disk is not
+exactly what [`scripts/reasoner/pin.json`](scripts/reasoner/pin.json) pins, it refuses to start and
+says why (exit 2). If port 8995 or 8977 is busy, it says so and stops nothing. The model server
+behind it on 8977 requires a key generated for this launch and never shown; if it does not refuse a
+request without that key, the launcher stops it and refuses to start. Ctrl+C stops it;
+from another terminal, `npm run reasoner:stop` stops an instance it started, after checking each
+process is still its own.
+
+**5. Build the extension** (the product build; no evidence flags):
+
+```bash
+npm run build -w apps/extension
+```
+
+**6. Use it in Chrome's side panel.** The harness below starts the demo page, launches Chrome for
+Testing with the build loaded, and prints each step. It never clicks anything for you, and it
+writes a value-free record of what happened.
+
+```bash
+CHROME_PATH="$LOCALAPPDATA/ms-playwright/chromium-1243/chrome-win64/chrome.exe" node tests/browser/extension/run-product-smoke.mjs
+```
+
+In the browser, open Chrome's side panel (the side-panel button at the right of the toolbar) and
+choose **PratiBimb**. Type the goal, press **Read this page**, declare what the Submit button should
+do, press **Start task**, and answer the consent request. **Allow once** restores the value once;
+**Deny** restores nothing. The panel then shows each turn's outcome and its measured stage timings.
+Records go to `artifacts/experiments/M20-runnable-measured-product/logs/`, one new file per run.
+
+**Outputs:**
+
+- **The side panel:** each turn's outcome, plus timings in ms. "Not measured" means the stage did
+  not run, and "waiting for you" is your time.
+- **The reasoner's terminal:** one line per request (status, sizes, latency), never a body.
+- **The smoke record:** the run's event trail and timings, as codes and times only.
+
+**Reproduce the measurements:**
+
+- **Benchmark** (stop any running reasoner first; it starts its own, cold):
+  `node tests/browser/extension/run-product-benchmark.mjs` with `CHROME_PATH` set as above.
+- **Launcher lifecycle:**
+  `node artifacts/experiments/M20-runnable-measured-product/harness/launcher-lifecycle.mjs`.
+- **Full test suite:** `npm run verify`.
+
+**Limitations of these instructions:**
+
+- Measured on W1 only.
+- Chrome for Testing is used because branded Chrome 152+ refuses `--load-extension`.
+- Loading the build by hand (`chrome://extensions` → Developer mode → Load unpacked →
+  `apps/extension/.output/chrome-mv3`) is not what the harness does, and was not exercised in M20.
 
 ---
 
@@ -53,7 +169,7 @@ See `agentos/state.md`.
 | Reviewing the architecture | `docs/architecture/constitution.md` — the constitution |
 | Touching anything security-related | `docs/security/security-invariants.md` |
 | Adding or changing a model | `agentos/workflows/model-adoption.md` |
-| Wondering what is actually proven | `agentos/registry/feasibility-matrix.md` — the answer is currently "nothing" |
+| Wondering what is actually proven | `agentos/state.md` "Current state" (each claim names its evidence) and `agentos/registry/feasibility-matrix.md` |
 
 ---
 
@@ -98,8 +214,9 @@ artifacts/
 scripts/                       repository tooling
 ```
 
-> `apps/` and `packages/` do not exist yet, and deliberately so — there is no product code.
-> They are created when the first product code is written, not before. See
+> `apps/extension` (the browser extension), `packages/*` (perception, privacy, plan, reasoner, agent,
+> orchestrator, egress, security and the rest) and `scripts/reasoner/` (the product launcher) hold the
+> product code. Until 2026-09-10 they did not exist, and this note said so. See
 > `docs/operations/repository-structure.md`.
 
 ---

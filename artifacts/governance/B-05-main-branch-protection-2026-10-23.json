@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-23T20:37:37.403Z",
+  "command": "gh api repos/ronitsaha11/pratibimb/branches/main/protection",
+  "httpStatus": 200,
+  "requiredStatusChecks": {
+    "strict": true,
+    "contexts": [
+      "Governance and secret hygiene"
+    ]
+  },
+  "requiredPullRequestReviews": {
+    "requiredApprovingReviewCount": 0,
+    "dismissStaleReviews": true
+  },
+  "allowForcePushes": false,
+  "allowDeletions": false,
+  "enforceAdmins": false,
+  "repository": {
+    "visibility": "PUBLIC (gh repo view --json isPrivate → false)"
+  }
+}

@@ -10,6 +10,9 @@
     "pin:check": "node scripts/generate-ort-pin.mjs --check",
     "demo": "node tests/browser/demo/run-sih-demo.mjs",
     "demo:present": "node tests/browser/demo/run-sih-demo.mjs --present",
+    "reasoner": "node scripts/reasoner/reasoner.mjs",
+    "reasoner:check": "node scripts/reasoner/reasoner.mjs --check",
+    "reasoner:stop": "node scripts/reasoner/reasoner.mjs --stop",
     "test": "vitest run",
     "typecheck": "tsc -b --force && tsc -p apps/extension/tsconfig.json",
     "verify": "python scripts/verify-repo.py && npm run pin:check && npm run typecheck && npm test"

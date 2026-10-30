@@ -118,24 +118,76 @@ export function summariseTask(status: unknown): string {
   if (task.state === "FAILED") return `Could not run: ${String(task.refused)}`;
   const loop = isRecord(task.result) && isRecord(task.result.loop) ? task.result.loop : null;
   if (!loop || !Array.isArray(loop.turns)) return "Finished.";
-  const turns = loop.turns
-    .map((t: unknown, i: number) => {
-      if (!isRecord(t)) return `turn ${i + 1}: ?`;
-      const steps = isRecord(t.plan) && Array.isArray(t.plan.steps) ? t.plan.steps : [];
-      const click = steps.find((s: unknown) => isRecord(s) && s.op === "click") as { target?: string } | undefined;
-      const verification = isRecord(t.act) && isRecord(t.act.verification) ? String(t.act.verification.verification) : null;
-      const refusal = isRecord(t.refusal) ? String(t.refusal.cause) : null;
-      const done = t.declaredDone === true;
-      // A click the client refused was never made: say "proposed", not "clicked".
-      const what = done
-        ? "the model said the task is done"
-        : click && verification !== null
-          ? `clicked ${click.target} → ${verification}`
-          : click
-            ? `the model proposed clicking ${click.target}; refused (${refusal ?? "?"}), nothing clicked`
-            : `stopped (${refusal ?? "?"})`;
-      return `turn ${i + 1}: ${what}`;
-    })
-    .join("; ");
+  const turns = loop.turns.map((t: unknown, i: number) => `turn ${i + 1}: ${describeTurn(t)}`).join("; ");
   return `${String(loop.outcome)} — ${turns}`;
+}
+
+/** What one turn did, value-free. A click the client refused was never made: "proposed", not "clicked". */
+function describeTurn(t: unknown): string {
+  if (!isRecord(t)) return "?";
+  const steps = isRecord(t.plan) && Array.isArray(t.plan.steps) ? t.plan.steps : [];
+  const click = steps.find((s: unknown) => isRecord(s) && s.op === "click") as { target?: string } | undefined;
+  const verification = isRecord(t.act) && isRecord(t.act.verification) ? String(t.act.verification.verification) : null;
+  const refusal = isRecord(t.refusal) ? String(t.refusal.cause) : null;
+  if (t.declaredDone === true) return "the model said the task is done";
+  if (click && verification !== null) return `clicked ${click.target} → ${verification}`;
+  if (click) return `the model proposed clicking ${click.target}; refused (${refusal ?? "?"}), nothing clicked`;
+  return `stopped (${refusal ?? "?"})`;
+}
+
+/**
+ * M20 — HOW LONG EACH STAGE TOOK, PER TURN, AS MEASURED.
+ *
+ * Only the stages the orchestrator times (`RunTimings`), in pipeline order, in milliseconds on the
+ * monotonic clock. A stage the turn never reached shows "not measured" — never 0, which would claim
+ * it ran instantly. The time a person spent deciding is labelled as theirs: it is not the system's
+ * latency, and the total includes it. Each turn's heading says what the turn actually did, so a
+ * refused or failed turn's timings cannot be read as a success. No value, label or page text.
+ */
+export const TIMING_STAGES: readonly { readonly key: string; readonly label: string; readonly person?: true; readonly within?: true }[] = [
+  { key: "observeMs", label: "Read the page" },
+  { key: "sanitizeMs", label: "Sanitize" },
+  { key: "verifyPayloadMs", label: "Verify the handoff" },
+  { key: "clarifyMs", label: "Waiting for you: which value", person: true },
+  { key: "sendMs", label: "Reasoner" },
+  { key: "fallbackMs", label: "Fallback planner" },
+  { key: "validatePlanMs", label: "Validate the plan" },
+  { key: "grantMs", label: "Waiting for you: allow or deny", person: true },
+  { key: "rehydrateMs", label: "Restore the value" },
+  { key: "refreshMs", label: "Re-read the page" },
+  { key: "structureMs", label: "Check the page did not move" },
+  { key: "actMs", label: "Click, then read the result" },
+  { key: "verifyResultMs", label: "of which: read the result", within: true },
+  { key: "totalMs", label: "Total (includes your time)" },
+];
+
+export interface TimingRow {
+  readonly label: string;
+  /** `null`: not measured — the stage did not run in this turn. */
+  readonly ms: number | null;
+  readonly text: string;
+  readonly person: boolean;
+}
+
+export interface TurnTimings {
+  readonly heading: string;
+  readonly rows: readonly TimingRow[];
+}
+
+export const formatMs = (ms: number | null): string => (ms === null ? "not measured" : `${ms.toFixed(1)} ms`);
+
+export function timingRows(status: unknown): readonly TurnTimings[] {
+  if (!isRecord(status) || !isRecord(status.task) || status.task.state === "RUNNING") return [];
+  const result = status.task.result;
+  if (!isRecord(result)) return [];
+  const turns = isRecord(result.loop) && Array.isArray(result.loop.turns) ? result.loop.turns : isRecord(result.record) ? [result.record] : [];
+  return turns.map((t: unknown, i: number) => {
+    const timings = isRecord(t) && isRecord(t.timings) ? t.timings : {};
+    const rows = TIMING_STAGES.map((stage) => {
+      const v = timings[stage.key];
+      const ms = typeof v === "number" && Number.isFinite(v) && v >= 0 ? v : null;
+      return { label: stage.label, ms, text: formatMs(ms), person: stage.person === true };
+    });
+    return { heading: `Turn ${i + 1}: ${describeTurn(t)}`, rows };
+  });
 }
