@@ -1,10 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { GATE_CHECKS, describeDataset, geometricVisibility, modelBoxOf, runDatasetGate } from "./dataset-quality-gate.mjs";
+import {
+  GATE_CHECKS,
+  REQUIRED_CHECKS_V1_RECIPE_AUDIT,
+  REQUIRED_CHECKS_V2,
+  describeDataset,
+  geometricVisibility,
+  modelBoxOf,
+  runDatasetGate,
+} from "./dataset-quality-gate.mjs";
 
 const V = { w: 1280, h: 720 };
 const ann = (id, cls, x, y, w, h, extra = {}) => ({ id, cls, box: { x, y, w, h }, visibility: geometricVisibility({ x, y, w, h }, V), ...extra });
 const sample = (id, split, annotations, seed) => ({ id, split, seed, viewportCss: V, annotations });
-const OPTS = { classes: ["button", "icon"], minPerClassBucket: 1, nearDuplicateIou: 0.9, repetitionShare: 0.5 };
+/** The geometry-only checks: what a dataset with no hit-test, source or intent fields can satisfy. */
+const GEOMETRY_ONLY = ["G1_NON_DEGENERATE", "G2_VISIBILITY_MATCHES_GEOMETRY", "G4_CLASS_SIZE_COVERAGE", "G5_DUPLICATES", "G6_SUSPICIOUS_REPETITION", "G7_SPLIT_INTEGRITY"];
+const OPTS = { classes: ["button", "icon"], minPerClassBucket: 1, nearDuplicateIou: 0.9, repetitionShare: 0.5, expectedSplits: ["train", "dev"], requiredChecks: GEOMETRY_ONLY };
 const check = (r, id) => r.checks.find((c) => c.id === id);
 
 /** One clean sample: a button and an icon in every size bucket (model scale 0.5 at 1280×720). */
@@ -65,7 +75,7 @@ describe("M22.1 dataset gate — each check fails on its defect", () => {
 
   it("G4: a class with no observable example in a bucket, and occluded labels do not count", () => {
     const ds = { samples: [sample("a", "train", [ann("x", "button", 50, 50, 80, 20, { validity: "HIT_TESTABLE" }), ann("y", "icon", 0, 0, 22, 22, { validity: "FULLY_OCCLUDED" })])] };
-    const g4 = check(runDatasetGate(ds, OPTS), "G4_CLASS_SIZE_COVERAGE");
+    const g4 = check(runDatasetGate(ds, { ...OPTS, expectedSplits: ["train"] }), "G4_CLASS_SIZE_COVERAGE");
     expect(g4.status).toBe("FAIL");
     expect(g4.coverage.train.icon).toBeUndefined();
     expect(g4.gaps).toBe(7); // button has 1 of 4 buckets, icon none
@@ -150,5 +160,114 @@ describe("M22.2 G9 — occlusion labels", () => {
   });
   it("FAIL: an intended positive the hit test found occluded (accidental occlusion)", () => {
     expect(G9([flagged("a", "PARTIALLY_OCCLUDED", "positive", false)])).toMatchObject({ status: "FAIL", intendedPositiveNotHitTestable: 1 });
+  });
+});
+
+describe("M22.2 hardening — the six false passes the architecture review found now fail", () => {
+  // Train and dev differ in layout (y 100 vs 300) so G7 does not mask the effect under test.
+  const Y = (sid) => (sid.startsWith("d") ? 300 : 100);
+  const sides = [12, 20, 40, 80]; // one per size bucket at scale 0.5
+  const v2f = (k, sid) => ({
+    validity: "HIT_TESTABLE",
+    intent: "positive",
+    positive: true,
+    source: { declared: { x: 40 + k * 200, y: Y(sid), w: sides[k] * 3, h: sides[k] }, computedPosition: "absolute" },
+  });
+  const four = (sid, extra = () => ({})) => sides.map((s, k) => ann(`${sid}-${k}`, "button", 40 + k * 200, Y(sid), s * 3, s, extra(k, sid)));
+  const V2 = { classes: ["button"], minPerClassBucket: 1, nearDuplicateIou: 0.9, repetitionShare: 0.5, sourceTolerancePx: 0, expectedSplits: ["train", "dev"], requiredChecks: REQUIRED_CHECKS_V2 };
+  const good = () => [sample("t0", "train", four("t0", v2f), 1), sample("d0", "dev", four("d0", v2f), 2)];
+
+  it("control: a complete, correct v2 dataset passes, with every required check applicable", () => {
+    const r = runDatasetGate({ samples: good() }, V2);
+    expect(r.pass).toBe(true);
+    expect(r.requiredNotApplicable).toEqual([]);
+    expect(r.checks.every((c) => c.status === "PASS")).toBe(true);
+  });
+
+  it("A — no validity, source or positive fields: required G3, G8 and G9 are NOT_APPLICABLE, so the gate FAILS", () => {
+    const r = runDatasetGate({ samples: [sample("t0", "train", four("t0"), 1), sample("d0", "dev", four("d0"), 2)] }, V2);
+    expect(r.pass).toBe(false);
+    expect(r.requiredNotApplicable).toEqual(["G3_LABEL_OBSERVABLE", "G8_SOURCE_RENDER_CONSISTENCY", "G9_OCCLUSION_LABELS"]);
+    // Each check's own status stays visible: NOT_APPLICABLE, not rewritten as FAIL.
+    expect(check(r, "G8_SOURCE_RENDER_CONSISTENCY").status).toBe("NOT_APPLICABLE");
+  });
+
+  it("B — v2 fields on only some annotations: G3, G8 and G9 FAIL as incomplete", () => {
+    const partial = [sample("t0", "train", four("t0", (k, sid) => (k === 0 ? v2f(k, sid) : {})), 1), sample("d0", "dev", four("d0", v2f), 2)];
+    const r = runDatasetGate({ samples: partial }, V2);
+    expect(r.pass).toBe(false);
+    expect(check(r, "G3_LABEL_OBSERVABLE")).toMatchObject({ status: "FAIL", missingValidity: 3 });
+    expect(check(r, "G8_SOURCE_RENDER_CONSISTENCY")).toMatchObject({ status: "FAIL", missingSource: 3 });
+    expect(check(r, "G9_OCCLUSION_LABELS")).toMatchObject({ status: "FAIL", incomplete: 3 });
+  });
+
+  it("C — a declared full occlusion that rendered HIT_TESTABLE (occluder missing) FAILS G9", () => {
+    const missingOccluder = ann("t0-x", "button", 40, 400, 60, 20, { validity: "HIT_TESTABLE", intent: "occlusion-full", positive: false, source: { declared: { x: 40, y: 400, w: 60, h: 20 }, computedPosition: "absolute" } });
+    const ds = good();
+    ds[0].annotations.push(missingOccluder);
+    const r = runDatasetGate({ samples: ds }, V2);
+    expect(r.pass).toBe(false);
+    expect(check(r, "G9_OCCLUSION_LABELS")).toMatchObject({ status: "FAIL", declaredOcclusionNotObserved: 1 });
+  });
+
+  it("C' — a declared partial occlusion observed as FULLY_OCCLUDED also fails; a matching one passes", () => {
+    const occ = (validity) => ann("t0-y", "button", 40, 400, 60, 20, { validity, intent: "occlusion-partial", positive: false, source: { declared: { x: 40, y: 400, w: 60, h: 20 }, computedPosition: "absolute" } });
+    const ds1 = good();
+    ds1[0].annotations.push(occ("FULLY_OCCLUDED"));
+    expect(check(runDatasetGate({ samples: ds1 }, V2), "G9_OCCLUSION_LABELS").status).toBe("FAIL");
+    const ds2 = good();
+    ds2[0].annotations.push(occ("PARTIALLY_OCCLUDED"));
+    expect(runDatasetGate({ samples: ds2 }, V2).pass).toBe(true);
+  });
+
+  it("D — an expected split absent entirely FAILS G4 and G7", () => {
+    const r = runDatasetGate({ samples: [good()[0]] }, V2);
+    expect(r.pass).toBe(false);
+    expect(check(r, "G7_SPLIT_INTEGRITY")).toMatchObject({ status: "FAIL", missingSplits: ["dev"] });
+    expect(check(r, "G4_CLASS_SIZE_COVERAGE")).toMatchObject({ status: "FAIL", gaps: 4 });
+  });
+
+  it("D' — a split the configuration did not expect FAILS G7", () => {
+    const r = runDatasetGate({ samples: [...good(), sample("x0", "holdout", four("x0", v2f), 3)] }, V2);
+    expect(check(r, "G7_SPLIT_INTEGRITY")).toMatchObject({ status: "FAIL", unexpectedSplits: ["holdout"] });
+  });
+
+  it("E — minPerClassBucket 0 (or fractional, or negative) is refused before any check runs", () => {
+    for (const bad of [0, -1, 0.5]) expect(() => runDatasetGate({ samples: [] }, { ...V2, minPerClassBucket: bad })).toThrow(/at least 1/);
+  });
+
+  it("F — computedPosition 'relative' (or 'fixed', or missing) FAILS G8; only 'absolute' passes", () => {
+    for (const pos of ["relative", "fixed", "sticky", undefined]) {
+      const ds = good();
+      ds[0].annotations[0].source.computedPosition = pos;
+      expect(check(runDatasetGate({ samples: ds }, V2), "G8_SOURCE_RENDER_CONSISTENCY")).toMatchObject({ status: "FAIL", positionIgnored: 1 });
+    }
+  });
+
+  it("G9 also fails an unknown intent, and a positive flag that contradicts intent and validity", () => {
+    const ds = good();
+    ds[0].annotations[0].intent = "decoy";
+    expect(check(runDatasetGate({ samples: ds }, V2), "G9_OCCLUSION_LABELS")).toMatchObject({ status: "FAIL", unknownIntent: 1 });
+    const ds2 = good();
+    ds2[0].annotations[1].positive = false; // intended positive, HIT_TESTABLE, but flagged non-positive
+    expect(check(runDatasetGate({ samples: ds2 }, V2), "G9_OCCLUSION_LABELS")).toMatchObject({ status: "FAIL", positiveFlagInconsistent: 1 });
+  });
+
+  it("requiredChecks and expectedSplits are required options, with no default", () => {
+    const { requiredChecks, ...noRequired } = V2;
+    const { expectedSplits, ...noSplits } = V2;
+    expect(() => runDatasetGate({ samples: [] }, noRequired)).toThrow(/requiredChecks/);
+    expect(() => runDatasetGate({ samples: [] }, noSplits)).toThrow(/expectedSplits/);
+    expect(() => runDatasetGate({ samples: [] }, { ...V2, requiredChecks: ["G99_IMAGINARY"] })).toThrow(/requiredChecks/);
+  });
+
+  it("M22.1 backward compatibility, made explicit: its schema requires G1–G7 only, so G8/G9 NOT_APPLICABLE is acceptable there", () => {
+    expect(REQUIRED_CHECKS_V1_RECIPE_AUDIT).toEqual(GATE_CHECKS.slice(0, 7));
+    const v1 = (sid, split, seed) => sample(sid, split, four(sid, () => ({ validity: "HIT_TESTABLE" })), seed);
+    const r = runDatasetGate({ samples: [v1("t0", "train", 1), v1("d0", "dev", 2)] }, { ...V2, requiredChecks: REQUIRED_CHECKS_V1_RECIPE_AUDIT });
+    expect(r.pass).toBe(true);
+    expect(check(r, "G8_SOURCE_RENDER_CONSISTENCY").status).toBe("NOT_APPLICABLE");
+    // The same data under the v2 schema fails, because v2 requires G8 and G9.
+    expect(runDatasetGate({ samples: [v1("t0", "train", 1), v1("d0", "dev", 2)] }, V2).pass).toBe(false);
   });
 });

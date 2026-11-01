@@ -31,7 +31,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..");
 const S = (p) => pathToFileURL(join(ROOT, "tests/browser/support", p)).href;
 const { classifyElement, hitMatches, samplingPlan } = await import(S("fixture-validity.mjs"));
-const { runDatasetGate, describeDataset } = await import(S("dataset-quality-gate.mjs"));
+const { runDatasetGate, describeDataset, REQUIRED_CHECKS_V1_RECIPE_AUDIT } = await import(S("dataset-quality-gate.mjs"));
 const { runIdOf, writeNewRecord } = await import(S("smoke-record.mjs"));
 const { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } = await import(S("workstation.mjs"));
 const E = await import(pathToFileURL(join(ROOT, "packages/evaluation/dist/src/index.js")).href);
@@ -53,6 +53,10 @@ const GATE_OPTIONS = Object.freeze({
   minPerClassBucket: 1, // the weakest possible coverage requirement: is there ANY example
   nearDuplicateIou: 0.9,
   repetitionShare: 0.5,
+  // M22.2: stated explicitly. v1 recipe labels carry a hit-test validity but no source box, intent or
+  // positive flag, so this schema requires G1–G7; G8 and G9 are NOT_APPLICABLE by design here.
+  expectedSplits: ["train", "dev"],
+  requiredChecks: REQUIRED_CHECKS_V1_RECIPE_AUDIT,
 });
 
 const plan = [];

@@ -14,6 +14,17 @@
  * label must be HIT_TESTABLE and intended as a positive). Both apply only to annotations that
  * carry the fields they need (`source`, `positive` / `intent`), and say NOT_APPLICABLE otherwise.
  *
+ * M22.2 hardening (after the architecture review's six false passes):
+ *   - `requiredChecks` and `expectedSplits` are REQUIRED. A required check that is NOT_APPLICABLE fails
+ *     the gate; an expected split that is absent fails G4 and G7.
+ *   - G3, G8 and G9 FAIL on a partially populated annotation set rather than skipping the rest.
+ *   - G9 checks a declared occlusion against what was observed, not just its metadata.
+ *   - G8 requires `computedPosition === "absolute"`.
+ *   - `minPerClassBucket` must be an integer of at least 1.
+ * Older records stay valid under their own schema: M22.1's recipe audit requires G1–G7
+ * (`REQUIRED_CHECKS_V1_RECIPE_AUDIT`), so its G8 and G9 may be NOT_APPLICABLE; a v2 dataset requires
+ * all nine (`REQUIRED_CHECKS_V2`).
+ *
  * Every threshold is a REQUIRED option. The gate invents no number: whoever runs it states the
  * minimum examples per class and size, and what counts as suspicious repetition, and the record
  * says what was used.
@@ -31,6 +42,13 @@ export const GATE_CHECKS = Object.freeze([
   "G8_SOURCE_RENDER_CONSISTENCY",
   "G9_OCCLUSION_LABELS",
 ]);
+
+/** The checks M22.1's recipe audit (v1 labels: validity, no source or intent) must pass. */
+export const REQUIRED_CHECKS_V1_RECIPE_AUDIT = Object.freeze(GATE_CHECKS.slice(0, 7));
+/** The checks a v2 dataset must pass: all of them, none NOT_APPLICABLE. */
+export const REQUIRED_CHECKS_V2 = Object.freeze([...GATE_CHECKS]);
+
+const INTENT_VALIDITY = Object.freeze({ positive: "HIT_TESTABLE", "occlusion-partial": "PARTIALLY_OCCLUDED", "occlusion-full": "FULLY_OCCLUDED" });
 
 const MODEL_INPUT = 640;
 const finite = (n) => typeof n === "number" && Number.isFinite(n);
@@ -55,7 +73,22 @@ const boxKey = (a) => `${a.cls}@${r2(a.box.x)},${r2(a.box.y)},${r2(a.box.w)},${r
 function requireOptions(o) {
   const need = ["minPerClassBucket", "nearDuplicateIou", "repetitionShare"];
   for (const k of need) if (!finite(o?.[k])) throw new Error(`dataset gate: option ${k} must be stated (no default is invented)`);
+  if (!Number.isInteger(o.minPerClassBucket) || o.minPerClassBucket < 1) {
+    throw new Error("dataset gate: minPerClassBucket must be an integer of at least 1 (0 would accept an empty dataset)");
+  }
   if (!Array.isArray(o.classes) || o.classes.length === 0) throw new Error("dataset gate: option classes must list the dataset's classes");
+  if (!Array.isArray(o.expectedSplits) || o.expectedSplits.length === 0 || o.expectedSplits.some((x) => typeof x !== "string")) {
+    throw new Error("dataset gate: option expectedSplits must list the splits the dataset must contain");
+  }
+  if (!Array.isArray(o.requiredChecks) || o.requiredChecks.length === 0 || o.requiredChecks.some((c) => !GATE_CHECKS.includes(c))) {
+    throw new Error(`dataset gate: option requiredChecks must list checks from ${GATE_CHECKS.join(", ")}`);
+  }
+}
+
+/** Among `list`, how many carry the field(s) `has` tests for: none, some (incomplete), or all. */
+function population(list, has) {
+  const n = list.filter(has).length;
+  return { n, total: list.length, state: n === 0 ? "NONE" : n === list.length ? "ALL" : "PARTIAL" };
 }
 
 /**
@@ -68,6 +101,8 @@ function requireOptions(o) {
  * @param options.repetitionShare    a (class, box) in at least this share of a split's samples is suspicious
  * @param options.sourceTolerancePx  G8 only, required when any annotation carries `source`: the largest
  *                                   allowed |rendered − declared| on any box edge, CSS px
+ * @param options.expectedSplits     the splits the dataset must contain, e.g. ["train", "dev"]
+ * @param options.requiredChecks     checks that must be applicable; NOT_APPLICABLE on one fails the gate
  */
 export function runDatasetGate(dataset, options) {
   requireOptions(options);
@@ -93,10 +128,14 @@ export function runDatasetGate(dataset, options) {
   // G3 — a label the dataset calls VISIBLE must be observable by the hit-test classification.
   // A LABELLED occlusion case (`intent` "occlusion-…") is occluded on purpose; G9 checks those. G3
   // is about occlusion nobody declared.
+  // An incomplete set (some annotations with a validity, some without) is a FAIL, never a skip.
   const declaredOcclusion = (a) => typeof a.intent === "string" && a.intent.startsWith("occlusion-");
+  const g3pop = population(samples.flatMap((s) => s.annotations), (a) => typeof a.validity === "string");
   const withValidity = samples.flatMap((s) => s.annotations).filter((a) => typeof a.validity === "string" && !declaredOcclusion(a));
-  if (withValidity.length === 0) {
+  if (g3pop.state === "NONE") {
     checks.push({ id: "G3_LABEL_OBSERVABLE", status: "NOT_APPLICABLE", reason: "no annotation carries a hit-test validity" });
+  } else if (g3pop.state === "PARTIAL") {
+    checks.push({ id: "G3_LABEL_OBSERVABLE", status: "FAIL", reason: "incomplete: some annotations carry no hit-test validity", missingValidity: g3pop.total - g3pop.n });
   } else {
     const byValidity = {};
     let visibleNotHitTestable = 0;
@@ -129,7 +168,9 @@ export function runDatasetGate(dataset, options) {
     }
   }
   const gaps = [];
-  for (const [split, byCls] of Object.entries(coverage)) {
+  // Every EXPECTED split is checked, present or not: an absent split is all gaps, not "no gaps".
+  for (const split of options.expectedSplits) {
+    const byCls = coverage[split] ?? {};
     for (const cls of options.classes) {
       for (const b of BUCKETS) {
         const n = byCls[cls]?.[b.id] ?? 0;
@@ -183,19 +224,26 @@ export function runDatasetGate(dataset, options) {
   }
   const seedsAcrossSplits = [...seedSplits.values()].filter((v) => v.size > 1).length;
   const layoutsAcrossSplits = [...layoutSplits.values()].filter((v) => v.size > 1).length;
+  const missingSplits = options.expectedSplits.filter((x) => !(x in bySplit));
+  const unexpectedSplits = Object.keys(bySplit).filter((x) => !options.expectedSplits.includes(x));
   checks.push({
     id: "G7_SPLIT_INTEGRITY",
-    status: duplicateIds || seedsAcrossSplits || layoutsAcrossSplits ? "FAIL" : "PASS",
+    status: duplicateIds || seedsAcrossSplits || layoutsAcrossSplits || missingSplits.length || unexpectedSplits.length ? "FAIL" : "PASS",
     duplicateIds,
     seedsAcrossSplits,
     layoutsAcrossSplits,
+    missingSplits,
+    unexpectedSplits,
     splits: Object.fromEntries(Object.entries(bySplit).map(([k, v]) => [k, v.length])),
   });
 
   // G8 — the label is where the source put it, and the browser honoured the declared position.
+  const g8pop = population(samples.flatMap((s) => s.annotations), (a) => Boolean(a.source && a.source.declared));
   const sourced = samples.flatMap((s) => s.annotations).filter((a) => a.source && a.source.declared);
-  if (sourced.length === 0) {
+  if (g8pop.state === "NONE") {
     checks.push({ id: "G8_SOURCE_RENDER_CONSISTENCY", status: "NOT_APPLICABLE", reason: "no annotation carries a declared source box" });
+  } else if (g8pop.state === "PARTIAL") {
+    checks.push({ id: "G8_SOURCE_RENDER_CONSISTENCY", status: "FAIL", reason: "incomplete: some annotations carry no declared source box", missingSource: g8pop.total - g8pop.n });
   } else {
     if (!finite(options.sourceTolerancePx) || options.sourceTolerancePx < 0) {
       throw new Error("dataset gate: option sourceTolerancePx must be stated for G8 (no default is invented)");
@@ -208,7 +256,8 @@ export function runDatasetGate(dataset, options) {
       const delta = Math.max(Math.abs(a.box.x - d.x), Math.abs(a.box.y - d.y), Math.abs(a.box.x + a.box.w - (d.x + d.w)), Math.abs(a.box.y + a.box.h - (d.y + d.h)));
       worst = Math.max(worst, delta);
       if (!(delta <= options.sourceTolerancePx)) displaced += 1;
-      if (a.source.computedPosition === "static") positionIgnored += 1;
+      // Exactly `absolute`, the v2 contract — not merely "not static".
+      if (a.source.computedPosition !== "absolute") positionIgnored += 1;
     }
     checks.push({
       id: "G8_SOURCE_RENDER_CONSISTENCY",
@@ -222,32 +271,58 @@ export function runDatasetGate(dataset, options) {
   }
 
   // G9 — a positive training label is HIT_TESTABLE and intended; an occlusion case is never positive.
-  const flagged = samples.flatMap((s) => s.annotations).filter((a) => typeof a.positive === "boolean");
-  if (flagged.length === 0) {
+  // Applicable when any annotation carries a positive flag; then EVERY annotation must carry the
+  // flag, an intent and a validity, and every declared intent must match what was observed.
+  const all9 = samples.flatMap((s) => s.annotations);
+  const g9pop = population(all9, (a) => typeof a.positive === "boolean");
+  const complete9 = (a) => typeof a.positive === "boolean" && typeof a.intent === "string" && typeof a.validity === "string";
+  if (g9pop.state === "NONE") {
     checks.push({ id: "G9_OCCLUSION_LABELS", status: "NOT_APPLICABLE", reason: "no annotation carries a positive flag" });
+  } else if (!all9.every(complete9)) {
+    checks.push({ id: "G9_OCCLUSION_LABELS", status: "FAIL", reason: "incomplete: some annotations lack positive, intent or validity", incomplete: all9.filter((a) => !complete9(a)).length });
   } else {
     let positiveNotHitTestable = 0;
     let positiveOcclusionCase = 0;
     let intendedPositiveNotHitTestable = 0;
+    let declaredOcclusionNotObserved = 0;
+    let unknownIntent = 0;
+    let positiveFlagInconsistent = 0;
     const byIntent = {};
-    for (const a of flagged) {
-      byIntent[a.intent ?? "unstated"] = (byIntent[a.intent ?? "unstated"] ?? 0) + 1;
+    for (const a of all9) {
+      byIntent[a.intent] = (byIntent[a.intent] ?? 0) + 1;
+      const expected = INTENT_VALIDITY[a.intent];
+      if (expected === undefined) unknownIntent += 1;
       if (a.positive && a.validity !== "HIT_TESTABLE") positiveNotHitTestable += 1;
       if (a.positive && a.intent !== "positive") positiveOcclusionCase += 1;
       if (a.intent === "positive" && a.validity !== "HIT_TESTABLE") intendedPositiveNotHitTestable += 1;
+      // A declared occlusion passes only when it was OBSERVED as that occlusion, not because it says so.
+      if (a.intent !== "positive" && expected !== undefined && a.validity !== expected) declaredOcclusionNotObserved += 1;
+      if (a.positive !== (a.intent === "positive" && a.validity === "HIT_TESTABLE")) positiveFlagInconsistent += 1;
     }
+    const failing = positiveNotHitTestable + positiveOcclusionCase + intendedPositiveNotHitTestable + declaredOcclusionNotObserved + unknownIntent + positiveFlagInconsistent;
     checks.push({
       id: "G9_OCCLUSION_LABELS",
-      status: positiveNotHitTestable || positiveOcclusionCase || intendedPositiveNotHitTestable ? "FAIL" : "PASS",
-      positives: flagged.filter((a) => a.positive).length,
+      status: failing ? "FAIL" : "PASS",
+      positives: all9.filter((a) => a.positive).length,
       positiveNotHitTestable,
       positiveOcclusionCase,
       intendedPositiveNotHitTestable,
+      declaredOcclusionNotObserved,
+      unknownIntent,
+      positiveFlagInconsistent,
       byIntent,
     });
   }
 
-  return { checks, pass: checks.every((c) => c.status !== "FAIL") };
+  // A required check that could not be applied is a failure of the gate, not a pass.
+  const requiredNotApplicable = checks.filter((c) => options.requiredChecks.includes(c.id) && c.status === "NOT_APPLICABLE").map((c) => c.id);
+  return {
+    checks,
+    requiredChecks: [...options.requiredChecks],
+    requiredNotApplicable,
+    expectedSplits: [...options.expectedSplits],
+    pass: checks.every((c) => c.status !== "FAIL") && requiredNotApplicable.length === 0,
+  };
 }
 
 /** Descriptive statistics: counts, sizes and aspect ratios by class. Counts and numbers only. */
