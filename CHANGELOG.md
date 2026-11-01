@@ -35,6 +35,15 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.4 — v2 TRAIN/DEV renderer and a validated candidate dataset (owner-authorised; TRAIN and
+  DEV only; no training, no detector, no TEST).**
+  - `tools/dataset/v2/render.mjs`, `build-candidate.mjs`, `compare-builds.mjs`: headless Chromium at
+    DPR 1, offline; measured geometry and 5×5/9×9 hit-test validity; PNG frames; per-split
+    manifests; fail-closed render checks; never overwrites a candidate.
+  - Gate: G4 counts a positive only when its rendered box matches its declared source.
+  - Candidate 1 (git-ignored): 600 TRAIN and 160 DEV frames; 165 / 44 valid positives in each of
+    32 cells; every occlusion case observed as declared; G1–G9 PASS on TRAIN, DEV and both;
+    reproduced byte for byte on W1.
 - **M22.3 — TRAIN/DEV build specification and pre-build generator improvements (still plan-only;
   no dataset generated, nothing rendered, nothing trained).** Generator version `2.1.0-draft`.
   - Provenance per sample, element and occluder: seed derivation, spec hash, declared box and
