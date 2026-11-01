@@ -205,10 +205,24 @@ export function decodeHeadOutput(
   return r.ok ? ok(r.value.detections) : r;
 }
 
-/** `decodeHeadOutput`, also saying where every anchor went. Same detections, same refusals. */
+/** The three numbers the decode filters by. The shipped values are `PROVISIONAL_THRESHOLDS`. */
+export interface DecodeThresholds {
+  readonly score: number;
+  readonly nmsIou: number;
+  readonly maxDetections: number;
+}
+
+/**
+ * `decodeHeadOutput`, also saying where every anchor went. Same detections, same refusals.
+ *
+ * `thresholds` defaults to the shipped `PROVISIONAL_THRESHOLDS` and nothing in the product passes
+ * another value. It exists so an EVALUATION can measure other operating points through this exact
+ * decode and NMS rather than through a copy of them (M22). Passing it changes nothing shipped.
+ */
 export function decodeHeadOutputAccounted(
   out: HeadOutput,
-  contract: HeadTensorContract = HEAD_CONTRACT
+  contract: HeadTensorContract = HEAD_CONTRACT,
+  thresholds: DecodeThresholds = PROVISIONAL_THRESHOLDS
 ): Perceived<{ readonly detections: readonly DecodedDetection[]; readonly accounting: HeadDecodeAccounting }> {
   const numClasses = contract.classes.length;
 
@@ -254,7 +268,7 @@ export function decodeHeadOutputAccounted(
         best = c;
       }
     }
-    if (best < 0 || bestScore < PROVISIONAL_THRESHOLDS.score) {
+    if (best < 0 || bestScore < thresholds.score) {
       belowScore += 1;
       continue;
     }
@@ -288,7 +302,7 @@ export function decodeHeadOutputAccounted(
     });
   }
 
-  const { kept, suppressed } = nms(results);
+  const { kept, suppressed } = nms(results, thresholds);
   return ok({
     detections: kept,
     accounting: {
@@ -324,7 +338,10 @@ function boxIou(a: ModelBox, b: ModelBox): number {
  * clickable region is two genuinely different targets at high overlap, and suppressing one
  * would remove a control a plan needs.
  */
-function nms<T extends { box: ModelBox; label: UiClass; score: number }>(items: T[]): { kept: T[]; suppressed: number } {
+function nms<T extends { box: ModelBox; label: UiClass; score: number }>(
+  items: T[],
+  thresholds: DecodeThresholds
+): { kept: T[]; suppressed: number } {
   const indexed = items.map((v, i) => ({ v, i }));
   indexed.sort((p, q) => q.v.score - p.v.score || p.i - q.i);
 
@@ -334,11 +351,11 @@ function nms<T extends { box: ModelBox; label: UiClass; score: number }>(items: 
   for (const { v, i } of indexed) {
     if (suppressed.has(i)) continue;
     kept.push(v);
-    if (kept.length >= PROVISIONAL_THRESHOLDS.maxDetections) break;
+    if (kept.length >= thresholds.maxDetections) break;
     for (const { v: other, i: j } of indexed) {
       if (j === i || suppressed.has(j)) continue;
       if (other.label !== v.label) continue;
-      if (boxIou(v.box, other.box) > PROVISIONAL_THRESHOLDS.nmsIou) suppressed.add(j);
+      if (boxIou(v.box, other.box) > thresholds.nmsIou) suppressed.add(j);
     }
   }
   return { kept, suppressed: suppressed.size };
