@@ -21,6 +21,8 @@
  *   - G9 checks a declared occlusion against what was observed, not just its metadata.
  *   - G8 requires `computedPosition === "absolute"`.
  *   - `minPerClassBucket` must be an integer of at least 1.
+ * M22.3: `minPerClassBucket` may instead be one such integer PER EXPECTED SPLIT, `{ train: n, dev: m }`,
+ * so each split can be held to its own quota. It must name exactly the expected splits.
  * Older records stay valid under their own schema: M22.1's recipe audit requires G1–G7
  * (`REQUIRED_CHECKS_V1_RECIPE_AUDIT`), so its G8 and G9 may be NOT_APPLICABLE; a v2 dataset requires
  * all nine (`REQUIRED_CHECKS_V2`).
@@ -71,9 +73,11 @@ export function geometricVisibility(box, viewport) {
 const boxKey = (a) => `${a.cls}@${r2(a.box.x)},${r2(a.box.y)},${r2(a.box.w)},${r2(a.box.h)}`;
 
 function requireOptions(o) {
-  const need = ["minPerClassBucket", "nearDuplicateIou", "repetitionShare"];
-  for (const k of need) if (!finite(o?.[k])) throw new Error(`dataset gate: option ${k} must be stated (no default is invented)`);
-  if (!Number.isInteger(o.minPerClassBucket) || o.minPerClassBucket < 1) {
+  for (const k of ["nearDuplicateIou", "repetitionShare"]) if (!finite(o?.[k])) throw new Error(`dataset gate: option ${k} must be stated (no default is invented)`);
+  if (o?.minPerClassBucket === undefined) throw new Error("dataset gate: option minPerClassBucket must be stated (no default is invented)");
+  const isMin = (n) => Number.isInteger(n) && n >= 1;
+  const perSplit = o.minPerClassBucket !== null && typeof o.minPerClassBucket === "object";
+  if (!perSplit && !isMin(o.minPerClassBucket)) {
     throw new Error("dataset gate: minPerClassBucket must be an integer of at least 1 (0 would accept an empty dataset)");
   }
   if (!Array.isArray(o.classes) || o.classes.length === 0) throw new Error("dataset gate: option classes must list the dataset's classes");
@@ -83,7 +87,16 @@ function requireOptions(o) {
   if (!Array.isArray(o.requiredChecks) || o.requiredChecks.length === 0 || o.requiredChecks.some((c) => !GATE_CHECKS.includes(c))) {
     throw new Error(`dataset gate: option requiredChecks must list checks from ${GATE_CHECKS.join(", ")}`);
   }
+  if (perSplit) {
+    const keys = Object.keys(o.minPerClassBucket).sort();
+    if (keys.join() !== [...o.expectedSplits].sort().join() || !Object.values(o.minPerClassBucket).every(isMin)) {
+      throw new Error("dataset gate: a per-split minPerClassBucket must give an integer of at least 1 for exactly the expected splits");
+    }
+  }
 }
+
+/** The G4 minimum for one split: the single integer, or that split's own. */
+const minFor = (o, split) => (typeof o.minPerClassBucket === "number" ? o.minPerClassBucket : o.minPerClassBucket[split]);
 
 /** Among `list`, how many carry the field(s) `has` tests for: none, some (incomplete), or all. */
 function population(list, has) {
@@ -96,7 +109,8 @@ function population(list, has) {
  * NOT_APPLICABLE (G3 when no annotation carries a hit-test validity).
  *
  * @param options.classes            the classes the dataset is meant to cover
- * @param options.minPerClassBucket  minimum HIT_TESTABLE (or VISIBLE, if no validity) examples per class per size bucket
+ * @param options.minPerClassBucket  minimum HIT_TESTABLE (or VISIBLE, if no validity) examples per class per size bucket;
+ *                                   one integer, or `{ [split]: integer }` for exactly the expected splits
  * @param options.nearDuplicateIou   same-class pairs in one sample at or above this IoU are near-duplicates
  * @param options.repetitionShare    a (class, box) in at least this share of a split's samples is suspicious
  * @param options.sourceTolerancePx  G8 only, required when any annotation carries `source`: the largest
@@ -174,11 +188,11 @@ export function runDatasetGate(dataset, options) {
     for (const cls of options.classes) {
       for (const b of BUCKETS) {
         const n = byCls[cls]?.[b.id] ?? 0;
-        if (n < options.minPerClassBucket) gaps.push({ split, cls, bucket: b.id, count: n });
+        if (n < minFor(options, split)) gaps.push({ split, cls, bucket: b.id, count: n, minimum: minFor(options, split) });
       }
     }
   }
-  checks.push({ id: "G4_CLASS_SIZE_COVERAGE", status: gaps.length ? "FAIL" : "PASS", minPerClassBucket: options.minPerClassBucket, gaps: gaps.length, coverage });
+  checks.push({ id: "G4_CLASS_SIZE_COVERAGE", status: gaps.length ? "FAIL" : "PASS", minPerClassBucket: typeof options.minPerClassBucket === "number" ? options.minPerClassBucket : { ...options.minPerClassBucket }, gaps: gaps.length, coverage });
 
   // G5 — exact and near-duplicate annotations within one sample.
   let exact = 0;

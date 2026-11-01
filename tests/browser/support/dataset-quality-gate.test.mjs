@@ -236,6 +236,18 @@ describe("M22.2 hardening — the six false passes the architecture review found
     for (const bad of [0, -1, 0.5]) expect(() => runDatasetGate({ samples: [] }, { ...V2, minPerClassBucket: bad })).toThrow(/at least 1/);
   });
 
+  it("M22.3 — a per-split G4 minimum holds each split to its own count", () => {
+    expect(runDatasetGate({ samples: good() }, { ...V2, minPerClassBucket: { train: 1, dev: 1 } }).pass).toBe(true);
+    const g4 = check(runDatasetGate({ samples: good() }, { ...V2, minPerClassBucket: { train: 2, dev: 1 } }), "G4_CLASS_SIZE_COVERAGE");
+    expect(g4).toMatchObject({ status: "FAIL", gaps: 4, minPerClassBucket: { train: 2, dev: 1 } }); // TRAIN's four buckets hold 1 each
+  });
+
+  it("M22.3 — a per-split G4 minimum must name exactly the expected splits, each at least 1", () => {
+    for (const bad of [{ train: 1 }, { train: 1, dev: 0 }, { train: 1, dev: 1, test: 1 }, { train: 1, dev: 1.5 }, null, "1"]) {
+      expect(() => runDatasetGate({ samples: [] }, { ...V2, minPerClassBucket: bad })).toThrow(/minPerClassBucket/);
+    }
+  });
+
   it("F — computedPosition 'relative' (or 'fixed', or missing) FAILS G8; only 'absolute' passes", () => {
     for (const pos of ["relative", "fixed", "sticky", undefined]) {
       const ds = good();
