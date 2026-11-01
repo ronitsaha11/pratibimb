@@ -35,6 +35,20 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.3 — TRAIN/DEV build specification and pre-build generator improvements (still plan-only;
+  no dataset generated, nothing rendered, nothing trained).** Generator version `2.1.0-draft`.
+  - Provenance per sample, element and occluder: seed derivation, spec hash, declared box and
+    positioning, size draw, appearance, occluder identity and covered share, decor.
+  - Appearance drawn from the seed: 6 palettes, 7 local font stacks, 6 control styles, 10 icon
+    glyphs, 3 density levels, wider log-uniform aspects. No external asset.
+  - Labelled boxes kept hit-safe (corner radius ≤ 0.15 of the shorter side); M22.2's circle and
+    rounded icon radii would have put validity-grid corner points outside the shape.
+  - SHA-256 seeds over an unambiguous identity, xoshiro128** streams, fixed-width ids, strict
+    canonical JSON, golden hashes. The old 32-bit seeds showed no collision on the real identities
+    (measured); the change removes the bound.
+  - Gate: G4 may take one minimum per expected split.
+  - A TRAIN 600 / DEV 160 configuration proposed for the owner, not approved.
+  - TEST authorisation unchanged and still weak; TEST refused.
 - **M22 (in progress) and M22.1 tooling, no detector run.**
   - `tests/browser/support/fixture-validity.mjs`: hit-test validity categories on 5×5 and 9×9 grids;
     `matchValidPopulation`: valid ground truth matched first.
