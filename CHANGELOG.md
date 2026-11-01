@@ -24,6 +24,17 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
   - Leakage checks, deterministic seeds, ids, ordering and hashes; plan-only CLI.
   - Gate checks G8 (source-to-render consistency) and G9 (occlusion labels).
   - The v1 builder and `t1-ui-v1` are unchanged.
+- **M22.2 hardening, after a read-only architecture review (still plan-only; no dataset generated).**
+  - Stratified 3 × 3 placement instead of top-left shelf packing: on the tested seeds every region
+    of every viewport shape holds 7.2–14.4% of element centres (sparse) and 9.4–12.5% (dense), where
+    the review measured 100% in the top quarter on sparse pages.
+  - Separate positive and occlusion-case quotas (occlusion added on top); deferred targets
+    rescheduled to bounded overflow samples; exact reconciliation, or refusal.
+  - The dataset gate now requires `requiredChecks` and `expectedSplits`, fails incomplete annotation
+    sets, checks declared occlusion against observed validity, requires `absolute` in G8 and
+    `minPerClassBucket ≥ 1`. The review's six false passes now fail.
+  - Near-identical cross-split layouts detected at owner-supplied thresholds.
+  - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
 - **M22 (in progress) and M22.1 tooling, no detector run.**
   - `tests/browser/support/fixture-validity.mjs`: hit-test validity categories on 5×5 and 9×9 grids;
     `matchValidPopulation`: valid ground truth matched first.
