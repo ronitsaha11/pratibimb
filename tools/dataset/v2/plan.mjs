@@ -18,6 +18,7 @@
 import { planSplitIds, sampleId, seedFor } from "./splits.mjs";
 import { countTargets, dealTargets, scheduledTargets, validateSchedule } from "./schedule.mjs";
 import { layoutSample } from "./layout.mjs";
+import { canonicalJson, sha256 } from "./prng.mjs";
 
 export const PLANNABLE_SPLITS = Object.freeze(["train", "dev"]);
 
@@ -39,7 +40,7 @@ export function planSplit(schedule, split, count) {
   while (pending.length > 0 && next - count < schedule.maxOverflowSamples) {
     const take = pending.slice(0, schedule.maxTargetsPerSample);
     pending = pending.slice(take.length);
-    const plan = { split, index: next, id: sampleId(split, next), seed: seedFor(split, next) };
+    const plan = { split, index: next, id: sampleId(split, next), seed: seedFor(split, next), overflow: true };
     const spec = layoutSample(plan, take.map(({ cls, bucket, role }) => ({ cls, bucket, role })));
     specs.push(spec);
     for (const t of take) rescheduled.push({ role: t.role, from: t.from, to: spec.id });
@@ -55,6 +56,11 @@ export function planSplit(schedule, split, count) {
         "Raise maxOverflowSamples or the sample count, or lower a quota; a quota is never reduced silently."
     );
   }
+
+  // No empty page: every requested sample is dealt at least one target and every overflow sample
+  // takes at least one, and the first target on an empty page always fits. Checked, not assumed.
+  const empty = specs.filter((s) => s.elements.length === 0).map((s) => s.id);
+  if (empty.length) throw new Error(`plan: ${empty.length} planned sample(s) of split ${split} are empty: ${empty.slice(0, 5).join(", ")}`);
 
   // Exact reconciliation: placed = scheduled, cell by cell, role by role.
   const wanted = countTargets(scheduledTargets(schedule, split));
@@ -79,7 +85,11 @@ export function planSplit(schedule, split, count) {
       deferredAtFirstLayout: deferredAtFirst,
       rescheduled: { positive: rescheduled.filter((t) => t.role === "positive").length, occlusion: rescheduled.filter((t) => t.role !== "positive").length },
       reconciled: true,
+      planSha256: planHash(specs),
       note: "PLANNED counts. Rendered, hit-testable positives are established only by rendering and the gate (G4, G9).",
     },
   };
 }
+
+/** The hash of a split's planned specs, over canonical JSON: equal plans, equal hashes. */
+export const planHash = (specs) => sha256(canonicalJson(specs));

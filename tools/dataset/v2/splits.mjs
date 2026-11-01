@@ -4,16 +4,17 @@
  *
  *   - One manifest and one frame folder PER SPLIT: `manifest-<split>.json`, `frames-<split>/`. An
  *     audit of TRAIN or DEV never needs a file that holds TEST.
- *   - Seeds derived from (version, split, index), and ids prefixed by split, so no seed or id can be
- *     shared by construction; `assertNoLeakage` checks it, and checks layouts too.
+ *   - Seeds are SHA-256 digests of the identity (name, version, "sample", split, index) — 256 bits,
+ *     not M22.2's 32 — and ids are prefixed by split and fixed-width, so no seed or id can be shared
+ *     by construction; `assertNoLeakage` checks it, and checks layouts too.
  *   - TEST is planned only with an explicit seal token, for the one sealed build; the audit reader
  *     refuses TEST before it touches the filesystem, and opens only one exact file name — it never
  *     lists a directory.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { SPLITS, V2 } from "./config.mjs";
-import { canonicalJson, fnv1a, sha256 } from "./prng.mjs";
+import { MAX_SAMPLES_PER_SPLIT, SPLITS, V2 } from "./config.mjs";
+import { canonicalJson, seedOf, sha256 } from "./prng.mjs";
 
 export const AUDITABLE_SPLITS = Object.freeze(["train", "dev"]);
 
@@ -23,10 +24,20 @@ const assertSplit = (split) => {
 
 export const manifestName = (split) => (assertSplit(split), `manifest-${split}.json`);
 export const framesDir = (split) => (assertSplit(split), `frames-${split}`);
-export const sampleId = (split, index) => (assertSplit(split), `${split}-${String(index).padStart(5, "0")}`);
+const assertIndex = (index) => {
+  if (!Number.isInteger(index) || index < 0 || index >= MAX_SAMPLES_PER_SPLIT) {
+    throw new Error(`sample index must be an integer in [0, ${MAX_SAMPLES_PER_SPLIT}), got ${index}: ids are fixed-width so that string order is index order`);
+  }
+};
 
-/** The layout seed of one sample: a function of version, split and index, and nothing else. */
-export const seedFor = (split, index, version = V2.version) => (assertSplit(split), fnv1a(`${V2.name}|${version}|${split}|${index}`));
+/** `<split>-<00000>`: fixed width, so sorting ids as strings sorts them by index. */
+export const sampleId = (split, index) => (assertSplit(split), assertIndex(index), `${split}-${String(index).padStart(5, "0")}`);
+
+/** What a sample's seed is derived from: the generator, its version, the split and the index — nothing else. */
+export const sampleIdentity = (split, index, version = V2.version) => (assertSplit(split), assertIndex(index), [V2.name, version, "sample", split, index]);
+
+/** The seed of one sample: SHA-256 of its identity, 64 hex characters. */
+export const seedFor = (split, index, version = V2.version) => seedOf(sampleIdentity(split, index, version));
 
 /** The token a sealed TEST build must present. Not a secret: an explicit, recorded intent. */
 export const testSealToken = (version = V2.version) => `SEAL-TEST-BUILD:${V2.name}@${version}`;
@@ -36,7 +47,7 @@ export const testSealToken = (version = V2.version) => `SEAL-TEST-BUILD:${V2.nam
  */
 export function planSplitIds(split, count, { sealToken } = {}) {
   assertSplit(split);
-  if (!Number.isInteger(count) || count <= 0) throw new Error(`count must be a positive integer, got ${count}`);
+  if (!Number.isInteger(count) || count <= 0 || count > MAX_SAMPLES_PER_SPLIT) throw new Error(`count must be an integer in [1, ${MAX_SAMPLES_PER_SPLIT}], got ${count}`);
   if (split === "test" && sealToken !== testSealToken()) {
     throw new Error("TEST is planned only by the sealed one-time build, with its seal token");
   }
@@ -57,7 +68,7 @@ export function openAuditManifest(dir, split, read = readFileSync) {
 
 /** A layout's identity: the classes and declared boxes, order-independent. */
 export const layoutSignature = (elements) =>
-  sha256(canonicalJson(elements.map((e) => [e.cls, e.box.x, e.box.y, e.box.w, e.box.h]).sort((a, b) => (JSON.stringify(a) < JSON.stringify(b) ? -1 : 1))));
+  sha256(canonicalJson(elements.map((e) => canonicalJson([e.cls, e.box.x, e.box.y, e.box.w, e.box.h])).sort()));
 
 const iou = (a, b) => {
   const x1 = Math.max(a.x, b.x);

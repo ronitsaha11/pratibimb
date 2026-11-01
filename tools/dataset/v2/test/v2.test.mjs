@@ -1,16 +1,36 @@
 /**
- * M22.2 — v2 generator, deterministic tests on in-memory fixtures. No browser, no dataset files:
- * nothing here reads `artifacts/datasets`. Schedules below are EXAMPLE test inputs, not proposed
- * training schedules. TEST is never planned, seeded or built here: the only calls that name the test
- * split are the two refusal checks, which throw before anything is computed.
+ * M22.2 / M22.3 — v2 generator, deterministic tests on in-memory fixtures. No browser, no dataset
+ * files: nothing here reads `artifacts/datasets`. Schedules below are EXAMPLE test inputs, not
+ * proposed training schedules. TEST is never planned, seeded or built here: the only calls that name
+ * the test split are the three refusal checks, which throw before anything is computed. Every seed
+ * computed here is a TRAIN or DEV seed.
  */
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it, vi } from "vitest";
-import { CLASSES, SIZE_BUCKETS, VIEWPORTS } from "../config.mjs";
-import { canonicalJson } from "../prng.mjs";
-import { AUDITABLE_SPLITS, assertNoLeakage, framesDir, layoutSimilarity, manifestName, openAuditManifest, planSplitIds } from "../splits.mjs";
-import { BUCKET_IDS, dealTargets, scheduledTargets, validateSchedule } from "../schedule.mjs";
+import {
+  CLASS_GEOMETRY,
+  CLASSES,
+  CONTROL_STYLES,
+  DECOR_KINDS,
+  DENSITY_LEVELS,
+  FONT_STACKS,
+  HIT_SAFE_RADIUS,
+  ICON_GLYPHS,
+  ICON_PLATES,
+  MAX_SAMPLES_PER_SPLIT,
+  PALETTES,
+  SIZE_BUCKETS,
+  V2,
+  VIEWPORTS,
+} from "../config.mjs";
+import { PRNG, SEED_SCHEME, canonicalJson, rngOf, seedOf, sha256, xoshiro128ss } from "../prng.mjs";
+import { WORDS, pageAppearanceOf } from "../appearance.mjs";
+import { AUDITABLE_SPLITS, assertNoLeakage, framesDir, layoutSimilarity, manifestName, openAuditManifest, planSplitIds, sampleId, seedFor } from "../splits.mjs";
+import { BUCKET_IDS, allocateTargets, dealTargets, scheduledTargets, validateSchedule } from "../schedule.mjs";
 import { GRID, cssShorterRange, layoutSample, regionOf, scaleOf } from "../layout.mjs";
-import { planSplit } from "../plan.mjs";
+import { planHash, planSplit } from "../plan.mjs";
+import { gridPoints } from "../../../../tests/browser/support/fixture-validity.mjs";
 import { specToHtmlV2 } from "../html.mjs";
 import { annotateSample, buildSplitManifest } from "../annotate.mjs";
 import { REQUIRED_CHECKS_V2, runDatasetGate } from "../../../../tests/browser/support/dataset-quality-gate.mjs";
@@ -139,8 +159,9 @@ function assertSpread(byShape) {
 describe("2 — spatial distribution (acceptance criteria above)", () => {
   // Sparse: 32 cells × 70 positives = 2,240 targets over 1,600 samples (1–2 each).
   const sparse = planSplit(schedule(["train"], 70, { partial: 0, full: 0 }, 8, 0), "train", 1600).specs;
-  // Dense: 32 cells × 75 = 2,400 targets over 200 samples (12 each).
-  const dense = planSplit(schedule(["train"], 75, { partial: 0, full: 0 }, 12, 40), "train", 200).specs;
+  // Dense: 32 cells × 112 = 3,584 targets over 300 samples (11–12 each). M22.3 raised this from 200
+  // samples: with the new seeds one viewport shape drew too few dense pages to reach the 300-element floor.
+  const dense = planSplit(schedule(["train"], 112, { partial: 0, full: 0 }, 12, 60), "train", 300).specs;
 
   it("sparse pages reach every region of every viewport shape", () => assertSpread(distribution(sparse)));
   it("dense pages reach every region of every viewport shape", () => assertSpread(distribution(dense)));
@@ -300,7 +321,7 @@ describe("5 — split separation (TRAIN and DEV only; TEST only as a refusal)", 
     openAuditManifest("/data/v2", "dev", read);
     expect(String(read.mock.calls[0][0]).replace(/\\/g, "/")).toBe("/data/v2/manifest-dev.json");
   });
-  it("planning refuses TEST without the seal, before any id or seed is computed", () => {
+  it("planning refuses TEST before any id or seed is computed", () => {
     expect(() => planSplitIds("test", 10)).toThrow(/sealed one-time build/);
     expect(() => planSplit(schedule(["train"], 1), "test", 10)).toThrow(/only train and dev/);
   });
@@ -402,5 +423,249 @@ describe("the v2 generator never touches the pinned dataset", () => {
       const code = readFileSync(join(dir, f), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
       expect(code).not.toMatch(/artifacts[\\/]datasets/);
     }
+  });
+});
+
+// ─────────────────────────────── provenance (M22.3) ───────────────────────────────
+
+describe("8 — provenance: every label traces to the visual context that produced it", () => {
+  const { specs } = planSplit(schedule(["dev"], 3, { partial: 1, full: 1 }), "dev", 24);
+  const withOcc = specs.filter((s) => s.occluders.length > 0);
+
+  it("each sample records its seed, how it was derived, and the page it was drawn on", () => {
+    for (const s of specs) {
+      expect(s.seedDerivation).toEqual({ scheme: SEED_SCHEME, identity: [V2.name, V2.version, "sample", "dev", s.index], prng: PRNG });
+      expect(seedOf(s.seedDerivation.identity)).toBe(s.seed);
+      expect(s.id).toBe(sampleId("dev", s.index));
+      expect(Object.keys(s.appearance).sort()).toEqual(["controlStyle", "density", "font", "palette"]);
+      expect(s.overflow).toBe(false);
+    }
+  });
+  it("each element records its declared box and positioning, region, size draw, appearance and occluder", () => {
+    for (const s of specs) for (const e of s.elements) {
+      expect(e.declaredPosition).toBe("absolute");
+      expect(e.size.shorterCss).toBe(Math.min(e.box.w, e.box.h));
+      expect(e.size.shorterModel).toBeCloseTo(e.size.shorterCss * s.scale, 9);
+      expect(e.size.aspectRealised).toBeCloseTo(e.box.w / e.box.h, 9);
+      expect(e.region).toBeGreaterThanOrEqual(0);
+      expect(e.region).toBeLessThan(GRID * GRID);
+      expect(typeof e.appearance.radiusPx).toBe("number");
+      if (e.cls === "icon") {
+        expect(ICON_GLYPHS).toContain(e.appearance.glyph);
+        expect(ICON_PLATES).toContain(e.appearance.plate);
+      }
+      expect(e.occluderId === null).toBe(e.intent === "positive");
+    }
+  });
+  it("each occluder has an identity and role, a declared box, its target and the share of the target it covers", () => {
+    expect(withOcc.length).toBeGreaterThan(0);
+    for (const s of withOcc) {
+      const keys = new Map(s.elements.map((e) => [e.key, e]));
+      expect(new Set(s.occluders.map((o) => o.id)).size).toBe(s.occluders.length);
+      for (const o of s.occluders) {
+        expect(o.role).toBe("occluder");
+        const target = keys.get(o.for);
+        expect(target.occluderId).toBe(o.id);
+        expect(o.kind).toBe(target.intent === "occlusion-full" ? "full" : "partial");
+        if (o.kind === "full") expect(o.coversTargetShare).toBe(1);
+        else {
+          expect(o.coversTargetShare).toBeGreaterThan(0.3);
+          expect(o.coversTargetShare).toBeLessThan(0.7);
+        }
+      }
+    }
+  });
+  it("annotations carry the sample's provenance, its spec hash, and each label's source", () => {
+    const spec = withOcc[0];
+    const r = renderAsDeclared(spec);
+    r.occluders = spec.occluders.map((o) => ({ id: o.id, rect: { ...o.box } }));
+    const a = annotateSample(spec, r);
+    expect(a.specHash).toBe(sha256(canonicalJson(spec)));
+    expect(a.provenance.seedDerivation).toEqual(spec.seedDerivation);
+    expect(a.provenance.occluders.map((o) => o.rendered)).toEqual(spec.occluders.map((o) => o.box));
+    // Not measured → null, never invented.
+    expect(annotateSample(spec, renderAsDeclared(spec)).provenance.occluders.every((o) => o.rendered === null)).toBe(true);
+    for (const x of a.annotations) {
+      const e = spec.elements.find((y) => y.key === x.id);
+      expect(x.source).toMatchObject({ declared: e.box, declaredPosition: "absolute", computedPosition: "absolute", occluderId: e.occluderId, region: e.region });
+    }
+  });
+  it("a manifest holds only generated values: no path, URL, page text or anything personal", () => {
+    const m = buildSplitManifest("dev", specs.map((spec) => annotateSample(spec, renderAsDeclared(spec))), {});
+    const allowed = new Set([
+      ...CLASSES, ...BUCKET_IDS, ...WORDS, ...FONT_STACKS, ...ICON_GLYPHS, ...ICON_PLATES, ...DECOR_KINDS,
+      ...PALETTES.map((p) => p.id), ...CONTROL_STYLES.map((c) => c.id), ...DENSITY_LEVELS.map((d) => d.id),
+      "positive", "occlusion-partial", "occlusion-full", "occluder", "full", "partial", "absolute", "VISIBLE", "HIT_TESTABLE", "PARTIALLY_OCCLUDED", "FULLY_OCCLUDED",
+      "dev", "sample", V2.name, V2.version, V2.generator, `${V2.name}@${V2.version}`, SEED_SCHEME, PRNG,
+    ]);
+    const strings = [];
+    const walk = (v) => (typeof v === "string" ? strings.push(v) : v && typeof v === "object" ? Object.values(v).forEach(walk) : null);
+    walk(m);
+    const unexpected = strings.filter((x) => !allowed.has(x) && !/^dev-\d{5}(-[eod]\d{3})?$/.test(x) && !/^[0-9a-f]{64}$/.test(x));
+    expect(unexpected).toEqual([]);
+  });
+});
+
+// ─────────────────────────────── appearance variety (M22.3) ───────────────────────────────
+
+describe("9 — appearance: genuine variety, deterministic from the seed, no external asset", () => {
+  const ids = planSplitIds("train", 1200);
+  const looks = ids.map((p) => pageAppearanceOf(p.seed));
+  const share = (key, value) => looks.filter((l) => l[key] === value).length / looks.length;
+  // 40 positives + 2 occlusion cases per cell: 168 draws per class, enough to judge each third of an
+  // aspect range (at 56 draws per class one third read 14% by chance; at 168 every third is 27–40%).
+  const varied = () => schedule(["train"], 40, { partial: 1, full: 1 }, 12, 60);
+  const { specs } = planSplit(varied(), "train", 600);
+
+  it("every palette, font stack, control style and density level is drawn, none below half its uniform share", () => {
+    const options = [["palette", PALETTES.map((p) => p.id)], ["font", FONT_STACKS], ["controlStyle", CONTROL_STYLES.map((c) => c.id)], ["density", DENSITY_LEVELS.map((d) => d.id)]];
+    for (const [key, values] of options) for (const v of values) expect(share(key, v), `${key} ${v}`).toBeGreaterThanOrEqual(0.5 / values.length);
+  });
+  it("every icon glyph and plate is drawn", () => {
+    const icons = specs.flatMap((s) => s.elements).filter((e) => e.cls === "icon");
+    expect(new Set(icons.map((e) => e.appearance.glyph))).toEqual(new Set(ICON_GLYPHS));
+    expect(new Set(icons.map((e) => e.appearance.plate))).toEqual(new Set(ICON_PLATES));
+  });
+  it("aspect ratios cover each class's range at both ends (log-uniform draw)", () => {
+    for (const [cls, g] of Object.entries(CLASS_GEOMETRY)) {
+      const [lo, hi] = g.aspect;
+      const drawn = specs.flatMap((s) => s.elements).filter((e) => e.cls === cls).map((e) => e.size.aspectDrawn);
+      if (lo === hi) {
+        expect(drawn.every((a) => a === lo)).toBe(true);
+        continue;
+      }
+      const t = drawn.map((a) => (Math.log(a) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)));
+      expect(t.every((x) => x >= 0 && x <= 1)).toBe(true);
+      expect(t.filter((x) => x < 1 / 3).length / t.length, `${cls} narrow third`).toBeGreaterThanOrEqual(0.2);
+      expect(t.filter((x) => x > 2 / 3).length / t.length, `${cls} wide third`).toBeGreaterThanOrEqual(0.2);
+    }
+  });
+  it("page density varies: denser levels are dealt more targets and draw more decor", () => {
+    const by = (id) => specs.filter((s) => !s.overflow && s.appearance.density === id);
+    const mean = (list, f) => list.reduce((a, s) => a + f(s), 0) / list.length;
+    const [sparse, medium, dense] = ["sparse", "medium", "dense"].map(by);
+    expect(mean(sparse, (s) => s.elements.length)).toBeLessThan(mean(medium, (s) => s.elements.length));
+    expect(mean(medium, (s) => s.elements.length)).toBeLessThan(mean(dense, (s) => s.elements.length));
+    expect(mean(sparse, (s) => s.decor.length)).toBeLessThan(mean(dense, (s) => s.decor.length));
+  });
+  it("the same seed gives the same look and the same HTML; different seeds look different", () => {
+    expect(pageAppearanceOf(ids[7].seed)).toEqual(pageAppearanceOf(ids[7].seed));
+    expect(planSplit(varied(), "train", 600).specs.map(specToHtmlV2)).toEqual(specs.map(specToHtmlV2));
+    expect(new Set(specs.slice(0, 24).map((s) => canonicalJson(s.appearance))).size).toBeGreaterThan(12);
+  });
+  it("the HTML loads nothing: no URL, image, @import or @font-face", () => {
+    for (const s of specs) expect(specToHtmlV2(s)).not.toMatch(/url\(|https?:|@import|@font-face|<img|<link|src=/i);
+  });
+  it("decor stays in the usable area, below the labels, and never overlaps a labelled element or an occluder", () => {
+    expect(specs.some((s) => s.decor.length > 0)).toBe(true);
+    for (const s of specs) for (const d of s.decor) {
+      expect(d.box.x >= s.area.x && d.box.y >= s.area.y && d.box.x + d.box.w <= s.area.x + s.area.w && d.box.y + d.box.h <= s.area.y + s.area.h).toBe(true);
+      for (const b of [...s.elements.map((e) => e.box), ...s.occluders.map((o) => o.box)]) expect(overlap(d.box, b)).toBe(false);
+    }
+  });
+});
+
+describe("9b — every labelled box stays hit-testable on both validity grids", () => {
+  /** Is point p inside a w × h box at (0, 0) with circular corners of radius r? */
+  const insideRounded = (p, w, h, r) => {
+    const cx = Math.min(Math.max(p.x, r), w - r);
+    const cy = Math.min(Math.max(p.y, r), h - r);
+    return (p.x - cx) ** 2 + (p.y - cy) ** 2 <= r * r;
+  };
+  it("no labelled element's corner radius exceeds HIT_SAFE_RADIUS × its shorter side", () => {
+    const { specs } = planSplit(schedule(["dev"], 6, { partial: 1, full: 1 }, 12, 20), "dev", 40);
+    for (const s of specs) for (const e of s.elements) expect(e.appearance.radiusPx).toBeLessThanOrEqual(HIT_SAFE_RADIUS * Math.min(e.box.w, e.box.h));
+  });
+  it("at the hit-safe radius every 5 × 5 and 9 × 9 grid point is inside the box; at M22.2's circle radius a corner point is not", () => {
+    for (const [w, h] of [[4, 4], [8, 8], [12, 48], [48, 12], [96, 96], [300, 40]]) {
+      const r = HIT_SAFE_RADIUS * Math.min(w, h);
+      for (const n of [5, 9]) for (const p of gridPoints({ x: 0, y: 0, w, h }, n)) expect(insideRounded(p, w, h, r), `${w}x${h} n${n}`).toBe(true);
+    }
+    // The defect M22.3 removed: a 50% (circle) radius puts the corner grid points outside the shape.
+    expect(insideRounded(gridPoints({ x: 0, y: 0, w: 20, h: 20 }, 5)[0], 20, 20, 10)).toBe(false);
+  });
+});
+
+// ─────────────────────────────── seeds and serialisation (M22.3) ───────────────────────────────
+
+describe("10 — seeds, identities and canonical JSON", () => {
+  it("xoshiro128** matches its reference sequence from state (1, 2, 3, 4)", () => {
+    const next = xoshiro128ss(1, 2, 3, 4);
+    expect([next(), next(), next()]).toEqual([11520, 0, 5927040]);
+    expect(() => xoshiro128ss(0, 0, 0, 0)).toThrow(/all-zero/);
+  });
+  it("seeds are 256-bit digests; 100,000 TRAIN and 40,000 DEV seeds are all distinct", () => {
+    const seen = new Set();
+    for (const [split, n] of [["train", 100000], ["dev", 40000]]) for (let i = 0; i < n; i += 1) seen.add(seedFor(split, i));
+    expect(seen.size).toBe(140000);
+    expect([...seen].every((x) => /^[0-9a-f]{64}$/.test(x))).toBe(true);
+  });
+  it("identities are unambiguous: no choice of strings makes two identities serialise alike", () => {
+    expect(seedOf(["a|b", "c"])).not.toBe(seedOf(["a", "b|c"]));
+    expect(seedOf(["train", 1])).not.toBe(seedOf(["train", "1"]));
+    for (const bad of [[], ["x", 1.5], ["x", null], "train|0"]) expect(() => seedOf(bad)).toThrow(/identity/);
+  });
+  it("named streams of one seed are independent, and the old numeric seeds are refused", () => {
+    const seed = seedFor("dev", 3);
+    const draw = (stream) => Array.from({ length: 4 }, rngOf(seed, stream).next);
+    expect(draw("layout")).toEqual(draw("layout"));
+    expect(draw("layout")).not.toEqual(draw("appearance"));
+    expect(() => rngOf(12345, "layout")).toThrow(/64 hex/);
+    expect(() => rngOf(seed)).toThrow(/stream/);
+  });
+  it("canonical JSON refuses what JSON would drop or change, instead of emitting invalid or lossy output", () => {
+    // eslint-disable-next-line no-sparse-arrays
+    const hole = [1, , 3];
+    for (const bad of [{ a: undefined }, [1, undefined], { n: Number.NaN }, { n: Number.POSITIVE_INFINITY }, { f: () => 1 }, { s: Symbol("x") }, { b: 1n }, { d: new Date(0) }, { m: new Map() }, hole]) {
+      expect(() => canonicalJson(bad)).toThrow(/canonicalJson/);
+    }
+    expect(canonicalJson({ b: [1, null, { d: true, c: "x" }], a: -0 })).toBe('{"a":0,"b":[1,null,{"c":"x","d":true}]}');
+    expect(() => canonicalJson({ deep: { list: [{ hole: undefined }] } })).toThrow(/\$\.deep\.list\[0\]\.hole/);
+  });
+  it("ids are fixed-width, so string order is index order; an index past the width is refused", () => {
+    const list = Array.from({ length: 12000 }, (_, i) => sampleId("train", i));
+    expect([...list].sort()).toEqual(list);
+    expect(() => sampleId("train", MAX_SAMPLES_PER_SPLIT)).toThrow(/fixed-width/);
+    expect(() => planSplitIds("dev", MAX_SAMPLES_PER_SPLIT + 1)).toThrow(/count/);
+  });
+  it("a spec whose seed is not the seed of its (split, index) is refused", () => {
+    const [p] = planSplitIds("dev", 1);
+    expect(() => layoutSample({ ...p, seed: seedFor("dev", 1) }, [])).toThrow(/not the seed/);
+  });
+  it("hashes are stable across executions: golden values, and a separate Node process agrees", () => {
+    const s = schedule(["dev"], 1, { partial: 1, full: 0 });
+    const here = planHash(planSplit(s, "dev", 12).specs);
+    // Golden values for 2.1.0-draft. A change to any of them changes every generated sample and must
+    // come with a version change.
+    expect(seedFor("train", 0)).toBe("cb7eda1c6211f9187934f721d7c49a3ddf857bd318ebd5f48d81bab94db9a78e");
+    expect(seedFor("dev", 0)).toBe("19f60b541fb460fe9e853f661a2c68d7eca842034b03b250ca1da60f24007cda");
+    expect(here).toBe("ed5a189a17215c844ccc500b01629bd80356071f6ad85e41604c76fb02a6beb9");
+    const plan = new URL("../plan.mjs", import.meta.url).href;
+    const code = `import { planSplit, planHash } from ${JSON.stringify(plan)};
+      const s = JSON.parse(process.argv[1]);
+      process.stdout.write(planHash(planSplit(s, "dev", 12).specs));`;
+    const out = execFileSync(process.execPath, ["--input-type=module", "-e", code, JSON.stringify(s)], { cwd: fileURLToPath(new URL(".", import.meta.url)), encoding: "utf8" });
+    expect(out).toBe(here);
+  });
+});
+
+describe("11 — density-weighted dealing", () => {
+  it("allocates exactly, at least one per sample, never above the cap, in proportion to weight", () => {
+    const w = [1, 2, 3, 1, 2, 3, 3, 3];
+    const a = allocateTargets(w, 60, 12);
+    expect(a.reduce((x, y) => x + y, 0)).toBe(60);
+    expect(a.every((n) => n >= 1 && n <= 12)).toBe(true);
+    expect(a[0]).toBeLessThan(a[1]);
+    expect(a[1]).toBeLessThan(a[2]);
+    expect(allocateTargets(w, 96, 12)).toEqual(Array(8).fill(12)); // full: every page at the cap
+    expect(allocateTargets(w, 8, 12)).toEqual(Array(8).fill(1));
+  });
+  it("refuses a plan that would overfill or leave a page empty", () => {
+    expect(() => allocateTargets([1, 1], 25, 12)).toThrow(/do not fit/);
+    expect(() => allocateTargets([1, 1, 1], 2, 12)).toThrow(/empty/);
+  });
+  it("no planned page is empty", () => {
+    const { specs } = planSplit(schedule(["dev"], 1), "dev", 30);
+    expect(specs.every((s) => s.elements.length > 0)).toBe(true);
   });
 });

@@ -1,6 +1,7 @@
 # `tools/dataset/v2` — the version 2 synthetic T1 dataset generator
 
-> **Status (2026-11-01): implemented, hardened after an architecture review, and unit-tested. NO v2
+> **Status (2026-11-02): version `2.1.0-draft`. Implemented, hardened after an architecture review,
+> given full provenance, appearance variety and SHA-256 seeds (M22.3), and unit-tested. NO v2
 > DATASET HAS BEEN GENERATED, nothing has been rendered, and no model has been trained on v2.** The
 > v1 builder (`tools/dataset/build-dataset.mjs`), `t1-ui-v1` and the shipped T1 artifact are
 > unchanged. Nothing here reads `artifacts/datasets`. TEST is not planned anywhere in this code
@@ -13,11 +14,12 @@ for audits.
 
 | Module | Does |
 |---|---|
-| `config.mjs` | Version, classes, size buckets (the M22 buckets plus generation bounds), per-class aspect ranges, icon shapes, viewports, layout constants |
-| `prng.mjs` | Seed derivation (FNV-1a), the PRNG (mulberry32), canonical JSON, SHA-256 |
-| `splits.mjs` | Per-split manifest and frame names, ids, seeds, the TEST seal, the audit reader, the leakage check |
-| `schedule.mjs` | Validates the owner's positive and occlusion-case quotas; deals targets to samples |
-| `layout.mjs` | One sample: viewport, masthead, usable area, stratified placement, occluders for occlusion cases |
+| `config.mjs` | Version, classes, size buckets (the M22 buckets plus generation bounds), per-class aspect ranges, viewports, layout constants, appearance sets |
+| `prng.mjs` | Seeds (SHA-256 of a canonical identity), the PRNG (xoshiro128\*\*, named streams), strict canonical JSON, SHA-256 |
+| `appearance.mjs` | A page's palette, font, control style and density; an element's own details; the hit-safe radius |
+| `splits.mjs` | Per-split manifest and frame names, fixed-width ids, seeds, the TEST seal, the audit reader, the leakage check |
+| `schedule.mjs` | Validates the owner's positive and occlusion-case quotas; deals targets to samples by density |
+| `layout.mjs` | One sample: viewport, masthead, usable area, stratified placement, occluders, decor, provenance |
 | `plan.mjs` | One split, TRAIN or DEV only: deal, lay out, reschedule deferred targets, reconcile or refuse |
 | `html.mjs` | A laid-out sample → a standalone HTML document, with `__measureV2()` |
 | `annotate.mjs` | Render results → annotations with provenance and the `positive` flag; split manifests |
@@ -57,6 +59,48 @@ for every seed. Measured on the review's own probe after the change:
 - every 3 × 3 region holds 7.2–14.4% (sparse) and 9.4–12.5% (dense).
 
 Very wide elements can only be centred in the middle column; that follows from geometry.
+
+## Provenance (M22.3)
+
+A spec records everything its pixels come from, and its annotations carry it:
+- **Seed:** the seed, and how it was derived (`seedDerivation`: scheme, identity, PRNG).
+- **Spec hash:** the sample's `specHash`.
+- **Page geometry:** viewport, scale, masthead and usable area.
+- **Page appearance:** palette, font stack, control style and density.
+- **Per element:**
+  - the declared box and declared positioning;
+  - region;
+  - the size draw: shorter side in CSS and model px, drawn and realised aspect;
+  - its own appearance;
+  - intent and occluder id.
+- **Per occluder:** id, role, kind, target, declared box, the share of the target it covers, and the rendered box once a renderer measures it (`null` until then).
+- **Decor:** the unlabelled blocks.
+
+Every value is generated: no page text, no path, nothing personal (tested over a whole manifest).
+
+## Appearance (M22.3)
+
+Drawn from the seed, each through its own stream, so the same seed always looks the same.
+
+**Per page:**
+- one of 6 palettes (light, dark and high-contrast);
+- one of 7 local font stacks, each ending in a generic family;
+- one of 6 control styles;
+- one of 3 density levels. Density sets the page's share of targets and its amount of unlabelled decor.
+
+**Per element:**
+- an icon gets one of 10 glyphs on one of 3 plates;
+- links may be underlined; tabs may be selected; checkboxes and radios may be checked.
+
+**No external asset:** no image, URL, `@import` or `@font-face`.
+
+**Hit-safety.** The M22 validity grids sample points 1/(2n) of the way in from each edge. A corner
+radius above about 0.19 of the shorter side puts a 9 × 9 corner point outside a rounded box, and
+browsers hit-test rounded corners (INFERENCE; UNKNOWN on this stack until rendered). So:
+- a labelled element's radius is at most `HIT_SAFE_RADIUS` = 0.15 of its shorter side;
+- round icon shapes are drawn inside a rectangular box.
+
+M22.2's `circle` and `rounded` icons broke this rule.
 
 ## Quotas: positives, plus occlusion cases on top
 
@@ -102,7 +146,7 @@ unplaced moves on.
 | `classes` | classes the dataset must cover | **none — required** |
 | `expectedSplits` | splits the dataset must contain; an absent one fails G4 and G7, an unexpected one fails G7 | **none — required** |
 | `requiredChecks` | checks that must be applicable; NOT_APPLICABLE on one fails the gate. Use `REQUIRED_CHECKS_V2` (all nine) for v2 | **none — required** |
-| `minPerClassBucket` | G4: minimum positives per class × bucket × split; an integer **≥ 1** | **none — required** |
+| `minPerClassBucket` | G4: minimum positives per class × bucket × split; an integer **≥ 1**, or one per expected split (`{ train: n, dev: m }`, M22.3) | **none — required** |
 | `nearDuplicateIou` | G5 | **none — required** |
 | `repetitionShare` | G6 | **none — required** |
 | `sourceTolerancePx` | G8: largest rendered-versus-declared edge difference, CSS px | **none — required** when any annotation has `source` |
@@ -143,16 +187,29 @@ The gate's G7 still compares rendered layouts exactly. Near-identical detection 
 
 ## Reproducibility
 
-- **Seeds:** `seedFor(split, index) = FNV-1a("t1-ui-synthetic|<version>|<split>|<index>")`.
-- **Ids:** `<split>-<00000>`; overflow ids continue the sequence.
+- **Seeds:** `seedFor(split, index)` = SHA-256 of the canonical JSON identity
+  `["t1-ui-synthetic", "<version>", "sample", "<split>", <index>]`, as 64 hex characters.
+  - Until M22.3 a seed was a 32-bit FNV-1a value; on the actual identities no collision was measured, but the bound is gone.
+  - Each sample draws from named streams (`layout`, `elements`, `decor`, `appearance`), each a xoshiro128\*\* generator with 128 bits of state.
+  - A spec whose seed is not the seed of its (split, index) is refused.
+- **Ids:** `<split>-<00000>`, fixed width, so string order is index order; at most 100,000 per split.
+  Overflow ids continue the sequence.
 - **Order:** elements top-to-bottom, then left-to-right, keyed after sorting; manifests sort samples
   by id.
-- **Hashes:** `specHash` per sample; `hash` per split manifest, over canonical JSON.
-- **Same inputs, same outputs:** byte-identical plans, HTML and hashes (tested).
+- **Canonical JSON is strict:** `undefined`, non-finite numbers, functions, symbols, bigints, array
+  holes and non-plain objects are refused, with their path, instead of being emitted or changed.
+- **Hashes:**
+  - per sample, `specHash`;
+  - per planned split, `planSha256`;
+  - per split manifest, `hash`, over canonical JSON.
+- **Same inputs, same outputs:** byte-identical plans, HTML and hashes, tested in two ways:
+  - golden values for `2.1.0-draft`;
+  - a second Node process that reproduces a plan hash.
 
 ## Build procedure for a future dataset (not performed)
 
-1. The owner approves and records:
+1. The owner approves and records the following. The proposal, unapproved, is in
+   `artifacts/experiments/M22.3-train-dev-build-spec/owner-config-proposal.md`.
    - the schedule (positives and occlusion cases);
    - `maxTargetsPerSample` and `maxOverflowSamples`;
    - split sizes;
@@ -170,8 +227,9 @@ The gate's G7 still compares rendered layouts exactly. Near-identical detection 
 
 `planSplitIds("test")` needs a seal token. But:
 - the token is a public constant;
-- lower-level helpers (`seedFor`, `sampleId`, `dealTargets`, `layoutSample`) do not check it;
-- TEST seeds come from a public formula, so TEST pages are predictable from source;
+- lower-level helpers (`seedFor`, `sampleIdentity`, `sampleId`, `dealTargets`, `layoutSample`) do not check it;
+- TEST seeds come from a public formula (SHA-256 of a public identity since M22.3), so TEST pages
+  are predictable from source;
 - "built once" is not enforced.
 
 `plan.mjs` and `build-v2.mjs` refuse TEST outright. **A separate task must harden TEST
