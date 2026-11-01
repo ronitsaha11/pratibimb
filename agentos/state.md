@@ -10,15 +10,28 @@
 | Field | Value |
 |---|---|
 | **Date** | 2026-10-30 (UTC) |
-| **Phase** | Product implementation. Milestones through M20 merged on `main` (last: #91, `0162c7e`); **M21 in review**. |
+| **Phase** | Product implementation. Milestones through M21 merged on `main` (last: #92, `077f139`). **M22 in progress on a local branch; its detector evaluation is not run.** |
 | **Health** | 🟠 **AMBER.** The product runs end to end on W1 from a clean checkout, and its latency and resources are measured. The open decisions (J7/B5, D1–D4) and the unadopted visual detector are unchanged. |
-| **Next** | Owner review of M21. Then the owner's open decisions (below): none of them is unblocked by M20 or M21. |
+| **Next** | An authorised route for the M22 evaluation runner; the owner's decision on a new T1 dataset version (M22.1). The open decisions below are unchanged. |
 | **Product code written** | **Yes**: `packages/*` and `apps/extension`. See "Current state" below. |
 
 > **Correction forward.** Until M20 this snapshot still read 2026-09-07 and "Product code written:
 > None". That was false from ADR-0001 (2026-09-10) onward. The sections after "Current state" are the
 > Phase 0/1 record, kept as written; where they disagree with "Current state", **"Current state"
 > wins**. The original wording is in this file's history.
+
+---
+
+## Current state — M22 / M22.1 (2026-11-01 UTC, local branch, not merged)
+
+| Claim | Label | Evidence |
+|---|---|---|
+| **No M22 detector evaluation has been run**: no recall, precision or attribution result exists. The runner is not written; an attempt to create it was stopped by a safety classifier. | FACT | `artifacts/experiments/M22-small-target-recall/README.md` |
+| M22 fixtures (220 DEV screens): 4,691 elements, 3,196 HIT_TESTABLE (primary), 1,495 excluded by the approved validity rule | FACT (no detector) | `M22-small-target-recall/design-amendment-2.md`, `logs/w1-fixture-audit-20261101T163950Z.json` |
+| In the T1 dataset recipe's TRAIN and DEV (regenerated; the pinned manifest holds TEST and was not opened), **every icon label is fully occluded** — the generator gives `[role=img]` no `position` rule, so its coordinates are ignored — and **no class has an element of 32 model px or more** | FACT (recipe regeneration); INFERENCE that it matches the pinned `t1-ui-v1` | `artifacts/experiments/M22.1-dataset-quality/README.md` |
+| No icon detection claim should be made for the current T1 artifact | recommendation | `M22.1-dataset-quality/decision.md` |
+
+`t1-ui-v1`, the model, thresholds, interfaces and contracts are unchanged. T1 stays UNADOPTED.
 
 ---
 

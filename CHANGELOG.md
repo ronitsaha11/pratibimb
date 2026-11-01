@@ -6,6 +6,25 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 
 ## [Unreleased]
 
+### Found
+- **M22.1 — the T1 dataset recipe cannot teach the icon class.** Regenerating its TRAIN and DEV
+  splits (the pinned manifest also holds TEST and was not opened): every icon label is fully
+  occluded, because `specToHtml` gives `[role=img]` no `position` rule, so the icon renders at the
+  origin under the masthead. No class has an element of 32 model px or more. Boxes are well formed
+  and TRAIN/DEV share no seed or layout. `t1-ui-v1` is unchanged
+  (`artifacts/experiments/M22.1-dataset-quality/`).
+
+### Added
+- **M22 (in progress) and M22.1 tooling, no detector run.**
+  - `tests/browser/support/fixture-validity.mjs`: hit-test validity categories on 5×5 and 9×9 grids;
+    `matchValidPopulation`: valid ground truth matched first.
+  - `tests/browser/support/dataset-quality-gate.mjs`: a dataset gate (G1–G7) with required,
+    stated thresholds.
+  - `tests/browser/perception/audit-m22-fixtures.mjs` and `tools/dataset/audit-recipe-splits.mjs`
+    (TRAIN/DEV only, never TEST).
+  - `decodeHeadOutputAccounted` takes optional thresholds for evaluation; it defaults to the
+    shipped values and no product code passes others.
+
 ### Fixed
 - **M21 — the T1 letterbox inverse could end an edge box past the frame.** `clipToContent` then
   `modelToCapture` left 25% of edge-touching boxes outside the frame by a rounding error (≤ 6.8e-13
