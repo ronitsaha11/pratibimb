@@ -146,6 +146,8 @@ try {
   result = {
     anchors: pass.anchors,
     afterFiltering: pass.afterFiltering,
+    /** M21: where every anchor and decoded box went, stage by stage. Counts only. */
+    accounting: pass.accounting ?? null,
     detections: detections.length,
     byClass: pass.byClass,
     scoreDistribution: {

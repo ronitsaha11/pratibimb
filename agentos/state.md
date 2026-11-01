@@ -9,16 +9,40 @@
 
 | Field | Value |
 |---|---|
-| **Date** | 2026-10-23 (UTC) |
-| **Phase** | Product implementation. Milestones through M19 merged on `main` (last: #90, `991f051`); **M20 in review**. |
+| **Date** | 2026-10-30 (UTC) |
+| **Phase** | Product implementation. Milestones through M20 merged on `main` (last: #91, `0162c7e`); **M21 in review**. |
 | **Health** | 🟠 **AMBER.** The product runs end to end on W1 from a clean checkout, and its latency and resources are measured. The open decisions (J7/B5, D1–D4) and the unadopted visual detector are unchanged. |
-| **Next** | Owner review of M20. Then the owner's open decisions (below): none of them is unblocked by M20. |
+| **Next** | Owner review of M21. Then the owner's open decisions (below): none of them is unblocked by M20 or M21. |
 | **Product code written** | **Yes**: `packages/*` and `apps/extension`. See "Current state" below. |
 
 > **Correction forward.** Until M20 this snapshot still read 2026-09-07 and "Product code written:
 > None". That was false from ADR-0001 (2026-09-10) onward. The sections after "Current state" are the
 > Phase 0/1 record, kept as written; where they disagree with "Current state", **"Current state"
 > wins**. The original wording is in this file's history.
+
+---
+
+## Current state — M21 (2026-10-30 UTC)
+
+M21 is perception geometry: an engineering diagnostic and one defect fix. Everything under "Current
+state — M20" still holds. `artifacts/experiments/M21-perception-geometry/README.md` has the detail.
+
+| Claim | Label | Evidence |
+|---|---|---|
+| The "16–34%" figure is QG-03b's: detections **changed** under canvas resampling (the kernel, not the letterbox). It was fixed then; shipped preprocessing matches the reference byte for byte. | FACT | `artifacts/experiments/W1-QG03b-letterbox-conformance/README.md` §3, §5 |
+| In the shipped path at 2.0 CSS px per model px, six shapes from 2:1 landscape to 9:16 portrait, 120 DEV screens: **0** labels lost in the letterbox inverse, **0** boxes in the padding, **0** frames refused. Every loss (3–12 per cell) was an element the head never emitted; those were small (shorter side p50 7.5–8.8 model px against 13.5–14 detected). | FACT (W1, DEV synthetic) | `artifacts/experiments/M21-perception-geometry/logs/w1-letterbox-diagnostic-20261030T144359Z.json`, repeated identically in `…T144553Z.json` |
+| At this scale the letterbox costs nothing measurable; the losses are the model's scale fragility (Track B, C3b) | INFERENCE | the two records above; `W1-TrackB-geometry-appearance/decision.md` |
+| `projectToCapture` could end an edge box past the frame by rounding (25% of edge boxes over 78,078 sizes, ≤ 6.8e-13 px; e.g. 390×844, 820×1180), which `validateDetections` treats as malformed. **Fixed** with `boundToFrame`; inside boxes unchanged. Not observed on the real head output above (0 boxes affected). | FACT | `packages/perception/test/geometryRegression.test.ts` (8 tests fail without the fix) |
+| The realm refuses to invert through a transform for another frame than it rasterised (`assertRasterMatchesInverse`) — defence in depth | FACT (unit) | same file |
+| Per-stage decode/projection counts exist, value-free, evaluation-only; the `Detector` interface is unchanged | FACT (unit) | `apps/extension/test/perceptionPass.test.ts` |
+| Clicks come only from DOM elements; a vision-only detection never becomes a target | FACT (code read) | `apps/extension/host-lib/perception-realm.ts` (`sourceBySelector`); no vision provenance read in `agent`, `plan`, `orchestrator`, `extension-transport` |
+
+**Not changed by M21:** the continuous-versus-raster inverse (QG-03a-C, owner decision),
+`computeLetterbox`, the coordinate contract, the fusion threshold, decode thresholds, the model,
+capture policy, CSP, manifest, permissions, endpoint, the 5-turn cap, click-only. T1 UNADOPTED;
+QG-03a OPEN; J7/B5, D1–D4 and F-M13-1 open. **No J7 experiment was run.** No roadmap document exists
+in the repository; the "Current state" sections are the current record (the "Active work" table
+further down is the Phase 0/1 record, kept as written).
 
 ---
 

@@ -6,7 +6,29 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 
 ## [Unreleased]
 
+### Fixed
+- **M21 — the T1 letterbox inverse could end an edge box past the frame.** `clipToContent` then
+  `modelToCapture` left 25% of edge-touching boxes outside the frame by a rounding error (≤ 6.8e-13
+  capture px; e.g. 390×844, 820×1180), which `validateDetections` treats as malformed.
+  `projectToCapture` now bounds every box to the frame (`boundToFrame`); a box already inside is
+  returned unchanged. `computeLetterbox` and the continuous inverse are unchanged.
+  - `assertRasterMatchesInverse`: the realm refuses to invert boxes through a transform for a
+    different frame than it rasterised.
+  - A stale comment in `apps/extension/host/offscreen/main.ts` still said T1's detections "move
+    16-34%"; QG-03b fixed that. Corrected.
+
 ### Added
+- **M21 — perception geometry regression and letterbox diagnostics.**
+  - `packages/perception/test/geometryRegression.test.ts` (201 tests): landscape, portrait, square
+    and extreme shapes; raster versus continuous rounding bounds; round trips; frame bounds;
+    padding and clipping; decode accounting; malformed output; incompatible geometry.
+  - `decodeHeadOutputAccounted` / `projectToCaptureAccounted`: value-free, per-stage counts. They
+    reach only an evaluation (the realm's collect-only `detail`); the `Detector` interface is
+    unchanged.
+  - `tests/browser/perception/run-letterbox-diagnostic.mjs`: an engineering diagnostic, not J7.
+    On W1, 120 DEV screens in six shapes at 2.0 CSS px per model px: no labelled element lost in the
+    letterbox inverse and no box in the padding; every loss was an element the head never emitted
+    (`artifacts/experiments/M21-perception-geometry/`).
 - **M20 — a runnable product, measured.**
   - **`npm run reasoner`** (`scripts/reasoner/`): a product-owned launcher for the pinned local
     reasoner.

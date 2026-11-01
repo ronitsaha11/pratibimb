@@ -151,3 +151,27 @@ export function clipToContent(b: ModelBox, t: LetterboxTransform): ModelBox | nu
   if (x2 <= x1 || y2 <= y1) return null;
   return modelBox(x1, y1, x2 - x1, y2 - y1);
 }
+
+/**
+ * Bound an inverted box to the frame it was inverted into.
+ *
+ * The content region IS the frame, so a box clipped to content and inverted lies inside the
+ * frame — in real arithmetic. In floating point it does not always: `(padX + contentW − padX) /
+ * scale` is not exactly `source.w`. M21 measured the shipped `clipToContent → modelToCapture`
+ * over 78,078 frame sizes: 25% of edge-touching boxes ended outside the frame, by at most
+ * 6.8e-13 capture px. Harmless as geometry, but a box outside the frame is exactly what
+ * `validateDetections` calls malformed, and it refuses the whole frame for it.
+ *
+ * This removes that rounding and nothing else: a box inside the frame comes back unchanged, bit
+ * for bit. `null` when nothing of the box is left inside the frame — only possible for a sliver
+ * narrower than the rounding itself, and such a box is dropped, never widened.
+ */
+export function boundToFrame(b: CaptureBox, frame: Size): CaptureBox | null {
+  const x1 = Math.max(b.x, 0);
+  const y1 = Math.max(b.y, 0);
+  const x2 = Math.min(b.x + b.w, frame.w);
+  const y2 = Math.min(b.y + b.h, frame.h);
+  if (x2 <= x1 || y2 <= y1) return null;
+  if (x1 === b.x && y1 === b.y && x2 === b.x + b.w && y2 === b.y + b.h) return b;
+  return captureBox(x1, y1, x2 - x1, y2 - y1);
+}

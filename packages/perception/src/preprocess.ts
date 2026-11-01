@@ -55,6 +55,7 @@
  */
 import type { Size } from "./coordinates.js";
 import { PerceptionError } from "./failure.js";
+import type { LetterboxTransform } from "./letterbox.js";
 import type { HeadTensorContract } from "./uiDetectorHead.js";
 
 /** Decoded image pixels. RGBA, 4 bytes per pixel — the shape `getImageData` returns. */
@@ -160,6 +161,30 @@ export function rasterLetterbox(source: Size, modelSize: number, padValue: numbe
     padBottom: modelSize - resizedH - padTop,
     padByte: Math.round(padValue * 255),
   };
+}
+
+/**
+ * Refuse to invert detections through a transform computed for a different frame than the one
+ * that was rasterised.
+ *
+ * The head's boxes are inverted with `computeLetterbox(geometry.captureSize)`, while the tensor
+ * is rasterised from the decoded image's own size. Those are the same frame only if the image is
+ * the size its geometry says. If they ever differ, every box is scaled by the wrong factor and
+ * offset by the wrong padding — no error, just a confident box somewhere else. So the two are
+ * compared exactly, and a mismatch is `COORDINATE_TRANSFORM_AMBIGUOUS`, never "close enough".
+ */
+export function assertRasterMatchesInverse(raster: RasterLetterbox, inverse: LetterboxTransform): void {
+  if (
+    raster.modelSize !== inverse.modelSize ||
+    raster.source.w !== inverse.source.w ||
+    raster.source.h !== inverse.source.h
+  ) {
+    throw new PerceptionError(
+      `The rasterised frame (${raster.source.w}x${raster.source.h} into ${raster.modelSize}) is not the frame ` +
+        `the detections would be inverted for (${inverse.source.w}x${inverse.source.h} into ${inverse.modelSize}).`,
+      "COORDINATE_TRANSFORM_AMBIGUOUS"
+    );
+  }
 }
 
 // ─────────────────────────── PIL's resampler, reproduced ───────────────────────────

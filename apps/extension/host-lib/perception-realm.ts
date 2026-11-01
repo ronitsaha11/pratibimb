@@ -70,6 +70,7 @@ import {
   type Detector,
   type ElementGraph,
   type FusionResult,
+  type HeadAccounting,
   type HeadOutput,
   type HeadRuntime,
   type HeadTensorContract,
@@ -83,6 +84,7 @@ import {
   fuse,
   geometryFrom,
   isThrottleSignature,
+  assertRasterMatchesInverse,
   preprocessToTensor,
   PROVISIONAL_THRESHOLDS,
   projectElement,
@@ -208,6 +210,11 @@ export interface PerceptionSummary {
      * the same value under several stage names would look like a measurement of each.
      */
     readonly afterFiltering: number;
+    /**
+     * M21: where every anchor and every decoded detection went, stage by stage — the counts the
+     * single number above could not give. Counts only. `null` when the head did not run to the end.
+     */
+    readonly accounting: HeadAccounting | null;
     readonly threshold: number;
     readonly detections: readonly { readonly box: { x: number; y: number; w: number; h: number }; readonly label: string; readonly score: number }[];
   };
@@ -533,6 +540,8 @@ export function createPerceptionRealm(deps: PerceptionRealmDeps): PerceptionReal
   let preprocessMs = 0;
   /** The head's anchor count, read off the output tensor rather than assumed from the contract. */
   let anchors = 0;
+  /** The head's own per-stage counts for this pass, when it ran to the end. */
+  let accounting: HeadAccounting | null = null;
 
   const runtime: HeadRuntime | null =
     deps.session === null || deps.ort === null
@@ -541,14 +550,20 @@ export function createPerceptionRealm(deps: PerceptionRealmDeps): PerceptionReal
           modelId: deps.modelId,
           revision: deps.revision,
           acceptedBackends: deps.acceptedBackends,
-          preprocess: (_frame: CaptureFrame, _transform: LetterboxTransform, contract: HeadTensorContract) => {
+          preprocess: (_frame: CaptureFrame, transform: LetterboxTransform, contract: HeadTensorContract) => {
             if (current === null) throw new Error("no decoded frame for this pass");
             const t0 = now();
             // The package owns every arithmetic decision here: resize, pad, channel order,
             // normalisation. This file supplies pixels and nothing else.
-            const tensor = preprocessToTensor(current, contract).tensor;
+            const stages = preprocessToTensor(current, contract);
+            // The boxes will be inverted with `transform`; the tensor was rasterised from these
+            // pixels. They must describe one frame, or every box lands somewhere else (M21).
+            assertRasterMatchesInverse(stages.transform, transform);
             preprocessMs += now() - t0;
-            return Promise.resolve(tensor);
+            return Promise.resolve(stages.tensor);
+          },
+          onAccounting: (a: HeadAccounting) => {
+            accounting = a;
           },
           infer: async (input: Float32Array, size: number): Promise<HeadOutput> => {
             const session = deps.session as OrtSession;
@@ -633,6 +648,7 @@ export function createPerceptionRealm(deps: PerceptionRealmDeps): PerceptionReal
     ): Promise<PerceptionSummary> {
       const started = now();
       anchors = 0;
+      accounting = null;
       current = null;
       // A new pass starts with NO frame held: an older frame must never stand in for this one.
       sanitized = null;
@@ -929,6 +945,7 @@ export function createPerceptionRealm(deps: PerceptionRealmDeps): PerceptionReal
               detail: {
                 anchors,
                 afterFiltering: visual.length,
+                accounting,
                 threshold: PROVISIONAL_THRESHOLDS.score,
                 detections: visual.map((d) => ({
                   box: { x: d.box.x, y: d.box.y, w: d.box.w, h: d.box.h },
