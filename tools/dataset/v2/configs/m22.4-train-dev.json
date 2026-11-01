@@ -1,0 +1,443 @@
+{
+  "status": "APPROVED by the owner for M22.4: TRAIN and DEV only. TEST is not part of this configuration.",
+  "counts": {
+    "train": 600,
+    "dev": 160
+  },
+  "schedule": {
+    "maxTargetsPerSample": 12,
+    "maxOverflowSamples": 60,
+    "positives": {
+      "train": {
+        "button": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "link": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "textbox": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "checkbox": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "radio": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "select": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "tab": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "icon": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        }
+      },
+      "dev": {
+        "button": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "link": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "textbox": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "checkbox": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "radio": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "select": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "tab": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "icon": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        }
+      }
+    },
+    "occlusionCases": {
+      "train": {
+        "button": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        },
+        "link": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        },
+        "textbox": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        },
+        "checkbox": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        },
+        "radio": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        },
+        "select": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        },
+        "tab": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        },
+        "icon": {
+          "very-small": {
+            "partial": 15,
+            "full": 15
+          },
+          "small": {
+            "partial": 15,
+            "full": 15
+          },
+          "medium": {
+            "partial": 15,
+            "full": 15
+          },
+          "large": {
+            "partial": 15,
+            "full": 15
+          }
+        }
+      },
+      "dev": {
+        "button": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        },
+        "link": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        },
+        "textbox": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        },
+        "checkbox": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        },
+        "radio": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        },
+        "select": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        },
+        "tab": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        },
+        "icon": {
+          "very-small": {
+            "partial": 4,
+            "full": 4
+          },
+          "small": {
+            "partial": 4,
+            "full": 4
+          },
+          "medium": {
+            "partial": 4,
+            "full": 4
+          },
+          "large": {
+            "partial": 4,
+            "full": 4
+          }
+        }
+      }
+    }
+  },
+  "expectedTotals": {
+    "train": {
+      "positives": 5280,
+      "occlusionPartial": 480,
+      "occlusionFull": 480,
+      "all": 6240
+    },
+    "dev": {
+      "positives": 1408,
+      "occlusionPartial": 128,
+      "occlusionFull": 128,
+      "all": 1664
+    }
+  },
+  "leakage": {
+    "elementIou": 0.5,
+    "layoutShare": 0.5
+  },
+  "gate": {
+    "minPerClassBucket": {
+      "train": 150,
+      "dev": 40
+    },
+    "nearDuplicateIou": 0.9,
+    "repetitionShare": 0.02,
+    "sourceTolerancePx": 0.5,
+    "requiredChecks": "REQUIRED_CHECKS_V2",
+    "expectedSplits": [
+      "train",
+      "dev"
+    ]
+  },
+  "notes": [
+    "Positive targets are scheduled 10% above the G4 minimum (165 for 150, 44 for 40) as headroom; G4 still requires the minimum.",
+    "Occlusion quotas are 10% of the 150/40 minimums, not of the oversampled counts."
+  ]
+}

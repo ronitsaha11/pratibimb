@@ -414,14 +414,17 @@ describe("7 — the hardened gate on v2 annotations", () => {
 });
 
 describe("the v2 generator never touches the pinned dataset", () => {
-  it("no v2 module's code names artifacts/datasets (comments may say it is not read)", async () => {
+  it("no v2 module's code names artifacts/datasets except as the one new candidate destination", async () => {
     const { readFileSync, readdirSync } = await import("node:fs");
     const { join, dirname } = await import("node:path");
     const { fileURLToPath } = await import("node:url");
     const dir = join(dirname(fileURLToPath(import.meta.url)), "..");
     for (const f of readdirSync(dir).filter((n) => n.endsWith(".mjs"))) {
       const code = readFileSync(join(dir, f), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
-      expect(code).not.toMatch(/artifacts[\\/]datasets/);
+      // M22.4: the build writes to `artifacts/datasets/<CANDIDATE_PREFIX><n>` and names nothing else there.
+      const named = code.match(/artifacts[\\/]datasets[\\/]?[^"'`\s)]*/g) ?? [];
+      expect(named.every((m) => m.startsWith("artifacts/datasets/${CANDIDATE_PREFIX}")), `${f}: ${named.join(", ")}`).toBe(true);
+      if (!["render.mjs", "build-candidate.mjs"].includes(f)) expect(code).not.toMatch(/"datasets"|artifacts[\\/]datasets/);
     }
   });
 });

@@ -27,7 +27,7 @@ function visibilityOf(b, v) {
 /**
  * @param spec     from `layoutSample`
  * @param rendered { elements: [{ key, rect, computedPosition }], validity: { [key]: category },
- *                   occluders?: [{ id, rect }] }
+ *                   occluders?: [{ id, rect }], hitTest?: { [key]: { category5, category9, fraction5, fraction9 } } }
  */
 export function annotateSample(spec, rendered) {
   const byKey = new Map(rendered.elements.map((e) => [e.key, e]));
@@ -44,6 +44,7 @@ export function annotateSample(spec, rendered) {
       box: { x: r.rect.x, y: r.rect.y, w: r.rect.w, h: r.rect.h },
       visibility: visibilityOf(r.rect, spec.viewport),
       validity,
+      ...(rendered.hitTest ? { hitTest: { ...rendered.hitTest[e.key] } } : {}),
       intent: e.intent,
       positive: e.intent === "positive" && validity === "HIT_TESTABLE",
       source: {
