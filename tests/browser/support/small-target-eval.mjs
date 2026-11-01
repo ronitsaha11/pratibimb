@@ -184,3 +184,27 @@ export function placeholderSamples(prefix, viewport, guards) {
     framePath: PLACEHOLDER_FRAME,
   }));
 }
+
+/**
+ * The primary (valid-population) matching of design amendment 2. NOT "match everything, then
+ * remove": that would let an excluded element take a prediction a valid element could have had.
+ *
+ *   1. Match predictions against VALID ground truth only, with the evaluator's rule.
+ *   2. Match the predictions still unmatched against the EXCLUDED ground truth, same rule.
+ *      A prediction matched there is IGNORED: neither TP nor FP.
+ *   3. Every other prediction is FP.
+ *
+ * So `predictions = TP + FP + IGNORED` and `FN = valid ground truth − TP`.
+ *
+ * @returns { gtMatchedBy: Map<validGtId, predIndex>, status: ("TP"|"FP"|"IGNORED")[] }
+ */
+export function matchValidPopulation(validGts, excludedGts, preds) {
+  const valid = matchLikeEvaluator(validGts, preds);
+  const status = valid.predTp.map((tp) => (tp ? "TP" : "FP"));
+  const rest = preds.map((p, i) => ({ p, i })).filter(({ i }) => status[i] === "FP");
+  const absorbed = matchLikeEvaluator(excludedGts, rest.map(({ p }) => p));
+  absorbed.predTp.forEach((tp, k) => {
+    if (tp) status[rest[k].i] = "IGNORED";
+  });
+  return { gtMatchedBy: valid.gtMatchedBy, status };
+}
