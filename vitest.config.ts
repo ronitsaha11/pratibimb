@@ -17,6 +17,8 @@ export default defineConfig({
       "tests/browser/support/**/*.test.mjs",
       // M20: the product reasoner launcher (`npm run reasoner`) and its front.
       "scripts/**/*.test.mjs",
+      // M22.2: the v2 synthetic dataset generator (pure; no browser, no dataset files).
+      "tools/dataset/**/*.test.mjs",
     ],
     reporters: ["default"],
   },
