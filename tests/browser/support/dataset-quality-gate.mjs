@@ -23,6 +23,9 @@
  *   - `minPerClassBucket` must be an integer of at least 1.
  * M22.3: `minPerClassBucket` may instead be one such integer PER EXPECTED SPLIT, `{ train: n, dev: m }`,
  * so each split can be held to its own quota. It must name exactly the expected splits.
+ * M22.4: G4 counts a positive that carries a `source` only when its rendered box agrees with the
+ * declared box within `sourceTolerancePx` and its computed position is `absolute` — the same test as
+ * G8 — so a displaced positive never fills a quota, even before G8 fails the dataset.
  * Older records stay valid under their own schema: M22.1's recipe audit requires G1–G7
  * (`REQUIRED_CHECKS_V1_RECIPE_AUDIT`), so its G8 and G9 may be NOT_APPLICABLE; a v2 dataset requires
  * all nine (`REQUIRED_CHECKS_V2`).
@@ -169,8 +172,25 @@ export function runDatasetGate(dataset, options) {
   }
 
   // G4 — examples per class per size bucket, per split, among observable labels.
-  const observable = (a) =>
-    typeof a.positive === "boolean" ? a.positive : typeof a.validity === "string" ? a.validity === "HIT_TESTABLE" : a.visibility === "VISIBLE";
+  const anySource = samples.some((s) => s.annotations.some((a) => a.source && a.source.declared));
+  if (anySource && (!finite(options.sourceTolerancePx) || options.sourceTolerancePx < 0)) {
+    throw new Error("dataset gate: option sourceTolerancePx must be stated for G4 and G8 (no default is invented)");
+  }
+  const sourceAgrees = (a) => {
+    if (!(a.source && a.source.declared)) return true;
+    const d = a.source.declared;
+    const delta = Math.max(Math.abs(a.box.x - d.x), Math.abs(a.box.y - d.y), Math.abs(a.box.x + a.box.w - (d.x + d.w)), Math.abs(a.box.y + a.box.h - (d.y + d.h)));
+    return delta <= options.sourceTolerancePx && a.source.computedPosition === "absolute";
+  };
+  let excludedForSource = 0;
+  const observable = (a) => {
+    if (typeof a.positive !== "boolean") return typeof a.validity === "string" ? a.validity === "HIT_TESTABLE" : a.visibility === "VISIBLE";
+    if (a.positive && !sourceAgrees(a)) {
+      excludedForSource += 1;
+      return false;
+    }
+    return a.positive;
+  };
   const coverage = {};
   for (const s of samples) {
     const split = (coverage[s.split] ??= {});
@@ -192,7 +212,7 @@ export function runDatasetGate(dataset, options) {
       }
     }
   }
-  checks.push({ id: "G4_CLASS_SIZE_COVERAGE", status: gaps.length ? "FAIL" : "PASS", minPerClassBucket: typeof options.minPerClassBucket === "number" ? options.minPerClassBucket : { ...options.minPerClassBucket }, gaps: gaps.length, coverage });
+  checks.push({ id: "G4_CLASS_SIZE_COVERAGE", status: gaps.length ? "FAIL" : "PASS", minPerClassBucket: typeof options.minPerClassBucket === "number" ? options.minPerClassBucket : { ...options.minPerClassBucket }, gaps: gaps.length, positivesExcludedForSource: excludedForSource, coverage });
 
   // G5 — exact and near-duplicate annotations within one sample.
   let exact = 0;

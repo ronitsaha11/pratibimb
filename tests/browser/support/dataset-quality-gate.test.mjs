@@ -242,6 +242,19 @@ describe("M22.2 hardening — the six false passes the architecture review found
     expect(g4).toMatchObject({ status: "FAIL", gaps: 4, minPerClassBucket: { train: 2, dev: 1 } }); // TRAIN's four buckets hold 1 each
   });
 
+  it("M22.4 — G4 does not count a positive whose rendered box left its declared box, or that is not absolute", () => {
+    for (const spoil of [(a) => (a.box = { ...a.box, x: a.box.x + 1 }), (a) => (a.source.computedPosition = "relative")]) {
+      const ds = good();
+      spoil(ds[0].annotations[0]);
+      const g4 = check(runDatasetGate({ samples: ds }, V2), "G4_CLASS_SIZE_COVERAGE");
+      expect(g4).toMatchObject({ status: "FAIL", gaps: 1, positivesExcludedForSource: 1 });
+    }
+    // Within the stated tolerance it still counts.
+    const ds = good();
+    ds[0].annotations[0].box = { ...ds[0].annotations[0].box, x: ds[0].annotations[0].box.x + 0.25 };
+    expect(check(runDatasetGate({ samples: ds }, { ...V2, sourceTolerancePx: 0.5 }), "G4_CLASS_SIZE_COVERAGE")).toMatchObject({ status: "PASS", positivesExcludedForSource: 0 });
+  });
+
   it("M22.3 — a per-split G4 minimum must name exactly the expected splits, each at least 1", () => {
     for (const bad of [{ train: 1 }, { train: 1, dev: 0 }, { train: 1, dev: 1, test: 1 }, { train: 1, dev: 1.5 }, null, "1"]) {
       expect(() => runDatasetGate({ samples: [] }, { ...V2, minPerClassBucket: bad })).toThrow(/minPerClassBucket/);
