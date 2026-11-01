@@ -22,8 +22,8 @@ function clean(id, split, dx, seed) {
 }
 
 describe("M22.1 dataset gate — a clean dataset passes every check", () => {
-  it("names exactly its seven checks", () => {
-    expect(GATE_CHECKS).toHaveLength(7);
+  it("names exactly its nine checks", () => {
+    expect(GATE_CHECKS).toHaveLength(9);
   });
   it("PASS on varied, observable, split-clean data", () => {
     const ds = { samples: [clean("t0", "train", 0, 1), clean("t1", "train", 7, 2), clean("d0", "dev", 13, 3)] };
@@ -36,6 +36,8 @@ describe("M22.1 dataset gate — a clean dataset passes every check", () => {
       ["G5_DUPLICATES", "PASS"],
       ["G6_SUSPICIOUS_REPETITION", "PASS"],
       ["G7_SPLIT_INTEGRITY", "PASS"],
+      ["G8_SOURCE_RENDER_CONSISTENCY", "NOT_APPLICABLE"],
+      ["G9_OCCLUSION_LABELS", "NOT_APPLICABLE"],
     ]);
     expect(r.pass).toBe(true);
   });
@@ -108,5 +110,45 @@ describe("M22.1 dataset description", () => {
   it("returns numbers and counts only", () => {
     const d = describeDataset({ samples: [clean("t0", "train", 0, 1)] });
     expect(JSON.stringify(d)).not.toMatch(/"x"|"y"|"box"|"id"/);
+  });
+});
+
+describe("M22.2 G8 — source-to-render consistency", () => {
+  const sourced = (box, declared, computedPosition = "absolute") => ({ ...ann("x", "icon", box.x, box.y, box.w, box.h), source: { declared, computedPosition } });
+  const ds = (a) => ({ samples: [sample("s", "train", [a])] });
+  const G8 = { ...OPTS, sourceTolerancePx: 0.5 };
+
+  it("PASS when the rendered box is the declared one, within the stated tolerance", () => {
+    const r = check(runDatasetGate(ds(sourced({ x: 900, y: 100, w: 30, h: 30 }, { x: 900.3, y: 100, w: 30, h: 30 })), G8), "G8_SOURCE_RENDER_CONSISTENCY");
+    expect(r).toMatchObject({ status: "PASS", checked: 1, displaced: 0, positionIgnored: 0 });
+  });
+  it("FAIL when the browser placed it elsewhere — v1's icon: declared top-right, rendered at the origin", () => {
+    const r = check(runDatasetGate(ds(sourced({ x: 0, y: 0, w: 22, h: 22 }, { x: 1232, y: 14, w: 22, h: 22 }, "static")), G8), "G8_SOURCE_RENDER_CONSISTENCY");
+    expect(r).toMatchObject({ status: "FAIL", displaced: 1, positionIgnored: 1, worstEdgeDeltaPx: 1232 });
+  });
+  it("FAIL on an ignored declared position even when the box happens to coincide", () => {
+    const r = check(runDatasetGate(ds(sourced({ x: 0, y: 0, w: 22, h: 22 }, { x: 0, y: 0, w: 22, h: 22 }, "static")), G8), "G8_SOURCE_RENDER_CONSISTENCY");
+    expect(r).toMatchObject({ status: "FAIL", displaced: 0, positionIgnored: 1 });
+  });
+  it("refuses to run G8 without a stated tolerance", () => {
+    expect(() => runDatasetGate(ds(sourced({ x: 1, y: 1, w: 5, h: 5 }, { x: 1, y: 1, w: 5, h: 5 })), OPTS)).toThrow(/sourceTolerancePx/);
+  });
+});
+
+describe("M22.2 G9 — occlusion labels", () => {
+  const flagged = (id, validity, intent, positive) => ({ ...ann(id, "button", 50, 50, 80, 20), validity, intent, positive });
+  const G9 = (anns) => check(runDatasetGate({ samples: [sample("s", "train", anns)] }, OPTS), "G9_OCCLUSION_LABELS");
+
+  it("PASS: positives are HIT_TESTABLE intended positives; occlusion cases are not positive", () => {
+    expect(G9([flagged("a", "HIT_TESTABLE", "positive", true), flagged("b", "FULLY_OCCLUDED", "occlusion-full", false), flagged("c", "PARTIALLY_OCCLUDED", "occlusion-partial", false)])).toMatchObject({ status: "PASS", positives: 1 });
+  });
+  it("FAIL: a positive that is not HIT_TESTABLE", () => {
+    expect(G9([flagged("a", "FULLY_OCCLUDED", "positive", true)])).toMatchObject({ status: "FAIL", positiveNotHitTestable: 1 });
+  });
+  it("FAIL: an occlusion case marked positive", () => {
+    expect(G9([flagged("a", "HIT_TESTABLE", "occlusion-partial", true)])).toMatchObject({ status: "FAIL", positiveOcclusionCase: 1 });
+  });
+  it("FAIL: an intended positive the hit test found occluded (accidental occlusion)", () => {
+    expect(G9([flagged("a", "PARTIALLY_OCCLUDED", "positive", false)])).toMatchObject({ status: "FAIL", intendedPositiveNotHitTestable: 1 });
   });
 });

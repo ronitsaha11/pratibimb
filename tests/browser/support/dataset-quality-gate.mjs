@@ -9,6 +9,11 @@
  *
  * A hit test is the browser's, not a pixel: no check here proves pixel-level visibility.
  *
+ * M22.2 adds G8 (source-to-render consistency: the rendered box against the declared source box,
+ * and no declared position ignored by the browser) and G9 (occlusion labels: a positive training
+ * label must be HIT_TESTABLE and intended as a positive). Both apply only to annotations that
+ * carry the fields they need (`source`, `positive` / `intent`), and say NOT_APPLICABLE otherwise.
+ *
  * Every threshold is a REQUIRED option. The gate invents no number: whoever runs it states the
  * minimum examples per class and size, and what counts as suspicious repetition, and the record
  * says what was used.
@@ -23,6 +28,8 @@ export const GATE_CHECKS = Object.freeze([
   "G5_DUPLICATES",
   "G6_SUSPICIOUS_REPETITION",
   "G7_SPLIT_INTEGRITY",
+  "G8_SOURCE_RENDER_CONSISTENCY",
+  "G9_OCCLUSION_LABELS",
 ]);
 
 const MODEL_INPUT = 640;
@@ -59,6 +66,8 @@ function requireOptions(o) {
  * @param options.minPerClassBucket  minimum HIT_TESTABLE (or VISIBLE, if no validity) examples per class per size bucket
  * @param options.nearDuplicateIou   same-class pairs in one sample at or above this IoU are near-duplicates
  * @param options.repetitionShare    a (class, box) in at least this share of a split's samples is suspicious
+ * @param options.sourceTolerancePx  G8 only, required when any annotation carries `source`: the largest
+ *                                   allowed |rendered − declared| on any box edge, CSS px
  */
 export function runDatasetGate(dataset, options) {
   requireOptions(options);
@@ -82,7 +91,10 @@ export function runDatasetGate(dataset, options) {
   checks.push({ id: "G2_VISIBILITY_MATCHES_GEOMETRY", status: mismatched ? "FAIL" : "PASS", failing: mismatched });
 
   // G3 — a label the dataset calls VISIBLE must be observable by the hit-test classification.
-  const withValidity = samples.flatMap((s) => s.annotations).filter((a) => typeof a.validity === "string");
+  // A LABELLED occlusion case (`intent` "occlusion-…") is occluded on purpose; G9 checks those. G3
+  // is about occlusion nobody declared.
+  const declaredOcclusion = (a) => typeof a.intent === "string" && a.intent.startsWith("occlusion-");
+  const withValidity = samples.flatMap((s) => s.annotations).filter((a) => typeof a.validity === "string" && !declaredOcclusion(a));
   if (withValidity.length === 0) {
     checks.push({ id: "G3_LABEL_OBSERVABLE", status: "NOT_APPLICABLE", reason: "no annotation carries a hit-test validity" });
   } else {
@@ -104,7 +116,8 @@ export function runDatasetGate(dataset, options) {
   }
 
   // G4 — examples per class per size bucket, per split, among observable labels.
-  const observable = (a) => (typeof a.validity === "string" ? a.validity === "HIT_TESTABLE" : a.visibility === "VISIBLE");
+  const observable = (a) =>
+    typeof a.positive === "boolean" ? a.positive : typeof a.validity === "string" ? a.validity === "HIT_TESTABLE" : a.visibility === "VISIBLE";
   const coverage = {};
   for (const s of samples) {
     const split = (coverage[s.split] ??= {});
@@ -178,6 +191,61 @@ export function runDatasetGate(dataset, options) {
     layoutsAcrossSplits,
     splits: Object.fromEntries(Object.entries(bySplit).map(([k, v]) => [k, v.length])),
   });
+
+  // G8 — the label is where the source put it, and the browser honoured the declared position.
+  const sourced = samples.flatMap((s) => s.annotations).filter((a) => a.source && a.source.declared);
+  if (sourced.length === 0) {
+    checks.push({ id: "G8_SOURCE_RENDER_CONSISTENCY", status: "NOT_APPLICABLE", reason: "no annotation carries a declared source box" });
+  } else {
+    if (!finite(options.sourceTolerancePx) || options.sourceTolerancePx < 0) {
+      throw new Error("dataset gate: option sourceTolerancePx must be stated for G8 (no default is invented)");
+    }
+    let displaced = 0;
+    let positionIgnored = 0;
+    let worst = 0;
+    for (const a of sourced) {
+      const d = a.source.declared;
+      const delta = Math.max(Math.abs(a.box.x - d.x), Math.abs(a.box.y - d.y), Math.abs(a.box.x + a.box.w - (d.x + d.w)), Math.abs(a.box.y + a.box.h - (d.y + d.h)));
+      worst = Math.max(worst, delta);
+      if (!(delta <= options.sourceTolerancePx)) displaced += 1;
+      if (a.source.computedPosition === "static") positionIgnored += 1;
+    }
+    checks.push({
+      id: "G8_SOURCE_RENDER_CONSISTENCY",
+      status: displaced || positionIgnored ? "FAIL" : "PASS",
+      sourceTolerancePx: options.sourceTolerancePx,
+      checked: sourced.length,
+      displaced,
+      positionIgnored,
+      worstEdgeDeltaPx: r2(worst),
+    });
+  }
+
+  // G9 — a positive training label is HIT_TESTABLE and intended; an occlusion case is never positive.
+  const flagged = samples.flatMap((s) => s.annotations).filter((a) => typeof a.positive === "boolean");
+  if (flagged.length === 0) {
+    checks.push({ id: "G9_OCCLUSION_LABELS", status: "NOT_APPLICABLE", reason: "no annotation carries a positive flag" });
+  } else {
+    let positiveNotHitTestable = 0;
+    let positiveOcclusionCase = 0;
+    let intendedPositiveNotHitTestable = 0;
+    const byIntent = {};
+    for (const a of flagged) {
+      byIntent[a.intent ?? "unstated"] = (byIntent[a.intent ?? "unstated"] ?? 0) + 1;
+      if (a.positive && a.validity !== "HIT_TESTABLE") positiveNotHitTestable += 1;
+      if (a.positive && a.intent !== "positive") positiveOcclusionCase += 1;
+      if (a.intent === "positive" && a.validity !== "HIT_TESTABLE") intendedPositiveNotHitTestable += 1;
+    }
+    checks.push({
+      id: "G9_OCCLUSION_LABELS",
+      status: positiveNotHitTestable || positiveOcclusionCase || intendedPositiveNotHitTestable ? "FAIL" : "PASS",
+      positives: flagged.filter((a) => a.positive).length,
+      positiveNotHitTestable,
+      positiveOcclusionCase,
+      intendedPositiveNotHitTestable,
+      byIntent,
+    });
+  }
 
   return { checks, pass: checks.every((c) => c.status !== "FAIL") };
 }
