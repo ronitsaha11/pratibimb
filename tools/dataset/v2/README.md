@@ -1,11 +1,12 @@
 # `tools/dataset/v2` — the version 2 synthetic T1 dataset generator
 
-> **Status (2026-11-02): version `2.1.0-draft`. Implemented, hardened after an architecture review,
-> given full provenance, appearance variety and SHA-256 seeds (M22.3), and unit-tested. NO v2
-> DATASET HAS BEEN GENERATED, nothing has been rendered, and no model has been trained on v2.** The
-> v1 builder (`tools/dataset/build-dataset.mjs`), `t1-ui-v1` and the shipped T1 artifact are
-> unchanged. Nothing here reads `artifacts/datasets`. TEST is not planned anywhere in this code
-> path, and its seal is known to be weak (§TEST below).
+> **Status (2026-11-02): version `2.1.0-draft`.** Implemented, hardened after an architecture
+> review, given full provenance, appearance variety and SHA-256 seeds (M22.3), and given a TRAIN/DEV
+> renderer and candidate build (M22.4, owner-authorised). **No model has been trained on v2, and no
+> detector has been run on it.** The v1 builder (`tools/dataset/build-dataset.mjs`), `t1-ui-v1` and
+> the shipped T1 artifact are unchanged. The build writes one new numbered candidate directory under
+> `artifacts/datasets` and names, lists and reads nothing else there. TEST is not planned anywhere in
+> this code path, and its seal is known to be weak (§TEST below).
 
 ## Architecture
 
@@ -24,10 +25,51 @@ for audits.
 | `html.mjs` | A laid-out sample → a standalone HTML document, with `__measureV2()` |
 | `annotate.mjs` | Render results → annotations with provenance and the `positive` flag; split manifests |
 | `build-v2.mjs` | Command line: **plan only** |
+| `render.mjs` | One spec → frame, measured geometry, hit-test validity, in headless Chromium; the fail-closed render checks |
+| `build-candidate.mjs` | Command line: plan, render, annotate, write and gate a TRAIN/DEV candidate |
+| `compare-builds.mjs` | Command line: compare two builds sample by sample (reproducibility) |
+| `configs/m22.4-train-dev.json` | The owner-approved TRAIN/DEV configuration of M22.4 |
 
-Rendering is not implemented. `annotate.mjs` defines exactly what a renderer must hand over: per
-element its rect, its computed `position` and its M22 hit-test validity
-(`tests/browser/support/fixture-validity.mjs`).
+## Rendering and candidate builds (M22.4)
+
+```bash
+node tools/dataset/v2/build-candidate.mjs --config=tools/dataset/v2/configs/m22.4-train-dev.json --candidate=<n>
+node tools/dataset/v2/build-candidate.mjs --config=<same> --scratch-out=<absolute directory outside the repository>
+node tools/dataset/v2/compare-builds.mjs --a=<build> --b=<build>
+```
+
+**Browser setup.** Each planned spec is rendered in Playwright's local headless Chromium:
+- **Context:** `deviceScaleFactor: 1`, offline, every request aborted and counted.
+- **Page:** the viewport is set to the spec's exactly, and the spec's standalone HTML is loaded with `setContent`. The document loads nothing.
+- **Fonts:** the renderer waits for them before measuring.
+
+**Measurement.** For each sample the renderer records:
+- every labelled element's `getBoundingClientRect` and computed `position`;
+- every occluder's rect;
+- the viewport and DPR;
+- the PNG frame, with its size checked against the viewport.
+
+**Hit-test validity.** `document.elementFromPoint` is asked at the 5 × 5 and 9 × 9 points of `samplingPlan`. The answer is judged by the tested `hitMatches` and `classifyElement` (`tests/browser/support/fixture-validity.mjs`), injected from source. A hit is the browser's hit test, not a pixel.
+
+**Fail closed.** These are render defects, and any one of them refuses the build:
+- a wrong viewport, DPR or frame size;
+- a labelled element or occluder missing or extra;
+- an occluder away from its declared box;
+- any network request;
+- a browser error.
+
+On a refused build, `BUILD-STATUS.json` says FAILED, names the defect, and the partial output is kept. A labelled element rendered away from its box is not a render defect: it is recorded as measured, and G4 and G8 fail it.
+
+**Gate.** G1–G9 run three times: on TRAIN alone, on DEV alone, and on both together, which catches cross-split integrity failures. A candidate PASSES only if all three pass. G4 counts a positive only when it is:
+- intended as a positive;
+- HIT_TESTABLE on both grids;
+- within `sourceTolerancePx` of its declared box;
+- `absolute`.
+
+**Outputs.**
+- **Per split:** `manifest-<split>.json` and `frames-<split>/<id>.png`. Each sample carries `framePath`, its frame hash and size, its HTML hash, its spec hash, provenance and annotations, including per-grid hit-test detail.
+- **Build:** `build-record.json`, holding counts, hashes, environment and gate results, and `BUILD-STATUS.json`.
+- **Never overwritten:** a destination that exists is refused, so a new attempt takes a new number.
 
 ## Spatial placement
 
@@ -206,10 +248,12 @@ The gate's G7 still compares rendered layouts exactly. Near-identical detection 
   - golden values for `2.1.0-draft`;
   - a second Node process that reproduces a plan hash.
 
-## Build procedure for a future dataset (not performed)
+## Build procedure
 
-1. The owner approves and records the following. The proposal, unapproved, is in
-   `artifacts/experiments/M22.3-train-dev-build-spec/owner-config-proposal.md`.
+M22.4 followed it for TRAIN and DEV (`artifacts/experiments/M22.4-train-dev-candidate/`).
+
+1. The owner approves and records the following. M22.3 proposed them, and M22.4 approved them, with
+   10% positive oversampling (`configs/m22.4-train-dev.json`).
    - the schedule (positives and occlusion cases);
    - `maxTargetsPerSample` and `maxOverflowSamples`;
    - split sizes;
@@ -217,8 +261,8 @@ The gate's G7 still compares rendered layouts exactly. Near-identical detection 
    - gate thresholds.
 2. Plan: `node tools/dataset/v2/build-v2.mjs --schedule=<file> --counts=train:<n>,dev:<m> --leakage=<elementIou>:<layoutShare>`.
    It writes nothing.
-3. Implement and review the render step.
-4. Build TRAIN and DEV into `manifest-<split>.json` and `frames-<split>/`.
+3. Implement and review the render step (M22.4).
+4. Build TRAIN and DEV into `manifest-<split>.json` and `frames-<split>/` (`build-candidate.mjs`).
 5. Gate TRAIN and DEV with `requiredChecks: REQUIRED_CHECKS_V2` and
    `expectedSplits: ["train", "dev"]`. Fix the generator on any failure; never edit labels by hand.
 6. TEST only after TEST authorisation is hardened (below).
