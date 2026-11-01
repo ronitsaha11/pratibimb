@@ -59,20 +59,100 @@ export function openAuditManifest(dir, split, read = readFileSync) {
 export const layoutSignature = (elements) =>
   sha256(canonicalJson(elements.map((e) => [e.cls, e.box.x, e.box.y, e.box.w, e.box.h]).sort((a, b) => (JSON.stringify(a) < JSON.stringify(b) ? -1 : 1))));
 
+const iou = (a, b) => {
+  const x1 = Math.max(a.x, b.x);
+  const y1 = Math.max(a.y, b.y);
+  const x2 = Math.min(a.x + a.w, b.x + b.w);
+  const y2 = Math.min(a.y + a.h, b.y + b.h);
+  if (x2 <= x1 || y2 <= y1) return 0;
+  const inter = (x2 - x1) * (y2 - y1);
+  return inter / (a.w * a.h + b.w * b.h - inter);
+};
+
 /**
- * No id, seed or layout in two splits; no duplicate id anywhere.
- * @param specs [{ id, split, seed, elements }]
+ * How alike two layouts are: elements are matched one-to-one, same class, at IoU ≥ `elementIou`
+ * (greedy by best IoU); the similarity is matched ÷ the larger element count. 1 for identical
+ * layouts; a layout shifted by 1 px is still close to 1 at any reasonable `elementIou`.
  */
-export function assertNoLeakage(specs) {
-  const seen = { id: new Map(), seed: new Map(), layout: new Map() };
-  const clash = [];
-  for (const s of specs) {
-    for (const [kind, key] of [["id", s.id], ["seed", s.seed], ["layout", layoutSignature(s.elements)]]) {
-      const prior = seen[kind].get(key);
-      if (prior !== undefined && (kind === "id" || prior !== s.split)) clash.push(`${kind} ${kind === "layout" ? "signature" : key} in ${prior} and ${s.split}`);
-      if (prior === undefined) seen[kind].set(key, s.split);
+export function layoutSimilarity(a, b, elementIou) {
+  if (a.length === 0 || b.length === 0) return 0;
+  const pairs = [];
+  for (let i = 0; i < a.length; i += 1) {
+    for (let j = 0; j < b.length; j += 1) {
+      if (a[i].cls !== b[j].cls) continue;
+      const v = iou(a[i].box, b[j].box);
+      if (v >= elementIou) pairs.push([v, i, j]);
     }
   }
-  if (clash.length) throw new Error(`split leakage: ${clash.slice(0, 5).join("; ")}${clash.length > 5 ? ` (+${clash.length - 5})` : ""}`);
-  return true;
+  pairs.sort((p, q) => q[0] - p[0] || p[1] - q[1] || p[2] - q[2]);
+  const ua = new Set();
+  const ub = new Set();
+  for (const [, i, j] of pairs) {
+    if (ua.has(i) || ub.has(j)) continue;
+    ua.add(i);
+    ub.add(j);
+  }
+  return ua.size / Math.max(a.length, b.length);
+}
+
+/**
+ * Split leakage. Throws on any CROSS-split leak; reports same-split similarity without throwing.
+ *
+ *   - a duplicate id anywhere (ids must be unique across the whole dataset);
+ *   - a seed in two splits;
+ *   - an exactly identical layout in two splits;
+ *   - a NEAR-identical layout in two splits: `layoutSimilarity ≥ layoutShare` at `elementIou`.
+ *
+ * BOTH THRESHOLDS ARE REQUIRED and have no default; whoever plans states them. Empty layouts are
+ * not compared (there is nothing in them to leak); they are counted.
+ *
+ * @param specs   [{ id, split, seed, elements }]
+ * @param options { elementIou: (0, 1], layoutShare: (0, 1] }
+ * @returns { crossSplit: [], sameSplit: { seeds, exactLayouts, nearLayouts }, emptyLayouts, comparedPairs }
+ */
+export function assertNoLeakage(specs, options) {
+  const inUnit = (v) => typeof v === "number" && v > 0 && v <= 1;
+  if (!inUnit(options?.elementIou) || !inUnit(options?.layoutShare)) {
+    throw new Error("leakage: options elementIou and layoutShare must be stated, each in (0, 1] — no default is invented");
+  }
+  const crossSplit = [];
+  const sameSplit = { seeds: 0, exactLayouts: 0, nearLayouts: 0 };
+  const ids = new Map();
+  const seeds = new Map();
+  const exact = new Map();
+  for (const s of specs) {
+    if (ids.has(s.id)) crossSplit.push(`id ${s.id} appears twice (${ids.get(s.id)}, ${s.split})`);
+    ids.set(s.id, s.split);
+    const priorSeed = seeds.get(s.seed);
+    if (priorSeed !== undefined) {
+      if (priorSeed !== s.split) crossSplit.push(`seed ${s.seed} in ${priorSeed} and ${s.split}`);
+      else sameSplit.seeds += 1;
+    } else seeds.set(s.seed, s.split);
+  }
+  const nonEmpty = specs.filter((s) => s.elements.length > 0);
+  for (const s of nonEmpty) {
+    const sig = layoutSignature(s.elements);
+    const prior = exact.get(sig);
+    if (prior !== undefined) {
+      if (prior.split !== s.split) crossSplit.push(`identical layout in ${prior.id} (${prior.split}) and ${s.id} (${s.split})`);
+      else sameSplit.exactLayouts += 1;
+    } else exact.set(sig, { id: s.id, split: s.split });
+  }
+  let comparedPairs = 0;
+  for (let i = 0; i < nonEmpty.length; i += 1) {
+    for (let j = i + 1; j < nonEmpty.length; j += 1) {
+      const a = nonEmpty[i];
+      const b = nonEmpty[j];
+      comparedPairs += 1;
+      const sim = layoutSimilarity(a.elements, b.elements, options.elementIou);
+      if (sim < options.layoutShare) continue;
+      if (a.split !== b.split) crossSplit.push(`near-identical layout in ${a.id} (${a.split}) and ${b.id} (${b.split}): similarity ${sim.toFixed(3)}`);
+      else sameSplit.nearLayouts += 1;
+    }
+  }
+  const report = { crossSplit, sameSplit, emptyLayouts: specs.length - nonEmpty.length, comparedPairs, options: { ...options } };
+  if (crossSplit.length) {
+    throw new Error(`split leakage: ${crossSplit.slice(0, 5).join("; ")}${crossSplit.length > 5 ? ` (+${crossSplit.length - 5} more)` : ""}`);
+  }
+  return report;
 }

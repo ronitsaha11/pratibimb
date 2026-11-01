@@ -1,21 +1,32 @@
 /**
  * v2 layout: one sample's elements and boxes, from its seed and its scheduled targets. Pure.
  *
- * Rules, each the fix for an M22.1 finding:
- *   - Every element gets an explicit box; HTML gives it `position:absolute` with exactly that box
- *     (`html.mjs`). No element's coordinates can be ignored by the browser, icons included.
- *   - Nothing is placed over the masthead: placement starts below it.
- *   - Intended positives never overlap each other: a seeded shelf packing with clearance.
- *   - Each target's shorter side is an INTEGER number of CSS px chosen so that, at this sample's
- *     scale, it lies inside its size bucket — rounding cannot move a target into another bucket.
- *   - Occlusion is never accidental: a target is occluded only as an explicit, labelled occlusion
- *     case, with its own occluder element.
- *   - A target that does not fit is returned in `deferred`, never silently dropped.
+ * PLACEMENT IS STRATIFIED (M22.2 hardening). The review measured the earlier top-left shelf packing:
+ * sparse pages had 95% of element centres in the left quarter and 100% in the top quarter; dense pages
+ * had 99% in the top half. Now:
+ *
+ *   1. The USABLE AREA is the viewport below the masthead, inside the margin.
+ *   2. It is divided into a 3 × 3 grid of REGIONS. Each sample draws a seeded permutation of the nine;
+ *      target i prefers region perm[i mod 9], so targets spread over regions within a page and,
+ *      because the permutation changes per sample, across pages.
+ *   3. Within a region, a seeded search places the element's CENTRE inside the region, with the whole
+ *      box inside the usable area and at least the minimum clearance from every element already
+ *      placed. If the preferred region has no room, the other regions are tried in permutation order.
+ *   4. A target with no room anywhere is returned in `deferred`, never dropped; `plan.mjs` reschedules
+ *      it.
+ *
+ * Unchanged rules: every element gets an explicit integer box (`html.mjs` gives it
+ * `position:absolute`); nothing overlaps the masthead; intended positives never overlap; each
+ * target's shorter side is an integer CSS size inside its bucket at this sample's scale; occlusion
+ * happens only for targets whose ROLE is an occlusion case, each with its own occluder.
  */
 import { CLASS_GEOMETRY, LAYOUT, SIZE_BUCKETS, V2, VIEWPORTS } from "./config.mjs";
 import { rngOf } from "./prng.mjs";
 
 const WORDS = Object.freeze(["Apply", "Next", "Back", "Save", "Open", "Close", "Find", "Help", "Edit", "Done", "Start", "Step"]);
+export const GRID = 3; // 3 × 3 regions
+export const PLACEMENT_ATTEMPTS = 48; // seeded candidate positions tried per region
+const MIN_CLEARANCE = LAYOUT.clearance[0];
 
 export const scaleOf = (viewport) => V2.modelInput / Math.max(viewport.w, viewport.h);
 
@@ -28,6 +39,21 @@ export function cssShorterRange(bucketId, scale) {
   if (lo > hi) throw new Error(`bucket ${bucketId} has no integer CSS size at scale ${scale}`);
   return [lo, hi];
 }
+
+/** The usable area: below the masthead, inside the margin. */
+export function usableArea(viewport, mastheadH) {
+  const m = LAYOUT.margin;
+  return { x: m, y: mastheadH + m, w: viewport.w - 2 * m, h: viewport.h - mastheadH - 2 * m };
+}
+
+/** Region r (0..8, row-major) of an area. */
+export function regionOf(area, r) {
+  const col = r % GRID;
+  const row = Math.floor(r / GRID);
+  return { x: area.x + (col * area.w) / GRID, y: area.y + (row * area.h) / GRID, w: area.w / GRID, h: area.h / GRID };
+}
+
+const clear = (a, b, c) => !(a.x < b.x + b.w + c && b.x < a.x + a.w + c && a.y < b.y + b.h + c && b.y < a.y + a.h + c);
 
 /** The box of one target, before placement. Shorter side exactly `s` CSS px. */
 function sizeTarget(rng, cls, s, maxW) {
@@ -45,53 +71,62 @@ function sizeTarget(rng, cls, s, maxW) {
   return { w, h, shape: g.shapes ? rng.pick(g.shapes) : undefined };
 }
 
+/** Try to place a w × h box with its centre in one region. Returns the box or null. */
+function placeInRegion(rng, area, region, w, h, placed) {
+  const cxLo = Math.max(region.x, area.x + w / 2);
+  const cxHi = Math.min(region.x + region.w, area.x + area.w - w / 2);
+  const cyLo = Math.max(region.y, area.y + h / 2);
+  const cyHi = Math.min(region.y + region.h, area.y + area.h - h / 2);
+  if (cxLo > cxHi || cyLo > cyHi) return null;
+  for (let k = 0; k < PLACEMENT_ATTEMPTS; k += 1) {
+    const x = Math.round(rng.between(cxLo, cxHi) - w / 2);
+    const y = Math.round(rng.between(cyLo, cyHi) - h / 2);
+    if (x < area.x || y < area.y || x + w > area.x + area.w || y + h > area.y + area.h) continue;
+    const box = { x, y, w, h };
+    if (placed.every((p) => clear(box, p, MIN_CLEARANCE))) return box;
+  }
+  return null;
+}
+
 /**
  * Lay out one sample.
- * @param plan       { id, split, seed } from `planSplitIds`
- * @param targets    [{ cls, bucket }] from `dealTargets`
- * @param occlusion  { share: 0..1, kinds: ["partial" | "full", ...] } — REQUIRED; share 0 means none
+ * @param plan    { id, split, seed }
+ * @param targets [{ cls, bucket, role }] — role "positive", "occlusion-partial" or "occlusion-full"
  */
-export function layoutSample(plan, targets, occlusion) {
-  if (!occlusion || !(occlusion.share >= 0 && occlusion.share <= 1) || !Array.isArray(occlusion.kinds)) {
-    throw new Error("layout: occlusion { share, kinds } must be stated (share 0 for none)");
-  }
-  if (occlusion.share > 0 && (occlusion.kinds.length === 0 || occlusion.kinds.some((k) => k !== "partial" && k !== "full"))) {
-    throw new Error("layout: occlusion kinds must be 'partial' and/or 'full'");
+export function layoutSample(plan, targets) {
+  for (const t of targets) {
+    if (!["positive", "occlusion-partial", "occlusion-full"].includes(t.role)) throw new Error(`layout: unknown target role ${JSON.stringify(t.role)}`);
   }
   const rng = rngOf(plan.seed);
   const viewport = rng.pick(VIEWPORTS);
   const scale = scaleOf(viewport);
   const mastheadH = rng.int(LAYOUT.mastheadHeight[0], LAYOUT.mastheadHeight[1]);
-  const m = LAYOUT.margin;
-  const maxW = viewport.w - 2 * m;
+  const area = usableArea(viewport, mastheadH);
+  const perm = rng.shuffle([...Array(GRID * GRID).keys()]);
 
-  const sized = rng.shuffle(targets).map((t) => {
+  // Larger boxes first: they have the fewest places to go. Ties keep the seeded order.
+  const sized = rng.shuffle(targets).map((t, i) => {
     const [lo, hi] = cssShorterRange(t.bucket, scale);
-    const s = rng.int(lo, hi);
-    return { ...t, ...sizeTarget(rng, t.cls, s, maxW) };
+    return { ...t, order: i, ...sizeTarget(rng, t.cls, rng.int(lo, hi), area.w) };
   });
+  sized.sort((a, b) => b.w * b.h - a.w * a.h || a.order - b.order);
 
+  const placedBoxes = [];
   const placed = [];
   const deferred = [];
-  let x = m + rng.int(0, LAYOUT.clearance[1]);
-  let y = mastheadH + m;
-  let rowH = 0;
-  for (const t of sized) {
-    const gap = rng.int(LAYOUT.clearance[0], LAYOUT.clearance[1]);
-    if (x + t.w + m > viewport.w) {
-      x = m + rng.int(0, LAYOUT.clearance[1]);
-      if (x + t.w + m > viewport.w) x = m; // a wide element starts flush, rather than being deferred
-      y += rowH + gap;
-      rowH = 0;
+  sized.forEach((t, i) => {
+    const preferred = i % (GRID * GRID);
+    const tryOrder = [...perm.slice(preferred), ...perm.slice(0, preferred)];
+    for (const r of tryOrder) {
+      const box = placeInRegion(rng, area, regionOf(area, r), t.w, t.h, placedBoxes);
+      if (box) {
+        placedBoxes.push(box);
+        placed.push({ ...t, box, region: r, preferredRegion: perm[preferred] });
+        return;
+      }
     }
-    if (x + t.w + m > viewport.w || y + t.h + m > viewport.h) {
-      deferred.push({ cls: t.cls, bucket: t.bucket });
-      continue;
-    }
-    placed.push({ ...t, box: { x, y, w: t.w, h: t.h } });
-    x += t.w + gap;
-    rowH = Math.max(rowH, t.h);
-  }
+    deferred.push({ cls: t.cls, bucket: t.bucket, role: t.role });
+  });
 
   // Stable order: top to bottom, then left to right. Keys are assigned AFTER sorting.
   placed.sort((a, b) => a.box.y - b.box.y || a.box.x - b.box.x);
@@ -99,27 +134,25 @@ export function layoutSample(plan, targets, occlusion) {
     key: `${plan.id}-e${String(k).padStart(3, "0")}`,
     cls: p.cls,
     bucket: p.bucket,
-    intent: "positive",
+    intent: p.role,
     box: p.box,
+    region: p.region,
     ...(p.shape ? { shape: p.shape } : {}),
     ...(["button", "link", "tab", "select"].includes(p.cls) ? { label: rng.pick(WORDS) } : {}),
   }));
 
-  // Explicit occlusion cases: each element is one with probability `share`, from this sample's seed,
-  // and gets its own occluder. Never accidental. (Per element, not `round(n × share)` per sample:
-  // with a few targets per sample that rounds to zero everywhere and the share is silently lost.)
-  const occluders = [];
-  for (const e of elements.filter(() => occlusion.share > 0 && rng.next() < occlusion.share)) {
-    const kind = rng.pick(occlusion.kinds);
-    e.intent = `occlusion-${kind}`;
-    const b = e.box;
-    occluders.push({
-      for: e.key,
-      kind,
-      box: kind === "full" ? { x: b.x - 1, y: b.y - 1, w: b.w + 2, h: b.h + 2 } : { x: b.x + Math.floor(b.w / 2), y: b.y - 1, w: Math.ceil(b.w / 2) + 1, h: b.h + 2 },
+  // An occluder for each occlusion-case target, and for nothing else.
+  const occluders = elements
+    .filter((e) => e.intent !== "positive")
+    .map((e) => {
+      const b = e.box;
+      const kind = e.intent === "occlusion-full" ? "full" : "partial";
+      return {
+        for: e.key,
+        kind,
+        box: kind === "full" ? { x: b.x - 1, y: b.y - 1, w: b.w + 2, h: b.h + 2 } : { x: b.x + Math.floor(b.w / 2), y: b.y - 1, w: Math.ceil(b.w / 2) + 1, h: b.h + 2 },
+      };
     });
-  }
-  occluders.sort((a, b) => (a.for < b.for ? -1 : 1));
 
   return {
     version: V2.version,
@@ -129,6 +162,7 @@ export function layoutSample(plan, targets, occlusion) {
     viewport: { w: viewport.w, h: viewport.h },
     scale,
     masthead: { x: 0, y: 0, w: viewport.w, h: mastheadH },
+    area,
     elements,
     occluders,
     deferred,

@@ -1,9 +1,10 @@
 # `tools/dataset/v2` — the version 2 synthetic T1 dataset generator
 
-> **Status (2026-11-01): implemented and unit-tested; NO v2 DATASET HAS BEEN GENERATED, nothing has
-> been rendered, and no model has been trained on v2.** The v1 builder
-> (`tools/dataset/build-dataset.mjs`), `t1-ui-v1` and the shipped T1 artifact are unchanged.
-> Nothing here reads `artifacts/datasets`.
+> **Status (2026-11-01): implemented, hardened after an architecture review, and unit-tested. NO v2
+> DATASET HAS BEEN GENERATED, nothing has been rendered, and no model has been trained on v2.** The
+> v1 builder (`tools/dataset/build-dataset.mjs`), `t1-ui-v1` and the shipped T1 artifact are
+> unchanged. Nothing here reads `artifacts/datasets`. TEST is not planned anywhere in this code
+> path, and its seal is known to be weak (§TEST below).
 
 ## Architecture
 
@@ -15,97 +16,163 @@ for audits.
 | `config.mjs` | Version, classes, size buckets (the M22 buckets plus generation bounds), per-class aspect ranges, icon shapes, viewports, layout constants |
 | `prng.mjs` | Seed derivation (FNV-1a), the PRNG (mulberry32), canonical JSON, SHA-256 |
 | `splits.mjs` | Per-split manifest and frame names, ids, seeds, the TEST seal, the audit reader, the leakage check |
-| `schedule.mjs` | Validates an owner-stated coverage schedule and deals its targets to samples |
-| `layout.mjs` | One sample: viewport, masthead, sized targets, shelf placement, explicit occlusion cases |
+| `schedule.mjs` | Validates the owner's positive and occlusion-case quotas; deals targets to samples |
+| `layout.mjs` | One sample: viewport, masthead, usable area, stratified placement, occluders for occlusion cases |
+| `plan.mjs` | One split, TRAIN or DEV only: deal, lay out, reschedule deferred targets, reconcile or refuse |
 | `html.mjs` | A laid-out sample → a standalone HTML document, with `__measureV2()` |
 | `annotate.mjs` | Render results → annotations with provenance and the `positive` flag; split manifests |
-| `build-v2.mjs` | Command line: **plan only** in M22.2 |
+| `build-v2.mjs` | Command line: **plan only** |
 
-Rendering (Playwright, `__measureV2`, the M22 hit-test validity from
-`tests/browser/support/fixture-validity.mjs`) is the build step that M22.2 deliberately does not
-implement. `annotate.mjs` defines exactly what that step must hand over.
+Rendering is not implemented. `annotate.mjs` defines exactly what a renderer must hand over: per
+element its rect, its computed `position` and its M22 hit-test validity
+(`tests/browser/support/fixture-validity.mjs`).
 
-## What changed from v1 (each a fix for an M22.1 finding)
+## Spatial placement
 
-| v1 finding | v2 |
-|---|---|
-| The icon's `left`/`top` were ignored (`[role=img]` had no `position` rule); every icon rendered at the origin under the masthead | **One rule for every labelled element:** `[data-v2]{position:absolute}`, with the declared box inline. G8 fails any element whose declared position is ignored, or which renders off its declared box |
-| One fixed 22×22 icon | Icons drawn per target: 4 shapes (circle, square, rounded, glyph), aspect 0.8–1.25, any size bucket, any position, and a count set by the schedule |
-| No element of 32 model px or more; very-small only for checkbox and radio | **A coverage schedule:** every class × every bucket has a stated quota. Each target's shorter side is an integer CSS size chosen to land inside its bucket at its sample's scale |
-| Overlaps from layout | Positives never overlap each other or the masthead. Occlusion appears only as **explicit, labelled occlusion cases** (`intent: occlusion-partial` / `occlusion-full`), each with its own occluder, and these are never positives |
-| One manifest holding all three splits | **One manifest and one frame folder per split.** Audits open TRAIN or DEV by exact file name, never TEST |
+The architecture review measured the first version's top-left shelf packing:
+- sparse pages: 95% of element centres in the left quarter of the viewport and 100% in the top
+  quarter;
+- dense pages: 99% in the top half and none in the bottom quarter.
 
-## Labels and provenance
+Placement is now **stratified**:
+1. The **usable area** is the viewport below the masthead, inside a 16 px margin.
+2. It is split into a **3 × 3 grid of regions**. Each sample draws a seeded permutation of the nine,
+   and its i-th target (largest boxes first) prefers region `perm[i mod 9]`.
+3. A seeded search (up to 48 candidates per region) puts the element's **centre** in the region, its
+   whole box in the usable area, and at least 8 px between it and every placed element. A full
+   region hands over to the next in the permutation.
+4. A target with no room anywhere is **deferred**, never dropped (see below).
 
-Each annotation records:
-- `box`: the rendered `getBoundingClientRect`;
-- `visibility`: by geometry;
-- `validity`: the M22 hit-test category;
-- `intent`: `positive`, `occlusion-partial` or `occlusion-full`;
-- `source.declared`: the box the generator declared;
-- `source.computedPosition` and `source.bucket`.
+**Acceptance criteria, fixed before measurement** and asserted by `test/v2.test.mjs`. For every one of
+the six viewport shapes, pooled over the tested seeds, separately for sparse pages (1–2 targets) and
+dense pages (12 targets):
+- every 3 × 3 region holds 5%–25% of element centres (uniform would be 11.1%);
+- the top third holds at most 45%;
+- the bottom, left and right thirds each hold at least 20%.
 
-**`positive` is true only when the intent is `positive` and the validity is `HIT_TESTABLE`.** A fully
-occluded element, or an occlusion case, is never a positive training target. The hit test is the
-browser's, not pixel visibility.
+These criteria hold on the tested seeds (1,600 sparse and 200 dense samples); they are not proven
+for every seed. Measured on the review's own probe after the change:
+- sparse: viewport x quarters 0.21 / 0.30 / 0.29 / 0.20 and y quarters 0.17 / 0.31 / 0.28 / 0.24;
+- dense: x 0.21 / 0.29 / 0.28 / 0.23 and y 0.18 / 0.29 / 0.28 / 0.25;
+- every 3 × 3 region holds 7.2–14.4% (sparse) and 9.4–12.5% (dense).
 
-## Reproducibility
+Very wide elements can only be centred in the middle column; that follows from geometry.
 
-- **Seeds:** `seedFor(split, index) = FNV-1a("t1-ui-synthetic|<version>|<split>|<index>")`.
-  Changing the version changes every seed.
-- **Ids:** `<split>-<00000>`.
-- **Order:** elements are sorted top-to-bottom, then left-to-right, and keyed `<id>-e<000>` after
-  sorting; manifests sort samples by id.
-- **Hashes:** each sample carries `specHash = sha256(canonical JSON of its spec)`; each split manifest
-  carries `hash = sha256(canonical JSON of everything else)`.
-- **Same inputs, same outputs:** the same version, schedule and occlusion setting give byte-identical
-  specs, HTML and manifest hashes (tested).
+## Quotas: positives, plus occlusion cases on top
 
-## Quality gate configuration (`tests/browser/support/dataset-quality-gate.mjs`)
+The schedule states **two separate quotas**, per split × class × size bucket, each an explicit
+integer with no default:
+
+```json
+{
+  "maxTargetsPerSample": 12,
+  "maxOverflowSamples": 40,
+  "positives":      { "train": { "button": { "very-small": 150, "small": 150, "medium": 150, "large": 150 }, "...": {} } },
+  "occlusionCases": { "train": { "button": { "very-small": { "partial": 8, "full": 7 }, "...": {} } } }
+}
+```
+
+- **Occlusion cases are additional.** A cell asking for 150 positives and 15 occlusion cases plans
+  165 targets of that class and size. An occlusion case never reduces a positive quota.
+- **Incomplete schedules are refused:** a missing class, bucket or kind, a non-integer, or an unknown
+  key.
+- **Planned is not observed.** The plan's counts are *planned* positives and occlusion cases.
+  Whether a planned positive is a usable, hit-testable positive is established only by rendering, and
+  then by the gate (G4 for coverage, G9 for labels). A rendered dataset that falls short fails the
+  gate.
+
+## Deferred targets
+
+A target a page could not hold is **rescheduled** to an overflow sample appended after the requested
+ones. Its id continues the split's sequence (`train-00600`, `train-00601`, …), so ids stay unique.
+Overflow samples take up to `maxTargetsPerSample` targets each, in deferral order; anything still
+unplaced moves on.
+- **The bound:** at most `maxOverflowSamples` overflow samples are added.
+- **If targets remain,** the plan is **refused** with the class, bucket and role of every unplaced
+  target. A quota is never silently reduced.
+- **Reconciliation:** placed counts must equal scheduled counts exactly, cell by cell and role by
+  role, or the plan is refused.
+- **Reporting:** deferrals at the first layout and the number rescheduled are reported separately
+  for positives and occlusion cases.
+
+## Quality gate (`tests/browser/support/dataset-quality-gate.mjs`)
 
 | Option | Meaning | Default |
 |---|---|---|
 | `classes` | classes the dataset must cover | **none — required** |
-| `minPerClassBucket` | G4: minimum positive examples per class per bucket per split | **none — required** |
-| `nearDuplicateIou` | G5: same-class pairs in a sample at or above this IoU are near-duplicates | **none — required** |
-| `repetitionShare` | G6: a (class, box) in at least this share of a split's samples (and ≥ 2) is suspicious | **none — required** |
-| `sourceTolerancePx` | G8: largest allowed rendered-versus-declared edge difference, CSS px | **none — required** when any annotation has `source` |
+| `expectedSplits` | splits the dataset must contain; an absent one fails G4 and G7, an unexpected one fails G7 | **none — required** |
+| `requiredChecks` | checks that must be applicable; NOT_APPLICABLE on one fails the gate. Use `REQUIRED_CHECKS_V2` (all nine) for v2 | **none — required** |
+| `minPerClassBucket` | G4: minimum positives per class × bucket × split; an integer **≥ 1** | **none — required** |
+| `nearDuplicateIou` | G5 | **none — required** |
+| `repetitionShare` | G6 | **none — required** |
+| `sourceTolerancePx` | G8: largest rendered-versus-declared edge difference, CSS px | **none — required** when any annotation has `source` |
 
-- **What the checks cover:**
-  - G1 box validity;
-  - G2 visibility against geometry;
-  - G3 unlabelled occlusion;
-  - G4 class × size coverage;
-  - G5 duplicates;
-  - G6 repetitive geometry;
-  - G7 split independence;
-  - G8 source-to-render consistency;
-  - G9 occlusion labels.
-- **No threshold here is an approved training threshold.** The values used in tests and in M22.1's
-  report were chosen for those purposes only.
+Hardening against the review's six false passes:
+- a required check that is NOT_APPLICABLE fails the gate, and each check's own status stays in the
+  report;
+- G3, G8 and G9 fail a **partially populated** annotation set rather than skipping the rest;
+- `expectedSplits` makes an absent split a failure;
+- `minPerClassBucket` must be at least 1;
+- G9 checks every declared intent against the observed validity: `positive` → HIT_TESTABLE,
+  `occlusion-partial` → PARTIALLY_OCCLUDED, `occlusion-full` → FULLY_OCCLUDED;
+- G8 requires `computedPosition` to be exactly `absolute`.
+
+**Backward compatibility:** M22.1's recipe audit states its own schema, `REQUIRED_CHECKS_V1_RECIPE_AUDIT`
+(G1–G7), so G8 and G9 may be NOT_APPLICABLE there.
+
+**No value here is an approved training threshold.**
+
+## Split leakage (`splits.mjs` `assertNoLeakage`)
+
+**What it checks:**
+- ids unique across the dataset;
+- no seed in two splits;
+- no **exactly identical** layout in two splits;
+- no **near-identical** layout in two splits.
+
+Near-identical is measured by `layoutSimilarity`: elements matched one-to-one, same class, at
+IoU ≥ `elementIou`, divided by the larger element count. A pair is a leak when that is
+≥ `layoutShare`. **Both thresholds are required, owner-supplied, and have no default.**
+
+A layout shifted by 1 px across splits is caught (tested). Same-split near-duplicates are
+**reported, not thrown**: they are a coverage question, not leakage. Empty layouts are not compared,
+and are counted. The check compares every pair of non-empty samples, so its cost grows with the
+square of the sample count.
+
+The gate's G7 still compares rendered layouts exactly. Near-identical detection runs at plan time.
+
+## Reproducibility
+
+- **Seeds:** `seedFor(split, index) = FNV-1a("t1-ui-synthetic|<version>|<split>|<index>")`.
+- **Ids:** `<split>-<00000>`; overflow ids continue the sequence.
+- **Order:** elements top-to-bottom, then left-to-right, keyed after sorting; manifests sort samples
+  by id.
+- **Hashes:** `specHash` per sample; `hash` per split manifest, over canonical JSON.
+- **Same inputs, same outputs:** byte-identical plans, HTML and hashes (tested).
 
 ## Build procedure for a future dataset (not performed)
 
-1. The owner approves: the schedule (quotas per split, class and bucket, allowing for the
-   occlusion share, which takes cases out of the quotas), the occlusion setting, the gate
-   thresholds, and the split sizes. All are recorded before any build.
-2. Plan: `node tools/dataset/v2/build-v2.mjs --schedule=<file> --counts=train:<n>,dev:<m> --occlusion=<share>:<kinds>`.
-   This checks leakage and reports coverage and deferred targets, and writes nothing.
-3. Implement and review the render step: Playwright, `__measureV2`, hit-test validity, and
-   `annotateSample`.
-4. Build TRAIN and DEV into `manifest-train.json` / `frames-train/` and `manifest-dev.json` /
-   `frames-dev/`.
-5. Run the gate on TRAIN and DEV with the approved thresholds. Fix the generator on any FAIL; never
-   edit labels by hand.
-6. Build TEST once, as below.
+1. The owner approves and records:
+   - the schedule (positives and occlusion cases);
+   - `maxTargetsPerSample` and `maxOverflowSamples`;
+   - split sizes;
+   - leakage thresholds;
+   - gate thresholds.
+2. Plan: `node tools/dataset/v2/build-v2.mjs --schedule=<file> --counts=train:<n>,dev:<m> --leakage=<elementIou>:<layoutShare>`.
+   It writes nothing.
+3. Implement and review the render step.
+4. Build TRAIN and DEV into `manifest-<split>.json` and `frames-<split>/`.
+5. Gate TRAIN and DEV with `requiredChecks: REQUIRED_CHECKS_V2` and
+   `expectedSplits: ["train", "dev"]`. Fix the generator on any failure; never edit labels by hand.
+6. TEST only after TEST authorisation is hardened (below).
 
-## TEST sealing and access policy
+## TEST — known limitation, not fixed here
 
-- **Planned only by the sealed build.** `planSplitIds("test", …)` refuses unless it is given
-  `testSealToken()`. That token is a recorded intent, not a secret.
-- **Built once,** into `manifest-test.json` / `frames-test/`. Its manifest hash is recorded when it
-  is built, before any model is evaluated.
-- **Never opened by routine work.** `openAuditManifest` refuses `test` before any filesystem call,
-  opens only `manifest-<split>.json` by exact name, and never lists a directory. No audit, tuning
-  or development step opens TEST.
-- **Opened once,** for the frozen evaluation the owner approves; that read is recorded.
+`planSplitIds("test")` needs a seal token. But:
+- the token is a public constant;
+- lower-level helpers (`seedFor`, `sampleId`, `dealTargets`, `layoutSample`) do not check it;
+- TEST seeds come from a public formula, so TEST pages are predictable from source;
+- "built once" is not enforced.
+
+`plan.mjs` and `build-v2.mjs` refuse TEST outright. **A separate task must harden TEST
+authorisation before any TEST build.**
