@@ -1,0 +1,37 @@
+{
+  "identical": true,
+  "splits": {
+    "train": {
+      "samples": [
+        600,
+        600
+      ],
+      "sameIds": true,
+      "differing": {
+        "specHash": 0,
+        "htmlSha256": 0,
+        "annotations": 0,
+        "provenance": 0,
+        "frameSha256": 0
+      },
+      "firstDiffering": {},
+      "manifestHashExceptDestination": "identical"
+    },
+    "dev": {
+      "samples": [
+        160,
+        160
+      ],
+      "sameIds": true,
+      "differing": {
+        "specHash": 0,
+        "htmlSha256": 0,
+        "annotations": 0,
+        "provenance": 0,
+        "frameSha256": 0
+      },
+      "firstDiffering": {},
+      "manifestHashExceptDestination": "identical"
+    }
+  }
+}
