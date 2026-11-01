@@ -15,6 +15,15 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
   (`artifacts/experiments/M22.1-dataset-quality/`).
 
 ### Added
+- **M22.2 — an isolated v2 generator for a future T1 dataset (`tools/dataset/v2/`). No dataset was
+  generated, nothing was rendered, no model was trained.**
+  - Every labelled element, icons included, absolutely positioned at its declared box.
+  - An owner-stated class × size schedule covering all four M22 buckets.
+  - Explicit, labelled occlusion cases, never positives.
+  - One manifest per split; TEST planned only by a sealed build and refused by audits.
+  - Leakage checks, deterministic seeds, ids, ordering and hashes; plan-only CLI.
+  - Gate checks G8 (source-to-render consistency) and G9 (occlusion labels).
+  - The v1 builder and `t1-ui-v1` are unchanged.
 - **M22 (in progress) and M22.1 tooling, no detector run.**
   - `tests/browser/support/fixture-validity.mjs`: hit-test validity categories on 5×5 and 9×9 grids;
     `matchValidPopulation`: valid ground truth matched first.

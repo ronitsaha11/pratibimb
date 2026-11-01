@@ -30,6 +30,7 @@
 | M22 fixtures (220 DEV screens): 4,691 elements, 3,196 HIT_TESTABLE (primary), 1,495 excluded by the approved validity rule | FACT (no detector) | `M22-small-target-recall/design-amendment-2.md`, `logs/w1-fixture-audit-20261101T163950Z.json` |
 | In the T1 dataset recipe's TRAIN and DEV (regenerated; the pinned manifest holds TEST and was not opened), **every icon label is fully occluded** — the generator gives `[role=img]` no `position` rule, so its coordinates are ignored — and **no class has an element of 32 model px or more** | FACT (recipe regeneration); INFERENCE that it matches the pinned `t1-ui-v1` | `artifacts/experiments/M22.1-dataset-quality/README.md` |
 | No icon detection claim should be made for the current T1 artifact | recommendation | `M22.1-dataset-quality/decision.md` |
+| An isolated v2 dataset generator exists and is unit-tested; **no v2 dataset has been generated or rendered, and nothing was trained on it**. Its schedule, occlusion setting, split sizes and gate thresholds await the owner | FACT (code, tests) | `tools/dataset/v2/README.md`, `artifacts/experiments/M22.2-dataset-generator-v2/` |
 
 `t1-ui-v1`, the model, thresholds, interfaces and contracts are unchanged. T1 stays UNADOPTED.
 
