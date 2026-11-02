@@ -1,0 +1,120 @@
+{
+  "what": "G10 calibration (M22.6): how many positives fall below each candidate threshold. Candidate 1 split into its 374 confirmed-invisible positives (M22.5 defects A and B, by attribute) and the other 6,314; candidate 2 has the same 6,688 positives redrawn. Counts only; no element ids.",
+  "metric": "salience = k-th highest contrast to the surround (k = max(3, 0.5% of the box)); coverage@1.25 = share of box pixels at contrast >= 1.25 to the surround",
+  "candidate1": {
+    "knownInvisible": 374,
+    "others": 6314,
+    "salienceBelow": {
+      "2": {
+        "knownInvisible": 374,
+        "others": 74
+      },
+      "1.05": {
+        "knownInvisible": 312,
+        "others": 0
+      },
+      "1.1": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "1.25": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "1.5": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "1.62": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "1.75": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "2.5": {
+        "knownInvisible": 374,
+        "others": 206
+      }
+    },
+    "coverage125Below": {
+      "0.001": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "0.005": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "0.01": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "0.011": {
+        "knownInvisible": 374,
+        "others": 0
+      },
+      "0.015": {
+        "knownInvisible": 374,
+        "others": 1
+      },
+      "0.02": {
+        "knownInvisible": 374,
+        "others": 11
+      },
+      "0.05": {
+        "knownInvisible": 374,
+        "others": 418
+      }
+    },
+    "knownInvisibleMax": {
+      "salience": 1.093,
+      "coverage125": 0
+    },
+    "othersMin": {
+      "salience": 1.913,
+      "coverage125": 0.013
+    }
+  },
+  "candidate2": {
+    "positives": 6688,
+    "salienceBelow": {
+      "2": 58,
+      "1.05": 0,
+      "1.1": 0,
+      "1.25": 0,
+      "1.5": 0,
+      "1.62": 0,
+      "1.75": 8,
+      "2.5": 175
+    },
+    "coverage125Below": {
+      "0.001": 0,
+      "0.005": 0,
+      "0.01": 0,
+      "0.011": 0,
+      "0.015": 5,
+      "0.02": 18,
+      "0.05": 354
+    },
+    "min": {
+      "salience": 1.622,
+      "coverage125": 0.011
+    },
+    "lowSalienceByClass": {
+      "radio": 8,
+      "checkbox": 13,
+      "textbox": 37
+    },
+    "lowCoverageByClass": {
+      "link/large": 3,
+      "link/medium": 5,
+      "button/large": 4,
+      "select/medium": 1,
+      "select/large": 3,
+      "link/small": 1,
+      "tab/large": 1
+    }
+  }
+}
