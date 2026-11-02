@@ -35,6 +35,14 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.5 — acceptance review of TRAIN/DEV candidate 1 (read-only; no training, no detector, no
+  TEST; candidate unmodified).**
+  - `tools/dataset/v2/audit-candidate.mjs` and `png.mjs`: independent integrity audit, recount,
+    distributions, and per-element pixel contrast (WCAG 2.x ratio formula; no conformance claim).
+  - Found: candidate 1 is structurally correct, but 282 textboxes and 92 icons are effectively
+    invisible (borderless page-on-page textboxes; icon plate lost to the `background` shorthand), and
+    hit-testing cannot see that. Not recommended for training as built; fixes and a pixel-salience
+    check proposed. A v2 trainer adapter is designed, not implemented.
 - **M22.4 — v2 TRAIN/DEV renderer and a validated candidate dataset (owner-authorised; TRAIN and
   DEV only; no training, no detector, no TEST).**
   - `tools/dataset/v2/render.mjs`, `build-candidate.mjs`, `compare-builds.mjs`: headless Chromium at
