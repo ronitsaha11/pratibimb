@@ -35,6 +35,16 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.7 — an isolated v2 TRAIN/DEV training adapter and data dry run (no training, no inference,
+  no TEST; candidates unmodified).**
+  - `tools/detector/data_v2.py`: TRAIN and DEV only (others refused before file access); per-split
+    manifests; frame SHA-256, size and set checks; captureSize from the frame; positives only, with
+    occlusion cases excluded and counted; an explicit G10 policy that records approval and claims no
+    acceptance while provisional. `data.py` and `train.py` unchanged.
+  - `tools/detector/dry_run_v2.py`: counts, exclusions, separation and a tensor check through the
+    unchanged v1 input path; no model. Candidate 2 passes; 31 Python adapter tests pass.
+  - `audit-candidate.mjs --g10-out`: per-positive G10 classes for the adapter. `train_v2.py` is
+    designed, not implemented.
 - **M22.6 — visual defect remediation, the G10 pixel diagnostic, and TRAIN/DEV candidate 2
   (owner-authorised; no training, no detector, no TEST; candidate 1 preserved).**
   - Fixed: page-on-page textboxes (each style now draws a field or a full edge) and icon plates lost to
