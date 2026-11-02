@@ -11,6 +11,10 @@ export const V2 = Object.freeze({
   name: "t1-ui-synthetic",
   version: "2.1.0-draft", // M22.3: SHA-256 seeds, appearance variety, full provenance — every output differs from 2.0.0-draft
   generator: "tools/dataset/v2",
+  // M22.6: what is drawn changed (textbox fields, icon plates, decor, occluders, native controls,
+  // label fitting), not where. Seeds and layouts are those of 2.1.0-draft, so candidate 2 is candidate
+  // 1's pages redrawn; the revision tells the two apart in every spec and manifest.
+  renderRevision: "r2-m22.6-visual-fixes",
   modelInput: 640, // the T1 head's square input; model px = CSS px × 640 / max(viewport w, h) at DPR 1
 });
 
@@ -77,14 +81,19 @@ export const MAX_SAMPLES_PER_SPLIT = 100000;
 // whatever fonts the rendering machine has (the stack is recorded; the resolved face is UNKNOWN
 // until a renderer records it).
 
-/** Colour palettes: three light, two dark, one high-contrast. The first is M22.2's only palette. */
+/**
+ * Colour palettes: three light, two dark, one high-contrast. The first is M22.2's only palette.
+ * M22.6 added `field` (a textbox's field fill, distinct from the page) and `fieldEdge` (its edge), and
+ * gave high-contrast a `surface` that is not the page colour (it was #ffffff on #ffffff, so a `flat`
+ * control there had no edge at all).
+ */
 export const PALETTES = Object.freeze([
-  Object.freeze({ id: "slate-light", scheme: "light", page: "#ffffff", text: "#111111", masthead: "#12395c", surface: "#e8eef6", border: "#9db4cc", accent: "#12395c", onAccent: "#ffffff", decor: "#e3e7ec", occluder: "#5a6b7a" }),
-  Object.freeze({ id: "sand-light", scheme: "light", page: "#faf6ee", text: "#2b2118", masthead: "#7a4b1e", surface: "#efe4d2", border: "#c4a77f", accent: "#9c5a1c", onAccent: "#ffffff", decor: "#ebe2d3", occluder: "#6e5a46" }),
-  Object.freeze({ id: "mint-light", scheme: "light", page: "#f4fbf7", text: "#0f2a1d", masthead: "#1d6b4a", surface: "#dcefe5", border: "#8fc2a8", accent: "#1d6b4a", onAccent: "#ffffff", decor: "#e0eee7", occluder: "#4d6b5d" }),
-  Object.freeze({ id: "graphite-dark", scheme: "dark", page: "#1b1d21", text: "#e6e6e6", masthead: "#2c3038", surface: "#2f343c", border: "#59616e", accent: "#7fb0ff", onAccent: "#0d1420", decor: "#262a30", occluder: "#8a94a3" }),
-  Object.freeze({ id: "navy-dark", scheme: "dark", page: "#0f1a2b", text: "#e3ebf5", masthead: "#1c2d48", surface: "#1d2f4a", border: "#4a6487", accent: "#f2b84b", onAccent: "#1a1306", decor: "#162540", occluder: "#9aa9bd" }),
-  Object.freeze({ id: "high-contrast", scheme: "light", page: "#ffffff", text: "#000000", masthead: "#000000", surface: "#ffffff", border: "#000000", accent: "#0000c8", onAccent: "#ffffff", decor: "#d9d9d9", occluder: "#444444" }),
+  Object.freeze({ id: "slate-light", scheme: "light", page: "#ffffff", text: "#111111", masthead: "#12395c", surface: "#e8eef6", border: "#9db4cc", accent: "#12395c", onAccent: "#ffffff", decor: "#e3e7ec", occluder: "#5a6b7a", field: "#dfe6ef", fieldEdge: "#7d93ad" }),
+  Object.freeze({ id: "sand-light", scheme: "light", page: "#faf6ee", text: "#2b2118", masthead: "#7a4b1e", surface: "#efe4d2", border: "#c4a77f", accent: "#9c5a1c", onAccent: "#ffffff", decor: "#ebe2d3", occluder: "#6e5a46", field: "#e7d9c0", fieldEdge: "#a88b62" }),
+  Object.freeze({ id: "mint-light", scheme: "light", page: "#f4fbf7", text: "#0f2a1d", masthead: "#1d6b4a", surface: "#dcefe5", border: "#8fc2a8", accent: "#1d6b4a", onAccent: "#ffffff", decor: "#e0eee7", occluder: "#4d6b5d", field: "#cde5d7", fieldEdge: "#6fa58a" }),
+  Object.freeze({ id: "graphite-dark", scheme: "dark", page: "#1b1d21", text: "#e6e6e6", masthead: "#2c3038", surface: "#2f343c", border: "#59616e", accent: "#7fb0ff", onAccent: "#0d1420", decor: "#262a30", occluder: "#8a94a3", field: "#343a44", fieldEdge: "#7a8494" }),
+  Object.freeze({ id: "navy-dark", scheme: "dark", page: "#0f1a2b", text: "#e3ebf5", masthead: "#1c2d48", surface: "#1d2f4a", border: "#4a6487", accent: "#f2b84b", onAccent: "#1a1306", decor: "#162540", occluder: "#9aa9bd", field: "#22385a", fieldEdge: "#6a86ad" }),
+  Object.freeze({ id: "high-contrast", scheme: "light", page: "#ffffff", text: "#000000", masthead: "#000000", surface: "#e2e2e2", border: "#000000", accent: "#0000c8", onAccent: "#ffffff", decor: "#f0f0f0", occluder: "#444444", field: "#e2e2e2", fieldEdge: "#000000" }),
 ]);
 
 /** Font stacks: local system faces only, each ending in a generic family. */
@@ -114,13 +123,30 @@ export const HIT_SAFE_RADIUS = 0.15;
  * shorter side, clamped to `HIT_SAFE_RADIUS`. `fill`: which palette colour fills the box.
  */
 export const CONTROL_STYLES = Object.freeze([
-  Object.freeze({ id: "outlined", border: 1, radius: 0.12, fill: "surface", underline: false, shadow: false }),
-  Object.freeze({ id: "filled", border: 0, radius: 0.12, fill: "accent", underline: false, shadow: false }),
-  Object.freeze({ id: "flat", border: 0, radius: 0, fill: "surface", underline: false, shadow: false }),
-  Object.freeze({ id: "heavy-outline", border: 2, radius: 0.06, fill: "page", underline: false, shadow: false }),
-  Object.freeze({ id: "underlined", border: 0, radius: 0, fill: "page", underline: true, shadow: false }),
-  Object.freeze({ id: "raised", border: 1, radius: 0.15, fill: "surface", underline: false, shadow: true }),
+  Object.freeze({ id: "outlined", border: 1, radius: 0.12, fill: "surface", underline: false, shadow: false, textbox: Object.freeze({ fill: "page", border: 1, edge: "border", bottom: null }) }),
+  Object.freeze({ id: "filled", border: 0, radius: 0.12, fill: "accent", underline: false, shadow: false, textbox: Object.freeze({ fill: "field", border: 1, edge: "fieldEdge", bottom: Object.freeze({ px: 2, colour: "accent" }) }) }),
+  Object.freeze({ id: "flat", border: 0, radius: 0, fill: "surface", underline: false, shadow: false, textbox: Object.freeze({ fill: "field", border: 0, edge: null, bottom: Object.freeze({ px: 1, colour: "fieldEdge" }) }) }),
+  Object.freeze({ id: "heavy-outline", border: 2, radius: 0.06, fill: "page", underline: false, shadow: false, textbox: Object.freeze({ fill: "page", border: 2, edge: "border", bottom: null }) }),
+  Object.freeze({ id: "underlined", border: 0, radius: 0, fill: "page", underline: true, shadow: false, textbox: Object.freeze({ fill: "field", border: 0, edge: null, bottom: Object.freeze({ px: 2, colour: "accent" }) }) }),
+  Object.freeze({ id: "raised", border: 1, radius: 0.15, fill: "surface", underline: false, shadow: true, textbox: Object.freeze({ fill: "page", border: 1, edge: "fieldEdge", bottom: null }) }),
 ]);
+
+/**
+ * How each style draws a TEXTBOX (M22.6). Until M22.6 a textbox was the page colour in every style,
+ * so `filled` and `flat` (border 0) drew it as page-on-page: 282 invisible textboxes in candidate 1.
+ * Now every style draws either a full edge (`border` px of `edge`) on a page-coloured field, or a
+ * `field`-coloured fill with a bottom rule — never the page colour alone. The styles still differ.
+ */
+export const TEXTBOX_RULE = "every textbox has a field fill other than the page, or a full edge, and the flat/underlined fills always carry a bottom rule";
+
+/** Native checkboxes and radios are drawn at the browser's own size and scaled to their box (M22.6). */
+export const NATIVE_BASE_PX = 13;
+
+/**
+ * Occluder appearances (M22.6). Until M22.6 every occluder was one solid rectangle in one colour per
+ * palette. The geometry is unchanged: an occluder is still a rectangle over its declared box.
+ */
+export const OCCLUDER_STYLES = Object.freeze(["solid", "banded", "striped", "card"]);
 
 /**
  * Icon glyphs, drawn with CSS gradients INSIDE the icon's rectangular box (no image, no font glyph).

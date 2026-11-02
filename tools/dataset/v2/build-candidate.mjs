@@ -173,6 +173,7 @@ const manifests = {};
 for (const s of splits) {
   const meta = {
     destination: destinationLabel,
+    renderRevision: CFG.V2.renderRevision,
     planSha256: plans[s].report.planSha256,
     ...hashes,
     seedScheme: SEED_SCHEME,
@@ -235,6 +236,7 @@ function countsOf(s) {
 const record = {
   experiment: "M22.4 — v2 TRAIN/DEV candidate build (no detector, no training, no TEST)",
   dataset: `${CFG.V2.name}@${CFG.V2.version}`,
+  renderRevision: CFG.V2.renderRevision,
   destination: destinationLabel,
   status: pass ? "PASS" : "FAIL",
   startedAt,

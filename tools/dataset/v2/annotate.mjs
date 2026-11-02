@@ -45,6 +45,8 @@ export function annotateSample(spec, rendered) {
       visibility: visibilityOf(r.rect, spec.viewport),
       validity,
       ...(rendered.hitTest ? { hitTest: { ...rendered.hitTest[e.key] } } : {}),
+      // M22.6: px of label text the browser could not fit in the box (null for elements without text).
+      ...("textOverflowPx" in r ? { textOverflowPx: r.textOverflowPx } : {}),
       intent: e.intent,
       positive: e.intent === "positive" && validity === "HIT_TESTABLE",
       source: {

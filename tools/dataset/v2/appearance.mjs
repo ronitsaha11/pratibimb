@@ -9,11 +9,36 @@
  * Nothing here loads an asset: colours are hex values, fonts are local stacks ending in a generic
  * family, glyphs are CSS gradients (`html.mjs`). No label word is personal or page-derived.
  */
-import { CONTROL_STYLES, DENSITY_LEVELS, FONT_STACKS, HIT_SAFE_RADIUS, ICON_GLYPHS, ICON_PLATES, PALETTES } from "./config.mjs";
+import { CONTROL_STYLES, DENSITY_LEVELS, FONT_STACKS, HIT_SAFE_RADIUS, ICON_GLYPHS, ICON_PLATES, NATIVE_BASE_PX, PALETTES } from "./config.mjs";
 import { rngOf } from "./prng.mjs";
 
-/** Neutral label words for buttons, links, tabs and selects. */
-export const WORDS = Object.freeze(["Apply", "Next", "Back", "Save", "Open", "Close", "Find", "Help", "Edit", "Done", "Start", "Step", "More", "View", "Add", "Sort"]);
+/** Neutral label words for buttons, links, tabs and selects; two-letter ones for the narrowest controls. */
+export const WORDS = Object.freeze(["Apply", "Next", "Back", "Save", "Open", "Close", "Find", "Help", "Edit", "Done", "Start", "Step", "More", "View", "Add", "Sort", "Go", "OK"]);
+
+/**
+ * Label fitting (M22.6). Candidate 1 drew every label at a size set by the box height alone, so wide
+ * words in narrow boxes were cut by `overflow: hidden`. Now the word and its size are chosen to fit
+ * the box's width, estimating a character at `CHAR_EM` of the font size (a deliberately generous
+ * estimate; fonts differ). The box is never changed. If no word fits at 4 px, the shortest is drawn
+ * and recorded as `fitted: false`. The renderer measures what really overflowed.
+ */
+export const CHAR_EM = 0.66;
+const MIN_FONT_PX = 4;
+
+function fitLabel(rng, cls, w, h, style) {
+  let fontPx = Math.max(6, Math.round(h * (cls === "link" ? 0.7 : 0.5)));
+  const edges = cls === "link" ? 0 : 2 * style.border + 2;
+  const arrowPx = (f) => (cls === "select" ? Math.max(12, Math.round(f * 1.6)) : 0); // the select's drop-down arrow
+  const fits = (word, f) => word.length * f * CHAR_EM <= w - edges - arrowPx(f);
+  let pool = WORDS.filter((x) => fits(x, fontPx));
+  while (pool.length === 0 && fontPx > MIN_FONT_PX) {
+    fontPx -= 1;
+    pool = WORDS.filter((x) => fits(x, fontPx));
+  }
+  const fitted = pool.length > 0;
+  const label = rng.pick(fitted ? pool : WORDS.filter((x) => x.length === 2));
+  return { label, fontPx, fitted };
+}
 
 const byId = (list, id, what) => {
   const v = list.find((x) => x.id === id);
@@ -43,11 +68,13 @@ export const hitSafeRadiusPx = (style, w, h) => Math.floor(Math.min(style.radius
  * Native checkboxes and radios keep the browser's own drawing (`radiusPx: 0`, `native: true`).
  */
 export function elementAppearanceOf(rng, cls, w, h, style) {
-  if (cls === "checkbox" || cls === "radio") return { native: true, radiusPx: 0, checked: rng.next() < 0.5 };
+  // M22.6: the browser's own control, drawn at its natural size and scaled to the box, so a large
+  // checkbox is a scaled checkbox (borders scale too) rather than a hairline square.
+  if (cls === "checkbox" || cls === "radio") return { native: true, radiusPx: 0, checked: rng.next() < 0.5, nativeScale: w / NATIVE_BASE_PX };
   const radiusPx = hitSafeRadiusPx(style, w, h);
   if (cls === "icon") return { native: false, radiusPx, glyph: rng.pick(ICON_GLYPHS), plate: rng.pick(ICON_PLATES) };
-  if (cls === "textbox") return { native: false, radiusPx };
-  const out = { native: false, radiusPx, label: rng.pick(WORDS) };
+  if (cls === "textbox") return { native: false, radiusPx, textbox: { ...style.textbox, bottom: style.textbox.bottom ? { ...style.textbox.bottom } : null } };
+  const out = { native: false, radiusPx, ...fitLabel(rng, cls, w, h, style) };
   if (cls === "link") out.underline = rng.next() < 0.5;
   if (cls === "tab") out.selected = rng.next() < 0.3;
   return out;

@@ -19,6 +19,7 @@ import {
   ICON_GLYPHS,
   ICON_PLATES,
   MAX_SAMPLES_PER_SPLIT,
+  OCCLUDER_STYLES,
   PALETTES,
   SIZE_BUCKETS,
   V2,
@@ -71,7 +72,13 @@ describe("1 — icon positioning and layout validity", () => {
       const html = specToHtmlV2(spec);
       expect(html).toMatch(/\[data-v2\]\{position:absolute;/);
       for (const e of spec.elements) {
-        expect(html).toContain(`data-v2="${e.key}" style="left:${e.box.x}px;top:${e.box.y}px;width:${e.box.w}px;height:${e.box.h}px`);
+        const tag = html.match(new RegExp(`<[a-z]+[^>]*data-v2="${e.key}"[^>]*>`))[0];
+        if (e.appearance.native) {
+          // M22.6: natural size, scaled to the box from its top-left corner — the rendered rect is the box.
+          expect(tag).toContain(`style="left:${e.box.x}px;top:${e.box.y}px;width:13px;height:13px;transform:scale(${e.box.w / 13});transform-origin:0 0`);
+        } else {
+          expect(tag).toContain(`style="left:${e.box.x}px;top:${e.box.y}px;width:${e.box.w}px;height:${e.box.h}px`);
+        }
       }
     }
   });
@@ -500,6 +507,8 @@ describe("8 — provenance: every label traces to the visual context that produc
       ...PALETTES.map((p) => p.id), ...CONTROL_STYLES.map((c) => c.id), ...DENSITY_LEVELS.map((d) => d.id),
       "positive", "occlusion-partial", "occlusion-full", "occluder", "full", "partial", "absolute", "VISIBLE", "HIT_TESTABLE", "PARTIALLY_OCCLUDED", "FULLY_OCCLUDED",
       "dev", "sample", V2.name, V2.version, V2.generator, `${V2.name}@${V2.version}`, SEED_SCHEME, PRNG,
+      // M22.6: render revision, occluder styles, and the textbox treatment's colour names.
+      V2.renderRevision, ...OCCLUDER_STYLES, "page", "field", "fieldEdge", "border", "accent",
     ]);
     const strings = [];
     const walk = (v) => (typeof v === "string" ? strings.push(v) : v && typeof v === "object" ? Object.values(v).forEach(walk) : null);
@@ -638,11 +647,13 @@ describe("10 — seeds, identities and canonical JSON", () => {
   it("hashes are stable across executions: golden values, and a separate Node process agrees", () => {
     const s = schedule(["dev"], 1, { partial: 1, full: 0 });
     const here = planHash(planSplit(s, "dev", 12).specs);
-    // Golden values for 2.1.0-draft. A change to any of them changes every generated sample and must
-    // come with a version change.
+    // Golden values for 2.1.0-draft. A change to a seed changes every generated sample and must come
+    // with a version change. The plan hash also covers what a spec records: M22.6 (render revision
+    // r2) added the render revision, occluder styles and fitted labels, moving it from
+    // ed5a189a…6beb9 while every seed and box stayed the same.
     expect(seedFor("train", 0)).toBe("cb7eda1c6211f9187934f721d7c49a3ddf857bd318ebd5f48d81bab94db9a78e");
     expect(seedFor("dev", 0)).toBe("19f60b541fb460fe9e853f661a2c68d7eca842034b03b250ca1da60f24007cda");
-    expect(here).toBe("ed5a189a17215c844ccc500b01629bd80356071f6ad85e41604c76fb02a6beb9");
+    expect(here).toBe("79f0b6648149e4b0cd0fbac4b091d76bd843bf35ed0aa5da42da2a4098495be8");
     const plan = new URL("../plan.mjs", import.meta.url).href;
     const code = `import { planSplit, planHash } from ${JSON.stringify(plan)};
       const s = JSON.parse(process.argv[1]);

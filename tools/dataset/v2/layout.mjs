@@ -29,9 +29,10 @@
  * unlabelled decor. Nothing is personal or page-derived: words come from a fixed neutral list.
  *
  * STREAMS. Geometry draws from the seed's `layout` stream, element details from `elements`, decor
- * from `decor` and the page look from `appearance`; each is independent of the others.
+ * from `decor`, occluder looks from `occluders` (M22.6) and the page look from `appearance`; each is
+ * independent of the others, so M22.6's appearance changes left every box where it was.
  */
-import { CLASS_GEOMETRY, DECOR_KINDS, LAYOUT, SIZE_BUCKETS, V2, VIEWPORTS } from "./config.mjs";
+import { CLASS_GEOMETRY, DECOR_KINDS, LAYOUT, OCCLUDER_STYLES, SIZE_BUCKETS, V2, VIEWPORTS } from "./config.mjs";
 import { PRNG, SEED_SCHEME, rngOf } from "./prng.mjs";
 import { controlStyleOf, densityLevelOf, elementAppearanceOf, pageAppearanceOf } from "./appearance.mjs";
 import { sampleIdentity, seedFor } from "./splits.mjs";
@@ -212,19 +213,21 @@ export function layoutSample(plan, targets) {
   }));
 
   // An occluder for each occlusion-case target, and for nothing else.
+  const occLook = rngOf(plan.seed, "occluders");
   const occluders = elements
     .filter((e) => e.intent !== "positive")
     .map((e) => {
       const b = e.box;
       const kind = e.intent === "occlusion-full" ? "full" : "partial";
       const box = kind === "full" ? { x: b.x - 1, y: b.y - 1, w: b.w + 2, h: b.h + 2 } : { x: b.x + Math.floor(b.w / 2), y: b.y - 1, w: Math.ceil(b.w / 2) + 1, h: b.h + 2 };
-      return { id: e.occluderId, role: "occluder", kind, for: e.key, box, coversTargetShare: intersectArea(box, b) / (b.w * b.h) };
+      return { id: e.occluderId, role: "occluder", kind, for: e.key, box, coversTargetShare: intersectArea(box, b) / (b.w * b.h), style: occLook.pick(OCCLUDER_STYLES) };
     });
 
   const decor = layoutDecor(rngOf(plan.seed, "decor"), plan, area, page.density, [...elements.map((e) => e.box), ...occluders.map((o) => o.box)]);
 
   return {
     version: V2.version,
+    renderRevision: V2.renderRevision,
     generator: V2.generator,
     id: plan.id,
     split: plan.split,
