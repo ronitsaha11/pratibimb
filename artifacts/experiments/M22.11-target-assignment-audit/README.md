@@ -161,3 +161,24 @@ The last step runs at 2.06e-10, and the learning rates sum to 9.0015.
 **Hypotheses, not findings:** whether any of this lowers recall after training is INFERENCE until a separately authorised DEV evaluation.
 
 **Follow-up:** M22.12 implements the ignore mask and reconciles the configuration.
+
+## Reproducibility
+
+From the repository root, with the approved G10 files in place (data only; no model):
+
+```bash
+python -I artifacts/experiments/M22.11-target-assignment-audit/harness/audit11.py
+```
+```bash
+python -I artifacts/experiments/M22.11-target-assignment-audit/harness/audit11b.py
+```
+```bash
+python -I artifacts/experiments/M22.11-target-assignment-audit/harness/audit11c.py
+```
+```bash
+python -I artifacts/experiments/M22.11-target-assignment-audit/harness/audit11d.py
+```
+
+**What to expect:**
+- **Output:** each script prints the JSON stored under `logs/`.
+- **Timing:** `audit11.py` decodes every TRAIN and DEV frame through `data.sample_to_tensors`, so it takes the longest. Its `seconds` field is wall time and varies between runs.
