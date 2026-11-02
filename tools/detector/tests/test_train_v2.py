@@ -25,7 +25,7 @@ import train_v2  # noqa: E402
 from data_v2 import AdapterError  # noqa: E402
 from test_data_v2 import add_occluder_provenance, approve, edit, read_json, write_candidate, write_json  # noqa: E402
 
-RUNTIME_MODULES = ("train_v2.py", "data_v2.py", "dry_run_v2.py", "occlusion_mask_v2.py")
+RUNTIME_MODULES = ("train_v2.py", "data_v2.py", "dry_run_v2.py", "occlusion_mask_v2.py", "loss_v2.py")
 PROPOSED = os.path.join(DETECTOR, "configs", "train-v2-first-run.PROPOSED.json")  # schema 2 (M22.12)
 PROPOSED_M22_9 = os.path.join(DETECTOR, "configs", "train-v2-first-experiment.PROPOSED.json")  # schema 1, kept as history
 
@@ -81,7 +81,9 @@ def test_2_the_legacy_trainer_is_never_invoked(name):
         if isinstance(node, ast.Call):
             fn = node.func
             name_ = getattr(fn, "attr", getattr(fn, "id", ""))
-            assert name_ not in ("system", "popen", "execv", "execvp", "spawnv", "run_path", "run_module", "exec", "eval"), f"{name} calls {name_}"
+            assert name_ not in ("system", "popen", "execv", "execvp", "spawnv", "run_path", "run_module"), f"{name} calls {name_}"
+            # The exec / eval BUILTINS; `model.eval()` (the module's evaluation mode) is an attribute call.
+            assert not (isinstance(fn, ast.Name) and fn.id in ("exec", "eval")), f"{name} calls the {fn.id} builtin"
             if name_ in ("run", "Popen", "call", "check_call", "check_output"):
                 # The only subprocess allowed: git, for the provenance record.
                 first = node.args[0] if node.args else None
@@ -111,13 +113,31 @@ def test_4_train_and_dev_have_separate_explicit_interfaces_and_no_split_paramete
         assert len(calls) == 1 and isinstance(calls[0].args[1], ast.Constant) and calls[0].args[1].value == split
 
 
-def test_10_no_training_step_exists_and_execution_is_refused():
+@pytest.mark.parametrize("name", ("train_v2.py", "loss_v2.py"))
+def test_10_training_has_no_inference_export_or_decode_path(name):
+    """M22.13 authorises training only: no detection decode, no prediction, no export, no ONNX."""
+    tree = _tree(name)
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            mods = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""]
+            assert not any(m.split(".")[0] in ("onnx", "onnxruntime") for m in mods), f"{name} imports {mods}"
+            if isinstance(node, ast.ImportFrom):
+                assert not {a.name for a in node.names} & {"decode", "ExportWrapper"}, f"{name} imports a decode/export path"
+    calls = {getattr(c.func, "attr", getattr(c.func, "id", "")) for c in ast.walk(tree) if isinstance(c, ast.Call)}
+    assert not calls & {"export", "decode", "nms", "predict_split", "InferenceSession"}
+
+
+def test_10b_weights_are_saved_only_by_the_checkpoint_writer():
     tree = _tree("train_v2.py")
-    names = {n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
-    assert not names & {"train", "fit", "execute", "run_training", "train_epoch", "step"}
-    calls = {getattr(c.func, "attr", "") for c in ast.walk(tree) if isinstance(c, ast.Call)}
-    assert not calls & {"backward", "step", "zero_grad", "save", "export"}
-    assert train_v2.main(["--candidate=2", "--g10-config=x", "--g10-evidence=y", "--build-config=z", "--run-config=w", "--run-id=abc"]) == 3
+    for fn in (n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)):
+        saves = [c for c in ast.walk(fn) if isinstance(c, ast.Call) and getattr(c.func, "attr", "") == "save"]
+        assert not saves or fn.name == "_write_checkpoint", f"{fn.name} saves"
+
+
+def test_10c_nothing_runs_by_default():
+    base = ["--candidate=2", "--g10-config=x", "--g10-evidence=y", "--build-config=z", "--run-config=w", "--run-id=abc"]
+    assert train_v2.main(base) == 3
+    assert train_v2.main(base + ["--resume"]) == 3
 
 
 def test_the_t1_hash_is_the_one_adr_0003_and_the_registry_record():
@@ -189,7 +209,7 @@ def test_preflight_passes_writes_nothing_and_builds_no_model(repo, traps):
     assert plan["mode"].startswith("PRE-FLIGHT ONLY")
     assert plan["g10"]["mode"] == "APPROVED" and plan["acceptance"]["claimed"] is True
     assert plan["train"]["positivesKept"] == 12 and plan["dev"]["positivesKept"] == 8
-    assert plan["outputDirectory"] == {"path": "artifacts/models/t1-ui-head-v2-fixture-run-01", "exists": False, "created": False}
+    assert plan["outputDirectory"] == {"path": "artifacts/models/t1-ui-head-v2-fixture-run-01", "exists": False, "created": False, "resume": False}
     assert plan["t1"]["unchanged"] is True
     rec = plan["provenanceRecordPlan"]
     for k in ("gitCommit", "trainManifestSha256", "devManifestSha256", "g10", "architecture", "hyperparameters", "seed", "environment", "runConfigSha256", "outputModelSha256"):
