@@ -1,0 +1,1786 @@
+{
+ "train": {
+  "collisions": {
+   "assignmentCollisionCells": 0,
+   "objectsInAssignmentCollisions": 0,
+   "sameCentreCellPairs": 0,
+   "sameCentreCellCrossClassPairs": 0,
+   "touchingSameCellPairs": 16,
+   "touchingSameCellCrossClassPairs": 15,
+   "jointEqualsSampleToTensors": 600,
+   "samples": 600
+  },
+  "byDimension": {
+   "class": {
+    "select": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "link": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "checkbox": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "radio": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "textbox": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "icon": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "button": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "tab": {
+     "objects": 660,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    }
+   },
+   "bucket": {
+    "medium": {
+     "objects": 1320,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "small": {
+     "objects": 1320,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "large": {
+     "objects": 1320,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "very-small": {
+     "objects": 1320,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    }
+   },
+   "viewport": {
+    "1280x800": {
+     "objects": 844,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "800x1280": {
+     "objects": 867,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "960x600": {
+     "objects": 844,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "1280x720": {
+     "objects": 930,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "1024x1024": {
+     "objects": 892,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "1024x640": {
+     "objects": 903,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    }
+   }
+  },
+  "buckets": {
+   "very-small": {
+    "objects": 1320,
+    "cssW": {
+     "min": 6.0,
+     "p50": 23.0,
+     "max": 240.0,
+     "mean": 34.779545454545456
+    },
+    "cssH": {
+     "min": 6.0,
+     "p50": 10.0,
+     "max": 18.0,
+     "mean": 10.470454545454546
+    },
+    "modelW": {
+     "min": 4.0,
+     "p50": 12.5,
+     "max": 120.0,
+     "mean": 19.390309343434343
+    },
+    "modelH": {
+     "min": 4.0,
+     "p50": 6.0,
+     "max": 9.375,
+     "mean": 5.854419191919193
+    },
+    "modelShorter": {
+     "min": 4.0,
+     "p50": 6.0,
+     "max": 7.5,
+     "mean": 5.8039772727272725
+    },
+    "coveredCentres": {
+     "min": 0.0,
+     "p50": 1.0,
+     "max": 15.0,
+     "mean": 2.0090909090909093
+    },
+    "coveredCentresHistogram": {
+     "0": 342,
+     "1": 417,
+     "2": 177,
+     "3": 138,
+     "4": 86,
+     "5": 42,
+     "6": 44,
+     "7": 23,
+     "8": 17,
+     "9": 34
+    },
+    "assignedPositiveCells": {
+     "min": 1.0,
+     "p50": 1.0,
+     "max": 15.0,
+     "mean": 2.268181818181818
+    },
+    "assignedCellsTotal": 2994,
+    "noNaturallyCoveredCentre": 342,
+    "nearestCellOnly": 342,
+    "fallbackMaxIoUAnyCell": {
+     "min": 0.5333333333333333,
+     "p50": 0.8749999999999973,
+     "max": 0.9999999999999958,
+     "mean": 0.8515459002028132
+    },
+    "fallbackMaxIoUAssignedCell": {
+     "min": 0.5333333333333333,
+     "p50": 0.8749999999999973,
+     "max": 0.9999999999999958,
+     "mean": 0.8515459002028132
+    },
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   },
+   "small": {
+    "objects": 1320,
+    "cssW": {
+     "min": 12.0,
+     "p50": 44.0,
+     "max": 457.0,
+     "mean": 70.53257575757576
+    },
+    "cssH": {
+     "min": 12.0,
+     "p50": 21.0,
+     "max": 37.0,
+     "mean": 20.852272727272727
+    },
+    "modelW": {
+     "min": 7.999999999999993,
+     "p50": 24.666666666666686,
+     "max": 228.5,
+     "mean": 39.628945707070706
+    },
+    "modelH": {
+     "min": 7.999999999999972,
+     "p50": 11.5,
+     "max": 19.375,
+     "mean": 11.74854797979798
+    },
+    "modelShorter": {
+     "min": 7.999999999999972,
+     "p50": 11.5,
+     "max": 15.625,
+     "mean": 11.644128787878788
+    },
+    "coveredCentres": {
+     "min": 1.0,
+     "p50": 4.0,
+     "max": 58.0,
+     "mean": 7.692424242424242
+    },
+    "coveredCentresHistogram": {
+     "1": 166,
+     "2": 209,
+     "3": 52,
+     "4": 272,
+     "5": 53,
+     "6": 97,
+     "7": 27,
+     "8": 77,
+     "9": 367
+    },
+    "assignedPositiveCells": {
+     "min": 1.0,
+     "p50": 4.0,
+     "max": 58.0,
+     "mean": 7.692424242424242
+    },
+    "assignedCellsTotal": 10154,
+    "noNaturallyCoveredCentre": 0,
+    "nearestCellOnly": 0,
+    "fallbackMaxIoUAnyCell": null,
+    "fallbackMaxIoUAssignedCell": null,
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   },
+   "medium": {
+    "objects": 1320,
+    "cssW": {
+     "min": 24.0,
+     "p50": 87.0,
+     "max": 1003.0,
+     "mean": 141.73030303030302
+    },
+    "cssH": {
+     "min": 24.0,
+     "p50": 42.0,
+     "max": 81.0,
+     "mean": 43.20075757575758
+    },
+    "modelW": {
+     "min": 16.0,
+     "p50": 49.1875,
+     "max": 501.5,
+     "mean": 79.55034722222221
+    },
+    "modelH": {
+     "min": 16.0,
+     "p50": 24.0,
+     "max": 41.333333333333314,
+     "mean": 24.091003787878787
+    },
+    "modelShorter": {
+     "min": 16.0,
+     "p50": 23.75,
+     "max": 31.5,
+     "mean": 23.87679924242424
+    },
+    "coveredCentres": {
+     "min": 4.0,
+     "p50": 18.0,
+     "max": 252.0,
+     "mean": 31.492424242424242
+    },
+    "coveredCentresHistogram": {
+     "4": 56,
+     "6": 99,
+     "8": 21,
+     "9": 1144
+    },
+    "assignedPositiveCells": {
+     "min": 4.0,
+     "p50": 18.0,
+     "max": 252.0,
+     "mean": 31.492424242424242
+    },
+    "assignedCellsTotal": 41570,
+    "noNaturallyCoveredCentre": 0,
+    "nearestCellOnly": 0,
+    "fallbackMaxIoUAnyCell": null,
+    "fallbackMaxIoUAssignedCell": null,
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   },
+   "large": {
+    "objects": 1320,
+    "cssW": {
+     "min": 48.0,
+     "p50": 150.5,
+     "max": 1248.0,
+     "mean": 236.3659090909091
+    },
+    "cssH": {
+     "min": 48.0,
+     "p50": 70.0,
+     "max": 124.0,
+     "mean": 71.76515151515152
+    },
+    "modelW": {
+     "min": 32.0,
+     "p50": 86.375,
+     "max": 624.0,
+     "mean": 132.57118055555557
+    },
+    "modelH": {
+     "min": 32.0,
+     "p50": 40.0,
+     "max": 62.0,
+     "mean": 40.400726010101
+    },
+    "modelShorter": {
+     "min": 32.0,
+     "p50": 40.0,
+     "max": 48.0,
+     "mean": 39.97174873737374
+    },
+    "coveredCentres": {
+     "min": 16.0,
+     "p50": 54.0,
+     "max": 468.0,
+     "mean": 86.00909090909092
+    },
+    "coveredCentresHistogram": {
+     "9": 1320
+    },
+    "assignedPositiveCells": {
+     "min": 16.0,
+     "p50": 54.0,
+     "max": 468.0,
+     "mean": 86.00909090909092
+    },
+    "assignedCellsTotal": 113532,
+    "noNaturallyCoveredCentre": 0,
+    "nearestCellOnly": 0,
+    "fallbackMaxIoUAnyCell": null,
+    "fallbackMaxIoUAssignedCell": null,
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   }
+  },
+  "fallbackByClass": {
+   "checkbox": 64,
+   "icon": 46,
+   "link": 41,
+   "select": 33,
+   "radio": 54,
+   "button": 34,
+   "textbox": 35,
+   "tab": 35
+  },
+  "fallbackByViewport": {
+   "1280x800": 56,
+   "800x1280": 71,
+   "960x600": 53,
+   "1280x720": 50,
+   "1024x1024": 49,
+   "1024x640": 63
+  },
+  "objectsByViewport": {
+   "1280x800": 844,
+   "800x1280": 867,
+   "960x600": 844,
+   "1280x720": 930,
+   "1024x1024": 892,
+   "1024x640": 903
+  },
+  "occlusion": {
+   "partial": {
+    "select/medium": {
+     "cases": 15,
+     "centresInBox": 638,
+     "centresVisible": 323,
+     "visibleCentresNegative": 323,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/large": {
+     "cases": 15,
+     "centresInBox": 422,
+     "centresVisible": 206,
+     "visibleCentresNegative": 206,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/small": {
+     "cases": 15,
+     "centresInBox": 117,
+     "centresVisible": 55,
+     "visibleCentresNegative": 55,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/small": {
+     "cases": 15,
+     "centresInBox": 170,
+     "centresVisible": 82,
+     "visibleCentresNegative": 82,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/medium": {
+     "cases": 15,
+     "centresInBox": 733,
+     "centresVisible": 356,
+     "visibleCentresNegative": 356,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/very-small": {
+     "cases": 15,
+     "centresInBox": 56,
+     "centresVisible": 27,
+     "visibleCentresNegative": 27,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/very-small": {
+     "cases": 15,
+     "centresInBox": 76,
+     "centresVisible": 37,
+     "visibleCentresNegative": 37,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/medium": {
+     "cases": 15,
+     "centresInBox": 245,
+     "centresVisible": 116,
+     "visibleCentresNegative": 116,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/medium": {
+     "cases": 15,
+     "centresInBox": 930,
+     "centresVisible": 465,
+     "visibleCentresNegative": 465,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/large": {
+     "cases": 15,
+     "centresInBox": 1874,
+     "centresVisible": 918,
+     "visibleCentresNegative": 918,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/small": {
+     "cases": 15,
+     "centresInBox": 31,
+     "centresVisible": 15,
+     "visibleCentresNegative": 15,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/large": {
+     "cases": 15,
+     "centresInBox": 3350,
+     "centresVisible": 1675,
+     "visibleCentresNegative": 1675,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/very-small": {
+     "cases": 15,
+     "centresInBox": 40,
+     "centresVisible": 20,
+     "visibleCentresNegative": 20,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/medium": {
+     "cases": 15,
+     "centresInBox": 141,
+     "centresVisible": 71,
+     "visibleCentresNegative": 71,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/large": {
+     "cases": 15,
+     "centresInBox": 906,
+     "centresVisible": 451,
+     "visibleCentresNegative": 451,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/small": {
+     "cases": 15,
+     "centresInBox": 36,
+     "centresVisible": 18,
+     "visibleCentresNegative": 18,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/very-small": {
+     "cases": 15,
+     "centresInBox": 33,
+     "centresVisible": 13,
+     "visibleCentresNegative": 13,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/small": {
+     "cases": 15,
+     "centresInBox": 320,
+     "centresVisible": 158,
+     "visibleCentresNegative": 158,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/very-small": {
+     "cases": 15,
+     "centresInBox": 10,
+     "centresVisible": 2,
+     "visibleCentresNegative": 2,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/very-small": {
+     "cases": 15,
+     "centresInBox": 8,
+     "centresVisible": 3,
+     "visibleCentresNegative": 3,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/large": {
+     "cases": 15,
+     "centresInBox": 419,
+     "centresVisible": 199,
+     "visibleCentresNegative": 199,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/large": {
+     "cases": 15,
+     "centresInBox": 396,
+     "centresVisible": 202,
+     "visibleCentresNegative": 202,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/small": {
+     "cases": 15,
+     "centresInBox": 94,
+     "centresVisible": 49,
+     "visibleCentresNegative": 49,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/large": {
+     "cases": 15,
+     "centresInBox": 1952,
+     "centresVisible": 967,
+     "visibleCentresNegative": 967,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/medium": {
+     "cases": 15,
+     "centresInBox": 138,
+     "centresVisible": 65,
+     "visibleCentresNegative": 65,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/small": {
+     "cases": 15,
+     "centresInBox": 39,
+     "centresVisible": 18,
+     "visibleCentresNegative": 18,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/medium": {
+     "cases": 15,
+     "centresInBox": 171,
+     "centresVisible": 92,
+     "visibleCentresNegative": 92,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/very-small": {
+     "cases": 15,
+     "centresInBox": 10,
+     "centresVisible": 5,
+     "visibleCentresNegative": 5,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/medium": {
+     "cases": 15,
+     "centresInBox": 363,
+     "centresVisible": 181,
+     "visibleCentresNegative": 181,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/very-small": {
+     "cases": 15,
+     "centresInBox": 24,
+     "centresVisible": 11,
+     "visibleCentresNegative": 11,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/small": {
+     "cases": 15,
+     "centresInBox": 175,
+     "centresVisible": 86,
+     "visibleCentresNegative": 86,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/large": {
+     "cases": 15,
+     "centresInBox": 1039,
+     "centresVisible": 519,
+     "visibleCentresNegative": 519,
+     "visibleCentresPositiveForAnother": 0
+    }
+   },
+   "full": {
+    "select/very-small": {
+     "cases": 15,
+     "centresInBox": 54,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/very-small": {
+     "cases": 15,
+     "centresInBox": 9,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/small": {
+     "cases": 15,
+     "centresInBox": 123,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/small": {
+     "cases": 15,
+     "centresInBox": 45,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/very-small": {
+     "cases": 15,
+     "centresInBox": 52,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/large": {
+     "cases": 15,
+     "centresInBox": 405,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/medium": {
+     "cases": 15,
+     "centresInBox": 165,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/small": {
+     "cases": 15,
+     "centresInBox": 79,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/medium": {
+     "cases": 15,
+     "centresInBox": 517,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/large": {
+     "cases": 15,
+     "centresInBox": 1759,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/medium": {
+     "cases": 15,
+     "centresInBox": 159,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/very-small": {
+     "cases": 15,
+     "centresInBox": 10,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/small": {
+     "cases": 15,
+     "centresInBox": 197,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/small": {
+     "cases": 15,
+     "centresInBox": 29,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/large": {
+     "cases": 15,
+     "centresInBox": 447,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/medium": {
+     "cases": 15,
+     "centresInBox": 1040,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/medium": {
+     "cases": 15,
+     "centresInBox": 188,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/small": {
+     "cases": 15,
+     "centresInBox": 108,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/medium": {
+     "cases": 15,
+     "centresInBox": 691,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/small": {
+     "cases": 15,
+     "centresInBox": 35,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/small": {
+     "cases": 15,
+     "centresInBox": 262,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/large": {
+     "cases": 15,
+     "centresInBox": 1018,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/large": {
+     "cases": 15,
+     "centresInBox": 1199,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/very-small": {
+     "cases": 15,
+     "centresInBox": 20,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/large": {
+     "cases": 15,
+     "centresInBox": 2620,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/very-small": {
+     "cases": 15,
+     "centresInBox": 9,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/medium": {
+     "cases": 15,
+     "centresInBox": 1069,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/medium": {
+     "cases": 15,
+     "centresInBox": 362,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/very-small": {
+     "cases": 15,
+     "centresInBox": 68,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/large": {
+     "cases": 15,
+     "centresInBox": 363,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/large": {
+     "cases": 15,
+     "centresInBox": 2252,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/very-small": {
+     "cases": 15,
+     "centresInBox": 26,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    }
+   }
+  },
+  "occlusionTotals": {
+   "fullCases": 480,
+   "fullCentresInBox": 15380,
+   "fullCentresVisible": 0,
+   "fullVisibleNegative": 0,
+   "fullWithAnyVisibleCentre": 0,
+   "fullWithNoCentreInBox": 33,
+   "fullVisibleAreaShareSum": 0.0,
+   "fullOccluderOverPositiveCells": 0,
+   "partialCases": 480,
+   "partialCentresInBox": 14956,
+   "partialCentresVisible": 7405,
+   "partialVisibleNegative": 7405,
+   "partialWithAnyVisibleCentre": 413,
+   "partialWithNoCentreInBox": 29,
+   "partialVisibleAreaShareSum": 237.14628127008547,
+   "partialOccluderOverPositiveCells": 0
+  },
+  "positiveCellsPerSample": {
+   "min": 11,
+   "p50": 242.0,
+   "max": 1080,
+   "total": 168250
+  }
+ },
+ "dev": {
+  "collisions": {
+   "assignmentCollisionCells": 0,
+   "objectsInAssignmentCollisions": 0,
+   "sameCentreCellPairs": 0,
+   "sameCentreCellCrossClassPairs": 0,
+   "touchingSameCellPairs": 10,
+   "touchingSameCellCrossClassPairs": 9,
+   "jointEqualsSampleToTensors": 160,
+   "samples": 160
+  },
+  "byDimension": {
+   "class": {
+    "checkbox": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "icon": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "button": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "link": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "tab": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "select": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "textbox": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "radio": {
+     "objects": 176,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    }
+   },
+   "bucket": {
+    "small": {
+     "objects": 352,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "medium": {
+     "objects": 352,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "large": {
+     "objects": 352,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "very-small": {
+     "objects": 352,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    }
+   },
+   "viewport": {
+    "1280x720": {
+     "objects": 246,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "1024x1024": {
+     "objects": 255,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "960x600": {
+     "objects": 266,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "800x1280": {
+     "objects": 237,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "1280x800": {
+     "objects": 207,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    },
+    "1024x640": {
+     "objects": 197,
+     "inAssignmentCollision": 0,
+     "lostAnyCell": 0,
+     "lostAllCells": 0
+    }
+   }
+  },
+  "buckets": {
+   "very-small": {
+    "objects": 352,
+    "cssW": {
+     "min": 6.0,
+     "p50": 21.0,
+     "max": 200.0,
+     "mean": 34.29261363636363
+    },
+    "cssH": {
+     "min": 6.0,
+     "p50": 10.0,
+     "max": 19.0,
+     "mean": 10.542613636363637
+    },
+    "modelW": {
+     "min": 4.0,
+     "p50": 12.0,
+     "max": 115.0,
+     "mean": 19.251420454545453
+    },
+    "modelH": {
+     "min": 4.0,
+     "p50": 6.0,
+     "max": 9.5,
+     "mean": 5.892992424242426
+    },
+    "modelShorter": {
+     "min": 4.0,
+     "p50": 6.0,
+     "max": 7.5,
+     "mean": 5.837239583333332
+    },
+    "coveredCentres": {
+     "min": 0.0,
+     "p50": 1.0,
+     "max": 14.0,
+     "mean": 1.9488636363636365
+    },
+    "coveredCentresHistogram": {
+     "0": 93,
+     "1": 126,
+     "2": 35,
+     "3": 28,
+     "4": 26,
+     "5": 10,
+     "6": 12,
+     "7": 13,
+     "8": 3,
+     "9": 6
+    },
+    "assignedPositiveCells": {
+     "min": 1.0,
+     "p50": 1.0,
+     "max": 14.0,
+     "mean": 2.2130681818181817
+    },
+    "assignedCellsTotal": 779,
+    "noNaturallyCoveredCentre": 93,
+    "nearestCellOnly": 93,
+    "fallbackMaxIoUAnyCell": {
+     "min": 0.5935077519379846,
+     "p50": 0.8571428571428571,
+     "max": 0.9836065573770492,
+     "mean": 0.8475996512764896
+    },
+    "fallbackMaxIoUAssignedCell": {
+     "min": 0.5935077519379846,
+     "p50": 0.8571428571428571,
+     "max": 0.9836065573770492,
+     "mean": 0.8475996512764896
+    },
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   },
+   "small": {
+    "objects": 352,
+    "cssW": {
+     "min": 12.0,
+     "p50": 45.0,
+     "max": 371.0,
+     "mean": 71.32954545454545
+    },
+    "cssH": {
+     "min": 12.0,
+     "p50": 20.0,
+     "max": 38.0,
+     "mean": 21.014204545454547
+    },
+    "modelW": {
+     "min": 8.0,
+     "p50": 25.416666666666668,
+     "max": 218.75,
+     "mean": 40.49195075757576
+    },
+    "modelH": {
+     "min": 8.0,
+     "p50": 11.875,
+     "max": 19.333333333333314,
+     "mean": 11.861624053030301
+    },
+    "modelShorter": {
+     "min": 8.0,
+     "p50": 11.5,
+     "max": 15.625,
+     "mean": 11.748106060606062
+    },
+    "coveredCentres": {
+     "min": 1.0,
+     "p50": 4.0,
+     "max": 56.0,
+     "mean": 8.048295454545455
+    },
+    "coveredCentresHistogram": {
+     "1": 39,
+     "2": 65,
+     "3": 16,
+     "4": 59,
+     "5": 18,
+     "6": 20,
+     "7": 10,
+     "8": 20,
+     "9": 105
+    },
+    "assignedPositiveCells": {
+     "min": 1.0,
+     "p50": 4.0,
+     "max": 56.0,
+     "mean": 8.048295454545455
+    },
+    "assignedCellsTotal": 2833,
+    "noNaturallyCoveredCentre": 0,
+    "nearestCellOnly": 0,
+    "fallbackMaxIoUAnyCell": null,
+    "fallbackMaxIoUAssignedCell": null,
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   },
+   "medium": {
+    "objects": 352,
+    "cssW": {
+     "min": 25.0,
+     "p50": 97.5,
+     "max": 735.0,
+     "mean": 135.35511363636363
+    },
+    "cssH": {
+     "min": 24.0,
+     "p50": 44.0,
+     "max": 78.0,
+     "mean": 44.01420454545455
+    },
+    "modelW": {
+     "min": 16.0,
+     "p50": 58.04166666666667,
+     "max": 367.5,
+     "mean": 76.89547821969697
+    },
+    "modelH": {
+     "min": 16.0,
+     "p50": 25.0,
+     "max": 40.625,
+     "mean": 24.899147727272727
+    },
+    "modelShorter": {
+     "min": 16.0,
+     "p50": 24.583333333333314,
+     "max": 31.5,
+     "mean": 24.46768465909091
+    },
+    "coveredCentres": {
+     "min": 4.0,
+     "p50": 20.0,
+     "max": 184.0,
+     "mean": 30.571022727272727
+    },
+    "coveredCentresHistogram": {
+     "4": 18,
+     "6": 25,
+     "8": 4,
+     "9": 305
+    },
+    "assignedPositiveCells": {
+     "min": 4.0,
+     "p50": 20.0,
+     "max": 184.0,
+     "mean": 30.571022727272727
+    },
+    "assignedCellsTotal": 10761,
+    "noNaturallyCoveredCentre": 0,
+    "nearestCellOnly": 0,
+    "fallbackMaxIoUAnyCell": null,
+    "fallbackMaxIoUAssignedCell": null,
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   },
+   "large": {
+    "objects": 352,
+    "cssW": {
+     "min": 49.0,
+     "p50": 153.0,
+     "max": 1248.0,
+     "mean": 237.8125
+    },
+    "cssH": {
+     "min": 48.0,
+     "p50": 70.0,
+     "max": 107.0,
+     "mean": 71.51704545454545
+    },
+    "modelW": {
+     "min": 32.0,
+     "p50": 87.5,
+     "max": 624.0,
+     "mean": 135.06605113636363
+    },
+    "modelH": {
+     "min": 32.0,
+     "p50": 40.0,
+     "max": 56.875,
+     "mean": 40.296046401515156
+    },
+    "modelShorter": {
+     "min": 32.0,
+     "p50": 39.5,
+     "max": 48.0,
+     "mean": 39.880563446969695
+    },
+    "coveredCentres": {
+     "min": 16.0,
+     "p50": 54.0,
+     "max": 468.0,
+     "mean": 85.04261363636364
+    },
+    "coveredCentresHistogram": {
+     "9": 352
+    },
+    "assignedPositiveCells": {
+     "min": 16.0,
+     "p50": 54.0,
+     "max": 468.0,
+     "mean": 85.04261363636364
+    },
+    "assignedCellsTotal": 29935,
+    "noNaturallyCoveredCentre": 0,
+    "nearestCellOnly": 0,
+    "fallbackMaxIoUAnyCell": null,
+    "fallbackMaxIoUAssignedCell": null,
+    "fallbackAssignedBelow0.5": 0,
+    "fallbackAnyCellBelow0.5": 0,
+    "fallbackAssignedNotTheBestCell": 0
+   }
+  },
+  "fallbackByClass": {
+   "link": 12,
+   "tab": 9,
+   "button": 13,
+   "textbox": 9,
+   "select": 14,
+   "icon": 8,
+   "checkbox": 14,
+   "radio": 14
+  },
+  "fallbackByViewport": {
+   "1280x720": 16,
+   "1024x1024": 13,
+   "1280x800": 16,
+   "800x1280": 14,
+   "1024x640": 14,
+   "960x600": 20
+  },
+  "objectsByViewport": {
+   "1280x720": 246,
+   "1024x1024": 255,
+   "960x600": 266,
+   "800x1280": 237,
+   "1280x800": 207,
+   "1024x640": 197
+  },
+  "occlusion": {
+   "partial": {
+    "select/very-small": {
+     "cases": 4,
+     "centresInBox": 15,
+     "centresVisible": 7,
+     "visibleCentresNegative": 7,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/large": {
+     "cases": 4,
+     "centresInBox": 555,
+     "centresVisible": 273,
+     "visibleCentresNegative": 273,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/very-small": {
+     "cases": 4,
+     "centresInBox": 22,
+     "centresVisible": 10,
+     "visibleCentresNegative": 10,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/large": {
+     "cases": 4,
+     "centresInBox": 570,
+     "centresVisible": 283,
+     "visibleCentresNegative": 283,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/small": {
+     "cases": 4,
+     "centresInBox": 6,
+     "centresVisible": 3,
+     "visibleCentresNegative": 3,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/medium": {
+     "cases": 4,
+     "centresInBox": 33,
+     "centresVisible": 15,
+     "visibleCentresNegative": 15,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/medium": {
+     "cases": 4,
+     "centresInBox": 81,
+     "centresVisible": 38,
+     "visibleCentresNegative": 38,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/very-small": {
+     "cases": 4,
+     "centresInBox": 2,
+     "centresVisible": 1,
+     "visibleCentresNegative": 1,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/large": {
+     "cases": 4,
+     "centresInBox": 297,
+     "centresVisible": 141,
+     "visibleCentresNegative": 141,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/small": {
+     "cases": 4,
+     "centresInBox": 15,
+     "centresVisible": 9,
+     "visibleCentresNegative": 9,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/large": {
+     "cases": 4,
+     "centresInBox": 546,
+     "centresVisible": 268,
+     "visibleCentresNegative": 268,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/small": {
+     "cases": 4,
+     "centresInBox": 66,
+     "centresVisible": 33,
+     "visibleCentresNegative": 33,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/large": {
+     "cases": 4,
+     "centresInBox": 100,
+     "centresVisible": 48,
+     "visibleCentresNegative": 48,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/medium": {
+     "cases": 4,
+     "centresInBox": 164,
+     "centresVisible": 82,
+     "visibleCentresNegative": 82,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/large": {
+     "cases": 4,
+     "centresInBox": 94,
+     "centresVisible": 42,
+     "visibleCentresNegative": 42,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/very-small": {
+     "cases": 4,
+     "centresInBox": 1,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/medium": {
+     "cases": 4,
+     "centresInBox": 264,
+     "centresVisible": 128,
+     "visibleCentresNegative": 128,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/medium": {
+     "cases": 4,
+     "centresInBox": 278,
+     "centresVisible": 137,
+     "visibleCentresNegative": 137,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/small": {
+     "cases": 4,
+     "centresInBox": 44,
+     "centresVisible": 22,
+     "visibleCentresNegative": 22,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/small": {
+     "cases": 4,
+     "centresInBox": 11,
+     "centresVisible": 4,
+     "visibleCentresNegative": 4,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/medium": {
+     "cases": 4,
+     "centresInBox": 26,
+     "centresVisible": 14,
+     "visibleCentresNegative": 14,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/very-small": {
+     "cases": 4,
+     "centresInBox": 24,
+     "centresVisible": 12,
+     "visibleCentresNegative": 12,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/medium": {
+     "cases": 4,
+     "centresInBox": 120,
+     "centresVisible": 62,
+     "visibleCentresNegative": 62,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/small": {
+     "cases": 4,
+     "centresInBox": 8,
+     "centresVisible": 5,
+     "visibleCentresNegative": 5,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/medium": {
+     "cases": 4,
+     "centresInBox": 39,
+     "centresVisible": 22,
+     "visibleCentresNegative": 22,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/small": {
+     "cases": 4,
+     "centresInBox": 45,
+     "centresVisible": 25,
+     "visibleCentresNegative": 25,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/very-small": {
+     "cases": 4,
+     "centresInBox": 6,
+     "centresVisible": 3,
+     "visibleCentresNegative": 3,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/large": {
+     "cases": 4,
+     "centresInBox": 300,
+     "centresVisible": 150,
+     "visibleCentresNegative": 150,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/large": {
+     "cases": 4,
+     "centresInBox": 122,
+     "centresVisible": 61,
+     "visibleCentresNegative": 61,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/small": {
+     "cases": 4,
+     "centresInBox": 23,
+     "centresVisible": 11,
+     "visibleCentresNegative": 11,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/very-small": {
+     "cases": 4,
+     "centresInBox": 0,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/very-small": {
+     "cases": 4,
+     "centresInBox": 4,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    }
+   },
+   "full": {
+    "textbox/small": {
+     "cases": 4,
+     "centresInBox": 75,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/very-small": {
+     "cases": 4,
+     "centresInBox": 6,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/large": {
+     "cases": 4,
+     "centresInBox": 972,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/large": {
+     "cases": 4,
+     "centresInBox": 188,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/large": {
+     "cases": 4,
+     "centresInBox": 116,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/very-small": {
+     "cases": 4,
+     "centresInBox": 23,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/medium": {
+     "cases": 4,
+     "centresInBox": 102,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/small": {
+     "cases": 4,
+     "centresInBox": 55,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/very-small": {
+     "cases": 4,
+     "centresInBox": 4,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/very-small": {
+     "cases": 4,
+     "centresInBox": 3,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/small": {
+     "cases": 4,
+     "centresInBox": 9,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/small": {
+     "cases": 4,
+     "centresInBox": 18,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/small": {
+     "cases": 4,
+     "centresInBox": 10,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/medium": {
+     "cases": 4,
+     "centresInBox": 36,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/large": {
+     "cases": 4,
+     "centresInBox": 132,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/large": {
+     "cases": 4,
+     "centresInBox": 86,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "icon/very-small": {
+     "cases": 4,
+     "centresInBox": 3,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/medium": {
+     "cases": 4,
+     "centresInBox": 137,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/medium": {
+     "cases": 4,
+     "centresInBox": 181,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/medium": {
+     "cases": 4,
+     "centresInBox": 36,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/small": {
+     "cases": 4,
+     "centresInBox": 11,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/large": {
+     "cases": 4,
+     "centresInBox": 306,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/small": {
+     "cases": 4,
+     "centresInBox": 29,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/large": {
+     "cases": 4,
+     "centresInBox": 578,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "textbox/medium": {
+     "cases": 4,
+     "centresInBox": 224,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "checkbox/medium": {
+     "cases": 4,
+     "centresInBox": 42,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "tab/medium": {
+     "cases": 4,
+     "centresInBox": 132,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/small": {
+     "cases": 4,
+     "centresInBox": 69,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "radio/very-small": {
+     "cases": 4,
+     "centresInBox": 3,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "button/very-small": {
+     "cases": 4,
+     "centresInBox": 5,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "select/large": {
+     "cases": 4,
+     "centresInBox": 754,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    },
+    "link/very-small": {
+     "cases": 4,
+     "centresInBox": 19,
+     "centresVisible": 0,
+     "visibleCentresNegative": 0,
+     "visibleCentresPositiveForAnother": 0
+    }
+   }
+  },
+  "occlusionTotals": {
+   "fullCases": 128,
+   "fullCentresInBox": 4364,
+   "fullCentresVisible": 0,
+   "fullVisibleNegative": 0,
+   "fullWithAnyVisibleCentre": 0,
+   "fullWithNoCentreInBox": 9,
+   "fullVisibleAreaShareSum": 0.0,
+   "fullOccluderOverPositiveCells": 0,
+   "partialCases": 128,
+   "partialCentresInBox": 3881,
+   "partialCentresVisible": 1909,
+   "partialVisibleNegative": 1909,
+   "partialWithAnyVisibleCentre": 104,
+   "partialWithNoCentreInBox": 11,
+   "partialVisibleAreaShareSum": 63.05742926118405,
+   "partialOccluderOverPositiveCells": 0
+  },
+  "positiveCellsPerSample": {
+   "min": 7,
+   "p50": 237.5,
+   "max": 963,
+   "total": 44308
+  }
+ },
+ "seconds": 33.1,
+ "orderingProbe": {
+  "bigClass": "button",
+  "smallClass": "checkbox",
+  "sharedCellOwnerClass": "button",
+  "commentSays": "the SMALL one keeps it",
+  "smallKeepsIt": false
+ }
+}

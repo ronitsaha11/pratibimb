@@ -1,0 +1,262 @@
+{
+ "train": {
+  "fallbackObjects": 342,
+  "boundMin": 0.5333333333333333,
+  "below": {
+   "0.5": 0,
+   "0.6": 4,
+   "0.7": 19,
+   "0.8": 82,
+   "0.9": 215
+  },
+  "touchingPairs": [
+   {
+    "pair": [
+     "button/large",
+     "textbox/medium"
+    ],
+    "gapModelPx": 5.333,
+    "sharedCells": 20,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "checkbox/small",
+     "textbox/medium"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 3,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "select/medium",
+     "textbox/large"
+    ],
+    "gapModelPx": 5.5,
+    "sharedCells": 10,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "button/large",
+     "radio/medium"
+    ],
+    "gapModelPx": 5.333,
+    "sharedCells": 3,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "radio/medium",
+     "textbox/medium"
+    ],
+    "gapModelPx": 4.5,
+    "sharedCells": 5,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "icon/very-small",
+     "select/medium"
+    ],
+    "gapModelPx": 4.0,
+    "sharedCells": 2,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "select/large",
+     "textbox/medium"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 9,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "link/large",
+     "link/large"
+    ],
+    "gapModelPx": 4.5,
+    "sharedCells": 12,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "radio/very-small",
+     "tab/large"
+    ],
+    "gapModelPx": 4.0,
+    "sharedCells": 2,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "link/medium",
+     "textbox/small"
+    ],
+    "gapModelPx": 4.5,
+    "sharedCells": 10,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "button/very-small",
+     "link/large"
+    ],
+    "gapModelPx": 4.5,
+    "sharedCells": 2,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "select/large",
+     "textbox/large"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 14,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "select/medium",
+     "textbox/small"
+    ],
+    "gapModelPx": 5.5,
+    "sharedCells": 10,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "select/very-small",
+     "tab/small"
+    ],
+    "gapModelPx": 5.625,
+    "sharedCells": 3,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "link/medium",
+     "select/very-small"
+    ],
+    "gapModelPx": 5.333,
+    "sharedCells": 3,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "button/large",
+     "textbox/large"
+    ],
+    "gapModelPx": 4.0,
+    "sharedCells": 9,
+    "sharedCellsPositive": 0
+   }
+  ]
+ },
+ "dev": {
+  "fallbackObjects": 93,
+  "boundMin": 0.5935077519379846,
+  "below": {
+   "0.5": 0,
+   "0.6": 1,
+   "0.7": 6,
+   "0.8": 26,
+   "0.9": 58
+  },
+  "touchingPairs": [
+   {
+    "pair": [
+     "select/medium",
+     "tab/large"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 3,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "button/very-small",
+     "tab/medium"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 1,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "button/large",
+     "tab/medium"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 10,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "button/large",
+     "button/medium"
+    ],
+    "gapModelPx": 6.0,
+    "sharedCells": 8,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "checkbox/small",
+     "select/medium"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 2,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "link/large",
+     "select/very-small"
+    ],
+    "gapModelPx": 5.625,
+    "sharedCells": 7,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "radio/very-small",
+     "tab/medium"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 2,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "link/medium",
+     "select/very-small"
+    ],
+    "gapModelPx": 5.0,
+    "sharedCells": 7,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "tab/small",
+     "textbox/large"
+    ],
+    "gapModelPx": 4.5,
+    "sharedCells": 6,
+    "sharedCellsPositive": 0
+   },
+   {
+    "pair": [
+     "select/large",
+     "tab/large"
+    ],
+    "gapModelPx": 4.0,
+    "sharedCells": 12,
+    "sharedCellsPositive": 0
+   }
+  ]
+ }
+}

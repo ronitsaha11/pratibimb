@@ -1,0 +1,48 @@
+{
+ "train": {
+  "visibleNegativeCells": 7405,
+  "rfFreeOfOccluder": 5719,
+  "rfFreeOfOccluderAndInsideControl": 727,
+  "byBucket": {
+   "medium": {
+    "visibleNegativeCells": 1669,
+    "rfFreeOfOccluder": 1137
+   },
+   "large": {
+    "visibleNegativeCells": 5137,
+    "rfFreeOfOccluder": 4266
+   },
+   "small": {
+    "visibleNegativeCells": 481,
+    "rfFreeOfOccluder": 274
+   },
+   "very-small": {
+    "visibleNegativeCells": 118,
+    "rfFreeOfOccluder": 42
+   }
+  }
+ },
+ "dev": {
+  "visibleNegativeCells": 1909,
+  "rfFreeOfOccluder": 1505,
+  "rfFreeOfOccluderAndInsideControl": 151,
+  "byBucket": {
+   "very-small": {
+    "visibleNegativeCells": 33,
+    "rfFreeOfOccluder": 17
+   },
+   "large": {
+    "visibleNegativeCells": 1266,
+    "rfFreeOfOccluder": 1061
+   },
+   "small": {
+    "visibleNegativeCells": 112,
+    "rfFreeOfOccluder": 59
+   },
+   "medium": {
+    "visibleNegativeCells": 498,
+    "rfFreeOfOccluder": 368
+   }
+  }
+ }
+}
