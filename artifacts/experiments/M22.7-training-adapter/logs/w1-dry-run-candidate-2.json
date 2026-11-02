@@ -1,0 +1,223 @@
+{
+  "run": "M22.7 v2 data dry run \u2014 no model, no weights, no optimizer step, no prediction; TRAIN and DEV only",
+  "candidate": "artifacts/datasets/t1-ui-synthetic-2.1.0-draft-candidate-2",
+  "dataset": "t1-ui-synthetic@2.1.0-draft",
+  "g10": {
+    "mode": "PROVISIONAL",
+    "status": "PROVISIONAL - NOT APPROVED BY THE OWNER",
+    "approval": {
+      "approved": false,
+      "approvedBy": null,
+      "approvedOn": null,
+      "note": "Only the project owner may set approved to true, with approvedBy and approvedOn. A file with approved: false is provisional; the training adapter reports its G10 results as diagnostic and claims no acceptance."
+    },
+    "thresholds": {
+      "salienceInvisibleBelow": 1.25,
+      "salienceVisibleAtLeast": 1.5,
+      "coverageContrast": 1.25,
+      "coverageInvisibleBelow": 0.005,
+      "coverageVisibleAtLeast": 0.01
+    }
+  },
+  "train": {
+    "split": "train",
+    "manifestHash": "f283720fab3ef6086becf51ec47f383b8a20344f9abe1e102c6ec6172c2427f8",
+    "renderRevision": "r2-m22.6-visual-fixes",
+    "samples": 600,
+    "framesVerified": 600,
+    "framesMissing": 0,
+    "framesUnexpected": 0,
+    "positivesKept": 5280,
+    "positivesKeptByClassAndBucket": {
+      "button": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "link": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "textbox": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "checkbox": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "radio": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "select": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "tab": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "icon": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      }
+    },
+    "excluded": {
+      "occlusion-partial": 480,
+      "occlusion-full": 480,
+      "not-positive": 0,
+      "g10-borderline": 0,
+      "g10-invisible": 0
+    },
+    "g10": {
+      "mode": "PROVISIONAL",
+      "status": "PROVISIONAL - NOT APPROVED BY THE OWNER",
+      "nonVisibleFound": {
+        "BORDERLINE": 0,
+        "INVISIBLE": 0
+      },
+      "excludedForG10": false,
+      "note": "PROVISIONAL thresholds: non-visible positives are reported, not excluded; no dataset acceptance is claimed"
+    },
+    "boxRangeCss": {
+      "minX": 16,
+      "minY": 61,
+      "maxRight": 1264,
+      "maxBottom": 1263
+    }
+  },
+  "dev": {
+    "split": "dev",
+    "manifestHash": "f072507a47ce087ef79b236d769b7d860c27ef536534d9490116d0145034ede1",
+    "renderRevision": "r2-m22.6-visual-fixes",
+    "samples": 160,
+    "framesVerified": 160,
+    "framesMissing": 0,
+    "framesUnexpected": 0,
+    "positivesKept": 1408,
+    "positivesKeptByClassAndBucket": {
+      "button": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "link": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "textbox": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "checkbox": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "radio": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "select": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "tab": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "icon": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      }
+    },
+    "excluded": {
+      "occlusion-partial": 128,
+      "occlusion-full": 128,
+      "not-positive": 0,
+      "g10-borderline": 0,
+      "g10-invisible": 0
+    },
+    "g10": {
+      "mode": "PROVISIONAL",
+      "status": "PROVISIONAL - NOT APPROVED BY THE OWNER",
+      "nonVisibleFound": {
+        "BORDERLINE": 0,
+        "INVISIBLE": 0
+      },
+      "excludedForG10": false,
+      "note": "PROVISIONAL thresholds: non-visible positives are reported, not excluded; no dataset acceptance is claimed"
+    },
+    "boxRangeCss": {
+      "minX": 16,
+      "minY": 63,
+      "maxRight": 1264,
+      "maxBottom": 1257
+    }
+  },
+  "separation": "TRAIN and DEV share no id, seed, spec hash or frame",
+  "minimumPerCell": {
+    "train": 150,
+    "dev": 40
+  },
+  "acceptance": {
+    "claimed": false,
+    "reason": "G10 thresholds are not approved: results are diagnostic, and no dataset acceptance is claimed"
+  },
+  "tensorCheck": {
+    "train": {
+      "samples": 600,
+      "targets": 5280,
+      "positiveCells": 168250,
+      "samplesWithTargetsButNoPositiveCell": 0,
+      "boxesOutsideLetterbox": 0,
+      "imageShape": [
+        3,
+        640,
+        640
+      ]
+    },
+    "dev": {
+      "samples": 160,
+      "targets": 1408,
+      "positiveCells": 44308,
+      "samplesWithTargetsButNoPositiveCell": 0,
+      "boxesOutsideLetterbox": 0,
+      "imageShape": [
+        3,
+        640,
+        640
+      ]
+    }
+  }
+}
