@@ -35,6 +35,18 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.10 — first T1 retraining experiment: specification review (read-only planning; no training,
+  no optimizer, no inference, no weights, no code change, no TEST).**
+  - Checkpoint re-verified: candidates 1 and 2, the approved-G10 hashes and T1 (ADR-0003) unchanged;
+    `npm run verify` PASS.
+  - Hyper-parameter review: inherited vs new values separated. Weight decay is not an effective
+    regulariser at these values; early stopping interacts with the cosine schedule; checkpoint every epoch.
+  - Experiment specification (success definition, failure conditions F1–F15, recovery, T1 protection),
+    evaluation plan (frozen F1 threshold rule; DEV figures selection-biased), risks and an analytic
+    resource estimate (duration UNKNOWN).
+  - Data-only measurement on candidate 2: positive cells skewed to large objects (very-small 1.8 %,
+    large 67.5 %); no positives overlap, so a latent `assign_targets` ordering defect has no effect.
+  - Final configuration proposed, every field marked, pending owner approval.
 - **M22.9 — approved G10, conditional acceptance of candidate 2, and a pre-flight-only training
   pipeline (owner-authorised; no training, no optimizer step, no inference, no TEST).**
   - G10 thresholds approved by the project owner (2026-11-02) for candidate 2 only, in a separately
