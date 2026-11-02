@@ -92,51 +92,137 @@ def _read_json(path):
 # ── G10 policy ────────────────────────────────────────────────────────────────────────────────
 
 
-class G10Policy:
-    """A G10 threshold configuration plus the per-positive classes computed from it."""
+def canonical_json(v):
+    """The JSON the v2 generator hashes (`prng.mjs` canonicalJson): keys sorted, no spaces, raw Unicode."""
+    return json.dumps(v, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
 
-    def __init__(self, config, classes):
+
+def canonical_sha256(v):
+    return hashlib.sha256(canonical_json(v).encode("utf-8")).hexdigest()
+
+
+def classify(thresholds, salience, coverage):
+    """The G10 rule (`visibility.mjs` classifyVisibility), on the recorded metrics."""
+    if salience < thresholds["salienceInvisibleBelow"] or coverage < thresholds["coverageInvisibleBelow"]:
+        return "INVISIBLE"
+    if salience >= thresholds["salienceVisibleAtLeast"] and coverage >= thresholds["coverageVisibleAtLeast"]:
+        return "VISIBLE"
+    return "BORDERLINE"
+
+
+class G10Policy:
+    """
+    A G10 threshold configuration plus the evidence computed from it (`audit-candidate.mjs --g10-out`).
+
+    EVIDENCE FORMAT 2 (M22.9) lists every positive as [id, category, salience, coverage]. It is REQUIRED
+    for an APPROVED configuration, and then everything fails closed: the evidence must be bound to this
+    configuration (`configSha256`), its thresholds (`thresholdsSha256`) and the candidate's manifests
+    (the configuration's `binding` too); every metric must be present and finite; every category must
+    be what the approved rule gives for its metrics; no id may be missing, duplicated or unexpected.
+    The M22.7 compact format (non-visible ids only) is still read, for PROVISIONAL use only.
+    """
+
+    def __init__(self, config, evidence):
         thresholds = config.get("thresholds")
-        if not isinstance(thresholds, dict) or any(not isinstance(thresholds.get(k), (int, float)) for k in G10_THRESHOLD_KEYS):
+        if not isinstance(thresholds, dict) or any(not isinstance(thresholds.get(k), (int, float)) or isinstance(thresholds.get(k), bool) for k in G10_THRESHOLD_KEYS):
             raise AdapterError(f"G10 configuration must state every threshold: {', '.join(G10_THRESHOLD_KEYS)} (no default is invented)")
         approval = config.get("approval")
         if not isinstance(approval, dict) or not isinstance(approval.get("approved"), bool):
             raise AdapterError("G10 configuration must record its approval status: approval.approved true or false")
         if approval["approved"] and not (_nonempty(approval.get("approvedBy")) and _nonempty(approval.get("approvedOn"))):
             raise AdapterError("an approved G10 configuration must name approval.approvedBy and approval.approvedOn")
-        if classes.get("thresholds") != thresholds:
-            raise AdapterError("the G10 classes were computed with other thresholds than this configuration states")
+        if evidence.get("thresholds") != thresholds:
+            raise AdapterError("the G10 evidence was computed with other thresholds than this configuration states")
         self.thresholds = dict(thresholds)
+        self.thresholds_sha256 = canonical_sha256(thresholds)
+        self.config_sha256 = canonical_sha256(config)
+        self.evidence_sha256 = canonical_sha256(evidence)
         self.approved = approval["approved"]
         self.approval = dict(approval)
         self.status = config.get("status")
-        self.classes = classes
+        self.version = config.get("version")
+        self.evidence = evidence
+        self.format = evidence.get("evidenceFormat", 1)
+        self.binding = (config.get("binding") or {}).get("manifestHashes")
+        if "thresholdsSha256" in evidence and evidence["thresholdsSha256"] != self.thresholds_sha256:
+            raise AdapterError("the G10 evidence's threshold hash does not match this configuration's thresholds")
+        if self.approved:
+            if self.format != 2:
+                raise AdapterError("an approved G10 configuration needs evidence format 2 (every positive with its metrics)")
+            if evidence.get("configSha256") != self.config_sha256:
+                raise AdapterError("the G10 evidence was computed from another configuration (configSha256 mismatch): stale or foreign evidence")
+            if not isinstance(self.binding, dict) or not all(isinstance(self.binding.get(s), str) for s in SPLITS):
+                raise AdapterError("an approved G10 configuration must be bound to the candidate's TRAIN and DEV manifest hashes")
 
     @classmethod
-    def from_files(cls, config_path, classes_path):
-        if not config_path or not classes_path:
-            raise AdapterError("a G10 threshold configuration and the G10 classes computed from it are both required")
-        return cls(_read_json(config_path), _read_json(classes_path))
+    def from_files(cls, config_path, evidence_path):
+        if not config_path or not evidence_path:
+            raise AdapterError("a G10 threshold configuration and the G10 evidence computed from it are both required")
+        for what, path in (("configuration", config_path), ("evidence", evidence_path)):
+            if not os.path.isfile(path):
+                raise AdapterError(f"the G10 {what} file does not exist: it is required, never assumed")
+        return cls(_read_json(config_path), _read_json(evidence_path))
 
     @property
     def mode(self):
         return "APPROVED" if self.approved else "PROVISIONAL"
 
     def split_classes(self, split, manifest_hash, positive_ids):
-        """The non-VISIBLE classes of one split, after proving they belong to this build and cover every positive."""
-        if (self.classes.get("manifestHashes") or {}).get(split) != manifest_hash:
-            raise AdapterError(f"the G10 classes were computed for another {split} manifest (hash mismatch)")
-        entry = (self.classes.get("splits") or {}).get(split)
+        """
+        The category of every positive of one split that is not VISIBLE, plus the split's counts, after
+        proving the evidence belongs to this build and covers exactly its positives.
+        """
+        if (self.evidence.get("manifestHashes") or {}).get(split) != manifest_hash:
+            raise AdapterError(f"the G10 evidence was computed for another {split} manifest (hash mismatch)")
+        if self.approved and self.binding.get(split) != manifest_hash:
+            raise AdapterError(f"the approved G10 configuration is bound to another {split} manifest (hash mismatch)")
+        entry = (self.evidence.get("splits") or {}).get(split)
         if not entry:
-            raise AdapterError(f"the G10 classes hold no {split} entry")
+            raise AdapterError(f"the G10 evidence holds no {split} entry")
         ids_hash = hashlib.sha256("\n".join(sorted(positive_ids)).encode("utf-8")).hexdigest()
         if entry.get("positivesClassified") != len(positive_ids) or entry.get("positiveIdsSha256") != ids_hash:
-            raise AdapterError(f"the G10 classes do not cover exactly the {split} positives")
-        non_visible = entry.get("nonVisible") or {}
-        bad = {k: v for k, v in non_visible.items() if v not in G10_NON_VISIBLE or k not in set(positive_ids)}
-        if bad:
-            raise AdapterError(f"the G10 classes hold unknown categories or ids: {sorted(bad)[:5]}")
-        return non_visible
+            raise AdapterError(f"the G10 evidence does not cover exactly the {split} positives")
+        if self.format != 2:
+            non_visible = entry.get("nonVisible") or {}
+            bad = {k: v for k, v in non_visible.items() if v not in G10_NON_VISIBLE or k not in set(positive_ids)}
+            if bad:
+                raise AdapterError(f"the G10 evidence holds unknown categories or ids: {sorted(bad)[:5]}")
+            counts = {"VISIBLE": len(positive_ids) - len(non_visible), "BORDERLINE": 0, "INVISIBLE": 0}
+            for v in non_visible.values():
+                counts[v] += 1
+            return non_visible, counts
+        elements = entry.get("elements")
+        if not isinstance(elements, list):
+            raise AdapterError(f"the G10 evidence for {split} lists no elements")
+        wanted = set(positive_ids)
+        seen = set()
+        non_visible = {}
+        counts = {"VISIBLE": 0, "BORDERLINE": 0, "INVISIBLE": 0}
+        for row in elements:
+            if not (isinstance(row, list) and len(row) == 4):
+                raise AdapterError(f"{split}: malformed G10 evidence row {row!r}")
+            eid, category, salience, coverage = row
+            if eid in seen:
+                raise AdapterError(f"{split}: G10 evidence lists {eid!r} twice")
+            if eid not in wanted:
+                raise AdapterError(f"{split}: G10 evidence lists {eid!r}, which is not a positive of this split")
+            seen.add(eid)
+            for name, v in (("salience", salience), ("coverage", coverage)):
+                if not isinstance(v, (int, float)) or isinstance(v, bool) or not math.isfinite(v):
+                    raise AdapterError(f"{eid}: G10 {name} is missing or not a finite number")
+            if category not in counts:
+                raise AdapterError(f"{eid}: unknown G10 category {category!r}")
+            if classify(self.thresholds, salience, coverage) != category:
+                raise AdapterError(f"{eid}: G10 category {category} does not follow from its metrics under these thresholds")
+            counts[category] += 1
+            if category != "VISIBLE":
+                non_visible[eid] = category
+        missing = wanted - seen
+        if missing:
+            raise AdapterError(f"{split}: {len(missing)} positive(s) have no G10 evidence, e.g. {sorted(missing)[:3]}")
+        if entry.get("counts") is not None and entry["counts"] != counts:
+            raise AdapterError(f"{split}: recorded G10 counts {entry['counts']} do not match the evidence rows {counts}")
+        return non_visible, counts
 
 
 def _nonempty(v):
@@ -150,7 +236,7 @@ def _empty_cells():
     return {c: {b[0]: 0 for b in BUCKETS} for c in CLASSES}
 
 
-def load_split(root, split, g10, verify_frames=True):
+def load_split(root, split, g10, verify_frames=True, require_approved=False):
     """
     Load and check one split. Returns a dict: `name`, `version`, `split`, `hash`, `samples` (adapted,
     ready for `data.sample_to_tensors`), and `report`. Raises AdapterError on anything inconsistent.
@@ -193,10 +279,13 @@ def load_split(root, split, g10, verify_frames=True):
 
     # The audit classifies every annotation intended as a positive; the same set is hashed here.
     positive_ids = [a["id"] for s in samples for a in s.get("annotations", []) if a.get("intent") == "positive"]
-    non_visible = g10.split_classes(split, manifest.get("hash"), positive_ids)
+    non_visible, g10_counts = g10.split_classes(split, manifest.get("hash"), positive_ids)
+    if require_approved and not g10.approved:
+        raise AdapterError("refused as an accepted dataset: the G10 configuration is not approved")
 
     kept = _empty_cells()
     excluded = {"occlusion-partial": 0, "occlusion-full": 0, "not-positive": 0, "g10-borderline": 0, "g10-invisible": 0}
+    excluded_by_cell = {k: _empty_cells() for k in excluded}
     g10_diagnostic = {"BORDERLINE": 0, "INVISIBLE": 0}
     ranges = {"minX": math.inf, "minY": math.inf, "maxRight": -math.inf, "maxBottom": -math.inf}
     adapted = []
@@ -231,10 +320,13 @@ def load_split(root, split, g10, verify_frames=True):
             if intent != "positive":
                 if a.get("positive") is not False:
                     raise AdapterError(f"{aid}: an {intent!r} annotation is flagged as a positive")
-                excluded[intent if intent in ("occlusion-partial", "occlusion-full") else "not-positive"] += 1
+                category = intent if intent in ("occlusion-partial", "occlusion-full") else "not-positive"
+                excluded[category] += 1
+                excluded_by_cell[category][cls][bucket] += 1
                 continue
             if a.get("positive") is not True or a.get("validity") != "HIT_TESTABLE":
                 excluded["not-positive"] += 1
+                excluded_by_cell["not-positive"][cls][bucket] += 1
                 continue
             inside = b["x"] >= 0 and b["y"] >= 0 and b["x"] + b["w"] <= vp["w"] and b["y"] + b["h"] <= vp["h"]
             if not inside:
@@ -244,6 +336,7 @@ def load_split(root, split, g10, verify_frames=True):
                 g10_diagnostic[category] += 1
                 if g10.approved:
                     excluded["g10-" + category.lower()] += 1
+                    excluded_by_cell["g10-" + category.lower()][cls][bucket] += 1
                     continue
             ranges["minX"] = min(ranges["minX"], b["x"])
             ranges["minY"] = min(ranges["minY"], b["y"])
@@ -274,9 +367,16 @@ def load_split(root, split, g10, verify_frames=True):
         "positivesKept": sum(sum(v.values()) for v in kept.values()),
         "positivesKeptByClassAndBucket": kept,
         "excluded": excluded,
+        "excludedByCategoryClassAndBucket": excluded_by_cell,
         "g10": {
             "mode": g10.mode,
             "status": g10.status,
+            "version": g10.version,
+            "configSha256": g10.config_sha256,
+            "thresholdsSha256": g10.thresholds_sha256,
+            "evidenceSha256": g10.evidence_sha256,
+            "evidenceFormat": g10.format,
+            "counts": g10_counts,
             "nonVisibleFound": g10_diagnostic,
             "excludedForG10": g10.approved,
             "note": None if g10.approved else "PROVISIONAL thresholds: non-visible positives are reported, not excluded; no dataset acceptance is claimed",
@@ -284,6 +384,15 @@ def load_split(root, split, g10, verify_frames=True):
         "boxRangeCss": ranges,
     }
     return {"name": manifest["name"], "version": manifest.get("version"), "split": split, "hash": manifest.get("hash"), "samples": adapted, "report": report}
+
+
+def load_accepted_split(root, split, g10):
+    """
+    Load one split AS AN ACCEPTED DATASET: only under an APPROVED G10 configuration, whose evidence is
+    then fully bound and checked (see G10Policy). Anything provisional, stale, incomplete or bound to
+    other manifests is refused.
+    """
+    return load_split(root, split, g10, verify_frames=True, require_approved=True)
 
 
 def check_separation(train, dev):

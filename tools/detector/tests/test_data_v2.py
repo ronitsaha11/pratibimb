@@ -28,6 +28,7 @@ from data_v2 import (  # noqa: E402
     require_split,
 )
 from head import CLASSES  # noqa: E402
+from data_v2 import canonical_sha256  # noqa: E402
 
 VW, VH = 320, 200  # scale = 640 / 320 = 2 model px per CSS px
 THRESHOLDS = {"salienceInvisibleBelow": 1.25, "salienceVisibleAtLeast": 1.5, "coverageContrast": 1.25, "coverageInvisibleBelow": 0.005, "coverageVisibleAtLeast": 0.01}
@@ -77,6 +78,37 @@ def write_candidate(root, n_train=3, n_dev=2):
         classes["splits"][split] = {"positivesClassified": len(ids), "positiveIdsSha256": hashlib.sha256("\n".join(ids).encode()).hexdigest(), "nonVisible": {}}
     write_json(os.path.join(root, "g10-classes.json"), classes)
     write_json(os.path.join(root, "g10-config.json"), {"status": "PROVISIONAL", "approval": {"approved": False, "approvedBy": None, "approvedOn": None}, "thresholds": dict(THRESHOLDS)})
+    return root
+
+
+def approve(root, non_visible=None):
+    """
+    Turn a fixture's G10 files into an APPROVED configuration (bound to the fixture's manifests) and
+    format-2 evidence (M22.9): every positive with metrics that give its category under THRESHOLDS.
+    """
+    from data_v2 import canonical_sha256
+
+    non_visible = non_visible or {}
+    metrics = {"VISIBLE": (5.0, 0.5), "BORDERLINE": (1.3, 0.5), "INVISIBLE": (1.0, 0.0)}
+    hashes = {s: read_json(os.path.join(root, f"manifest-{s}.json"))["hash"] for s in ("train", "dev")}
+    config = {
+        "version": "g10-fixture-approved",
+        "status": "APPROVED",
+        "approval": {"approved": True, "approvedBy": "fixture owner", "approvedOn": "2026-11-02"},
+        "binding": {"manifestHashes": dict(hashes)},
+        "thresholds": dict(THRESHOLDS),
+    }
+    evidence = {"evidenceFormat": 2, "thresholds": dict(THRESHOLDS), "thresholdsSha256": canonical_sha256(THRESHOLDS), "configSha256": canonical_sha256(config), "manifestHashes": dict(hashes), "splits": {}}
+    for split in ("train", "dev"):
+        m = read_json(os.path.join(root, f"manifest-{split}.json"))
+        ids = sorted(a["id"] for s in m["samples"] for a in s["annotations"] if a["intent"] == "positive")
+        rows = [[i, non_visible.get(i, "VISIBLE"), *metrics[non_visible.get(i, "VISIBLE")]] for i in ids]
+        counts = {"VISIBLE": 0, "BORDERLINE": 0, "INVISIBLE": 0}
+        for r in rows:
+            counts[r[1]] += 1
+        evidence["splits"][split] = {"positivesClassified": len(ids), "positiveIdsSha256": hashlib.sha256("\n".join(ids).encode()).hexdigest(), "counts": counts, "elements": rows}
+    write_json(os.path.join(root, "g10-config.json"), config)
+    write_json(os.path.join(root, "g10-classes.json"), evidence)
     return root
 
 
@@ -266,7 +298,7 @@ def test_g10_classes_for_another_build_or_not_covering_every_positive_are_refuse
         load_split(cand, "train", policy(cand))
     cand2 = write_candidate(cand + "-2")
     edit(cand2, "g10-classes.json", lambda c: c["splits"]["dev"].update(positivesClassified=7))
-    with pytest.raises(AdapterError, match="do not cover exactly"):
+    with pytest.raises(AdapterError, match="not cover exactly"):
         load_split(cand2, "dev", policy(cand2))
 
 
@@ -283,8 +315,7 @@ def test_provisional_g10_reports_but_does_not_exclude_and_claims_no_acceptance(c
 
 
 def test_approved_g10_excludes_invisible_and_borderline_separately(cand):
-    edit(cand, "g10-classes.json", lambda c: c["splits"]["train"].update(nonVisible={"train-00000-e000": "INVISIBLE", "train-00001-e001": "BORDERLINE"}))
-    edit(cand, "g10-config.json", lambda c: c["approval"].update(approved=True, approvedBy="fixture owner", approvedOn="2026-11-02"))
+    approve(cand, {"train-00000-e000": "INVISIBLE", "train-00001-e001": "BORDERLINE"})
     g10 = policy(cand)
     train = load_split(cand, "train", g10)
     dev = load_split(cand, "dev", g10)
@@ -389,6 +420,88 @@ def test_every_split_converts_to_tensors_with_targets_inside_the_letterbox(cand)
         assert out["imageShape"] == [3, 640, 640]
         assert out["targets"] == 4 * out["samples"]  # positives only: two occlusion cases per sample excluded
         assert out["boxesOutsideLetterbox"] == 0 and out["samplesWithTargetsButNoPositiveCell"] == 0
+
+
+# ── M22.9: approved G10, fail-closed ──────────────────────────────────────────────────────────
+
+
+def test_an_approved_dataset_loads_with_counts_and_exclusions_by_class_bucket_and_category(cand):
+    from data_v2 import load_accepted_split
+
+    approve(cand, {"train-00000-e000": "INVISIBLE", "train-00002-e002": "BORDERLINE"})
+    train = load_accepted_split(cand, "train", policy(cand))
+    r = train["report"]
+    assert r["g10"]["mode"] == "APPROVED" and r["g10"]["evidenceFormat"] == 2
+    assert r["g10"]["counts"] == {"VISIBLE": 10, "BORDERLINE": 1, "INVISIBLE": 1}
+    by = r["excludedByCategoryClassAndBucket"]
+    assert by["g10-invisible"][CLASSES[0]]["very-small"] == 1  # train-00000-e000: class 0, very-small
+    assert by["g10-borderline"][CLASSES[4]]["medium"] == 1  # train-00002-e002: class (2 + 2) % 8, medium
+    assert by["occlusion-partial"]["button"]["medium"] == 3 and by["occlusion-full"]["tab"]["medium"] == 3
+    assert len(r["g10"]["configSha256"]) == 64 and len(r["g10"]["evidenceSha256"]) == 64
+
+
+def test_loading_as_an_accepted_dataset_needs_an_approved_configuration(cand):
+    from data_v2 import load_accepted_split
+
+    with pytest.raises(AdapterError, match="not approved"):
+        load_accepted_split(cand, "train", policy(cand))  # the fixture's own configuration is provisional
+
+
+@pytest.mark.parametrize(
+    "spoil, message",
+    [
+        (lambda c, e: e.pop("evidenceFormat"), "evidence format 2"),
+        (lambda c, e: c.update(decision="edited after the evidence was computed"), "configSha256 mismatch"),
+        (lambda c, e: e.update(thresholdsSha256="0" * 64), "threshold hash"),
+        # Unbound, even with the evidence re-hashed to the unbound configuration:
+        (lambda c, e: (c.pop("binding"), e.update(configSha256=canonical_sha256(c))), "bound to the candidate"),
+    ],
+)
+def test_approved_evidence_that_is_stale_foreign_or_unbound_is_refused(cand, spoil, message):
+    approve(cand)
+    config = read_json(os.path.join(cand, "g10-config.json"))
+    evidence = read_json(os.path.join(cand, "g10-classes.json"))
+    spoil(config, evidence)
+    with pytest.raises(AdapterError, match=message):
+        G10Policy(config, evidence)
+
+
+def test_an_approved_configuration_bound_to_other_manifests_is_refused(cand):
+    from data_v2 import canonical_sha256
+
+    approve(cand)
+    config = read_json(os.path.join(cand, "g10-config.json"))
+    evidence = read_json(os.path.join(cand, "g10-classes.json"))
+    config["binding"]["manifestHashes"]["dev"] = "another"
+    evidence["configSha256"] = canonical_sha256(config)  # even with the evidence re-bound to it
+    with pytest.raises(AdapterError, match="bound to another dev manifest"):
+        load_split(cand, "dev", G10Policy(config, evidence))
+
+
+@pytest.mark.parametrize(
+    "spoil, message",
+    [
+        (lambda rows: rows.append(list(rows[0])), "twice"),
+        (lambda rows: rows.pop(), "no G10 evidence"),
+        (lambda rows: rows[0].__setitem__(0, "train-00000-e004"), "not a positive of this split"),  # an occlusion case
+        (lambda rows: rows[0].__setitem__(2, None), "missing or not a finite number"),
+        (lambda rows: rows[0].__setitem__(3, "0.5"), "missing or not a finite number"),
+        (lambda rows: rows[0].__setitem__(1, "INVISIBLE"), "does not follow from its metrics"),
+        (lambda rows: rows[0].__setitem__(1, "FAINT"), "unknown G10 category"),
+    ],
+)
+def test_approved_evidence_rows_must_be_complete_unique_and_consistent(cand, spoil, message):
+    approve(cand)
+    edit(cand, "g10-classes.json", lambda e: spoil(e["splits"]["train"]["elements"]))
+    with pytest.raises(AdapterError, match=message):
+        load_split(cand, "train", policy(cand))
+
+
+def test_approved_counts_must_match_the_evidence_rows(cand):
+    approve(cand)
+    edit(cand, "g10-classes.json", lambda e: e["splits"]["dev"]["counts"].update(VISIBLE=999))
+    with pytest.raises(AdapterError, match="recorded G10 counts"):
+        load_split(cand, "dev", policy(cand))
 
 
 def test_the_dry_run_has_no_split_argument_at_all():
