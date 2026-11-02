@@ -2,7 +2,7 @@
 v2 data dry run (M22.7): load a v2 TRAIN/DEV candidate through the adapter and check that the
 existing training input path accepts it. NO MODEL, NO WEIGHTS, NO OPTIMIZER STEP, NO PREDICTION.
 
-    python tools/detector/dry_run_v2.py --candidate=<n> --g10-config=<thresholds.json> --g10-classes=<classes.json> --build-config=<config.json> [--tensors]
+    python tools/detector/dry_run_v2.py --candidate=<n> --g10-config=<thresholds.json> --g10-classes=<classes.json> --build-config=<config.json> [--tensors [--ignore-mask]]
 
   - TRAIN and DEV are loaded separately (`data_v2.load_split`): every frame's SHA-256 is checked,
     missing or unexpected frames are refused, and every annotation's class, box and bucket checked.
@@ -14,6 +14,8 @@ existing training input path accepts it. NO MODEL, NO WEIGHTS, NO OPTIMIZER STEP
     letterbox and target assignment the trainer uses) and checks the result: image shape, every
     target box inside the letterboxed content, and at least one positive cell per sample with a
     target. That builds input tensors only; no model is constructed.
+  - `--ignore-mask` (with `--tensors`) builds every sample's partial-occlusion classification ignore
+    mask (`occlusion_mask_v2`, M22.12) against its real class targets and totals it per class.
 
 There is no TEST argument, path or fallback: the adapter reads TRAIN and DEV only. Only the numbered
 candidate directory is read. Prints one JSON report; no path, no page text.
@@ -31,15 +33,34 @@ from data_v2 import AdapterError, G10Policy, acceptance, candidate_root, check_s
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 
-def tensor_check(root, data):
-    """Run the unchanged v1 input path over every adapted sample. No model is involved."""
+def tensor_check(root, data, ignore_mask=False):
+    """
+    Run the unchanged v1 input path over every adapted sample. No model is involved. With
+    `ignore_mask`, also build each sample's partial-occlusion classification ignore mask
+    (`occlusion_mask_v2`, M22.12) against its real `cls_t`, and total it.
+    """
     from data import sample_to_tensors
-    from head import INPUT_SIZE
+    from head import CLASSES, INPUT_SIZE
     from targets import css_box_to_model, letterbox_params
 
     out = {"samples": 0, "targets": 0, "positiveCells": 0, "samplesWithTargetsButNoPositiveCell": 0, "boxesOutsideLetterbox": 0, "imageShape": None}
+    if ignore_mask:
+        from occlusion_mask_v2 import partial_occlusion_ignore_mask
+
+        agg = {"ignoredEntries": 0, "ignoredByClass": {c: 0 for c in CLASSES}, "positiveConflicts": 0, "positiveConflictsByClass": {c: 0 for c in CLASSES},
+               "ignoredOnCellsPositiveForAnotherClass": 0, "samplesWithIgnoredEntries": 0,
+               "cases": {"partial": 0, "partialWithVisibleRegion": 0, "partialOutsideLetterbox": 0, "full": 0}}
+        out["ignoreMask"] = agg
     for s in data["samples"]:
         x, pos, box_t, cls_t = sample_to_tensors(root, s)
+        if ignore_mask:
+            m = partial_occlusion_ignore_mask(s, cls_t)
+            for k in ("ignoredEntries", "positiveConflicts", "ignoredOnCellsPositiveForAnotherClass"):
+                agg[k] += m[k]
+            for k in ("ignoredByClass", "positiveConflictsByClass", "cases"):
+                for kk, v in m[k].items():
+                    agg[k][kk] += v
+            agg["samplesWithIgnoredEntries"] += m["ignoredEntries"] > 0
         out["imageShape"] = list(x.shape)
         if list(x.shape) != [3, INPUT_SIZE, INPUT_SIZE]:
             raise AdapterError(f"{s['id']}: input tensor shape {list(x.shape)}")
@@ -65,7 +86,10 @@ def main(argv=None):
     ap.add_argument("--g10-classes", required=True)
     ap.add_argument("--build-config", required=True, help="the candidate's build configuration, for the per-cell G4 minimums")
     ap.add_argument("--tensors", action="store_true", help="also run the unchanged v1 input path over every sample")
+    ap.add_argument("--ignore-mask", action="store_true", help="with --tensors: also build and total the partial-occlusion ignore masks")
     args = ap.parse_args(argv)
+    if args.ignore_mask and not args.tensors:
+        raise AdapterError("--ignore-mask needs --tensors: the mask is built against each sample's real class targets")
 
     root = candidate_root(ROOT, args.candidate)
     if not os.path.isdir(root):
@@ -89,7 +113,7 @@ def main(argv=None):
         "acceptance": acceptance(train, dev, g10, minimum),
     }
     if args.tensors:
-        report["tensorCheck"] = {"train": tensor_check(root, train), "dev": tensor_check(root, dev)}
+        report["tensorCheck"] = {"train": tensor_check(root, train, args.ignore_mask), "dev": tensor_check(root, dev, args.ignore_mask)}
     print(json.dumps(report, indent=2, allow_nan=False))
     return 0
 

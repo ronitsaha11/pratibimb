@@ -17,7 +17,9 @@ WHAT IT DOES, per split, TRAIN or DEV only (anything else is refused before any 
     box inside the viewport, and a size bucket that agrees with its rendered box;
   - keeps POSITIVES ONLY: `positive is True`, intent `positive`, validity `HIT_TESTABLE`. Intentional
     occlusion cases are never targets; they, and any other non-positive, are counted as exclusions.
-    A positive flag on an occlusion case is an error, not an exclusion;
+    A positive flag on an occlusion case is an error, not an exclusion. Each occlusion case is carried
+    on its sample as `occlusionCases` (class, box, intent, its occluder's rendered box) for the
+    partial-occlusion ignore mask (M22.12); an occluder recorded for another element is refused;
   - applies a G10 policy (below) and reports every exclusion separately.
 Boxes stay in CSS viewport px, top-left origin: exactly the semantics `sample_to_tensors` converts.
 
@@ -305,6 +307,8 @@ def load_split(root, split, g10, verify_frames=True, require_approved=False):
             frames_verified += 1
         scale = INPUT_SIZE / max(vp["w"], vp["h"])
         keep = []
+        occlusion_cases = []
+        occluders = {o.get("id"): o for o in (s.get("provenance") or {}).get("occluders", [])}
         for a in s.get("annotations", []):
             aid = a["id"]  # association checked above
             cls = a.get("cls")
@@ -323,6 +327,21 @@ def load_split(root, split, g10, verify_frames=True, require_approved=False):
                 category = intent if intent in ("occlusion-partial", "occlusion-full") else "not-positive"
                 excluded[category] += 1
                 excluded_by_cell[category][cls][bucket] += 1
+                if category != "not-positive":
+                    # Never a target, but its pixels stay in the frame: carried, with its occluder's
+                    # RENDERED box, for the partial-occlusion ignore mask (occlusion_mask_v2, M22.12).
+                    occ_id = (a.get("source") or {}).get("occluderId")
+                    occ = occluders.get(occ_id) if occ_id else None
+                    if occ is not None and occ.get("for") != aid:
+                        raise AdapterError(f"{aid}: its occluder {occ_id!r} is recorded for another element")
+                    rendered = (occ or {}).get("rendered")
+                    occlusion_cases.append({
+                        "id": aid,
+                        "cls": cls,
+                        "intent": intent,
+                        "box": {"x": b["x"], "y": b["y"], "w": b["w"], "h": b["h"]},
+                        "occluder": {k: rendered[k] for k in ("x", "y", "w", "h")} if isinstance(rendered, dict) and all(k in rendered for k in ("x", "y", "w", "h")) else None,
+                    })
                 continue
             if a.get("positive") is not True or a.get("validity") != "HIT_TESTABLE":
                 excluded["not-positive"] += 1
@@ -352,6 +371,9 @@ def load_split(root, split, g10, verify_frames=True, require_approved=False):
             # Derived from the frame itself (verified above), never assumed.
             "captureSize": {"w": frame["w"], "h": frame["h"]},
             "annotations": keep,
+            # Excluded occlusion cases with their occluder provenance (None when absent); `sample_to_tensors`
+            # never reads this key, so the targets are exactly what they were.
+            "occlusionCases": occlusion_cases,
             "provenance": {"seed": s.get("seed"), "specHash": s.get("specHash"), "frameSha256": frame.get("sha256"), "htmlSha256": s.get("htmlSha256")},
         })
 
