@@ -35,6 +35,17 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.6 — visual defect remediation, the G10 pixel diagnostic, and TRAIN/DEV candidate 2
+  (owner-authorised; no training, no detector, no TEST; candidate 1 preserved).**
+  - Fixed: page-on-page textboxes (each style now draws a field or a full edge) and icon plates lost to
+    the `background` shorthand (plate and glyph now separate longhand layers).
+  - Improved: dashed dividers and banded panels (unlike fields), width-fitted labels with measured
+    overflow, scaled native checkboxes and radios, varied occluder looks. No box moved.
+  - Added: G10 pixel-visibility metrics (`visibility.mjs`) with no default thresholds, a browser
+    fixture matrix (`render-fixtures.mjs`), and G10 in the candidate audit.
+  - Candidate 2: G1–G9 PASS on TRAIN, DEV and both; 165 / 44 valid positives per cell; every
+    positive measures visible (G10 diagnostic only, thresholds unapproved); reproduced byte for byte.
+    A draft pending owner acceptance.
 - **M22.5 — acceptance review of TRAIN/DEV candidate 1 (read-only; no training, no detector, no
   TEST; candidate unmodified).**
   - `tools/dataset/v2/audit-candidate.mjs` and `png.mjs`: independent integrity audit, recount,
