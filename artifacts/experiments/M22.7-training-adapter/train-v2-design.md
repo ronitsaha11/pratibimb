@@ -50,3 +50,30 @@ train_v2.py --candidate=<n> --g10-config=<approved.json> --g10-classes=<classes.
 - Exporting it to ONNX for the product.
 - Adopting it.
 - Building or evaluating TEST, including the blocked M22 recall runner.
+
+---
+
+## M22.9 status (appended 2026-11-02; the design above is unchanged)
+
+**Implemented** (`tools/detector/train_v2.py`): everything above except the training step itself.
+- **Pre-flight:**
+  - the T1 hash is checked against ADR-0003's value before and after;
+  - the run configuration is validated with no defaults and no TEST reference;
+  - approved G10 evidence is required;
+  - TRAIN and DEV load as an accepted dataset through separate `load_train` and `load_dev`, with cell minimums and the v1 tensor path checked.
+- **Output-directory safety:** a new `t1-ui-head-v2-<run id>` folder only. Protected, existing, linked, junctioned and case-variant paths are refused, and the folder is never created by pre-flight.
+- **Provenance:** the run record a future run would write is assembled.
+
+**Amendments from the M22.8 review, now in the code:**
+1. No `train.py` import (tested statically).
+2. "No TEST" tested statically.
+3. The T1 hash is compared against the recorded value, and paths are resolved and case-folded.
+
+**Not implemented:** model construction, optimizer, forward and backward passes, checkpoints, prediction, export. Without `--preflight` the command refuses.
+
+**Owner decisions taken in M22.9:**
+- the G10 thresholds are approved (`tools/dataset/v2/configs/g10-approved-candidate-2.json`);
+- candidate 2 is conditionally accepted, subject to approved-G10 verification, which passed;
+- the first-experiment hyper-parameters are **proposed, pending review**.
+
+See `artifacts/experiments/M22.9-training-pipeline/`.
