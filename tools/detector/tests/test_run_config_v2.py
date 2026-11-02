@@ -135,3 +135,16 @@ def test_a_shorter_consistent_schedule_is_accepted():
     c = cfg()
     c["epochs"]["max"], c["steps"]["max"], c["schedule"]["tMaxSteps"] = 10, 1500, 1500
     assert train_v2.validate_run_config(c) is c
+
+
+APPROVED = os.path.join(DETECTOR, "configs", "train-v2-first-run.APPROVED.json")
+
+
+def test_the_approved_first_run_configuration_is_the_proposal_with_only_the_approval_recorded():
+    """M22.13: the owner approved the M22.12 proposal for one run. Nothing else may differ."""
+    a, p = read_json(APPROVED), cfg()
+    assert train_v2.validate_run_config(a) is a
+    assert a["approval"]["approved"] is True and a["approval"]["approvedBy"] == "project owner" and a["approval"]["approvedOn"] == "2026-11-03"
+    assert a["status"].startswith("APPROVED")
+    assert {k: v for k, v in a.items() if k not in ("status", "approval")} == {k: v for k, v in p.items() if k not in ("status", "approval")}
+    assert a["loss"]["partialOcclusion"] == "ignore-mask"
