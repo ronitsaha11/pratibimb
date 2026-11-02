@@ -35,6 +35,18 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.9 — approved G10, conditional acceptance of candidate 2, and a pre-flight-only training
+  pipeline (owner-authorised; no training, no optimizer step, no inference, no TEST).**
+  - G10 thresholds approved by the project owner (2026-11-02) for candidate 2 only, in a separately
+    versioned configuration bound to its manifest hashes; the provisional file is kept.
+  - Audit evidence format 2: every positive's category and metrics, hash-bound to the configuration
+    and thresholds. Candidate 2: 6,688 VISIBLE, 0 BORDERLINE, 0 INVISIBLE; 165 / 44 per cell.
+  - Adapter: approved G10 enforced fail-closed (bindings, recomputed categories, missing, duplicate
+    or unexpected ids refused); exclusions by category, class and size bucket.
+  - `tools/detector/train_v2.py`: pre-flight only. It checks T1 against ADR-0003, validates the config
+    and loads accepted TRAIN and DEV separately. Its output guard refuses T1, links and existing runs.
+    It assembles the provenance plan and has no training step. 37 static and behavioural safety tests.
+  - First-experiment hyper-parameters proposed, pending owner review.
 - **M22.8 — the v2 adapter tests in canonical verification (no training, no inference, no TEST).**
   - `npm run verify` now ends with `npm run test:py` (`scripts/verify-python.py`): Python >= 3.12 and
     every pin in `tools/detector/requirements-test.txt` checked, then `pytest tools/detector/tests`.
