@@ -424,7 +424,7 @@ describe("the v2 generator never touches the pinned dataset", () => {
       // M22.4: the build writes to `artifacts/datasets/<CANDIDATE_PREFIX><n>` and names nothing else there.
       const named = code.match(/artifacts[\\/]datasets[\\/]?[^"'`\s)]*/g) ?? [];
       expect(named.every((m) => m.startsWith("artifacts/datasets/${CANDIDATE_PREFIX}")), `${f}: ${named.join(", ")}`).toBe(true);
-      if (!["render.mjs", "build-candidate.mjs"].includes(f)) expect(code).not.toMatch(/"datasets"|artifacts[\\/]datasets/);
+      if (!["render.mjs", "build-candidate.mjs", "audit-candidate.mjs"].includes(f)) expect(code).not.toMatch(/"datasets"|artifacts[\\/]datasets/);
     }
   });
 });

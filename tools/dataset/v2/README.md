@@ -28,6 +28,8 @@ for audits.
 | `render.mjs` | One spec → frame, measured geometry, hit-test validity, in headless Chromium; the fail-closed render checks |
 | `build-candidate.mjs` | Command line: plan, render, annotate, write and gate a TRAIN/DEV candidate |
 | `compare-builds.mjs` | Command line: compare two builds sample by sample (reproducibility) |
+| `audit-candidate.mjs` | Command line: independent read-only audit of one candidate (integrity, recount, distributions, pixel contrast, contact sheets outside the repo) — M22.5 |
+| `png.mjs` | Strict PNG decoder (every CRC, inflate, unfilter) and encoder, for the audit |
 | `configs/m22.4-train-dev.json` | The owner-approved TRAIN/DEV configuration of M22.4 |
 
 ## Rendering and candidate builds (M22.4)
