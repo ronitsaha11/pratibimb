@@ -9,9 +9,11 @@ M22, and nothing in the v2 tooling imports or calls `train.py`.
 | File | Does |
 |---|---|
 | `data_v2.py` | Loads a v2 synthetic candidate's TRAIN and DEV **separately**, and refuses any other split before touching a file. It checks frame sets, SHA-256s and sizes; derives `captureSize` from the frame; checks each annotation's sample, class, box and size bucket. It keeps **positives only**, applies the G10 policy below, and reports exclusions by category, class and size bucket. `load_accepted_split` loads a split **as an accepted dataset**: approved G10 only. `V2SplitDataset` feeds the unchanged `data.sample_to_tensors` |
-| `dry_run_v2.py` | Loads TRAIN and DEV, checks they share nothing, reports counts and exclusions, and with `--tensors` runs every sample through the v1 input path. No model |
+| `dry_run_v2.py` | Loads TRAIN and DEV, checks they share nothing, reports counts and exclusions. With `--tensors` it runs every sample through the v1 input path; adding `--ignore-mask` also totals the ignore masks. No model |
 | `train_v2.py` | The separate v2 entry point: **PRE-FLIGHT ONLY** (M22.9). See "Training" below |
-| `configs/train-v2-first-experiment.PROPOSED.json` | The first experiment's configuration: **proposed, pending owner review** |
+| `occlusion_mask_v2.py` | The partial-occlusion classification ignore mask (M22.12): a pure helper. For each partial-occlusion case, it ignores that class's channel wherever a cell's receptive field (31 px, exact for `UiHead`) sees the control's visible part. Positives always win; full occlusion ignores nothing; box targets are untouched |
+| `configs/train-v2-first-run.PROPOSED.json` | The canonical first-run configuration, schema `train-v2-run-config/2` (M22.12): **proposed, pending owner approval** |
+| `configs/train-v2-first-experiment.PROPOSED.json` | The M22.9 proposal, schema 1: kept as history; the validator refuses it |
 | `tests/` | The pytest suite (synthetic candidates and a synthetic repository in a temp directory; never a real dataset or model) |
 | `requirements-test.txt` | The suite's exact dependency pins (CPU torch) |
 
@@ -52,12 +54,14 @@ python tools/detector/train_v2.py --preflight --candidate=2 \
   --g10-config=tools/dataset/v2/configs/g10-approved-candidate-2.json \
   --g10-evidence=artifacts/experiments/M22.9-training-pipeline/logs/w1-candidate-2-g10-evidence-approved.json \
   --build-config=tools/dataset/v2/configs/m22.4-train-dev.json \
-  --run-config=tools/detector/configs/train-v2-first-experiment.PROPOSED.json --run-id=<id>
+  --run-config=tools/detector/configs/train-v2-first-run.PROPOSED.json --run-id=<id>
 ```
 
 **What `train_v2.py` checks and assembles:**
 - the T1 artifact's SHA-256 against ADR-0003, before and after;
-- the run configuration, with no defaults and no TEST reference;
+- the run configuration (schema 2), with no defaults and no TEST reference. It checks the exact step count, a schedule that ends on the last step, and that every checkpoint has a DEV loss;
+- that the configured steps per epoch and DEV batches are the data's exact quotients (no partial batch), and that the CPU thread count exists;
+- with `loss.partialOcclusion: ignore-mask`, every sample's ignore mask, totalled per class;
 - approved G10 evidence;
 - TRAIN and DEV, through separate `load_train` and `load_dev`, as an accepted dataset, including the cell minimums and the v1 tensor path;
 - a new `artifacts/models/t1-ui-head-v2-<run id>` output directory, which is **not created**;
@@ -70,4 +74,5 @@ It prints the plan as JSON.
 **Design and review:**
 - `artifacts/experiments/M22.7-training-adapter/train-v2-design.md`;
 - `artifacts/experiments/M22.8-verification-readiness/training-architecture-review.md`;
-- the M22.9 record.
+- the M22.9 record;
+- the M22.12 record (the ignore mask, schema 2, the assignment-order ADR proposal).

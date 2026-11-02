@@ -35,6 +35,21 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.12 — partial-occlusion ignore mask and first-run configuration hardening (no training, no
+  optimizer, no inference, no weights, no TEST).**
+  - `tools/detector/occlusion_mask_v2.py`: a pure classification ignore mask. For each partial-occlusion
+    case it ignores that class's channel at cells whose receptive field (31 px, jump 8, checked against
+    `UiHead` on the meta device) sees the visible part. Positives always win; full occlusion ignores
+    nothing; box targets are untouched. 35 tests. Candidate 2: 26,953 TRAIN / 6,999 DEV entries.
+  - The adapter carries each occlusion case with its rendered occluder; a foreign occluder is refused.
+  - Run configuration schema 2 (`train-v2-first-run.PROPOSED.json`, pending approval): exact steps,
+    record-only early stopping, DEV frequency and aggregation, checkpoint retention and best rule,
+    determinism, threads and non-finite-gradient policy. Pre-flight checks the counts against the data.
+    41 + 7 tests. The M22.9 schema-1 file is kept and refused.
+  - ADR proposal for the shared-cell assignment order; `targets.py` unchanged.
+- **M22.11 — target-assignment and loss-semantics audit (read-only).** 0 collisions on candidate 2;
+  larger-wins ordering contradicts the comment; 25.9 % of very-small objects are nearest-cell only;
+  7,405 visible partial-occlusion cells were negatively supervised, with no ignore path.
 - **M22.10 — first T1 retraining experiment: specification review (read-only planning; no training,
   no optimizer, no inference, no weights, no code change, no TEST).**
   - Checkpoint re-verified: candidates 1 and 2, the approved-G10 hashes and T1 (ADR-0003) unchanged;

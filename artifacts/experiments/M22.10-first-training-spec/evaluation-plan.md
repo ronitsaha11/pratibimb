@@ -93,3 +93,7 @@ A DEV figure is therefore an **optimistic** estimate and is never presented as a
 4. FP / FN breakdowns and the confusion matrix.
 5. Limitations, as in `risks.md` §1, verbatim.
 6. The label "DEV — validation, selection-biased; no unbiased test estimate exists", on every table.
+
+---
+
+**Amended by M22.12 (2026-11-03).** Parts of this document are superseded by `artifacts/experiments/M22.12-occlusion-mask-and-config/evaluation-plan-update.md`. The text above is kept unchanged as the M22.10 record.

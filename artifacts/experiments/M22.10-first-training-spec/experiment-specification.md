@@ -193,3 +193,7 @@ A run is **SUCCESSFUL** if and only if **all** of the following hold:
 | DEV detection metrics; T1 baseline on DEV | detector inference | its own authorisation (D8) |
 | Seed repeats (2–3 seeds) | each is a full run | D6 |
 | Learning-rate or batch sweep, per-object loss normalisation, ignore-masks for partial occlusion, augmentation | each is a separate, attributable change | later experiments |
+
+---
+
+**Amended by M22.12 (2026-11-03).** Parts of this document are superseded by `artifacts/experiments/M22.12-occlusion-mask-and-config/training-specification-update.md`. The text above is kept unchanged as the M22.10 record.

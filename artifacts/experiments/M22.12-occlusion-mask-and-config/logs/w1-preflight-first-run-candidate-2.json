@@ -1,0 +1,923 @@
+{
+  "mode": "PRE-FLIGHT ONLY - no model built, no optimizer, no forward or backward pass, no weights written, no prediction",
+  "candidate": "artifacts/datasets/t1-ui-synthetic-2.1.0-draft-candidate-2",
+  "g10": {
+    "mode": "APPROVED",
+    "version": "g10-approved-1",
+    "approval": {
+      "approved": true,
+      "approvedBy": "project owner",
+      "approvedOn": "2026-11-02",
+      "decision": "M22.9 owner authorisation: G10 thresholds approved for candidate 2"
+    }
+  },
+  "acceptance": {
+    "claimed": true,
+    "reason": "G10-approved visible positives meet every cell minimum (still subject to the owner's acceptance of the candidate)"
+  },
+  "train": {
+    "samples": 600,
+    "framesVerified": 600,
+    "positivesKept": 5280,
+    "positivesKeptByClassAndBucket": {
+      "button": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "link": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "textbox": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "checkbox": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "radio": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "select": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "tab": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      },
+      "icon": {
+        "very-small": 165,
+        "small": 165,
+        "medium": 165,
+        "large": 165
+      }
+    },
+    "excluded": {
+      "occlusion-partial": 480,
+      "occlusion-full": 480,
+      "not-positive": 0,
+      "g10-borderline": 0,
+      "g10-invisible": 0
+    },
+    "excludedByCategoryClassAndBucket": {
+      "occlusion-partial": {
+        "button": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "link": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "textbox": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "checkbox": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "radio": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "select": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "tab": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "icon": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        }
+      },
+      "occlusion-full": {
+        "button": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "link": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "textbox": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "checkbox": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "radio": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "select": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "tab": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        },
+        "icon": {
+          "very-small": 15,
+          "small": 15,
+          "medium": 15,
+          "large": 15
+        }
+      },
+      "not-positive": {
+        "button": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "link": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "textbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "checkbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "radio": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "select": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "tab": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "icon": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        }
+      },
+      "g10-borderline": {
+        "button": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "link": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "textbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "checkbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "radio": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "select": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "tab": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "icon": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        }
+      },
+      "g10-invisible": {
+        "button": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "link": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "textbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "checkbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "radio": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "select": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "tab": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "icon": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        }
+      }
+    },
+    "g10": {
+      "mode": "APPROVED",
+      "status": "APPROVED",
+      "version": "g10-approved-1",
+      "configSha256": "5cbb059fff57304c36a4ae47d54012ebda2defc9db7154786e2944f7fedbbddf",
+      "thresholdsSha256": "fcce918a5341dc97350bbe3b85c9c21de95a04e32d85f23cf1a3f64b7dce78b1",
+      "evidenceSha256": "404e0b286a8efdd4a76c389e7e0b2babd07e39303417f62002d55a8b5c29b533",
+      "evidenceFormat": 2,
+      "counts": {
+        "VISIBLE": 5280,
+        "BORDERLINE": 0,
+        "INVISIBLE": 0
+      },
+      "nonVisibleFound": {
+        "BORDERLINE": 0,
+        "INVISIBLE": 0
+      },
+      "excludedForG10": true,
+      "note": null
+    }
+  },
+  "dev": {
+    "samples": 160,
+    "framesVerified": 160,
+    "positivesKept": 1408,
+    "positivesKeptByClassAndBucket": {
+      "button": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "link": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "textbox": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "checkbox": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "radio": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "select": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "tab": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      },
+      "icon": {
+        "very-small": 44,
+        "small": 44,
+        "medium": 44,
+        "large": 44
+      }
+    },
+    "excluded": {
+      "occlusion-partial": 128,
+      "occlusion-full": 128,
+      "not-positive": 0,
+      "g10-borderline": 0,
+      "g10-invisible": 0
+    },
+    "excludedByCategoryClassAndBucket": {
+      "occlusion-partial": {
+        "button": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "link": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "textbox": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "checkbox": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "radio": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "select": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "tab": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "icon": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        }
+      },
+      "occlusion-full": {
+        "button": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "link": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "textbox": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "checkbox": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "radio": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "select": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "tab": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        },
+        "icon": {
+          "very-small": 4,
+          "small": 4,
+          "medium": 4,
+          "large": 4
+        }
+      },
+      "not-positive": {
+        "button": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "link": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "textbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "checkbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "radio": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "select": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "tab": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "icon": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        }
+      },
+      "g10-borderline": {
+        "button": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "link": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "textbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "checkbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "radio": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "select": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "tab": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "icon": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        }
+      },
+      "g10-invisible": {
+        "button": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "link": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "textbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "checkbox": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "radio": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "select": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "tab": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        },
+        "icon": {
+          "very-small": 0,
+          "small": 0,
+          "medium": 0,
+          "large": 0
+        }
+      }
+    },
+    "g10": {
+      "mode": "APPROVED",
+      "status": "APPROVED",
+      "version": "g10-approved-1",
+      "configSha256": "5cbb059fff57304c36a4ae47d54012ebda2defc9db7154786e2944f7fedbbddf",
+      "thresholdsSha256": "fcce918a5341dc97350bbe3b85c9c21de95a04e32d85f23cf1a3f64b7dce78b1",
+      "evidenceSha256": "404e0b286a8efdd4a76c389e7e0b2babd07e39303417f62002d55a8b5c29b533",
+      "evidenceFormat": 2,
+      "counts": {
+        "VISIBLE": 1408,
+        "BORDERLINE": 0,
+        "INVISIBLE": 0
+      },
+      "nonVisibleFound": {
+        "BORDERLINE": 0,
+        "INVISIBLE": 0
+      },
+      "excludedForG10": true,
+      "note": null
+    }
+  },
+  "separation": "TRAIN and DEV share no id, seed, spec hash or frame",
+  "tensorCheck": {
+    "train": {
+      "samples": 600,
+      "targets": 5280,
+      "positiveCells": 168250,
+      "samplesWithTargetsButNoPositiveCell": 0,
+      "boxesOutsideLetterbox": 0,
+      "imageShape": [
+        3,
+        640,
+        640
+      ],
+      "ignoreMask": {
+        "ignoredEntries": 26953,
+        "ignoredByClass": {
+          "button": 2856,
+          "link": 4415,
+          "textbox": 6172,
+          "checkbox": 1995,
+          "radio": 2072,
+          "select": 4299,
+          "tab": 3061,
+          "icon": 2083
+        },
+        "positiveConflicts": 14,
+        "positiveConflictsByClass": {
+          "button": 0,
+          "link": 0,
+          "textbox": 0,
+          "checkbox": 0,
+          "radio": 3,
+          "select": 6,
+          "tab": 5,
+          "icon": 0
+        },
+        "ignoredOnCellsPositiveForAnotherClass": 156,
+        "samplesWithIgnoredEntries": 340,
+        "cases": {
+          "partial": 480,
+          "partialWithVisibleRegion": 480,
+          "partialOutsideLetterbox": 0,
+          "full": 480
+        }
+      }
+    },
+    "dev": {
+      "samples": 160,
+      "targets": 1408,
+      "positiveCells": 44308,
+      "samplesWithTargetsButNoPositiveCell": 0,
+      "boxesOutsideLetterbox": 0,
+      "imageShape": [
+        3,
+        640,
+        640
+      ],
+      "ignoreMask": {
+        "ignoredEntries": 6999,
+        "ignoredByClass": {
+          "button": 817,
+          "link": 1319,
+          "textbox": 1253,
+          "checkbox": 521,
+          "radio": 563,
+          "select": 1223,
+          "tab": 785,
+          "icon": 518
+        },
+        "positiveConflicts": 40,
+        "positiveConflictsByClass": {
+          "button": 0,
+          "link": 40,
+          "textbox": 0,
+          "checkbox": 0,
+          "radio": 0,
+          "select": 0,
+          "tab": 0,
+          "icon": 0
+        },
+        "ignoredOnCellsPositiveForAnotherClass": 24,
+        "samplesWithIgnoredEntries": 87,
+        "cases": {
+          "partial": 128,
+          "partialWithVisibleRegion": 128,
+          "partialOutsideLetterbox": 0,
+          "full": 128
+        }
+      }
+    }
+  },
+  "runConfiguration": {
+    "schemaVersion": "train-v2-run-config/2",
+    "status": "PROPOSED - PENDING OWNER APPROVAL (M22.12): the M22.10 final configuration, reconciled into the validated schema; not an approved configuration",
+    "approval": {
+      "approved": false,
+      "approvedBy": null,
+      "approvedOn": null
+    },
+    "plan": {
+      "stepsPerEpoch": 150,
+      "maxEpochs": 40,
+      "maxSteps": 6000,
+      "devBatchesPerEvaluation": 40,
+      "devEvaluations": 40,
+      "checkpoints": 40,
+      "earlyStoppingAction": "record-only",
+      "partialOcclusion": "ignore-mask",
+      "cpuThreads": 8,
+      "logicalCpus": 16
+    }
+  },
+  "outputDirectory": {
+    "path": "artifacts/models/t1-ui-head-v2-first-run-01",
+    "exists": false,
+    "created": false
+  },
+  "provenanceRecordPlan": {
+    "gitCommit": "31239eaafb1fe507f2c0d19303da5f3bf93e1636",
+    "gitTrackedChanges": false,
+    "dataset": {
+      "version": "t1-ui-synthetic@2.1.0-draft",
+      "candidate": 2,
+      "renderRevision": "r2-m22.6-visual-fixes"
+    },
+    "trainManifestSha256": "f283720fab3ef6086becf51ec47f383b8a20344f9abe1e102c6ec6172c2427f8",
+    "devManifestSha256": "f072507a47ce087ef79b236d769b7d860c27ef536534d9490116d0145034ede1",
+    "g10": {
+      "version": "g10-approved-1",
+      "configSha256": "5cbb059fff57304c36a4ae47d54012ebda2defc9db7154786e2944f7fedbbddf",
+      "thresholdsSha256": "fcce918a5341dc97350bbe3b85c9c21de95a04e32d85f23cf1a3f64b7dce78b1",
+      "evidenceSha256": "404e0b286a8efdd4a76c389e7e0b2babd07e39303417f62002d55a8b5c29b533",
+      "approval": {
+        "approved": true,
+        "approvedBy": "project owner",
+        "approvedOn": "2026-11-02",
+        "decision": "M22.9 owner authorisation: G10 thresholds approved for candidate 2"
+      }
+    },
+    "architecture": {
+      "model": "head.UiHead",
+      "width": [
+        16,
+        32,
+        64
+      ],
+      "inputSize": 640,
+      "stride": 8,
+      "classes": [
+        "button",
+        "link",
+        "textbox",
+        "checkbox",
+        "radio",
+        "select",
+        "tab",
+        "icon"
+      ],
+      "initialisation": "fresh UiHead() after torch.manual_seed(seed); no weights loaded"
+    },
+    "schemaVersion": "train-v2-run-config/2",
+    "hyperparameters": {
+      "batchSize": 4,
+      "optimizer": {
+        "name": "AdamW",
+        "learningRate": 0.003,
+        "weightDecay": 0.0001,
+        "parameterGroups": "single group, all parameters (v1)",
+        "gradientClipNorm": 10.0,
+        "nonFiniteGradient": "fail"
+      },
+      "schedule": {
+        "name": "cosine",
+        "tMaxSteps": 6000,
+        "etaMin": 0,
+        "stepEvery": "optimizer-step",
+        "warmup": "none"
+      },
+      "epochs": {
+        "max": 40
+      },
+      "steps": {
+        "perEpoch": 150,
+        "max": 6000
+      },
+      "determinism": {
+        "deterministicAlgorithms": "required",
+        "cpuThreads": 8
+      },
+      "devEvaluation": {
+        "everyEpochs": 1,
+        "batches": 40,
+        "lossAggregation": "dataset-sum"
+      },
+      "checkpoint": {
+        "everyEpochs": 1,
+        "retention": "all",
+        "best": "strict-min-dev-loss"
+      },
+      "earlyStopping": {
+        "monitor": "dev_loss",
+        "patience": 5,
+        "minDelta": 0.001,
+        "action": "record-only"
+      },
+      "loss": {
+        "function": "targets.detector_loss",
+        "boxWeight": 5.0,
+        "classification": "focal, alpha 0.25, gamma 2 (fixed in targets.py)",
+        "box": "1 - IoU over positive cells",
+        "partialOcclusion": "ignore-mask"
+      }
+    },
+    "seed": 20261102,
+    "runConfigSha256": "2cb331b505d958d74b55fe8df5b46c8f0c7b964f6dbf2c09366770e621ef3d8b",
+    "runConfigApproval": {
+      "approved": false,
+      "approvedBy": null,
+      "approvedOn": null
+    },
+    "environment": {
+      "python": "3.13.14",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "torch": "2.14.0+cpu",
+      "numpy": "2.5.1",
+      "pillow": "12.3.0"
+    },
+    "outputDirectory": "artifacts/models/t1-ui-head-v2-first-run-01",
+    "outputModelSha256": "written by a future, separately authorised training run",
+    "t1ArtifactSha256": "ba6d9e93695b22d17d9dc2b8193966132af85a6a031b08eb453d1d20a05179d0",
+    "label": "UNADOPTED"
+  },
+  "t1": {
+    "before": "ba6d9e93695b22d17d9dc2b8193966132af85a6a031b08eb453d1d20a05179d0",
+    "after": "ba6d9e93695b22d17d9dc2b8193966132af85a6a031b08eb453d1d20a05179d0",
+    "unchanged": true
+  }
+}
