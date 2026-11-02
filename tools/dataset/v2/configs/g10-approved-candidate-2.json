@@ -1,0 +1,30 @@
+{
+  "version": "g10-approved-1",
+  "status": "APPROVED",
+  "approval": {
+    "approved": true,
+    "approvedBy": "project owner",
+    "approvedOn": "2026-11-02",
+    "decision": "M22.9 owner authorisation: G10 thresholds approved for candidate 2"
+  },
+  "scope": {
+    "candidate": "artifacts/datasets/t1-ui-synthetic-2.1.0-draft-candidate-2",
+    "renderRevision": "r2-m22.6-visual-fixes",
+    "environment": "W1, Chromium 153.0.8010.12 headless via Playwright 1.63.0, DPR 1",
+    "limit": "These thresholds apply to candidate 2 in this rendering environment only; they are not to be generalised to other candidates, machines, fonts or browsers."
+  },
+  "binding": {
+    "manifestHashes": {
+      "train": "f283720fab3ef6086becf51ec47f383b8a20344f9abe1e102c6ec6172c2427f8",
+      "dev": "f072507a47ce087ef79b236d769b7d860c27ef536534d9490116d0145034ede1"
+    }
+  },
+  "rule": "INVISIBLE when salience < 1.25 or coverage@1.25 < 0.005; VISIBLE (visibly acceptable) only when salience >= 1.5 and coverage@1.25 >= 0.005; otherwise BORDERLINE. Missing metrics, mismatched hashes or incomplete coverage fail closed.",
+  "thresholds": {
+    "salienceInvisibleBelow": 1.25,
+    "salienceVisibleAtLeast": 1.5,
+    "coverageContrast": 1.25,
+    "coverageInvisibleBelow": 0.005,
+    "coverageVisibleAtLeast": 0.005
+  }
+}
