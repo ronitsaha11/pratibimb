@@ -35,6 +35,14 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.8 — the v2 adapter tests in canonical verification (no training, no inference, no TEST).**
+  - `npm run verify` now ends with `npm run test:py` (`scripts/verify-python.py`): Python >= 3.12 and
+    every pin in `tools/detector/requirements-test.txt` checked, then `pytest tools/detector/tests`.
+    It fails, never skips, on a missing dependency or an empty collection; strict pins in CI.
+  - CI: new `detector-adapter` job (Python 3.13, pinned CPU torch).
+  - 13 adapter regression tests (split isolation, trapped-filesystem TEST refusal, separation on every
+    identity, class order, bucket edges, DEV-side G10 binding, both-split tensor checks) and runner tests.
+  - G10 acceptance review and train_v2 design review prepared for the owner; nothing approved.
 - **M22.7 — an isolated v2 TRAIN/DEV training adapter and data dry run (no training, no inference,
   no TEST; candidates unmodified).**
   - `tools/detector/data_v2.py`: TRAIN and DEV only (others refused before file access); per-split
