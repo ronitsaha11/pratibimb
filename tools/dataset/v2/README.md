@@ -30,6 +30,9 @@ for audits.
 | `compare-builds.mjs` | Command line: compare two builds sample by sample (reproducibility) |
 | `audit-candidate.mjs` | Command line: independent read-only audit of one candidate (integrity, recount, distributions, pixel contrast, contact sheets outside the repo) — M22.5 |
 | `png.mjs` | Strict PNG decoder (every CRC, inflate, unfilter) and encoder, for the audit |
+| `visibility.mjs` | G10 (development name): per-element pixel-visibility metrics on decoded frames, and a classification that needs stated thresholds — no default (M22.6) |
+| `render-fixtures.mjs` | Command line: renders and measures a fixture matrix (every palette × style, glyph × plate, native control, decor and occluder style) in a real browser — not a dataset (M22.6) |
+| `configs/g10-provisional-UNAPPROVED.json` | Provisional G10 thresholds, calibrated on candidate 1, for diagnostic use only (M22.6) |
 | `configs/m22.4-train-dev.json` | The owner-approved TRAIN/DEV configuration of M22.4 |
 
 ## Rendering and candidate builds (M22.4)
@@ -145,6 +148,35 @@ browsers hit-test rounded corners (INFERENCE; UNKNOWN on this stack until render
 - round icon shapes are drawn inside a rectangular box.
 
 M22.2's `circle` and `rounded` icons broke this rule.
+
+## Visual fixes and the G10 pixel diagnostic (M22.6)
+
+**Why.** M22.5 found that candidate 1 passed G1–G9 while 374 positives were effectively invisible:
+- *page-on-page textboxes* in the `filled` and `flat` styles;
+- *icon plates erased* by the CSS `background:` shorthand.
+
+Hit-testing cannot see drawing.
+
+**What changed in render revision `r2-m22.6-visual-fixes`.** Seeds and boxes are unchanged.
+- **Textbox:** each control style's `textbox` treatment is either a page field with a full edge, or a tinted `field` with a bottom rule, never page-on-page. Palettes gain `field` and `fieldEdge`. The high-contrast `surface` is no longer the page colour.
+- **Icon:** the plate is `background-color`, and the glyph is `background-image` with `-position`, `-size` and `-repeat` longhands. The shorthand is never used on an icon.
+- **Decor:** dividers are dashed, and panels are borderless with a header band, so neither reads as a field.
+- **Labels:** the word and size are fitted to the box width. `__measureV2` reports each text element's overflow in px.
+- **Native controls:** checkboxes and radios are drawn at 13 px and scaled to the box, so the rect is unchanged.
+- **Occluders:** four looks (solid, banded, striped, card), with unchanged geometry.
+
+**G10.** `visibility.mjs` measures each positive on the decoded PNG:
+- salience (the k-th highest contrast to the surround);
+- coverage at five contrast levels;
+- fill, edge and ink;
+- class-specific readings.
+
+It classifies VISIBLE, BORDERLINE or INVISIBLE **only with stated thresholds**; there is no default. It is separate from G1–G9. Contrast is the WCAG 2.x ratio. It is not a conformance claim, and not a measure of recognisability.
+
+**Running it:**
+- `audit-candidate.mjs` reports G10 distributions always.
+- With `--g10=<file>` it also reports classifications, usable positives per cell and every invisible element.
+- Until the owner approves thresholds, G10 is diagnostic only. See `artifacts/experiments/M22.6-visual-remediation/decision.md`.
 
 ## Quotas: positives, plus occlusion cases on top
 
