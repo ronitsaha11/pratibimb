@@ -1,5 +1,11 @@
 {
   "status": "PROVISIONAL - NOT APPROVED BY THE OWNER",
+  "approval": {
+    "approved": false,
+    "approvedBy": null,
+    "approvedOn": null,
+    "note": "Only the project owner may set approved to true, with approvedBy and approvedOn. A file with approved: false is provisional; the training adapter reports its G10 results as diagnostic and claims no acceptance."
+  },
   "note": "Diagnostic use only (M22.6). Calibrated on candidate 1: its 374 confirmed-invisible positives measured salience <= 1.093 and coverage@1.25 = 0; all 6,314 others measured salience >= 1.913 and coverage@1.25 >= 0.013. Not an acceptance gate until the owner approves thresholds.",
   "thresholds": {
     "salienceInvisibleBelow": 1.25,

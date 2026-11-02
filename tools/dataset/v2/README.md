@@ -176,6 +176,7 @@ It classifies VISIBLE, BORDERLINE or INVISIBLE **only with stated thresholds**; 
 **Running it:**
 - `audit-candidate.mjs` reports G10 distributions always.
 - With `--g10=<file>` it also reports classifications, usable positives per cell and every invisible element.
+- With `--g10-out=<file outside the repo>` as well, it writes the per-positive classes for the training adapter (`tools/detector/data_v2.py`, M22.7), bound to the threshold file, the manifest hashes and a hash of the classified ids.
 - Until the owner approves thresholds, G10 is diagnostic only. See `artifacts/experiments/M22.6-visual-remediation/decision.md`.
 
 ## Quotas: positives, plus occlusion cases on top

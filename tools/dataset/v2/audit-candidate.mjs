@@ -51,6 +51,11 @@ const sheetsDir = arg("sheets") ? assertScratchRoot(ROOT, arg("sheets")) : null;
 const g10Config = arg("g10") ? JSON.parse(readFileSync(arg("g10"), "utf8")) : null;
 if (g10Config) assertThresholds(g10Config.thresholds);
 const elementsOut = arg("elements-out") ? assertScratchRoot(ROOT, arg("elements-out")) : null;
+// M22.7: the per-positive G10 classes, for the training adapter (`tools/detector/data_v2.py`).
+const g10ClassesOut = arg("g10-out") ? assertScratchRoot(ROOT, arg("g10-out")) : null;
+if (g10ClassesOut && !g10Config) refuse("--g10-out needs --g10=<thresholds file>: nothing is classified without stated thresholds");
+const g10Classified = { train: { ids: [], nonVisible: {} }, dev: { ids: [], nonVisible: {} } };
+const manifestHashes = {};
 
 /** The edge and ink contrast below which an element is flagged for review. Audit thresholds, not standards. */
 const LOW = 1.25;
@@ -171,6 +176,7 @@ for (const split of AUDITABLE_SPLITS) {
   walk(m);
   const rec = record.splits[split];
   const { hash, ...body } = m;
+  manifestHashes[split] = hash;
   const ids = m.samples.map((s) => s.id);
   const expected = Array.from({ length: rec.plannedSamples }, (_, i) => `${split}-${String(i).padStart(5, "0")}`);
   const framesDir = `frames-${split}`;
@@ -306,6 +312,8 @@ for (const split of AUDITABLE_SPLITS) {
             if (gcat === "VISIBLE" && valid) c.usablePositives += 1;
             if (gcat === "BORDERLINE") (c.borderlinePositives += 1, g10.borderline.push(row));
             if (gcat === "INVISIBLE") (c.invisiblePositives += 1, g10.invisible.push(row));
+            g10Classified[split].ids.push(a.id);
+            if (gcat !== "VISIBLE") g10Classified[split].nonVisible[a.id] = gcat;
           }
           if (elementsOut) elementRows.push([split, a.id, a.cls, bucket, ap.palette, ap.controlStyle, ea.glyph ?? null, ea.plate ?? null, gm.salience, ...COVERAGE_LEVELS.map((l) => gm.coverage[String(l)]), gm.fill, gm.edge, gm.ink]);
           if (sheetsDir) forSheets.push({ split, sample: s, a, px, combo, gcat, gm });
@@ -448,6 +456,25 @@ const g10Out = {
   byPaletteAndStyle: Object.fromEntries(Object.entries(g10.byPaletteAndStyle).sort().map(([k, v]) => [k, { n: v.length, salience: qs(v) }])),
   byGlyphAndPlate: Object.fromEntries(Object.entries(g10.byGlyphAndPlate).sort().map(([k, v]) => [k, { n: v.length, salience: qs(v) }])),
 };
+if (g10ClassesOut) {
+  // Compact: every positive's class is VISIBLE unless listed in `nonVisible`. `positiveIdsSha256`
+  // (SHA-256 of the split's classified positive ids, sorted, joined by "\n") lets a reader prove
+  // that every positive it loads was classified, and `manifestHashes` that it is the same build.
+  writeFileSync(g10ClassesOut, `${JSON.stringify({
+    what: "G10 class of every positive of one candidate (VISIBLE unless listed in nonVisible)",
+    g10Version: G10_VERSION,
+    candidate: `artifacts/datasets/${CANDIDATE_PREFIX}${n}`,
+    configStatus: g10Config.status ?? null,
+    approval: g10Config.approval ?? null,
+    thresholds: g10Config.thresholds,
+    manifestHashes,
+    splits: Object.fromEntries(Object.entries(g10Classified).map(([s, v]) => [s, {
+      positivesClassified: v.ids.length,
+      positiveIdsSha256: sha256([...v.ids].sort().join("\n")),
+      nonVisible: v.nonVisible,
+    }])),
+  }, null, 2)}\n`);
+}
 if (elementsOut) {
   const head = ["split", "id", "cls", "bucket", "palette", "controlStyle", "glyph", "plate", "salience", ...COVERAGE_LEVELS.map((l) => `coverage${l}`), "fill", "edge", "ink"];
   writeFileSync(elementsOut, `${JSON.stringify({ head, rows: elementRows })}\n`);
