@@ -303,6 +303,94 @@ def test_the_candidate_root_names_only_a_numbered_candidate(tmp_path):
             candidate_root(str(tmp_path), bad)
 
 
+# ── M22.8 regression additions ────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize("only, other", [("train", "dev"), ("dev", "train")])
+def test_each_split_loads_without_the_other_splits_files(cand, only, other):
+    import shutil
+
+    os.remove(os.path.join(cand, f"manifest-{other}.json"))
+    shutil.rmtree(os.path.join(cand, f"frames-{other}"))
+    loaded = load_split(cand, only, policy(cand))
+    assert loaded["split"] == only and all(s["split"] == only for s in loaded["samples"])
+
+
+@pytest.mark.parametrize("split", ["test", "holdout"])
+def test_a_refused_split_touches_no_file_at_all(cand, monkeypatch, split):
+    import builtins
+
+    g10 = policy(cand)  # built before the trap: the policy itself is not under test here
+
+    def trap(*a, **k):
+        raise AssertionError("the filesystem was touched for a refused split")
+
+    monkeypatch.setattr(builtins, "open", trap)
+    monkeypatch.setattr(os, "listdir", trap)
+    monkeypatch.setattr(os.path, "join", trap)
+    with pytest.raises(AdapterError, match="refused"):
+        load_split(cand, split, g10)
+
+
+@pytest.mark.parametrize("key", ["id", "seed", "specHash", "frameSha256"])
+def test_train_and_dev_sharing_any_identity_is_refused(cand, key):
+    g10 = policy(cand)
+    train = load_split(cand, "train", g10)
+    dev = copy.deepcopy(load_split(cand, "dev", g10))
+    if key == "id":
+        dev["samples"][0]["id"] = train["samples"][0]["id"]
+    else:
+        dev["samples"][0]["provenance"][key] = train["samples"][0]["provenance"][key]
+    with pytest.raises(AdapterError, match=f"share 1 {key}"):
+        check_separation(train, dev)
+    with pytest.raises(AdapterError, match="TRAIN split, then the DEV split"):
+        check_separation(dev, train)
+
+
+def test_the_class_mapping_is_the_trainers_eight_classes_in_order():
+    import data_v2
+    import targets
+
+    expected = ["button", "link", "textbox", "checkbox", "radio", "select", "tab", "icon"]
+    assert list(CLASSES) == expected  # head.CLASSES, which is also the v2 generator's order
+    assert data_v2.CLASS_INDEX == {c: i for i, c in enumerate(expected)} == targets.CLASS_INDEX
+
+
+def test_size_bucket_edges_match_the_m22_buckets():
+    from data_v2 import bucket_of
+
+    assert [bucket_of(v) for v in (0.0, 7.999, 8.0, 15.999, 16.0, 31.999, 32.0, 500.0)] == [
+        "very-small", "very-small", "small", "small", "medium", "medium", "large", "large",
+    ]
+    with pytest.raises(AdapterError):
+        bucket_of(-1.0)
+
+
+def test_g10_classes_bound_to_the_dev_manifest_too(cand):
+    edit(cand, "g10-classes.json", lambda c: c["manifestHashes"].update(dev="another"))
+    g10 = policy(cand)
+    load_split(cand, "train", g10)  # TRAIN's binding is intact
+    with pytest.raises(AdapterError, match="another dev manifest"):
+        load_split(cand, "dev", g10)
+
+
+def test_g10_classes_naming_an_unknown_category_or_id_are_refused(cand):
+    edit(cand, "g10-classes.json", lambda c: c["splits"]["train"].update(nonVisible={"train-00000-e000": "FAINT"}))
+    with pytest.raises(AdapterError, match="unknown categories or ids"):
+        load_split(cand, "train", policy(cand))
+
+
+def test_every_split_converts_to_tensors_with_targets_inside_the_letterbox(cand):
+    import dry_run_v2
+
+    g10 = policy(cand)
+    for split in ("train", "dev"):
+        out = dry_run_v2.tensor_check(cand, load_split(cand, split, g10))
+        assert out["imageShape"] == [3, 640, 640]
+        assert out["targets"] == 4 * out["samples"]  # positives only: two occlusion cases per sample excluded
+        assert out["boxesOutsideLetterbox"] == 0 and out["samplesWithTargetsButNoPositiveCell"] == 0
+
+
 def test_the_dry_run_has_no_split_argument_at_all():
     import dry_run_v2
 
