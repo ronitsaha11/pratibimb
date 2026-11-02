@@ -1,0 +1,10 @@
+# Python dependencies of the v2 data adapter tests (tools/detector/tests), M22.8.
+# Pinned to the exact versions the suite was run with on workstation 1 (Python 3.13.14).
+# torch is the CPU build, from PyTorch's CPU wheel index; nothing here needs a GPU.
+#   python -m pip install -r tools/detector/requirements-test.txt
+# `scripts/verify-python.py` (run by `npm run verify`) checks these pins before running the tests.
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy==2.5.1
+pillow==12.3.0
+pytest==9.1.1
+torch==2.14.0+cpu

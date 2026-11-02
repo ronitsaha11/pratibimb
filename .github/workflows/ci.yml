@@ -148,6 +148,34 @@ jobs:
         run: npm test
 
   # ───────────────────────────────────────────────────────────────────────────────────
+  # M22.8 — the v2 detector data adapter's Python tests (tools/detector/tests), the same
+  # suite `npm run verify` runs locally via `npm run test:py`. They run on small synthetic
+  # candidates written to a temp directory: no dataset folder, no model, no training, no
+  # TEST. Dependencies are the exact pins of tools/detector/requirements-test.txt (CPU
+  # torch), and PRATIBIMB_STRICT_PY_PINS makes any version drift a failure here. The
+  # runner fails, never skips, if a dependency is missing or no test is collected.
+  # ───────────────────────────────────────────────────────────────────────────────────
+  detector-adapter:
+    name: Detector data adapter - Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: tools/detector/requirements-test.txt
+
+      - name: Install pinned test dependencies (CPU torch)
+        run: python -m pip install --quiet -r tools/detector/requirements-test.txt
+
+      - name: Adapter tests (strict pins; fail, never skip)
+        env:
+          PRATIBIMB_STRICT_PY_PINS: '1'
+        run: python scripts/verify-python.py
+
+  # ───────────────────────────────────────────────────────────────────────────────────
   # QG-02 — the coordinate contract, in real browsers.
   #
   # The gate requires a fixture rendered at DPR 1.0/1.5/2.0 and 100%/125% zoom, asserting

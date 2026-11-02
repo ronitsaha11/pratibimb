@@ -14,8 +14,9 @@
     "reasoner:check": "node scripts/reasoner/reasoner.mjs --check",
     "reasoner:stop": "node scripts/reasoner/reasoner.mjs --stop",
     "test": "vitest run",
+    "test:py": "python scripts/verify-python.py",
     "typecheck": "tsc -b --force && tsc -p apps/extension/tsconfig.json",
-    "verify": "python scripts/verify-repo.py && npm run pin:check && npm run typecheck && npm test"
+    "verify": "python scripts/verify-repo.py && npm run pin:check && npm run typecheck && npm test && npm run test:py"
   },
   "devDependencies": {
     "playwright": "1.63.0",
