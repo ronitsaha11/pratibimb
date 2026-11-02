@@ -1,0 +1,55 @@
+{
+  "status": "PROPOSED - PENDING OWNER REVIEW (M22.9); not an approved hyper-parameter set",
+  "approval": {
+    "approved": false,
+    "approvedBy": null,
+    "approvedOn": null
+  },
+  "rationale": "artifacts/experiments/M22.9-training-pipeline/training-config-proposal.md",
+  "architecture": {
+    "model": "head.UiHead",
+    "width": [16, 32, 64],
+    "inputSize": 640,
+    "stride": 8,
+    "classes": ["button", "link", "textbox", "checkbox", "radio", "select", "tab", "icon"],
+    "note": "unchanged from the shipped T1 head, so a first result isolates the effect of the data"
+  },
+  "data": {
+    "candidate": 2,
+    "train": "train",
+    "validation": "dev",
+    "positives": "approved-G10 VISIBLE positives only; occlusion cases excluded",
+    "augmentation": "none, as v1"
+  },
+  "batchSize": 4,
+  "optimizer": {
+    "name": "AdamW",
+    "learningRate": 0.003,
+    "weightDecay": 0.0001,
+    "gradientClipNorm": 10.0,
+    "source": "v1 train.py values, carried over unchanged"
+  },
+  "schedule": {
+    "name": "cosine",
+    "over": "maxSteps"
+  },
+  "epochs": {
+    "max": 40
+  },
+  "seed": 20261102,
+  "checkpoint": {
+    "everyEpochs": 5,
+    "keepBestByDevLoss": true
+  },
+  "earlyStopping": {
+    "monitor": "dev_loss",
+    "patience": 5,
+    "minDelta": 0.001
+  },
+  "loss": {
+    "function": "targets.detector_loss",
+    "boxWeight": 5.0,
+    "classification": "focal, alpha 0.25, gamma 2 (fixed in targets.py)",
+    "box": "1 - IoU over positive cells"
+  }
+}
