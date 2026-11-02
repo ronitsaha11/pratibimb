@@ -1,0 +1,11 @@
+{
+  "status": "PROVISIONAL - NOT APPROVED BY THE OWNER",
+  "note": "Diagnostic use only (M22.6). Calibrated on candidate 1: its 374 confirmed-invisible positives measured salience <= 1.093 and coverage@1.25 = 0; all 6,314 others measured salience >= 1.913 and coverage@1.25 >= 0.013. Not an acceptance gate until the owner approves thresholds.",
+  "thresholds": {
+    "salienceInvisibleBelow": 1.25,
+    "salienceVisibleAtLeast": 1.5,
+    "coverageContrast": 1.25,
+    "coverageInvisibleBelow": 0.005,
+    "coverageVisibleAtLeast": 0.01
+  }
+}

@@ -19,6 +19,13 @@
  *
  * `--sheets` writes contact sheets (crops of real frames) for the visual review, outside the repo.
  * Prints one JSON record; no path, no page text.
+ *
+ * M22.6 adds the G10 pixel-visibility diagnostic (`visibility.mjs`) for every positive: metric
+ * distributions always; a classification (VISIBLE / BORDERLINE / INVISIBLE) and usable-positive counts
+ * per cell ONLY with `--g10=<file>`, whose thresholds are stated in that file — there is no default,
+ * and unapproved thresholds are reported as provisional. `--elements-out=<file outside the repo>`
+ * writes one row of metrics per positive, for threshold calibration. Measured text overflow (a
+ * candidate-2 field) is tallied where present.
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -28,6 +35,7 @@ import { canonicalJson, sha256 } from "./prng.mjs";
 import { AUDITABLE_SPLITS, openAuditManifest } from "./splits.mjs";
 import { CANDIDATE_PREFIX, assertScratchRoot, candidateRoot } from "./render.mjs";
 import { decodePng, encodePng } from "./png.mjs";
+import { COVERAGE_LEVELS, G10_VERSION, assertThresholds, classifyVisibility, elementPixelMetrics, readings } from "./visibility.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const arg = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.slice(n.length + 3);
@@ -40,6 +48,9 @@ if (!Number.isInteger(n) || n < 1) refuse("--candidate=<n> is required");
 const dir = candidateRoot(ROOT, n);
 if (!existsSync(dir)) refuse(`candidate ${n} does not exist`);
 const sheetsDir = arg("sheets") ? assertScratchRoot(ROOT, arg("sheets")) : null;
+const g10Config = arg("g10") ? JSON.parse(readFileSync(arg("g10"), "utf8")) : null;
+if (g10Config) assertThresholds(g10Config.thresholds);
+const elementsOut = arg("elements-out") ? assertScratchRoot(ROOT, arg("elements-out")) : null;
 
 /** The edge and ink contrast below which an element is flagged for review. Audit thresholds, not standards. */
 const LOW = 1.25;
@@ -137,6 +148,23 @@ const walk = (v) => (typeof v === "string" ? strings.push(v) : v && typeof v ===
 walk(record);
 walk(status);
 const forSheets = [];
+const g10 = {
+  version: G10_VERSION,
+  mode: g10Config ? `CLASSIFICATION AT ${g10Config.status ?? "UNLABELLED"} THRESHOLDS` : "METRICS ONLY: no thresholds given, nothing classified",
+  thresholds: g10Config?.thresholds ?? null,
+  referenceLevel: "salience < 1.1 is the level of candidate 1's confirmed invisible elements (1.00–1.09); counted for reference, not a threshold",
+  byClass: {},
+  byPaletteAndStyle: {},
+  byGlyphAndPlate: {},
+  readingsByClass: {},
+  belowReferenceByClass: {},
+  categories: {},
+  invisible: [],
+  borderline: [],
+};
+const elementRows = [];
+const textOverflow = { annotationsWithText: 0, overflowing: 0, maxPx: 0, overflowingByClassAndBucket: {} };
+const push = (o, k, v) => (o[k] ??= []).push(v);
 
 for (const split of AUDITABLE_SPLITS) {
   const m = openAuditManifest(dir, split);
@@ -167,7 +195,7 @@ for (const split of AUDITABLE_SPLITS) {
     manifestHashStored: hash,
     manifestHashInRecord: rec.hashes.manifestSha256,
   };
-  const cells = Object.fromEntries(CLASSES.map((c) => [c, Object.fromEntries(BUCKET_IDS.map((b) => [b, { validPositives: 0, flaggedPositive: 0, partialPlanned: 0, partialObserved: 0, fullPlanned: 0, fullObserved: 0 }]))]));
+  const cells = Object.fromEntries(CLASSES.map((c) => [c, Object.fromEntries(BUCKET_IDS.map((b) => [b, { validPositives: 0, flaggedPositive: 0, partialPlanned: 0, partialObserved: 0, fullPlanned: 0, fullObserved: 0, ...(g10Config ? { usablePositives: 0, borderlinePositives: 0, invisiblePositives: 0 } : {}) }]))]));
   let bucketDisagreements = 0;
   let validityOther = 0;
   const d = { samplesByViewport: {}, positivesByViewport: {}, samplesByPalette: {}, samplesByFont: {}, samplesByControlStyle: {}, samplesByDensity: {}, samplesByPaletteAndStyle: {}, iconsByGlyph: {}, iconsByPlate: {}, aspectByClass: {}, cssShorterByClass: {}, modelShorterByBucket: {}, targetsPerSample: [] };
@@ -207,6 +235,14 @@ for (const split of AUDITABLE_SPLITS) {
       const shorterModel = Math.min(a.box.w, a.box.h) * scale;
       if (bucketOfModel(shorterModel) !== bucket) bucketDisagreements += 1;
       const inside = a.box.x >= 0 && a.box.y >= 0 && a.box.x + a.box.w <= s.viewportCss.w && a.box.y + a.box.h <= s.viewportCss.h;
+      if ("textOverflowPx" in a && a.textOverflowPx !== null) {
+        textOverflow.annotationsWithText += 1;
+        if (a.textOverflowPx > 0) {
+          textOverflow.overflowing += 1;
+          textOverflow.maxPx = Math.max(textOverflow.maxPx, a.textOverflowPx);
+          inc(textOverflow.overflowingByClassAndBucket, `${a.cls}/${bucket}`);
+        }
+      }
       const dd = a.source.declared;
       const delta = Math.max(Math.abs(a.box.x - dd.x), Math.abs(a.box.y - dd.y), Math.abs(a.box.x + a.box.w - (dd.x + dd.w)), Math.abs(a.box.y + a.box.h - (dd.y + dd.h)));
       if (a.intent === "positive") {
@@ -249,7 +285,30 @@ for (const split of AUDITABLE_SPLITS) {
             inc(measured.flaggedByClass, `${a.cls} / ${ap.controlStyle}`);
             if (measured.examples.length < 40) measured.examples.push({ id: a.id, cls: a.cls, bucket, palette: ap.palette, controlStyle: ap.controlStyle, edge: r3(px.edge), ink: r3(px.ink) });
           }
-          if (sheetsDir) forSheets.push({ split, sample: s, a, px, combo });
+          // G10 (M22.6).
+          const gm = elementPixelMetrics(img, a.box);
+          const ea = a.source.appearance;
+          const gc = (g10.byClass[a.cls] ??= { salience: [], coverage125: [], fill: [], edge: [], ink: [] });
+          gc.salience.push(gm.salience);
+          gc.coverage125.push(gm.coverage["1.25"]);
+          gc.fill.push(gm.fill);
+          gc.edge.push(gm.edge);
+          gc.ink.push(gm.ink);
+          push(g10.byPaletteAndStyle, combo, gm.salience);
+          if (a.cls === "icon") push(g10.byGlyphAndPlate, `${ea.glyph} / ${ea.plate}`, gm.salience);
+          for (const [k, v] of Object.entries(readings(a.cls, gm, ea))) push((g10.readingsByClass[a.cls] ??= {}), k, v);
+          if (gm.salience < 1.1) inc(g10.belowReferenceByClass, a.cls);
+          let gcat = null;
+          if (g10Config) {
+            gcat = classifyVisibility("positive", gm, g10Config.thresholds);
+            inc(g10.categories, gcat);
+            const row = { id: a.id, cls: a.cls, bucket, palette: ap.palette, controlStyle: ap.controlStyle, ...(a.cls === "icon" ? { glyph: ea.glyph, plate: ea.plate } : {}), salience: gm.salience, coverage: gm.coverage[String(g10Config.thresholds.coverageContrast)] };
+            if (gcat === "VISIBLE" && valid) c.usablePositives += 1;
+            if (gcat === "BORDERLINE") (c.borderlinePositives += 1, g10.borderline.push(row));
+            if (gcat === "INVISIBLE") (c.invisiblePositives += 1, g10.invisible.push(row));
+          }
+          if (elementsOut) elementRows.push([split, a.id, a.cls, bucket, ap.palette, ap.controlStyle, ea.glyph ?? null, ea.plate ?? null, gm.salience, ...COVERAGE_LEVELS.map((l) => gm.coverage[String(l)]), gm.fill, gm.edge, gm.ink]);
+          if (sheetsDir) forSheets.push({ split, sample: s, a, px, combo, gcat, gm });
         }
       } else {
         const kind = a.intent === "occlusion-full" ? "full" : "partial";
@@ -285,6 +344,13 @@ for (const split of AUDITABLE_SPLITS) {
     occlusionFull: { planned: sum("fullPlanned"), observed: sum("fullObserved") },
     renderedBucketDisagreesWithDeclared: bucketDisagreements,
     cellsDisagreeingWithBuildRecord: recordDisagreements,
+    ...(g10Config
+      ? {
+          g10UsablePositives: { total: sum("usablePositives"), min: Math.min(...cellRows.map((r) => r.usablePositives)), max: Math.max(...cellRows.map((r) => r.usablePositives)) },
+          g10Borderline: sum("borderlinePositives"),
+          g10Invisible: sum("invisiblePositives"),
+        }
+      : {}),
     byCell: cellRows,
   };
   distribution[split] = d;
@@ -363,6 +429,28 @@ if (sheetsDir) {
   if (lowEdge.length) sheet("flagged-low-edge-only", Array.from({ length: Math.ceil(lowEdge.length / 12) }, (_, i) => lowEdge.slice(i * 12, i * 12 + 12)));
   const occ = forSheets.filter((e) => !e.px);
   sheet("occlusion-cases", [occ.filter((e) => e.a.intent === "occlusion-partial").slice(0, 12), occ.filter((e) => e.a.intent === "occlusion-full").slice(0, 12)]);
+  // M22.6: every glyph on every plate (rows: plates; columns: glyphs), and the G10 classes.
+  sheet("icon-glyph-by-plate", ICON_PLATES.map((plate) => ICON_GLYPHS.map((glyph) => positives.find((e) => e.a.cls === "icon" && e.a.source.appearance.glyph === glyph && e.a.source.appearance.plate === plate)).filter(Boolean)));
+  const lowestSalience = [...positives].sort((x, y) => x.gm.salience - y.gm.salience).slice(0, 48);
+  sheet("g10-lowest-salience", Array.from({ length: 4 }, (_, i) => lowestSalience.slice(i * 12, i * 12 + 12)).filter((r) => r.length));
+  for (const cat of ["INVISIBLE", "BORDERLINE"]) {
+    const list = positives.filter((e) => e.gcat === cat).slice(0, 60);
+    if (list.length) sheet(`g10-${cat.toLowerCase()}`, Array.from({ length: Math.ceil(list.length / 12) }, (_, i) => list.slice(i * 12, i * 12 + 12)));
+  }
+}
+
+// G10 distributions (M22.6), and the per-element rows for calibration.
+const qs = (list) => q(list, [0, 0.01, 0.05, 0.25, 0.5]);
+const g10Out = {
+  ...g10,
+  byClass: Object.fromEntries(Object.entries(g10.byClass).map(([k, v]) => [k, { n: v.salience.length, salience: qs(v.salience), coverage125: qs(v.coverage125), fill: qs(v.fill), edge: qs(v.edge), ink: qs(v.ink) }])),
+  readingsByClass: Object.fromEntries(Object.entries(g10.readingsByClass).map(([k, v]) => [k, Object.fromEntries(Object.entries(v).map(([r, list]) => [r, qs(list)]))])),
+  byPaletteAndStyle: Object.fromEntries(Object.entries(g10.byPaletteAndStyle).sort().map(([k, v]) => [k, { n: v.length, salience: qs(v) }])),
+  byGlyphAndPlate: Object.fromEntries(Object.entries(g10.byGlyphAndPlate).sort().map(([k, v]) => [k, { n: v.length, salience: qs(v) }])),
+};
+if (elementsOut) {
+  const head = ["split", "id", "cls", "bucket", "palette", "controlStyle", "glyph", "plate", "salience", ...COVERAGE_LEVELS.map((l) => `coverage${l}`), "fill", "edge", "ink"];
+  writeFileSync(elementsOut, `${JSON.stringify({ head, rows: elementRows })}\n`);
 }
 
 // Representative full frames: a greedy cover of viewport, palette, font, style and icon glyph.
@@ -378,14 +466,21 @@ while (want.size) {
 }
 
 console.log(JSON.stringify({
-  audit: "M22.5 — independent read-only audit of a v2 TRAIN/DEV candidate (no detector, no training, no TEST)",
+  audit: "M22.5 / M22.6 — independent read-only audit of a v2 TRAIN/DEV candidate (no detector, no training, no TEST)",
   candidate: `artifacts/datasets/${CANDIDATE_PREFIX}${n}`,
   buildStatus: status.status,
+  renderRevision: record.renderRevision ?? "r1 (built before M22.6; not recorded)",
   integrity,
   privacy: { stringsScanned: strings.length, suspicious },
   reconciliation,
   distribution,
   appearanceCoverage: coverage,
-  contrast: { formula: "WCAG 2.x contrast ratio (relative luminance); a measurement, not a conformance claim", declaredCssPairs: cssContrast(), measuredOnPixels: measured },
+  contrast: {
+    formula: "WCAG 2.x contrast ratio (relative luminance); a measurement, not a conformance claim",
+    declaredCssPairs: { of: `the CURRENT generator palettes (${V2.renderRevision}), which may differ from the ones this candidate was built with`, pairs: cssContrast() },
+    measuredOnPixels: measured,
+  },
+  g10: g10Out,
+  textOverflow: textOverflow.annotationsWithText ? textOverflow : { note: "not measured in this candidate (the renderer recorded text overflow from M22.6 on)" },
   visualReview: { representativeFrames: cover, sheets: sheets.map(({ name, rows, cols }) => ({ name, rows, cols })) },
 }, null, 2));
