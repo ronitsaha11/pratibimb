@@ -16,14 +16,19 @@ touching a file.
 
 PRE-FLIGHT, in order (any failure stops it):
   1. the shipped T1 artifact's SHA-256 equals the value ADR-0003 records;
-  2. the run configuration is complete, consistent with the model head, and free of any TEST reference;
-     its approval status is reported (a proposal is pending until the owner approves it);
+  2. the run configuration is schema 2 (M22.12), complete, internally consistent (exact step count,
+     schedule ending at the last step, every checkpoint with a DEV loss), consistent with the model
+     head, and free of any TEST reference; its approval status is reported (a proposal is pending
+     until the owner approves it);
   3. the G10 configuration is APPROVED, and its evidence is format 2, bound to it and to the
      candidate's manifests (`data_v2.G10Policy`);
   4. TRAIN and DEV load as an ACCEPTED dataset (`data_v2.load_accepted_split`): frames verified,
      positives only, occlusion cases and non-visible positives excluded, separation checked, every
      class x size cell at its minimum;
-  5. every adapted sample goes through the unchanged v1 input path (`dry_run_v2.tensor_check`);
+  5. the configured steps per epoch and DEV batches equal the accepted TRAIN and DEV sizes over the
+     batch size, with no partial batch, and the configured CPU threads exist on this machine;
+     every adapted sample goes through the unchanged v1 input path (`dry_run_v2.tensor_check`), and,
+     with `loss.partialOcclusion` "ignore-mask", its partial-occlusion ignore mask is built and totalled;
   6. the output directory is a NEW `artifacts/models/t1-ui-head-v2-<run id>`, outside every protected
      model directory after resolving links and case, and not existing yet. It is NOT created;
   7. the provenance record a future run would write is assembled;
@@ -57,9 +62,22 @@ PROTECTED_MODEL_DIRS = (T1_MODEL_DIR,)
 OUTPUT_PREFIX = "t1-ui-head-v2-"
 RUN_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{2,47}$")
 
-RUN_CONFIG_KEYS = ("status", "approval", "architecture", "data", "batchSize", "optimizer", "schedule", "epochs", "seed", "checkpoint", "earlyStopping", "loss")
+# Schema 2 (M22.12) makes every first-run decision explicit and checkable. Schema-1 files (M22.9) are
+# refused, not upgraded: a configuration is never completed with defaults.
+RUN_CONFIG_SCHEMA = "train-v2-run-config/2"
+RUN_CONFIG_KEYS = ("schemaVersion", "status", "approval", "architecture", "data", "batchSize", "optimizer", "schedule", "epochs", "steps", "seed", "determinism", "devEvaluation", "checkpoint", "earlyStopping", "loss")
 OPTIMIZERS = ("AdamW", "SGD")
 EARLY_STOPPING_MONITORS = ("dev_loss",)
+EARLY_STOPPING_ACTIONS = ("record-only", "stop")
+SCHEDULES = ("cosine",)
+WARMUPS = ("none",)
+SCHEDULE_STEPPING = ("optimizer-step",)
+DEV_LOSS_AGGREGATIONS = ("dataset-sum",)  # sum of numerators / sum of positive cells over all of DEV
+CHECKPOINT_RETENTIONS = ("all",)
+BEST_CHECKPOINT_RULES = ("strict-min-dev-loss",)  # ties keep the earlier epoch
+DETERMINISM = ("required",)  # torch.use_deterministic_algorithms(True), never warn_only
+NON_FINITE_GRADIENT = ("fail",)
+PARTIAL_OCCLUSION = ("ignore-mask", "background")
 
 
 class SafetyError(Exception):
@@ -143,9 +161,13 @@ def validate_run_config(cfg):
     """A complete, consistent configuration, free of TEST. Returns it. Never fills in a default."""
     from head import CLASSES, INPUT_SIZE, STRIDE
 
+    if not isinstance(cfg, dict) or cfg.get("schemaVersion") != RUN_CONFIG_SCHEMA:
+        raise SafetyError(f"run configuration schemaVersion must be {RUN_CONFIG_SCHEMA!r}: an older schema is refused, not upgraded")
     missing = [k for k in RUN_CONFIG_KEYS if k not in cfg]
     if missing:
         raise SafetyError(f"run configuration lacks {missing}: nothing is defaulted")
+    if not all(isinstance(cfg[k], dict) for k in ("architecture", "data", "optimizer", "schedule", "epochs", "steps", "determinism", "devEvaluation", "checkpoint", "earlyStopping", "loss")):
+        raise SafetyError("run configuration sections must be objects")
     if _mentions_test(cfg):
         raise SafetyError("run configuration mentions TEST: TRAIN trains, DEV validates, and nothing else exists here")
     a = cfg["approval"]
@@ -164,17 +186,80 @@ def validate_run_config(cfg):
     o = cfg["optimizer"]
     if o.get("name") not in OPTIMIZERS or not pos_num(o.get("learningRate")) or not (isinstance(o.get("weightDecay"), (int, float)) and o["weightDecay"] >= 0):
         raise SafetyError(f"optimizer must name one of {OPTIMIZERS} with a positive learningRate and a weightDecay >= 0")
-    if not pos_int(cfg["batchSize"]) or not pos_int(cfg["epochs"].get("max")) or not isinstance(cfg["seed"], int):
+    if not pos_num(o.get("gradientClipNorm")):
+        raise SafetyError("optimizer.gradientClipNorm must be a positive number")
+    if o.get("nonFiniteGradient") not in NON_FINITE_GRADIENT:
+        raise SafetyError(f"optimizer.nonFiniteGradient must be one of {NON_FINITE_GRADIENT}")
+    if not pos_int(cfg["batchSize"]) or not pos_int(cfg["epochs"].get("max")) or not isinstance(cfg["seed"], int) or isinstance(cfg["seed"], bool):
         raise SafetyError("batchSize and epochs.max must be positive integers, and seed an integer")
-    if not pos_int(cfg["checkpoint"].get("everyEpochs")):
-        raise SafetyError("checkpoint.everyEpochs must be a positive integer")
+    epochs = cfg["epochs"]["max"]
+    steps = cfg["steps"]
+    if not pos_int(steps.get("perEpoch")) or not pos_int(steps.get("max")):
+        raise SafetyError("steps.perEpoch and steps.max must be positive integers")
+    if steps["max"] != steps["perEpoch"] * epochs:
+        raise SafetyError(f"steps.max ({steps['max']}) must equal steps.perEpoch x epochs.max ({steps['perEpoch'] * epochs}): the step count is exact")
+    sch = cfg["schedule"]
+    if sch.get("name") not in SCHEDULES or sch.get("warmup") not in WARMUPS or sch.get("stepEvery") not in SCHEDULE_STEPPING:
+        raise SafetyError(f"schedule must be one of {SCHEDULES}, warmup one of {WARMUPS}, stepped every {SCHEDULE_STEPPING}")
+    if sch.get("tMaxSteps") != steps["max"] or not pos_int(sch.get("tMaxSteps")):
+        raise SafetyError("schedule.tMaxSteps must equal steps.max: the schedule completes exactly at the last step")
+    if not (isinstance(sch.get("etaMin"), (int, float)) and not isinstance(sch.get("etaMin"), bool) and 0 <= sch["etaMin"] < o["learningRate"]):
+        raise SafetyError("schedule.etaMin must be a number >= 0 and below the learning rate")
+    det = cfg["determinism"]
+    if det.get("deterministicAlgorithms") not in DETERMINISM or not pos_int(det.get("cpuThreads")):
+        raise SafetyError(f"determinism.deterministicAlgorithms must be one of {DETERMINISM} and cpuThreads a positive integer")
+    dev = cfg["devEvaluation"]
+    if not pos_int(dev.get("everyEpochs")) or dev["everyEpochs"] > epochs or not pos_int(dev.get("batches")) or dev.get("lossAggregation") not in DEV_LOSS_AGGREGATIONS:
+        raise SafetyError(f"devEvaluation needs everyEpochs (1..epochs.max), a positive batches count and lossAggregation one of {DEV_LOSS_AGGREGATIONS}")
+    ck = cfg["checkpoint"]
+    if not pos_int(ck.get("everyEpochs")) or ck["everyEpochs"] > epochs:
+        raise SafetyError("checkpoint.everyEpochs must be a positive integer, at most epochs.max")
+    if ck.get("retention") not in CHECKPOINT_RETENTIONS or ck.get("best") not in BEST_CHECKPOINT_RULES:
+        raise SafetyError(f"checkpoint.retention must be one of {CHECKPOINT_RETENTIONS} and checkpoint.best one of {BEST_CHECKPOINT_RULES}")
+    if ck["everyEpochs"] % dev["everyEpochs"]:
+        raise SafetyError("checkpoint.everyEpochs must be a multiple of devEvaluation.everyEpochs: every checkpoint needs its DEV loss")
     es = cfg["earlyStopping"]
-    if es.get("monitor") not in EARLY_STOPPING_MONITORS or not pos_int(es.get("patience")) or not (isinstance(es.get("minDelta"), (int, float)) and es["minDelta"] >= 0):
+    if es.get("monitor") not in EARLY_STOPPING_MONITORS or not pos_int(es.get("patience")) or not (isinstance(es.get("minDelta"), (int, float)) and not isinstance(es.get("minDelta"), bool) and es["minDelta"] >= 0):
         raise SafetyError(f"earlyStopping must monitor one of {EARLY_STOPPING_MONITORS} with a positive patience and minDelta >= 0")
+    if es.get("action") not in EARLY_STOPPING_ACTIONS:
+        raise SafetyError(f"earlyStopping.action must be one of {EARLY_STOPPING_ACTIONS}")
     loss = cfg["loss"]
     if loss.get("function") != "targets.detector_loss" or not pos_num(loss.get("boxWeight")):
         raise SafetyError("loss must be targets.detector_loss with a positive boxWeight")
+    if loss.get("partialOcclusion") not in PARTIAL_OCCLUSION:
+        raise SafetyError(f"loss.partialOcclusion must be one of {PARTIAL_OCCLUSION}")
     return cfg
+
+
+def check_plan_against_data(cfg, n_train, n_dev, cpu_count=None):
+    """
+    The configuration's exact counts against the accepted data and this machine. No partial batch is
+    ever planned: TRAIN and DEV must divide exactly by the batch size, and the configured steps per
+    epoch and DEV batches must be those quotients. The CPU thread count must exist on this machine.
+    """
+    b = cfg["batchSize"]
+    if n_train % b or n_dev % b:
+        raise SafetyError(f"TRAIN ({n_train}) and DEV ({n_dev}) must divide exactly by batchSize {b}: no partial batch is planned")
+    if cfg["steps"]["perEpoch"] != n_train // b:
+        raise SafetyError(f"steps.perEpoch is {cfg['steps']['perEpoch']}, but {n_train} TRAIN samples / batch {b} = {n_train // b}")
+    if cfg["devEvaluation"]["batches"] != n_dev // b:
+        raise SafetyError(f"devEvaluation.batches is {cfg['devEvaluation']['batches']}, but {n_dev} DEV samples / batch {b} = {n_dev // b}")
+    cpus = os.cpu_count() if cpu_count is None else cpu_count
+    if not cpus or cfg["determinism"]["cpuThreads"] > cpus:
+        raise SafetyError(f"determinism.cpuThreads {cfg['determinism']['cpuThreads']} exceeds this machine's {cpus} logical CPUs")
+    epochs = cfg["epochs"]["max"]
+    return {
+        "stepsPerEpoch": cfg["steps"]["perEpoch"],
+        "maxEpochs": epochs,
+        "maxSteps": cfg["steps"]["max"],
+        "devBatchesPerEvaluation": cfg["devEvaluation"]["batches"],
+        "devEvaluations": epochs // cfg["devEvaluation"]["everyEpochs"],
+        "checkpoints": epochs // cfg["checkpoint"]["everyEpochs"],
+        "earlyStoppingAction": cfg["earlyStopping"]["action"],
+        "partialOcclusion": cfg["loss"]["partialOcclusion"],
+        "cpuThreads": cfg["determinism"]["cpuThreads"],
+        "logicalCpus": cpus,
+    }
 
 
 # ── data: TRAIN and DEV through separate, explicit interfaces ─────────────────────────────────
@@ -218,7 +303,8 @@ def provenance_plan(repo_root, candidate_n, train, dev, g10, run_cfg, out, t1_sh
         "devManifestSha256": dev["hash"],
         "g10": {"version": g10.version, "configSha256": g10.config_sha256, "thresholdsSha256": g10.thresholds_sha256, "evidenceSha256": g10.evidence_sha256, "approval": g10.approval},
         "architecture": run_cfg["architecture"],
-        "hyperparameters": {k: run_cfg[k] for k in ("batchSize", "optimizer", "schedule", "epochs", "checkpoint", "earlyStopping", "loss")},
+        "schemaVersion": run_cfg["schemaVersion"],
+        "hyperparameters": {k: run_cfg[k] for k in ("batchSize", "optimizer", "schedule", "epochs", "steps", "determinism", "devEvaluation", "checkpoint", "earlyStopping", "loss")},
         "seed": run_cfg["seed"],
         "runConfigSha256": canonical_sha256(run_cfg),
         "runConfigApproval": run_cfg["approval"],
@@ -251,9 +337,15 @@ def preflight(repo_root, candidate_n, g10_config, g10_evidence, build_config, ru
     accepted = acceptance(train, dev, g10, minimum)
     if not accepted["claimed"]:
         raise AdapterError(f"the candidate is not acceptable for training: {accepted['reason']} {accepted.get('short', '')}")
+    plan = check_plan_against_data(run_cfg, len(train["samples"]), len(dev["samples"]))
     import dry_run_v2
+    from occlusion_mask_v2 import MaskError
 
-    tensors = {"train": dry_run_v2.tensor_check(root, train), "dev": dry_run_v2.tensor_check(root, dev)}
+    ignore = run_cfg["loss"]["partialOcclusion"] == "ignore-mask"
+    try:
+        tensors = {"train": dry_run_v2.tensor_check(root, train, ignore), "dev": dry_run_v2.tensor_check(root, dev, ignore)}
+    except MaskError as e:
+        raise AdapterError(f"the partial-occlusion ignore mask cannot be built: {e}") from e
     for split, t in tensors.items():
         if t["boxesOutsideLetterbox"] or t["samplesWithTargetsButNoPositiveCell"]:
             raise AdapterError(f"{split}: the v1 input path rejected targets: {t}")
@@ -262,7 +354,6 @@ def preflight(repo_root, candidate_n, g10_config, g10_evidence, build_config, ru
     t1_after = check_t1(repo_root, t1_expected)
     if t1_after != t1_before:
         raise SafetyError("the T1 artifact changed during pre-flight")
-    steps_per_epoch = -(-len(train["samples"]) // run_cfg["batchSize"])
     return {
         "mode": PREFLIGHT_ONLY,
         "candidate": f"artifacts/datasets/{os.path.basename(root)}",
@@ -272,7 +363,7 @@ def preflight(repo_root, candidate_n, g10_config, g10_evidence, build_config, ru
         "dev": {k: dev["report"][k] for k in ("samples", "framesVerified", "positivesKept", "positivesKeptByClassAndBucket", "excluded", "excludedByCategoryClassAndBucket", "g10")},
         "separation": "TRAIN and DEV share no id, seed, spec hash or frame",
         "tensorCheck": tensors,
-        "runConfiguration": {"status": run_cfg["status"], "approval": run_cfg["approval"], "plan": {"stepsPerEpoch": steps_per_epoch, "maxEpochs": run_cfg["epochs"]["max"], "maxSteps": steps_per_epoch * run_cfg["epochs"]["max"]}},
+        "runConfiguration": {"schemaVersion": run_cfg["schemaVersion"], "status": run_cfg["status"], "approval": run_cfg["approval"], "plan": plan},
         "outputDirectory": {"path": record["outputDirectory"], "exists": os.path.lexists(out), "created": False},
         "provenanceRecordPlan": record,
         "t1": {"before": t1_before, "after": t1_after, "unchanged": True},

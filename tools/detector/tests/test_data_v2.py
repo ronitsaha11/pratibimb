@@ -112,6 +112,27 @@ def approve(root, non_visible=None):
     return root
 
 
+def add_occluder_provenance(root, splits=("train", "dev")):
+    """Give every partial-occlusion case an occluder over its right half, as the v2 generator does
+    (`layout.mjs`: from x + floor(w/2), 1 px proud above and below), with a rendered box (M22.12)."""
+    def add(m):
+        for s in m["samples"]:
+            occs = []
+            for a in s["annotations"]:
+                if a["intent"] != "occlusion-partial":
+                    continue
+                oid = f"{s['id']}-o{len(occs):03d}"
+                a["source"]["occluderId"] = oid
+                b = a["box"]
+                r = {"x": b["x"] + b["w"] // 2, "y": b["y"] - 1, "w": b["w"] - b["w"] // 2 + 1, "h": b["h"] + 2}
+                occs.append({"id": oid, "for": a["id"], "kind": "partial", "box": dict(r), "rendered": dict(r)})
+            s["provenance"] = {"occluders": occs}
+
+    for split in splits:
+        edit(root, f"manifest-{split}.json", add)
+    return root
+
+
 def write_json(path, v):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(v, f)

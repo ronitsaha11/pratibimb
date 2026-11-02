@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "train-v2-run-config/2",
+  "status": "PROPOSED - PENDING OWNER APPROVAL (M22.12): the M22.10 final configuration, reconciled into the validated schema; not an approved configuration",
+  "approval": {
+    "approved": false,
+    "approvedBy": null,
+    "approvedOn": null
+  },
+  "rationale": "artifacts/experiments/M22.10-first-training-spec/final-configuration.PROPOSED.json; artifacts/experiments/M22.12-occlusion-mask-and-config/README.md",
+  "supersedes": "train-v2-first-experiment.PROPOSED.json (M22.9, schema 1), which is kept unchanged as history",
+  "architecture": {
+    "model": "head.UiHead",
+    "width": [16, 32, 64],
+    "inputSize": 640,
+    "stride": 8,
+    "classes": ["button", "link", "textbox", "checkbox", "radio", "select", "tab", "icon"],
+    "initialisation": "fresh UiHead() after torch.manual_seed(seed); no weights loaded"
+  },
+  "data": {
+    "candidate": 2,
+    "train": "train",
+    "validation": "dev",
+    "positives": "approved-G10 VISIBLE positives only; occlusion cases excluded from targets",
+    "augmentation": "none, as v1",
+    "preload": "uint8 letterboxed images, converted to float32 / 255 per batch (M22.10 recommendation)"
+  },
+  "batchSize": 4,
+  "optimizer": {
+    "name": "AdamW",
+    "learningRate": 0.003,
+    "weightDecay": 0.0001,
+    "parameterGroups": "single group, all parameters (v1)",
+    "gradientClipNorm": 10.0,
+    "nonFiniteGradient": "fail"
+  },
+  "schedule": {
+    "name": "cosine",
+    "tMaxSteps": 6000,
+    "etaMin": 0,
+    "stepEvery": "optimizer-step",
+    "warmup": "none"
+  },
+  "epochs": {
+    "max": 40
+  },
+  "steps": {
+    "perEpoch": 150,
+    "max": 6000
+  },
+  "seed": 20261102,
+  "determinism": {
+    "deterministicAlgorithms": "required",
+    "cpuThreads": 8
+  },
+  "devEvaluation": {
+    "everyEpochs": 1,
+    "batches": 40,
+    "lossAggregation": "dataset-sum"
+  },
+  "checkpoint": {
+    "everyEpochs": 1,
+    "retention": "all",
+    "best": "strict-min-dev-loss"
+  },
+  "earlyStopping": {
+    "monitor": "dev_loss",
+    "patience": 5,
+    "minDelta": 0.001,
+    "action": "record-only"
+  },
+  "loss": {
+    "function": "targets.detector_loss",
+    "boxWeight": 5.0,
+    "classification": "focal, alpha 0.25, gamma 2 (fixed in targets.py)",
+    "box": "1 - IoU over positive cells",
+    "partialOcclusion": "ignore-mask"
+  }
+}

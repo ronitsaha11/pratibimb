@@ -23,7 +23,7 @@ import occlusion_mask_v2 as om  # noqa: E402
 from data_v2 import AdapterError, load_split  # noqa: E402
 from head import CLASSES, GRID, INPUT_SIZE, NUM_CLASSES, STRIDE  # noqa: E402
 from targets import assign_targets  # noqa: E402
-from test_data_v2 import edit, policy, read_json, write_candidate  # noqa: E402
+from test_data_v2 import add_occluder_provenance, edit, policy, write_candidate  # noqa: E402
 
 A = GRID * GRID
 BUTTON, TAB, CHECKBOX = CLASSES.index("button"), CLASSES.index("tab"), CLASSES.index("checkbox")
@@ -288,20 +288,15 @@ def test_the_adapter_carries_occlusion_cases_with_their_rendered_occluder(tmp_pa
     s0 = load_split(root, "train", policy(root))["samples"][0]
     assert [(c["intent"], c["cls"], c["occluder"]) for c in s0["occlusionCases"]] == [("occlusion-partial", "button", None), ("occlusion-full", "tab", None)]
 
-    def add_provenance(m):
-        for s in m["samples"]:
-            p = next(a for a in s["annotations"] if a["intent"] == "occlusion-partial")
-            p["source"]["occluderId"] = s["id"] + "-o000"
-            b = p["box"]
-            s["provenance"] = {"occluders": [{"id": s["id"] + "-o000", "for": p["id"], "kind": "partial", "box": dict(b), "rendered": {"x": b["x"] + b["w"] // 2, "y": b["y"] - 1, "w": b["w"] // 2 + 1, "h": b["h"] + 2}}]}
-
-    edit(root, "manifest-train.json", add_provenance)
+    add_occluder_provenance(root, ("train",))
     s0 = load_split(root, "train", policy(root))["samples"][0]
-    part = s0["occlusionCases"][0]
-    assert part["occluder"] == {"x": part["box"]["x"] + part["box"]["w"] // 2, "y": part["box"]["y"] - 1, "w": part["box"]["w"] // 2 + 1, "h": part["box"]["h"] + 2}
+    part, full = s0["occlusionCases"]
+    b = part["box"]
+    assert part["occluder"] == {"x": b["x"] + b["w"] // 2, "y": b["y"] - 1, "w": b["w"] - b["w"] // 2 + 1, "h": b["h"] + 2}  # floor(w/2), ceil(w/2)+1
+    assert full["occluder"] is None  # the fixture's full case has no occluder recorded; the mask never needs one
     assert part["id"] not in {a["id"] for a in s0["annotations"]}  # occlusion cases are never targets
+    assert om.partial_occlusion_ignore_mask(s0, np.zeros((A, NUM_CLASSES)))["ignoredEntries"] > 0
 
     edit(root, "manifest-train.json", lambda m: [o.update({"for": "someone-else"}) for s in m["samples"] for o in s["provenance"]["occluders"]])
     with pytest.raises(AdapterError, match="recorded for another element"):
         load_split(root, "train", policy(root))
-    assert read_json(os.path.join(root, "manifest-train.json"))["samples"]  # the fixture, not a real candidate

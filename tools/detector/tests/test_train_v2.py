@@ -23,10 +23,21 @@ sys.path.insert(0, DETECTOR)
 
 import train_v2  # noqa: E402
 from data_v2 import AdapterError  # noqa: E402
-from test_data_v2 import approve, edit, read_json, write_candidate, write_json  # noqa: E402
+from test_data_v2 import add_occluder_provenance, approve, edit, read_json, write_candidate, write_json  # noqa: E402
 
 RUNTIME_MODULES = ("train_v2.py", "data_v2.py", "dry_run_v2.py", "occlusion_mask_v2.py")
-PROPOSED = os.path.join(DETECTOR, "configs", "train-v2-first-experiment.PROPOSED.json")
+PROPOSED = os.path.join(DETECTOR, "configs", "train-v2-first-run.PROPOSED.json")  # schema 2 (M22.12)
+PROPOSED_M22_9 = os.path.join(DETECTOR, "configs", "train-v2-first-experiment.PROPOSED.json")  # schema 1, kept as history
+
+
+def fixture_run_config(cfg, n_train=3, n_dev=2):
+    """The canonical proposal, resized to the tiny synthetic candidate (batch 1) so its exact counts hold."""
+    cfg["batchSize"] = 1
+    cfg["steps"] = {"perEpoch": n_train, "max": n_train * cfg["epochs"]["max"]}
+    cfg["schedule"]["tMaxSteps"] = cfg["steps"]["max"]
+    cfg["devEvaluation"]["batches"] = n_dev
+    cfg["determinism"]["cpuThreads"] = 1
+    return cfg
 
 
 def _tree(name):
@@ -125,9 +136,9 @@ def repo(tmp_path):
     t1 = root / "artifacts" / "models" / "t1-ui-head"
     t1.mkdir(parents=True)
     (t1 / "t1-ui-head.onnx").write_bytes(b"fake t1 artifact for M22.9 tests")
-    cand = approve(write_candidate(str(root / "artifacts" / "datasets" / "t1-ui-synthetic-2.1.0-draft-candidate-2")))
+    cand = approve(add_occluder_provenance(write_candidate(str(root / "artifacts" / "datasets" / "t1-ui-synthetic-2.1.0-draft-candidate-2"))))
     write_json(str(tmp_path / "build.json"), {"gate": {"minPerClassBucket": {"train": 0, "dev": 0}}})
-    shutil.copy(PROPOSED, tmp_path / "run.json")
+    write_json(str(tmp_path / "run.json"), fixture_run_config(read_json(PROPOSED)))
     return {
         "root": str(root),
         "cand": cand,
@@ -213,10 +224,10 @@ def test_the_t1_artifact_is_checked_before_and_a_change_stops_preflight(repo, mo
 
     real = dry_run_v2.tensor_check
 
-    def tamper(root, data):
+    def tamper(root, data, *a, **k):
         with open(os.path.join(repo["root"], *train_v2.T1_ARTIFACT), "ab") as f:
             f.write(b"!")
-        return real(root, data)
+        return real(root, data, *a, **k)
 
     monkeypatch.setattr(dry_run_v2, "tensor_check", tamper)
     with pytest.raises(train_v2.SafetyError, match="it changed"):
@@ -291,3 +302,62 @@ def test_the_run_configuration_is_validated_without_defaults(spoil, message):
     spoil(cfg)
     with pytest.raises(train_v2.SafetyError, match=message):
         train_v2.validate_run_config(cfg)
+
+
+# ── M22.12: the schema-2 plan is checked against the data and the machine ─────────────────────
+
+
+def _run(repo, fn):
+    edit(os.path.dirname(repo["args"]["run_config"]), "run.json", fn)
+
+
+def test_preflight_reports_the_exact_plan_and_the_ignore_mask(repo, traps):
+    plan = train_v2.preflight(repo["root"], **repo["args"])
+    assert plan["runConfiguration"]["schemaVersion"] == train_v2.RUN_CONFIG_SCHEMA
+    p = plan["runConfiguration"]["plan"]
+    assert (p["stepsPerEpoch"], p["maxSteps"], p["devBatchesPerEvaluation"], p["devEvaluations"], p["checkpoints"]) == (3, 120, 2, 40, 40)
+    assert p["earlyStoppingAction"] == "record-only" and p["partialOcclusion"] == "ignore-mask"
+    for split, n in (("train", 3), ("dev", 2)):
+        m = plan["tensorCheck"][split]["ignoreMask"]
+        assert m["cases"]["partial"] == n and m["cases"]["full"] == n and m["ignoredEntries"] > 0
+        assert m["ignoredEntries"] == m["ignoredByClass"]["button"]  # the fixture's partial cases are all buttons
+
+
+def test_a_partial_batch_is_never_planned(repo):
+    _run(repo, lambda c: c.update(batchSize=2))
+    with pytest.raises(train_v2.SafetyError, match="divide exactly"):
+        train_v2.preflight(repo["root"], **repo["args"])
+
+
+@pytest.mark.parametrize(
+    "spoil, message",
+    [
+        (lambda c: c.update(steps={"perEpoch": 4, "max": 160}, schedule={**c["schedule"], "tMaxSteps": 160}), "steps.perEpoch"),
+        (lambda c: c["devEvaluation"].update(batches=3), "devEvaluation.batches"),
+    ],
+)
+def test_configured_counts_must_match_the_accepted_data(repo, spoil, message):
+    _run(repo, spoil)
+    with pytest.raises(train_v2.SafetyError, match=message):
+        train_v2.preflight(repo["root"], **repo["args"])
+
+
+def test_cpu_threads_must_exist_on_the_machine():
+    cfg = read_json(PROPOSED)
+    with pytest.raises(train_v2.SafetyError, match="cpuThreads"):
+        train_v2.check_plan_against_data(cfg, 600, 160, cpu_count=4)
+    assert train_v2.check_plan_against_data(cfg, 600, 160, cpu_count=16)["cpuThreads"] == 8
+
+
+def test_the_ignore_mask_needs_occluder_provenance(repo):
+    edit(repo["cand"], "manifest-train.json", lambda m: [o.update(rendered=None) for s in m["samples"] for o in s["provenance"]["occluders"]])
+    with pytest.raises(AdapterError, match="ignore mask cannot be built"):
+        train_v2.preflight(repo["root"], **repo["args"])
+    _run(repo, lambda c: c["loss"].update(partialOcclusion="background"))  # the v1 behaviour needs no mask
+    assert train_v2.preflight(repo["root"], **repo["args"])["tensorCheck"]["train"].get("ignoreMask") is None
+
+
+def test_the_m22_9_schema_1_file_is_refused_not_upgraded(repo):
+    shutil.copy(PROPOSED_M22_9, repo["args"]["run_config"])
+    with pytest.raises(train_v2.SafetyError, match="schemaVersion"):
+        train_v2.preflight(repo["root"], **repo["args"])
