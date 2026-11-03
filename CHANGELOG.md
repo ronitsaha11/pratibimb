@@ -35,6 +35,17 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.13 — the first v2 T1 retraining run (owner-authorised, one run; no detection evaluation, no
+  export, no TEST).**
+  - `tools/detector/loss_v2.py`: the legacy loss with ignored classification entries set to zero; bitwise
+    equal in value and gradients to `detector_loss` under an empty mask. 24 tests.
+  - `train_v2 --train`: the authorised loop. It needs an approved configuration, a clean tree and one
+    run, and repeats the full pre-flight. Per epoch: all TRAIN, the full DEV loss (eval, no grad, same mask),
+    an atomic verified checkpoint and a T1 re-check. Fail-closed conditions; resume only of an interrupted
+    run. 10 loop tests, including bitwise interrupt-and-resume equivalence.
+  - `train-v2-first-run.APPROVED.json`: the M22.12 proposal with the owner's approval only.
+  - The run: COMPLETED, 40 epochs, 6,000 steps; DEV loss 3.983 → 2.893, best epoch 39; 185 of 6,000 steps
+    clipped; no non-finite value. Weights stay in the git-ignored run directory. Candidate UNADOPTED.
 - **M22.12 — partial-occlusion ignore mask and first-run configuration hardening (no training, no
   optimizer, no inference, no weights, no TEST).**
   - `tools/detector/occlusion_mask_v2.py`: a pure classification ignore mask. For each partial-occlusion

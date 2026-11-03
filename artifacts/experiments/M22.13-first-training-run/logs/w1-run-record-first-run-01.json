@@ -1,0 +1,3810 @@
+{
+ "architecture": {
+  "classes": [
+   "button",
+   "link",
+   "textbox",
+   "checkbox",
+   "radio",
+   "select",
+   "tab",
+   "icon"
+  ],
+  "initialisation": "fresh UiHead() after torch.manual_seed(seed); no weights loaded",
+  "inputSize": 640,
+  "model": "head.UiHead",
+  "stride": 8,
+  "width": [
+   16,
+   32,
+   64
+  ]
+ },
+ "authorisation": "M22.13 owner authorisation: one 40-epoch training run on candidate 2",
+ "best": {
+  "devLoss": 2.8933307699017696,
+  "epoch": 39,
+  "file": "checkpoint-e39.pt",
+  "rule": "strict-min-dev-loss",
+  "sha256": "a485425dfb4ea7f73d91707d4e9a8eb6a10a7a0be36f8dbe6d95f71e26025c0d"
+ },
+ "candidateFingerprint": {
+  "frames-dev": {
+   "files": 160,
+   "listSha256": "9dd3d8c3453fe610e06f95afdf8eff27df6cbf3cd63e7b803646037926afa812"
+  },
+  "frames-train": {
+   "files": 600,
+   "listSha256": "5d3e63b4e903785c7827a25055faa39f9ee01d6f72195233fa10aa0f8d465acf"
+  },
+  "manifest-dev.json": "11599e053c7bb3dc32c08f429d4d649492c8a9b024c00dd0219f3ad3b74d6868",
+  "manifest-train.json": "663df327d71ef42d7d4136b8fe9d50fbdcdea9e7de1284dbb2b148e473d229ca"
+ },
+ "checkpointRehashEqual": {
+  "checkpoint-e01.pt": true,
+  "checkpoint-e02.pt": true,
+  "checkpoint-e03.pt": true,
+  "checkpoint-e04.pt": true,
+  "checkpoint-e05.pt": true,
+  "checkpoint-e06.pt": true,
+  "checkpoint-e07.pt": true,
+  "checkpoint-e08.pt": true,
+  "checkpoint-e09.pt": true,
+  "checkpoint-e10.pt": true,
+  "checkpoint-e11.pt": true,
+  "checkpoint-e12.pt": true,
+  "checkpoint-e13.pt": true,
+  "checkpoint-e14.pt": true,
+  "checkpoint-e15.pt": true,
+  "checkpoint-e16.pt": true,
+  "checkpoint-e17.pt": true,
+  "checkpoint-e18.pt": true,
+  "checkpoint-e19.pt": true,
+  "checkpoint-e20.pt": true,
+  "checkpoint-e21.pt": true,
+  "checkpoint-e22.pt": true,
+  "checkpoint-e23.pt": true,
+  "checkpoint-e24.pt": true,
+  "checkpoint-e25.pt": true,
+  "checkpoint-e26.pt": true,
+  "checkpoint-e27.pt": true,
+  "checkpoint-e28.pt": true,
+  "checkpoint-e29.pt": true,
+  "checkpoint-e30.pt": true,
+  "checkpoint-e31.pt": true,
+  "checkpoint-e32.pt": true,
+  "checkpoint-e33.pt": true,
+  "checkpoint-e34.pt": true,
+  "checkpoint-e35.pt": true,
+  "checkpoint-e36.pt": true,
+  "checkpoint-e37.pt": true,
+  "checkpoint-e38.pt": true,
+  "checkpoint-e39.pt": true,
+  "checkpoint-e40.pt": true
+ },
+ "checkpoints": [
+  {
+   "bytes": 771324,
+   "epoch": 1,
+   "file": "checkpoint-e01.pt",
+   "sha256": "2468d69f6f3c0fd2f7adb8901c8d66675bde2e0086f6b97af6de05b9f6eaeda5",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 2,
+   "file": "checkpoint-e02.pt",
+   "sha256": "95e6200bc63c7091ca6b4196fdec60db657763d49dc104b87b957720b619f506",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 3,
+   "file": "checkpoint-e03.pt",
+   "sha256": "98eafa90e9657d1060b66ece41ec49d8f561d2743e5a7a658415c37cc47b61ed",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 4,
+   "file": "checkpoint-e04.pt",
+   "sha256": "fd42d7e7b3e04a790eacda60227fe241f4a629a2723ada4976ca1580f7dfbc2a",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 5,
+   "file": "checkpoint-e05.pt",
+   "sha256": "31c4d348be9a4ac75c551c4d136a9594a590734b9f43506499f9a1a43a589ab7",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 6,
+   "file": "checkpoint-e06.pt",
+   "sha256": "9d5b8afadfe0f92cce4207ce8a6af27f16ba2b8cc7cfee37d96c05096325528f",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 7,
+   "file": "checkpoint-e07.pt",
+   "sha256": "ef6208f6c6cecbb0f3c6d4097f314defbf3e96438586b39953894a42dab2ee3f",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 8,
+   "file": "checkpoint-e08.pt",
+   "sha256": "2c6cb0f7bd31de28254a2cca43b44a4ba660584c9862d4a6aa499ddaa1f4c03c",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 9,
+   "file": "checkpoint-e09.pt",
+   "sha256": "6e2ecc4c86c1572644f1f4b6d59014ded0623ba90477904707e466ce6907a08c",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 10,
+   "file": "checkpoint-e10.pt",
+   "sha256": "715221bb10e383364617f275f17b32fd15362158da918b759b26601431a53b9d",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 11,
+   "file": "checkpoint-e11.pt",
+   "sha256": "e3325d2c223c26ddd018a65f2372bcf219e718bab61b7bb58d92bc6cf850378e",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 12,
+   "file": "checkpoint-e12.pt",
+   "sha256": "136857bb021bcdca90416ed5db09df6c2f4cdccc137d32770d68224380657fb7",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 13,
+   "file": "checkpoint-e13.pt",
+   "sha256": "acac079fb77a858fd7d1474af10f7dfd7b72f3d41f5d12b752382d21670569d0",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 14,
+   "file": "checkpoint-e14.pt",
+   "sha256": "224fc226781897cc5fbc509a6db23d5ec02d43f813e1bb88d3a6cda7d4735519",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 15,
+   "file": "checkpoint-e15.pt",
+   "sha256": "86b11f187c492aa2f11d428f7ae1a1181b136cbe23e8a599e4cf8f82b9a2ea18",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 16,
+   "file": "checkpoint-e16.pt",
+   "sha256": "af50a18b4e8780400913c81525894dbb56465b2b0165c460b330ce8d89b582e1",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 17,
+   "file": "checkpoint-e17.pt",
+   "sha256": "dae71698aca9ad115aef71aeb7300a13f3cdef812ab1c43816fbde9991d745cc",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 18,
+   "file": "checkpoint-e18.pt",
+   "sha256": "3a62ac78b6adef3b4a3c7d80c07ac995ef0b412cff180aef4e133b04ba57f488",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 19,
+   "file": "checkpoint-e19.pt",
+   "sha256": "86d094edce12e6efb453f61f3a3e1097c78e81f0bafe1f7606d8a74d10fbaf5c",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 20,
+   "file": "checkpoint-e20.pt",
+   "sha256": "406c80e58453a93b499a0187a000d8f161938e4505ad3d530397d6a11c4a28c6",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 21,
+   "file": "checkpoint-e21.pt",
+   "sha256": "0750637f427b40b2115074ae98f17581188ac9855b5134bef30d7064251d7dad",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 22,
+   "file": "checkpoint-e22.pt",
+   "sha256": "152a0c174a416f379ee12b23fe7fc1807027cd330029d7beed143811142be183",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 23,
+   "file": "checkpoint-e23.pt",
+   "sha256": "54b85d70abea1036d826bab821f99cb98f537212d31e8f62abd6461cb0347de8",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 24,
+   "file": "checkpoint-e24.pt",
+   "sha256": "40d1d35edef2e3ea82e329755ec0c74dddf9418f4c247e3f4b30619ad8711b0e",
+   "verified": true
+  },
+  {
+   "bytes": 771324,
+   "epoch": 25,
+   "file": "checkpoint-e25.pt",
+   "sha256": "58740a5d0eaf2cfa2bf28ca916bc33f1c12af3f987f24aa43a234b33f51a0a48",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 26,
+   "file": "checkpoint-e26.pt",
+   "sha256": "3eb8d8d87c65faa03417e22bb70baf4107ca28452fce70c81fe8433ca8741383",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 27,
+   "file": "checkpoint-e27.pt",
+   "sha256": "eeff01af0f0e1ba53f1a165b27ccc65ddfe3d346dee77827d9d1a4c0495b2952",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 28,
+   "file": "checkpoint-e28.pt",
+   "sha256": "fb21531480f846537bd49d0b3ac6b30829dddcccf48c0762c23b48c52dbf083f",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 29,
+   "file": "checkpoint-e29.pt",
+   "sha256": "a3af521cd266a3c4ab2362af3f2a6b82bad269bbf16f829dafdd5a0cab920ff8",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 30,
+   "file": "checkpoint-e30.pt",
+   "sha256": "aa2e19bea65d2e6b28fa0d39c9e37962a8363e2dea3f75b2db752b3bed60e2d0",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 31,
+   "file": "checkpoint-e31.pt",
+   "sha256": "cbfee8af9ce57212cc25d27ec934f0681a27639770a3c04a1a0e559bd5123b7f",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 32,
+   "file": "checkpoint-e32.pt",
+   "sha256": "d5893aec4eff75270a0d4cc53f7ccea2cb4dd3d592b32b6673f167ad076e87f0",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 33,
+   "file": "checkpoint-e33.pt",
+   "sha256": "3df442092e0be46364585d65eef71d724c9143599e24af5e0b506fcb66839a9e",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 34,
+   "file": "checkpoint-e34.pt",
+   "sha256": "a3388e26e31da4cef6634fc8c25b66cac83eda88ab8b87c7fa3b25ae55110fc9",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 35,
+   "file": "checkpoint-e35.pt",
+   "sha256": "79306513128594dbee3044da05d5a0de55e004dc4278a269bac94b2e3e32f674",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 36,
+   "file": "checkpoint-e36.pt",
+   "sha256": "658029968e9dd8ecefbc3b84632d1c1ab5fa86fa82a7c5b06fda4a25ce278871",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 37,
+   "file": "checkpoint-e37.pt",
+   "sha256": "c67896e89dd463eb382122f6771f0e23177f965dc2ae9799208e7164e35e9956",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 38,
+   "file": "checkpoint-e38.pt",
+   "sha256": "5cb7eac97334fcae3f4e2abb7c34801655b09c6b82f9afacae1daef7db4a265a",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 39,
+   "file": "checkpoint-e39.pt",
+   "sha256": "a485425dfb4ea7f73d91707d4e9a8eb6a10a7a0be36f8dbe6d95f71e26025c0d",
+   "verified": true
+  },
+  {
+   "bytes": 771388,
+   "epoch": 40,
+   "file": "checkpoint-e40.pt",
+   "sha256": "6b5b42e77df4b8dc5cb852d5f46caa34185dd77cb940e8a414e44607b68fcfde",
+   "verified": true
+  }
+ ],
+ "completedAt": "2026-11-03T08:08:37Z",
+ "dataAccounting": {
+  "dev": {
+   "bySizeBucket": {
+    "large": {
+     "nearestCellFallback": 0,
+     "objects": 352,
+     "positiveCells": 29935
+    },
+    "medium": {
+     "nearestCellFallback": 0,
+     "objects": 352,
+     "positiveCells": 10761
+    },
+    "small": {
+     "nearestCellFallback": 0,
+     "objects": 352,
+     "positiveCells": 2833
+    },
+    "very-small": {
+     "nearestCellFallback": 93,
+     "objects": 352,
+     "positiveCells": 779
+    }
+   },
+   "ignoredEntries": 6999,
+   "positiveCells": 44308,
+   "samples": 160
+  },
+  "excludedOcclusion": {
+   "dev": {
+    "occlusion-full": 128,
+    "occlusion-partial": 128
+   },
+   "train": {
+    "occlusion-full": 480,
+    "occlusion-partial": 480
+   }
+  },
+  "note": "very-small objects are reported separately: in TRAIN 25.9 % of them have no grid-cell centre inside their box and train through the nearest cell (M22.11)",
+  "train": {
+   "bySizeBucket": {
+    "large": {
+     "nearestCellFallback": 0,
+     "objects": 1320,
+     "positiveCells": 113532
+    },
+    "medium": {
+     "nearestCellFallback": 0,
+     "objects": 1320,
+     "positiveCells": 41570
+    },
+    "small": {
+     "nearestCellFallback": 0,
+     "objects": 1320,
+     "positiveCells": 10154
+    },
+    "very-small": {
+     "nearestCellFallback": 342,
+     "objects": 1320,
+     "positiveCells": 2994
+    }
+   },
+   "ignoredEntries": 26953,
+   "positiveCells": 168250,
+   "samples": 600
+  }
+ },
+ "dataset": {
+  "candidate": 2,
+  "renderRevision": "r2-m22.6-visual-fixes",
+  "version": "t1-ui-synthetic@2.1.0-draft"
+ },
+ "datasetHashes": {
+  "dev": "f072507a47ce087ef79b236d769b7d860c27ef536534d9490116d0145034ede1",
+  "train": "f283720fab3ef6086becf51ec47f383b8a20344f9abe1e102c6ec6172c2427f8"
+ },
+ "earlyStopping": {
+  "action": "record-only",
+  "bestForPatience": 2.8933307699017696,
+  "sinceImprovement": 1,
+  "wouldStopAtEpoch": 30
+ },
+ "environment": {
+  "numpy": "2.5.1",
+  "pillow": "12.3.0",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.13.14",
+  "torch": "2.14.0+cpu"
+ },
+ "epochs": [
+  {
+   "bestDevLoss": 3.983009381770786,
+   "bestEpoch": 1,
+   "checkpointSha256": "2468d69f6f3c0fd2f7adb8901c8d66675bde2e0086f6b97af6de05b9f6eaeda5",
+   "dev": {
+    "backgroundClsShare": 0.10617562089255621,
+    "box": 0.6836978085497134,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6548908723501763,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.5014928278594298
+     },
+     "medium": {
+      "boxPerCell": 0.6904858096737521,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.5086145144748362
+     },
+     "small": {
+      "boxPerCell": 0.8831124339388151,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.5159160159804398
+     },
+     "very-small": {
+      "boxPerCell": 0.9716932368829406,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.5263702569479202
+     }
+    },
+    "cls": 0.5645203390222191,
+    "clsByClass": {
+     "button": 0.06307295552460312,
+     "checkbox": 0.026321643450835885,
+     "icon": 0.03261822764366854,
+     "link": 0.10579114498257727,
+     "radio": 0.0279165800064933,
+     "select": 0.11227595416065535,
+     "tab": 0.0630273064072414,
+     "textbox": 0.13349653409578496
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.983009381770786,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.983009381770786,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 1,
+   "globalStep": 150,
+   "gradNorm": {
+    "clippedSteps": 5,
+    "max": 53.671878814697266,
+    "mean": 4.3196135302384695,
+    "min": 0.9508035778999329
+   },
+   "lrAfter": 0.002995376000599694,
+   "lrFirst": 0.003,
+   "lrLast": 0.002995437417243659,
+   "memory": null,
+   "seconds": {
+    "total": 131.79468750953674,
+    "train": 121.31578707695007
+   },
+   "train": {
+    "boxMean": 0.7244648869832356,
+    "clsMean": 0.6489915651082993,
+    "ignoredEntries": 26953,
+    "lossMax": 5.8437113761901855,
+    "lossMean": 4.27131600856781,
+    "lossMin": 3.5792860984802246,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.983009381770786,
+   "bestEpoch": 1,
+   "checkpointSha256": "95e6200bc63c7091ca6b4196fdec60db657763d49dc104b87b957720b619f506",
+   "dev": {
+    "backgroundClsShare": 0.10341152617674,
+    "box": 0.7093117364296427,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.7010628130253954,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.539288272323743
+     },
+     "medium": {
+      "boxPerCell": 0.6792282383466961,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.5401058861861695
+     },
+     "small": {
+      "boxPerCell": 0.8437933369739882,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.532089763701993
+     },
+     "very-small": {
+      "boxPerCell": 0.952795196329369,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.5894557851652432
+     }
+    },
+    "cls": 0.6021810622704721,
+    "clsByClass": {
+     "button": 0.06541376139952304,
+     "checkbox": 0.024187349605001247,
+     "icon": 0.028272495636963574,
+     "link": 0.12644606607675848,
+     "radio": 0.02619369174255642,
+     "select": 0.11770505777714264,
+     "tab": 0.059458248466245756,
+     "textbox": 0.1545044046827664
+    },
+    "ignoredEntries": 6999,
+    "loss": 4.148739744418686,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.983009381770786,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 2,
+   "globalStep": 300,
+   "gradNorm": {
+    "clippedSteps": 2,
+    "max": 12.814751625061035,
+    "mean": 3.9467491324742636,
+    "min": 1.6033390760421753
+   },
+   "lrAfter": 0.00298153251089271,
+   "lrFirst": 0.002995376000599694,
+   "lrLast": 0.0029816551711433605,
+   "memory": null,
+   "seconds": {
+    "total": 126.9384536743164,
+    "train": 116.72399234771729
+   },
+   "train": {
+    "boxMean": 0.6889782456556955,
+    "clsMean": 0.5529460223515829,
+    "ignoredEntries": 26953,
+    "lossMax": 5.019147872924805,
+    "lossMean": 3.997837257385254,
+    "lossMin": 3.565662145614624,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.8204575342596936,
+   "bestEpoch": 3,
+   "checkpointSha256": "98eafa90e9657d1060b66ece41ec49d8f561d2743e5a7a658415c37cc47b61ed",
+   "dev": {
+    "backgroundClsShare": 0.06287732113230247,
+    "box": 0.6579474194058229,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6247540743716954,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.4999032091816658
+     },
+     "medium": {
+      "boxPerCell": 0.6716964533034117,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.48973901447294016
+     },
+     "small": {
+      "boxPerCell": 0.8709867976598002,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.4930078388785794
+     },
+     "very-small": {
+      "boxPerCell": 0.9687930245301537,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.5201739225254438
+     }
+    },
+    "cls": 0.5307204372305792,
+    "clsByClass": {
+     "button": 0.05799652955998805,
+     "checkbox": 0.02138231356790838,
+     "icon": 0.024801350835245175,
+     "link": 0.0992814948854739,
+     "radio": 0.021700217475431643,
+     "select": 0.10693721713456432,
+     "tab": 0.05524175566725897,
+     "textbox": 0.14337955496173066
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.8204575342596936,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.8204575342596936,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 3,
+   "globalStep": 450,
+   "gradNorm": {
+    "clippedSteps": 4,
+    "max": 15.95071029663086,
+    "mean": 4.355430327256521,
+    "min": 1.558458685874939
+   },
+   "lrAfter": 0.002958554880596515,
+   "lrFirst": 0.00298153251089271,
+   "lrLast": 0.002958738028212617,
+   "memory": null,
+   "seconds": {
+    "total": 109.78908109664917,
+    "train": 107.64143395423889
+   },
+   "train": {
+    "boxMean": 0.6680994558334351,
+    "clsMean": 0.5119890683889389,
+    "ignoredEntries": 26953,
+    "lossMax": 4.717550277709961,
+    "lossMean": 3.8524863576889037,
+    "lossMin": 3.4812862873077393,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.781318526110021,
+   "bestEpoch": 4,
+   "checkpointSha256": "fd42d7e7b3e04a790eacda60227fe241f4a629a2723ada4976ca1580f7dfbc2a",
+   "dev": {
+    "backgroundClsShare": 0.08294270800825679,
+    "box": 0.651539454641374,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.606756474871418,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.4869074174066866
+     },
+     "medium": {
+      "boxPerCell": 0.691887424089864,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.4641282413182189
+     },
+     "small": {
+      "boxPerCell": 0.8830044500784869,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.4587330354704396
+     },
+     "very-small": {
+      "boxPerCell": 0.9733030643787556,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.5220035675516177
+     }
+    },
+    "cls": 0.523621252903151,
+    "clsByClass": {
+     "button": 0.06276610071533821,
+     "checkbox": 0.020170893225388623,
+     "icon": 0.022972601361188186,
+     "link": 0.09750168214934697,
+     "radio": 0.01997155828499996,
+     "select": 0.11245430674543248,
+     "tab": 0.05531660388724217,
+     "textbox": 0.13246751165754814
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.781318526110021,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.781318526110021,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 4,
+   "globalStep": 600,
+   "gradNorm": {
+    "clippedSteps": 11,
+    "max": 23.784954071044922,
+    "mean": 4.811646432081858,
+    "min": 1.256028652191162
+   },
+   "lrAfter": 0.0029265847744427316,
+   "lrFirst": 0.002958554880596515,
+   "lrLast": 0.002926827280258329,
+   "memory": null,
+   "seconds": {
+    "total": 53.60897922515869,
+    "train": 44.20950245857239
+   },
+   "train": {
+    "boxMean": 0.6469810597101847,
+    "clsMean": 0.47991387605667113,
+    "ignoredEntries": 26953,
+    "lossMax": 4.314624786376953,
+    "lossMean": 3.714819181760152,
+    "lossMin": 3.310940742492676,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.7545066503580053,
+   "bestEpoch": 5,
+   "checkpointSha256": "31c4d348be9a4ac75c551c4d136a9594a590734b9f43506499f9a1a43a589ab7",
+   "dev": {
+    "backgroundClsShare": 0.17415425229913548,
+    "box": 0.6579293484096763,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6531400696471077,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.39478514510879975
+     },
+     "medium": {
+      "boxPerCell": 0.6193655157563368,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.3606560842291832
+     },
+     "small": {
+      "boxPerCell": 0.7809837627991576,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.35078135356596324
+     },
+     "very-small": {
+      "boxPerCell": 0.9271709010751011,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.4072893898604158
+     }
+    },
+    "cls": 0.4648599083096238,
+    "clsByClass": {
+     "button": 0.0509708148004381,
+     "checkbox": 0.015132288336018603,
+     "icon": 0.018932887195660553,
+     "link": 0.09456720450855279,
+     "radio": 0.014846770958558252,
+     "select": 0.09635869561584331,
+     "tab": 0.0462783496237593,
+     "textbox": 0.12777288849626647
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.7545066503580053,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.7545066503580053,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 5,
+   "globalStep": 750,
+   "gradNorm": {
+    "clippedSteps": 8,
+    "max": 20.92812728881836,
+    "mean": 4.871703415711721,
+    "min": 1.3616546392440796
+   },
+   "lrAfter": 0.002885819298766931,
+   "lrFirst": 0.0029265847744427316,
+   "lrLast": 0.0028861196676530296,
+   "memory": null,
+   "seconds": {
+    "total": 128.80017852783203,
+    "train": 119.40721559524536
+   },
+   "train": {
+    "boxMean": 0.6283012549082438,
+    "clsMean": 0.45492957015832264,
+    "ignoredEntries": 26953,
+    "lossMax": 4.155774116516113,
+    "lossMean": 3.5964358536402385,
+    "lossMin": 3.21012020111084,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.5736358923592206,
+   "bestEpoch": 6,
+   "checkpointSha256": "9d5b8afadfe0f92cce4207ce8a6af27f16ba2b8cc7cfee37d96c05096325528f",
+   "dev": {
+    "backgroundClsShare": 0.07205761564966764,
+    "box": 0.6166214343280453,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6017737244273419,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.469355659461119
+     },
+     "medium": {
+      "boxPerCell": 0.5944751087102225,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.42494448953587793
+     },
+     "small": {
+      "boxPerCell": 0.7708157187967473,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.4146559008972787
+     },
+     "very-small": {
+      "boxPerCell": 0.9323476771794174,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.4756250088133004
+     }
+    },
+    "cls": 0.490528720718994,
+    "clsByClass": {
+     "button": 0.051849643217527504,
+     "checkbox": 0.014469206429503022,
+     "icon": 0.019552088602036638,
+     "link": 0.0979139963672537,
+     "radio": 0.015797819767702764,
+     "select": 0.11042615964286026,
+     "tab": 0.04754775371120867,
+     "textbox": 0.1329720562141465
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.5736358923592206,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.5736358923592206,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 6,
+   "globalStep": 900,
+   "gradNorm": {
+    "clippedSteps": 7,
+    "max": 36.15053939819336,
+    "mean": 4.628544769287109,
+    "min": 1.2844455242156982
+   },
+   "lrAfter": 0.002836509786282553,
+   "lrFirst": 0.002885819298766931,
+   "lrLast": 0.002836866166365087,
+   "memory": null,
+   "seconds": {
+    "total": 118.47470235824585,
+    "train": 108.45611214637756
+   },
+   "train": {
+    "boxMean": 0.6190693672498068,
+    "clsMean": 0.4473656851053238,
+    "ignoredEntries": 26953,
+    "lossMax": 4.126597881317139,
+    "lossMean": 3.5427125247319537,
+    "lossMin": 3.1679468154907227,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.5736358923592206,
+   "bestEpoch": 6,
+   "checkpointSha256": "ef6208f6c6cecbb0f3c6d4097f314defbf3e96438586b39953894a42dab2ee3f",
+   "dev": {
+    "backgroundClsShare": 0.29115180919630845,
+    "box": 0.7298723010581205,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.719236321880958,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.5358245894647619
+     },
+     "medium": {
+      "boxPerCell": 0.7179860031834079,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.505218018062365
+     },
+     "small": {
+      "boxPerCell": 0.8302382478392507,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.5255269467451948
+     },
+     "very-small": {
+      "boxPerCell": 0.9377793669700623,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.5643344441182501
+     }
+    },
+    "cls": 0.7452005419240829,
+    "clsByClass": {
+     "button": 0.07083150255311071,
+     "checkbox": 0.05667457806200538,
+     "icon": 0.04411683278517666,
+     "link": 0.10758627249608575,
+     "radio": 0.06742049859270131,
+     "select": 0.12996936461981495,
+     "tab": 0.06771250097192319,
+     "textbox": 0.20088898875618105
+    },
+    "ignoredEntries": 6999,
+    "loss": 4.394562047214685,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.5736358923592206,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 7,
+   "globalStep": 1050,
+   "gradNorm": {
+    "clippedSteps": 8,
+    "max": 16.368209838867188,
+    "mean": 4.5686150630315145,
+    "min": 1.4948681592941284
+   },
+   "lrAfter": 0.002778960246531139,
+   "lrFirst": 0.002836509786282553,
+   "lrLast": 0.002779370440608391,
+   "memory": null,
+   "seconds": {
+    "total": 125.7846531867981,
+    "train": 113.99496865272522
+   },
+   "train": {
+    "boxMean": 0.6059001795450847,
+    "clsMean": 0.43753409961859385,
+    "ignoredEntries": 26953,
+    "lossMax": 3.9863600730895996,
+    "lossMean": 3.467034999529521,
+    "lossMin": 3.0899415016174316,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.5736358923592206,
+   "bestEpoch": 6,
+   "checkpointSha256": "2c6cb0f7bd31de28254a2cca43b44a4ba660584c9862d4a6aa499ddaa1f4c03c",
+   "dev": {
+    "backgroundClsShare": 0.4762069073034702,
+    "box": 0.6772257643098101,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6984995618275893,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3242132967760149
+     },
+     "medium": {
+      "boxPerCell": 0.605052014125478,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.3080489738717026
+     },
+     "small": {
+      "boxPerCell": 0.6759395776727449,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.30057313385266027
+     },
+     "very-small": {
+      "boxPerCell": 0.8614037076683191,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.32162611832093824
+     }
+    },
+    "cls": 0.6085045657735165,
+    "clsByClass": {
+     "button": 0.06697383970159086,
+     "checkbox": 0.018114689560512234,
+     "icon": 0.021513010281211817,
+     "link": 0.09500785636289732,
+     "radio": 0.014730244253179503,
+     "select": 0.12875617352590055,
+     "tab": 0.055483301573470284,
+     "textbox": 0.20792544975191057
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.9946333873225663,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.5736358923592206,
+    "sinceImprovement": 2,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 8,
+   "globalStep": 1200,
+   "gradNorm": {
+    "clippedSteps": 5,
+    "max": 29.25181770324707,
+    "mean": 4.5119175267219545,
+    "min": 1.6675441265106201
+   },
+   "lrAfter": 0.00271352549156242,
+   "lrFirst": 0.002778960246531139,
+   "lrLast": 0.002713986970651501,
+   "memory": null,
+   "seconds": {
+    "total": 119.35652661323547,
+    "train": 109.4822952747345
+   },
+   "train": {
+    "boxMean": 0.5956232937177023,
+    "clsMean": 0.42949430108070374,
+    "ignoredEntries": 26953,
+    "lossMax": 3.952077865600586,
+    "lossMean": 3.4076107581456503,
+    "lossMin": 3.020749092102051,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.3864517597619663,
+   "bestEpoch": 9,
+   "checkpointSha256": "6e2ecc4c86c1572644f1f4b6d59014ded0623ba90477904707e466ce6907a08c",
+   "dev": {
+    "backgroundClsShare": 0.16992272127193117,
+    "box": 0.5890867573007238,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.584458623307564,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3884273713218157
+     },
+     "medium": {
+      "boxPerCell": 0.5515109350242399,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.3228440066702071
+     },
+     "small": {
+      "boxPerCell": 0.7025286538037907,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.29785781660361466
+     },
+     "very-small": {
+      "boxPerCell": 0.8734457551744386,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.352630785545657
+     }
+    },
+    "cls": 0.44101797325834746,
+    "clsByClass": {
+     "button": 0.04790911531488994,
+     "checkbox": 0.013720693967744585,
+     "icon": 0.01654394208154969,
+     "link": 0.09066549402376957,
+     "radio": 0.013723616134614511,
+     "select": 0.09816178814120523,
+     "tab": 0.043938856835447494,
+     "textbox": 0.116354465719541
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.3864517597619663,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.3864517597619663,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 9,
+   "globalStep": 1350,
+   "gradNorm": {
+    "clippedSteps": 9,
+    "max": 31.545732498168945,
+    "mean": 4.745855648517608,
+    "min": 1.6886008977890015
+   },
+   "lrAfter": 0.002640608948400044,
+   "lrFirst": 0.00271352549156242,
+   "lrLast": 0.0026411188673289114,
+   "memory": null,
+   "seconds": {
+    "total": 176.2353994846344,
+    "train": 163.3615529537201
+   },
+   "train": {
+    "boxMean": 0.5941462008158366,
+    "clsMean": 0.42225049416224164,
+    "ignoredEntries": 26953,
+    "lossMax": 3.8882172107696533,
+    "lossMean": 3.392981497446696,
+    "lossMin": 3.0067036151885986,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.3864517597619663,
+   "bestEpoch": 9,
+   "checkpointSha256": "715221bb10e383364617f275f17b32fd15362158da918b759b26601431a53b9d",
+   "dev": {
+    "backgroundClsShare": 0.647170187227665,
+    "box": 0.690701617524761,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.712046281843805,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.32361204296232876
+     },
+     "medium": {
+      "boxPerCell": 0.6300331409253791,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.29223972832149325
+     },
+     "small": {
+      "boxPerCell": 0.6614604244541877,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.30081693674781235
+     },
+     "very-small": {
+      "boxPerCell": 0.8148876130963474,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.33150735691629724
+     }
+    },
+    "cls": 0.8918578211684579,
+    "clsByClass": {
+     "button": 0.10659901110057318,
+     "checkbox": 0.01503246445946566,
+     "icon": 0.01750587105252741,
+     "link": 0.09405425144822123,
+     "radio": 0.013688852925072412,
+     "select": 0.14922448829907603,
+     "tab": 0.12024650804894674,
+     "textbox": 0.37550639393564905
+    },
+    "ignoredEntries": 6999,
+    "loss": 4.345365908792263,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.3864517597619663,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 10,
+   "globalStep": 1500,
+   "gradNorm": {
+    "clippedSteps": 3,
+    "max": 25.06000328063965,
+    "mean": 3.951807330449422,
+    "min": 1.5063211917877197
+   },
+   "lrAfter": 0.0025606601717798206,
+   "lrFirst": 0.002640608948400044,
+   "lrLast": 0.002561215386728714,
+   "memory": null,
+   "seconds": {
+    "total": 128.04873991012573,
+    "train": 118.18098282814026
+   },
+   "train": {
+    "boxMean": 0.5815429544448852,
+    "clsMean": 0.4138335305452347,
+    "ignoredEntries": 26953,
+    "lossMax": 3.86598539352417,
+    "lossMean": 3.3215483061472573,
+    "lossMin": 2.9563984870910645,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.3864517597619663,
+   "bestEpoch": 9,
+   "checkpointSha256": "e3325d2c223c26ddd018a65f2372bcf219e718bab61b7bb58d92bc6cf850378e",
+   "dev": {
+    "backgroundClsShare": 0.22665809484982663,
+    "box": 0.5969275846220455,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5934328059571125,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3465041935458812
+     },
+     "medium": {
+      "boxPerCell": 0.5674462409259196,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.2893803746933435
+     },
+     "small": {
+      "boxPerCell": 0.6723898163626146,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.27111665476797336
+     },
+     "very-small": {
+      "boxPerCell": 0.864040023937764,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.32525374006303037
+     }
+    },
+    "cls": 0.42340501043311607,
+    "clsByClass": {
+     "button": 0.04662217474027579,
+     "checkbox": 0.013442575958228275,
+     "icon": 0.017602118919036975,
+     "link": 0.09186110087524058,
+     "radio": 0.014482659614851671,
+     "select": 0.08636816588229285,
+     "tab": 0.04544830907512585,
+     "textbox": 0.10757790740264997
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.4080429335433435,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.3864517597619663,
+    "sinceImprovement": 2,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 11,
+   "globalStep": 1650,
+   "gradNorm": {
+    "clippedSteps": 5,
+    "max": 22.353002548217773,
+    "mean": 4.29923775434494,
+    "min": 1.718619704246521
+   },
+   "lrAfter": 0.002474172072495273,
+   "lrFirst": 0.0025606601717798206,
+   "lrLast": 0.002474769160379404,
+   "memory": null,
+   "seconds": {
+    "total": 166.3167119026184,
+    "train": 140.49072003364563
+   },
+   "train": {
+    "boxMean": 0.5737824732065201,
+    "clsMean": 0.40173712611198426,
+    "ignoredEntries": 26953,
+    "lossMax": 3.7939672470092773,
+    "lossMean": 3.270649487177531,
+    "lossMin": 2.8612918853759766,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.3864517597619663,
+   "bestEpoch": 9,
+   "checkpointSha256": "136857bb021bcdca90416ed5db09df6c2f4cdccc137d32770d68224380657fb7",
+   "dev": {
+    "backgroundClsShare": 0.35415140650325355,
+    "box": 0.685561819714502,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.7106656064090375,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3130332854269805
+     },
+     "medium": {
+      "boxPerCell": 0.6204842458138201,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.2850219264130421
+     },
+     "small": {
+      "boxPerCell": 0.6349542078894438,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.2842614071642894
+     },
+     "very-small": {
+      "boxPerCell": 0.8039050237664209,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.3276772147118663
+     }
+    },
+    "cls": 0.4717019523557928,
+    "clsByClass": {
+     "button": 0.051897796359345105,
+     "checkbox": 0.013675749481883307,
+     "icon": 0.016961875937223772,
+     "link": 0.09841159770953224,
+     "radio": 0.012724769825408785,
+     "select": 0.09336034128800155,
+     "tab": 0.04449427828117775,
+     "textbox": 0.14017555128494183
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.899511050928303,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.3864517597619663,
+    "sinceImprovement": 3,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 12,
+   "globalStep": 1800,
+   "gradNorm": {
+    "clippedSteps": 6,
+    "max": 20.022050857543945,
+    "mean": 4.358747124671936,
+    "min": 1.5642764568328857
+   },
+   "lrAfter": 0.002381677878438706,
+   "lrFirst": 0.002474172072495273,
+   "lrLast": 0.002382313158012717,
+   "memory": null,
+   "seconds": {
+    "total": 135.8127679824829,
+    "train": 126.22626376152039
+   },
+   "train": {
+    "boxMean": 0.5671367438634237,
+    "clsMean": 0.40496651411056517,
+    "ignoredEntries": 26953,
+    "lossMax": 3.8417868614196777,
+    "lossMean": 3.2406502230962118,
+    "lossMin": 2.8848488330841064,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.3864517597619663,
+   "bestEpoch": 9,
+   "checkpointSha256": "acac079fb77a858fd7d1474af10f7dfd7b72f3d41f5d12b752382d21670569d0",
+   "dev": {
+    "backgroundClsShare": 0.4701755279410843,
+    "box": 0.5980541638715867,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6069127910559695,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.2881713330366759
+     },
+     "medium": {
+      "boxPerCell": 0.5509456238021262,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.24952136874894745
+     },
+     "small": {
+      "boxPerCell": 0.6282276499410253,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.24455811114382806
+     },
+     "very-small": {
+      "boxPerCell": 0.7986587611181286,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.30086954729452214
+     }
+    },
+    "cls": 0.5213408980266684,
+    "clsByClass": {
+     "button": 0.046907966258046836,
+     "checkbox": 0.013032881762293193,
+     "icon": 0.01679624867926365,
+     "link": 0.09463233854971168,
+     "radio": 0.012874554651890207,
+     "select": 0.09698143866701196,
+     "tab": 0.043469057188303524,
+     "textbox": 0.1966464212947101
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.511611717384602,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.3864517597619663,
+    "sinceImprovement": 4,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 13,
+   "globalStep": 1950,
+   "gradNorm": {
+    "clippedSteps": 2,
+    "max": 18.62483024597168,
+    "mean": 3.9657851656277976,
+    "min": 1.324736475944519
+   },
+   "lrAfter": 0.002283747847073925,
+   "lrFirst": 0.002381677878438706,
+   "lrLast": 0.0022844174016279904,
+   "memory": null,
+   "seconds": {
+    "total": 410.683385848999,
+    "train": 343.30285263061523
+   },
+   "train": {
+    "boxMean": 0.56581989188989,
+    "clsMean": 0.39848445216814676,
+    "ignoredEntries": 26953,
+    "lossMax": 3.9037821292877197,
+    "lossMean": 3.227583899497986,
+    "lossMin": 2.8375515937805176,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.290730017923519,
+   "bestEpoch": 14,
+   "checkpointSha256": "224fc226781897cc5fbc509a6db23d5ec02d43f813e1bb88d3a6cda7d4735519",
+   "dev": {
+    "backgroundClsShare": 0.12301845806174552,
+    "box": 0.5766808204275504,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5852783226958893,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3805499697153564
+     },
+     "medium": {
+      "boxPerCell": 0.5266428060297208,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.31226484990738357
+     },
+     "small": {
+      "boxPerCell": 0.6255177382525731,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.28602920143618166
+     },
+     "very-small": {
+      "boxPerCell": 0.7599128146532718,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.34046012466350173
+     }
+    },
+    "cls": 0.4073259157857665,
+    "clsByClass": {
+     "button": 0.04713858161460101,
+     "checkbox": 0.012495877815770664,
+     "icon": 0.016745836020233704,
+     "link": 0.08944124715383249,
+     "radio": 0.011391126786708929,
+     "select": 0.0848367094080557,
+     "tab": 0.042365604389988445,
+     "textbox": 0.10291093126672902
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.290730017923519,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.290730017923519,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 14,
+   "globalStep": 2100,
+   "gradNorm": {
+    "clippedSteps": 4,
+    "max": 22.57831382751465,
+    "mean": 3.9275799949963885,
+    "min": 1.3645228147506714
+   },
+   "lrAfter": 0.002180985749609323,
+   "lrFirst": 0.002283747847073925,
+   "lrLast": 0.002181685451116967,
+   "memory": null,
+   "seconds": {
+    "total": 725.3059244155884,
+    "train": 677.0431067943573
+   },
+   "train": {
+    "boxMean": 0.5603617793321609,
+    "clsMean": 0.3918975712855657,
+    "ignoredEntries": 26953,
+    "lossMax": 3.8286690711975098,
+    "lossMean": 3.193706482251485,
+    "lossMin": 2.8272998332977295,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.254294127260852,
+   "bestEpoch": 15,
+   "checkpointSha256": "86b11f187c492aa2f11d428f7ae1a1181b136cbe23e8a599e4cf8f82b9a2ea18",
+   "dev": {
+    "backgroundClsShare": 0.36890349948440915,
+    "box": 0.5625796385638774,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5688584505107938,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.2912285866331249
+     },
+     "medium": {
+      "boxPerCell": 0.5220267212188174,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.2518449101481791
+     },
+     "small": {
+      "boxPerCell": 0.5972910700356039,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.24430342012029463
+     },
+     "very-small": {
+      "boxPerCell": 0.7552579766060483,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.28555331081247604
+     }
+    },
+    "cls": 0.4413959344414648,
+    "clsByClass": {
+     "button": 0.04368794405699843,
+     "checkbox": 0.012257314136705015,
+     "icon": 0.016046292434485167,
+     "link": 0.09175019063759532,
+     "radio": 0.010749508806616454,
+     "select": 0.07890833927194925,
+     "tab": 0.04202167697052722,
+     "textbox": 0.14597467704537942
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.254294127260852,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.254294127260852,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 15,
+   "globalStep": 2250,
+   "gradNorm": {
+    "clippedSteps": 3,
+    "max": 17.059038162231445,
+    "mean": 3.8989681458473204,
+    "min": 1.5095670223236084
+   },
+   "lrAfter": 0.002074025148547639,
+   "lrFirst": 0.002180985749609323,
+   "lrLast": 0.002074750683116394,
+   "memory": null,
+   "seconds": {
+    "total": 704.9573800563812,
+    "train": 639.2408013343811
+   },
+   "train": {
+    "boxMean": 0.5533246485392253,
+    "clsMean": 0.38542128264904024,
+    "ignoredEntries": 26953,
+    "lossMax": 3.663886785507202,
+    "lossMean": 3.152044515609741,
+    "lossMin": 2.7321228981018066,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.254294127260852,
+   "bestEpoch": 15,
+   "checkpointSha256": "af50a18b4e8780400913c81525894dbb56465b2b0165c460b330ce8d89b582e1",
+   "dev": {
+    "backgroundClsShare": 0.28826085354125314,
+    "box": 0.6374271024680045,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6484515664353282,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3315513845279885
+     },
+     "medium": {
+      "boxPerCell": 0.5807878838940498,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.29640468089977096
+     },
+     "small": {
+      "boxPerCell": 0.6798414195799971,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.30640059740319087
+     },
+     "very-small": {
+      "boxPerCell": 0.8419426838760964,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.3423388255748118
+     }
+    },
+    "cls": 0.4518466084035949,
+    "clsByClass": {
+     "button": 0.05001741017015699,
+     "checkbox": 0.02068830575721656,
+     "icon": 0.022684110642523812,
+     "link": 0.10027666879485726,
+     "radio": 0.023545010339684428,
+     "select": 0.08191553780550602,
+     "tab": 0.04655669655584535,
+     "textbox": 0.10616286596716512
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.6389821207436173,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.254294127260852,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 16,
+   "globalStep": 2400,
+   "gradNorm": {
+    "clippedSteps": 3,
+    "max": 11.692577362060547,
+    "mean": 3.9562106768290204,
+    "min": 1.6075550317764282
+   },
+   "lrAfter": 0.001963525491562425,
+   "lrFirst": 0.002074025148547639,
+   "lrLast": 0.001964272386030409,
+   "memory": null,
+   "seconds": {
+    "total": 555.5396490097046,
+    "train": 511.97272992134094
+   },
+   "train": {
+    "boxMean": 0.5498028331995011,
+    "clsMean": 0.38015770057837167,
+    "ignoredEntries": 26953,
+    "lossMax": 3.6782922744750977,
+    "lossMean": 3.129171864191691,
+    "lossMin": 2.7365334033966064,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.254294127260852,
+   "bestEpoch": 15,
+   "checkpointSha256": "dae71698aca9ad115aef71aeb7300a13f3cdef812ab1c43816fbde9991d745cc",
+   "dev": {
+    "backgroundClsShare": 0.3831334301145674,
+    "box": 0.6619586247210577,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6653502536154519,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3458714782515939
+     },
+     "medium": {
+      "boxPerCell": 0.6242663641366337,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.3064281599375104
+     },
+     "small": {
+      "boxPerCell": 0.7150971218128319,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.30262152858517677
+     },
+     "very-small": {
+      "boxPerCell": 0.8590528656643682,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.337202513325046
+     }
+    },
+    "cls": 0.5404316067986188,
+    "clsByClass": {
+     "button": 0.04621672277640219,
+     "checkbox": 0.018086183519577734,
+     "icon": 0.029539631769312676,
+     "link": 0.13976990200424705,
+     "radio": 0.04732952598982178,
+     "select": 0.08497152479689975,
+     "tab": 0.0452182363448311,
+     "textbox": 0.1292998691052549
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.8502247304039074,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.254294127260852,
+    "sinceImprovement": 2,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 17,
+   "globalStep": 2550,
+   "gradNorm": {
+    "clippedSteps": 3,
+    "max": 21.105676651000977,
+    "mean": 4.181071342627208,
+    "min": 1.6964337825775146
+   },
+   "lrAfter": 0.001850168045783861,
+   "lrFirst": 0.001963525491562425,
+   "lrLast": 0.001850931695298311,
+   "memory": null,
+   "seconds": {
+    "total": 118.85004830360413,
+    "train": 109.0909116268158
+   },
+   "train": {
+    "boxMean": 0.5463202265898387,
+    "clsMean": 0.3756659572323163,
+    "ignoredEntries": 26953,
+    "lossMax": 3.6585676670074463,
+    "lossMean": 3.1072670936584474,
+    "lossMin": 2.7457923889160156,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.1080860955153193,
+   "bestEpoch": 18,
+   "checkpointSha256": "3a62ac78b6adef3b4a3c7d80c07ac995ef0b412cff180aef4e133b04ba57f488",
+   "dev": {
+    "backgroundClsShare": 0.14736291957155104,
+    "box": 0.5438804299303843,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5377936688432395,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.35704200101743483
+     },
+     "medium": {
+      "boxPerCell": 0.5295380154580789,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.28268702917410954
+     },
+     "small": {
+      "boxPerCell": 0.610619299453011,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.2543705468435213
+     },
+     "very-small": {
+      "boxPerCell": 0.7331934536069593,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.299452047818968
+     }
+    },
+    "cls": 0.3886839458633978,
+    "clsByClass": {
+     "button": 0.045127626012385465,
+     "checkbox": 0.012088797690692378,
+     "icon": 0.015287639372060471,
+     "link": 0.08745943481103194,
+     "radio": 0.010376517628128046,
+     "select": 0.0808078186785614,
+     "tab": 0.04111754538459414,
+     "textbox": 0.09641857605034101
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.1080860955153193,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.1080860955153193,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 18,
+   "globalStep": 2700,
+   "gradNorm": {
+    "clippedSteps": 6,
+    "max": 18.13743782043457,
+    "mean": 4.0801482089360555,
+    "min": 1.7068883180618286
+   },
+   "lrAfter": 0.0017346516975603483,
+   "lrFirst": 0.001850168045783861,
+   "lrLast": 0.001735427393968069,
+   "memory": null,
+   "seconds": {
+    "total": 116.77861309051514,
+    "train": 106.65419912338257
+   },
+   "train": {
+    "boxMean": 0.5435598713159561,
+    "clsMean": 0.3756497593720754,
+    "ignoredEntries": 26953,
+    "lossMax": 3.753335475921631,
+    "lossMean": 3.0934491030375164,
+    "lossMin": 2.711348056793213,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.062221288099889,
+   "bestEpoch": 19,
+   "checkpointSha256": "86d094edce12e6efb453f61f3a3e1097c78e81f0bafe1f7606d8a74d10fbaf5c",
+   "dev": {
+    "backgroundClsShare": 0.22417271597555405,
+    "box": 0.5397133492730397,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5334427948246541,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.2996640135235593
+     },
+     "medium": {
+      "boxPerCell": 0.5259266892238107,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.24606823147914217
+     },
+     "small": {
+      "boxPerCell": 0.6018586367042588,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.23547099709334599
+     },
+     "very-small": {
+      "boxPerCell": 0.7451176732128177,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.27635720186174606
+     }
+    },
+    "cls": 0.3636545417346904,
+    "clsByClass": {
+     "button": 0.04249500705222793,
+     "checkbox": 0.012214528281103488,
+     "icon": 0.015244940701284064,
+     "link": 0.0872024862826049,
+     "radio": 0.010156667552957244,
+     "select": 0.07421880178319848,
+     "tab": 0.04010338015384692,
+     "textbox": 0.08201872176170732
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.062221288099889,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.062221288099889,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 19,
+   "globalStep": 2850,
+   "gradNorm": {
+    "clippedSteps": 1,
+    "max": 10.170620918273926,
+    "mean": 3.4662704634666444,
+    "min": 1.4625658988952637
+   },
+   "lrAfter": 0.0016176886435917694,
+   "lrFirst": 0.0017346516975603483,
+   "lrLast": 0.0016184716044664613,
+   "memory": null,
+   "seconds": {
+    "total": 112.73928189277649,
+    "train": 102.89953398704529
+   },
+   "train": {
+    "boxMean": 0.5381273613373438,
+    "clsMean": 0.36623669306437173,
+    "ignoredEntries": 26953,
+    "lossMax": 3.559443712234497,
+    "lossMean": 3.056873517036438,
+    "lossMin": 2.7059872150421143,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.062221288099889,
+   "bestEpoch": 19,
+   "checkpointSha256": "406c80e58453a93b499a0187a000d8f161938e4505ad3d530397d6a11c4a28c6",
+   "dev": {
+    "backgroundClsShare": 0.4476752076772164,
+    "box": 0.6730249902019757,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6842940235289265,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.34451612033346907
+     },
+     "medium": {
+      "boxPerCell": 0.6175681843975642,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.32999857324418297
+     },
+     "small": {
+      "boxPerCell": 0.7128718680936542,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.3393301712621912
+     },
+     "very-small": {
+      "boxPerCell": 0.8611458975329173,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.3688315015970054
+     }
+    },
+    "cls": 0.6175464018163692,
+    "clsByClass": {
+     "button": 0.10969214829120649,
+     "checkbox": 0.030532753584050693,
+     "icon": 0.030112885488656548,
+     "link": 0.09275752001371261,
+     "radio": 0.04220080348125782,
+     "select": 0.09887974573144233,
+     "tab": 0.08374787336781542,
+     "textbox": 0.12962267315254372
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.982671352826248,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.062221288099889,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 20,
+   "globalStep": 3000,
+   "gradNorm": {
+    "clippedSteps": 6,
+    "max": 19.964082717895508,
+    "mean": 4.157027242978414,
+    "min": 1.4905731678009033
+   },
+   "lrAfter": 0.0015000000000000018,
+   "lrFirst": 0.0016176886435917694,
+   "lrLast": 0.0015007853981275127,
+   "memory": null,
+   "seconds": {
+    "total": 141.32269191741943,
+    "train": 131.69621539115906
+   },
+   "train": {
+    "boxMean": 0.5376087758938471,
+    "clsMean": 0.3633622984091441,
+    "ignoredEntries": 26953,
+    "lossMax": 3.657865047454834,
+    "lossMean": 3.051406183242798,
+    "lossMin": 2.627781867980957,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.062221288099889,
+   "bestEpoch": 19,
+   "checkpointSha256": "0750637f427b40b2115074ae98f17581188ac9855b5134bef30d7064251d7dad",
+   "dev": {
+    "backgroundClsShare": 0.1999397067514373,
+    "box": 0.6187022809163536,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6315481998077394,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.39585730690911664
+     },
+     "medium": {
+      "boxPerCell": 0.5683425467881269,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.31380007138802746
+     },
+     "small": {
+      "boxPerCell": 0.6322140255624062,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.27914986868171654
+     },
+     "very-small": {
+      "boxPerCell": 0.7715900649002183,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.31945538162152176
+     }
+    },
+    "cls": 0.4588689546653098,
+    "clsByClass": {
+     "button": 0.04668396488364724,
+     "checkbox": 0.01289448421431985,
+     "icon": 0.01577057098589128,
+     "link": 0.09871717439436532,
+     "radio": 0.01489908122344763,
+     "select": 0.09010962135090102,
+     "tab": 0.04172132725902001,
+     "textbox": 0.13807272560800396
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.5523803592470777,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.062221288099889,
+    "sinceImprovement": 2,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 21,
+   "globalStep": 3150,
+   "gradNorm": {
+    "clippedSteps": 5,
+    "max": 14.744142532348633,
+    "mean": 4.1591288638114925,
+    "min": 1.5090388059616089
+   },
+   "lrAfter": 0.0013823113564082332,
+   "lrFirst": 0.0015000000000000018,
+   "lrLast": 0.0013830943495479343,
+   "memory": null,
+   "seconds": {
+    "total": 112.91959023475647,
+    "train": 103.4996247291565
+   },
+   "train": {
+    "boxMean": 0.5326631939411164,
+    "clsMean": 0.3588739546140035,
+    "ignoredEntries": 26953,
+    "lossMax": 3.4175195693969727,
+    "lossMean": 3.0221899127960206,
+    "lossMin": 2.604860305786133,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.062221288099889,
+   "bestEpoch": 19,
+   "checkpointSha256": "152a0c174a416f379ee12b23fe7fc1807027cd330029d7beed143811142be183",
+   "dev": {
+    "backgroundClsShare": 0.31522640639766053,
+    "box": 0.5535513263236447,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5403535498847184,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.27448340641648566
+     },
+     "medium": {
+      "boxPerCell": 0.5507332391316159,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.22501157494669494
+     },
+     "small": {
+      "boxPerCell": 0.6393968314826594,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.22660831594363018
+     },
+     "very-small": {
+      "boxPerCell": 0.7874419167350897,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2613965264056476
+     }
+    },
+    "cls": 0.3784858481143801,
+    "clsByClass": {
+     "button": 0.044008942183822806,
+     "checkbox": 0.012258976659871463,
+     "icon": 0.014835794935863239,
+     "link": 0.10284937700786312,
+     "radio": 0.010237212661140815,
+     "select": 0.0752690927160524,
+     "tab": 0.04028998991551472,
+     "textbox": 0.07873645964049912
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.1462424797326034,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.062221288099889,
+    "sinceImprovement": 3,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 22,
+   "globalStep": 3300,
+   "gradNorm": {
+    "clippedSteps": 3,
+    "max": 14.744248390197754,
+    "mean": 4.182320026556651,
+    "min": 1.532786250114441
+   },
+   "lrAfter": 0.001265348302439653,
+   "lrFirst": 0.0013823113564082332,
+   "lrLast": 0.0012661240631784679,
+   "memory": null,
+   "seconds": {
+    "total": 133.87347650527954,
+    "train": 124.04150223731995
+   },
+   "train": {
+    "boxMean": 0.531124724149704,
+    "clsMean": 0.35748246232668557,
+    "ignoredEntries": 26953,
+    "lossMax": 3.534111738204956,
+    "lossMean": 3.0131060711542763,
+    "lossMin": 2.6132864952087402,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.009446230112909,
+   "bestEpoch": 23,
+   "checkpointSha256": "54b85d70abea1036d826bab821f99cb98f537212d31e8f62abd6461cb0347de8",
+   "dev": {
+    "backgroundClsShare": 0.20267038122108427,
+    "box": 0.531136035703952,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5228895017016366,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.30140048913752243
+     },
+     "medium": {
+      "boxPerCell": 0.5303195816313353,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.24147151936728037
+     },
+     "small": {
+      "boxPerCell": 0.5774666876957857,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.23324266620088163
+     },
+     "very-small": {
+      "boxPerCell": 0.6908164898146407,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.27753594518186037
+     }
+    },
+    "cls": 0.3537660515931493,
+    "clsByClass": {
+     "button": 0.041843301169572404,
+     "checkbox": 0.011860530021728868,
+     "icon": 0.015103743467700015,
+     "link": 0.08808032540374337,
+     "radio": 0.009717037762711503,
+     "select": 0.07377882777740455,
+     "tab": 0.03892241542443307,
+     "textbox": 0.07445987313698056
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.009446230112909,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.009446230112909,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 23,
+   "globalStep": 3450,
+   "gradNorm": {
+    "clippedSteps": 6,
+    "max": 19.823486328125,
+    "mean": 4.071366919676463,
+    "min": 1.615477204322815
+   },
+   "lrAfter": 0.0011498319542161412,
+   "lrFirst": 0.001265348302439653,
+   "lrLast": 0.0011505956997311466,
+   "memory": null,
+   "seconds": {
+    "total": 113.38677310943604,
+    "train": 104.03831243515015
+   },
+   "train": {
+    "boxMean": 0.5295331281423569,
+    "clsMean": 0.3572816902399063,
+    "ignoredEntries": 26953,
+    "lossMax": 3.679579257965088,
+    "lossMean": 3.004947328567505,
+    "lossMin": 2.6151418685913086,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 3.009446230112909,
+   "bestEpoch": 23,
+   "checkpointSha256": "40d1d35edef2e3ea82e329755ec0c74dddf9418f4c247e3f4b30619ad8711b0e",
+   "dev": {
+    "backgroundClsShare": 0.17234836933543043,
+    "box": 0.531532793147497,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5320972125578428,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3146512140237269
+     },
+     "medium": {
+      "boxPerCell": 0.5116191039009172,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.25332718685403677
+     },
+     "small": {
+      "boxPerCell": 0.5653599211995441,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.24383206457225753
+     },
+     "very-small": {
+      "boxPerCell": 0.6619094353126164,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.28540725217455465
+     }
+    },
+    "cls": 0.35608619613489045,
+    "clsByClass": {
+     "button": 0.041976253646444354,
+     "checkbox": 0.011733405118028051,
+     "icon": 0.014784762549846939,
+     "link": 0.09045399836382177,
+     "radio": 0.00927539792687571,
+     "select": 0.07428317996355781,
+     "tab": 0.038643491331006884,
+     "textbox": 0.07493570522590601
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.0137501618723754,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 3.009446230112909,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 24,
+   "globalStep": 3600,
+   "gradNorm": {
+    "clippedSteps": 3,
+    "max": 15.019932746887207,
+    "mean": 4.129150667190552,
+    "min": 1.4390686750411987
+   },
+   "lrAfter": 0.0010364745084375786,
+   "lrFirst": 0.0011498319542161412,
+   "lrLast": 0.001037221529983705,
+   "memory": null,
+   "seconds": {
+    "total": 116.12787389755249,
+    "train": 106.51547455787659
+   },
+   "train": {
+    "boxMean": 0.5225043646494547,
+    "clsMean": 0.3530166271328926,
+    "ignoredEntries": 26953,
+    "lossMax": 3.519103765487671,
+    "lossMean": 2.9655384540557863,
+    "lossMin": 2.5968949794769287,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9895967557734395,
+   "bestEpoch": 25,
+   "checkpointSha256": "58740a5d0eaf2cfa2bf28ca916bc33f1c12af3f987f24aa43a234b33f51a0a48",
+   "dev": {
+    "backgroundClsShare": 0.24744418266797988,
+    "box": 0.5268735487000267,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.526797808562652,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.2821386178796456
+     },
+     "medium": {
+      "boxPerCell": 0.506107881220729,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.2349032537968224
+     },
+     "small": {
+      "boxPerCell": 0.5644948404667616,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.23596683153642642
+     },
+     "very-small": {
+      "boxPerCell": 0.6798203627319482,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.26025043214660554
+     }
+    },
+    "cls": 0.3552290122733065,
+    "clsByClass": {
+     "button": 0.042412187218886864,
+     "checkbox": 0.011767433958337657,
+     "icon": 0.014452488162586222,
+     "link": 0.08796196282199065,
+     "radio": 0.00935893888732877,
+     "select": 0.0747975157783018,
+     "tab": 0.039091861284140744,
+     "textbox": 0.07538662477979598
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.9895967557734395,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9895967557734395,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 25,
+   "globalStep": 3750,
+   "gradNorm": {
+    "clippedSteps": 5,
+    "max": 15.603362083435059,
+    "mean": 4.038485360145569,
+    "min": 1.7106022834777832
+   },
+   "lrAfter": 0.0009259748514523662,
+   "lrFirst": 0.0010364745084375786,
+   "lrLast": 0.0009267005433933709,
+   "memory": null,
+   "seconds": {
+    "total": 95.36637258529663,
+    "train": 85.61939096450806
+   },
+   "train": {
+    "boxMean": 0.5217457397778829,
+    "clsMean": 0.34751181085904437,
+    "ignoredEntries": 26953,
+    "lossMax": 3.381490707397461,
+    "lossMean": 2.9562405157089233,
+    "lossMin": 2.521113872528076,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9895967557734395,
+   "bestEpoch": 25,
+   "checkpointSha256": "3eb8d8d87c65faa03417e22bb70baf4107ca28452fce70c81fe8433ca8741383",
+   "dev": {
+    "backgroundClsShare": 0.2723321680082449,
+    "box": 0.6176736522928369,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6480461252577938,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.32526975830846405
+     },
+     "medium": {
+      "boxPerCell": 0.55000153252897,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.2771331922868356
+     },
+     "small": {
+      "boxPerCell": 0.5418307875055245,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.2575590239783195
+     },
+     "very-small": {
+      "boxPerCell": 0.6611685224154794,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.29701669491464044
+     }
+    },
+    "cls": 0.42430465531562267,
+    "clsByClass": {
+     "button": 0.04367130021306923,
+     "checkbox": 0.012873364311865728,
+     "icon": 0.01557951108399266,
+     "link": 0.10513776912741593,
+     "radio": 0.009668029506929753,
+     "select": 0.07882758408362228,
+     "tab": 0.040254492536487156,
+     "textbox": 0.11829260740955616
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.512672916779807,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9895967557734395,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 26,
+   "globalStep": 3900,
+   "gradNorm": {
+    "clippedSteps": 7,
+    "max": 25.019412994384766,
+    "mean": 4.289502254327139,
+    "min": 1.4500398635864258
+   },
+   "lrAfter": 0.000819014250390681,
+   "lrFirst": 0.0009259748514523662,
+   "lrLast": 0.000819714138594431,
+   "memory": null,
+   "seconds": {
+    "total": 92.9454824924469,
+    "train": 88.95081830024719
+   },
+   "train": {
+    "boxMean": 0.5169100254774094,
+    "clsMean": 0.3433135626713435,
+    "ignoredEntries": 26953,
+    "lossMax": 3.416991710662842,
+    "lossMean": 2.927863704363505,
+    "lossMin": 2.4673633575439453,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9895967557734395,
+   "bestEpoch": 25,
+   "checkpointSha256": "eeff01af0f0e1ba53f1a165b27ccc65ddfe3d346dee77827d9d1a4c0495b2952",
+   "dev": {
+    "backgroundClsShare": 0.1956451357166477,
+    "box": 0.5344533359809636,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5438684851553397,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3004242034827012
+     },
+     "medium": {
+      "boxPerCell": 0.49827204221088794,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.24091410220874757
+     },
+     "small": {
+      "boxPerCell": 0.5465519986428686,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.23315125621363464
+     },
+     "very-small": {
+      "boxPerCell": 0.6284571961811786,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2743894555229354
+     }
+    },
+    "cls": 0.3496118817420237,
+    "clsByClass": {
+     "button": 0.04145280177213725,
+     "checkbox": 0.011608483881884358,
+     "icon": 0.014492720823892158,
+     "link": 0.08901476527162991,
+     "radio": 0.009093405165658272,
+     "select": 0.07319318206176767,
+     "tab": 0.03834720454475078,
+     "textbox": 0.07240931678368118
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.021878561646841,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9895967557734395,
+    "sinceImprovement": 2,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 27,
+   "globalStep": 4050,
+   "gradNorm": {
+    "clippedSteps": 5,
+    "max": 22.78843116760254,
+    "mean": 4.105490157604217,
+    "min": 1.4487260580062866
+   },
+   "lrAfter": 0.0007162521529260776,
+   "lrFirst": 0.000819014250390681,
+   "lrLast": 0.0007169219223490602,
+   "memory": null,
+   "seconds": {
+    "total": 204.5686674118042,
+    "train": 158.38709712028503
+   },
+   "train": {
+    "boxMean": 0.5148436254262925,
+    "clsMean": 0.3418909830848376,
+    "ignoredEntries": 26953,
+    "lossMax": 3.3943684101104736,
+    "lossMean": 2.916109118461609,
+    "lossMin": 2.5865845680236816,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9895967557734395,
+   "bestEpoch": 25,
+   "checkpointSha256": "fb21531480f846537bd49d0b3ac6b30829dddcccf48c0762c23b48c52dbf083f",
+   "dev": {
+    "backgroundClsShare": 0.2516034560160641,
+    "box": 0.5257219268256085,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5228675132763889,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.2918226625838931
+     },
+     "medium": {
+      "boxPerCell": 0.5177027944427985,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.22635472392225955
+     },
+     "small": {
+      "boxPerCell": 0.557871543347015,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.21552985141226713
+     },
+     "very-small": {
+      "boxPerCell": 0.6292658713723943,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2516793381991833
+     }
+    },
+    "cls": 0.36122392800952635,
+    "clsByClass": {
+     "button": 0.04194298401018987,
+     "checkbox": 0.011844547607198679,
+     "icon": 0.014614169409080748,
+     "link": 0.0843815909344323,
+     "radio": 0.009383476691836505,
+     "select": 0.07504953825372758,
+     "tab": 0.03934743598834376,
+     "textbox": 0.0846601841406184
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.989833562137569,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9895967557734395,
+    "sinceImprovement": 3,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 28,
+   "globalStep": 4200,
+   "gradNorm": {
+    "clippedSteps": 4,
+    "max": 19.256851196289062,
+    "mean": 4.334977928002675,
+    "min": 1.2222400903701782
+   },
+   "lrAfter": 0.000618322121561291,
+   "lrFirst": 0.0007162521529260776,
+   "lrLast": 0.0006189576428522927,
+   "memory": null,
+   "seconds": {
+    "total": 489.85220313072205,
+    "train": 435.3564450740814
+   },
+   "train": {
+    "boxMean": 0.5135631493727366,
+    "clsMean": 0.34073691566785175,
+    "ignoredEntries": 26953,
+    "lossMax": 3.622838258743286,
+    "lossMean": 2.9085526577631633,
+    "lossMin": 2.5222201347351074,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9895967557734395,
+   "bestEpoch": 25,
+   "checkpointSha256": "a3af521cd266a3c4ab2362af3f2a6b82bad269bbf16f829dafdd5a0cab920ff8",
+   "dev": {
+    "backgroundClsShare": 0.25676944841482985,
+    "box": 0.5642533942423454,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5631721486029012,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.29312003213384596
+     },
+     "medium": {
+      "boxPerCell": 0.5482558221547159,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.23793695270707063
+     },
+     "small": {
+      "boxPerCell": 0.5900780289912871,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.23574300057873093
+     },
+     "very-small": {
+      "boxPerCell": 0.7328743147299134,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.26951264495816707
+     }
+    },
+    "cls": 0.3708595547250347,
+    "clsByClass": {
+     "button": 0.0415466528018955,
+     "checkbox": 0.012960841290206335,
+     "icon": 0.01575055095665361,
+     "link": 0.09026085175617576,
+     "radio": 0.012581580090727412,
+     "select": 0.0723990019234497,
+     "tab": 0.03906708314525371,
+     "textbox": 0.08629299798169128
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.192126525936762,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9895967557734395,
+    "sinceImprovement": 4,
+    "wouldStopAtEpoch": null
+   },
+   "epoch": 29,
+   "globalStep": 4350,
+   "gradNorm": {
+    "clippedSteps": 6,
+    "max": 35.35237121582031,
+    "mean": 4.393810512224833,
+    "min": 1.475115180015564
+   },
+   "lrAfter": 0.000525827927504725,
+   "lrFirst": 0.000618322121561291,
+   "lrLast": 0.0005264252824636544,
+   "memory": null,
+   "seconds": {
+    "total": 495.9292621612549,
+    "train": 450.0830829143524
+   },
+   "train": {
+    "boxMean": 0.5120223371187845,
+    "clsMean": 0.3386975274483363,
+    "ignoredEntries": 26953,
+    "lossMax": 3.5198237895965576,
+    "lossMean": 2.898809210459391,
+    "lossMin": 2.4603469371795654,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9895967557734395,
+   "bestEpoch": 25,
+   "checkpointSha256": "aa2e19bea65d2e6b28fa0d39c9e37962a8363e2dea3f75b2db752b3bed60e2d0",
+   "dev": {
+    "backgroundClsShare": 0.24104706148817553,
+    "box": 0.6194873440294713,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.6236812142173337,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.3262021144938532
+     },
+     "medium": {
+      "boxPerCell": 0.5882181940153178,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.28087896473280655
+     },
+     "small": {
+      "boxPerCell": 0.6505477442532683,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.29841771317751764
+     },
+     "very-small": {
+      "boxPerCell": 0.7773179813588231,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.3317591619793809
+     }
+    },
+    "cls": 0.4130898651539058,
+    "clsByClass": {
+     "button": 0.044010659995486125,
+     "checkbox": 0.015109333488698464,
+     "icon": 0.01906856420382411,
+     "link": 0.09014363276540753,
+     "radio": 0.02213013456748535,
+     "select": 0.07823841476425591,
+     "tab": 0.04120971241253328,
+     "textbox": 0.10317940503516104
+    },
+    "ignoredEntries": 6999,
+    "loss": 3.510526585301262,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9895967557734395,
+    "sinceImprovement": 5,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 30,
+   "globalStep": 4500,
+   "gradNorm": {
+    "clippedSteps": 8,
+    "max": 30.139610290527344,
+    "mean": 4.972305706342062,
+    "min": 1.6430201530456543
+   },
+   "lrAfter": 0.0004393398282201794,
+   "lrFirst": 0.000525827927504725,
+   "lrLast": 0.0004398953339550742,
+   "memory": null,
+   "seconds": {
+    "total": 498.77671480178833,
+    "train": 453.0034272670746
+   },
+   "train": {
+    "boxMean": 0.5118872610727946,
+    "clsMean": 0.3394104219476382,
+    "ignoredEntries": 26953,
+    "lossMax": 3.334056854248047,
+    "lossMean": 2.8988467343648274,
+    "lossMin": 2.471477508544922,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.910159791948305,
+   "bestEpoch": 31,
+   "checkpointSha256": "cbfee8af9ce57212cc25d27ec934f0681a27639770a3c04a1a0e559bd5123b7f",
+   "dev": {
+    "backgroundClsShare": 0.21275822784925108,
+    "box": 0.5148370695789981,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5081124791263518,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.28440431491373047
+     },
+     "medium": {
+      "boxPerCell": 0.5187621159177322,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.22134126277593555
+     },
+     "small": {
+      "boxPerCell": 0.5428486039518173,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.22036568168846596
+     },
+     "very-small": {
+      "boxPerCell": 0.6171560982990633,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2559288117427269
+     }
+    },
+    "cls": 0.3359744440533145,
+    "clsByClass": {
+     "button": 0.04019553903558381,
+     "checkbox": 0.011317841142036605,
+     "icon": 0.01418282979452,
+     "link": 0.08403772109790766,
+     "radio": 0.008704206541047066,
+     "select": 0.07100945904559035,
+     "tab": 0.037991031561133815,
+     "textbox": 0.06853581654375406
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.910159791948305,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.910159791948305,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 31,
+   "globalStep": 4650,
+   "gradNorm": {
+    "clippedSteps": 2,
+    "max": 11.724245071411133,
+    "mean": 3.4105428767204287,
+    "min": 1.523486852645874
+   },
+   "lrAfter": 0.0003593910515999538,
+   "lrFirst": 0.0004393398282201794,
+   "lrLast": 0.00035990128323323383,
+   "memory": null,
+   "seconds": {
+    "total": 479.5775046348572,
+    "train": 431.11039185523987
+   },
+   "train": {
+    "boxMean": 0.5080443028608957,
+    "clsMean": 0.33523020962874095,
+    "ignoredEntries": 26953,
+    "lossMax": 3.40910005569458,
+    "lossMean": 2.875451712608337,
+    "lossMin": 2.2913899421691895,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9082658300548725,
+   "bestEpoch": 32,
+   "checkpointSha256": "d5893aec4eff75270a0d4cc53f7ccea2cb4dd3d592b32b6673f167ad076e87f0",
+   "dev": {
+    "backgroundClsShare": 0.23009640295107242,
+    "box": 0.514482311342795,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5112696602047038,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.27563650646314325
+     },
+     "medium": {
+      "boxPerCell": 0.509769678204468,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.22085159602033658
+     },
+     "small": {
+      "boxPerCell": 0.538102397597219,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.22151458742109512
+     },
+     "very-small": {
+      "boxPerCell": 0.6171363904326198,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2588520321244223
+     }
+    },
+    "cls": 0.3358542733408973,
+    "clsByClass": {
+     "button": 0.04009133804183723,
+     "checkbox": 0.011559912643432006,
+     "icon": 0.014339060549528982,
+     "link": 0.08441935454270526,
+     "radio": 0.00879532559814176,
+     "select": 0.07129214480797204,
+     "tab": 0.037519567894724166,
+     "textbox": 0.06783756576972257
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.9082658300548725,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9082658300548725,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 32,
+   "globalStep": 4800,
+   "gradNorm": {
+    "clippedSteps": 4,
+    "max": 12.728339195251465,
+    "mean": 3.396073311169942,
+    "min": 1.6403963565826416
+   },
+   "lrAfter": 0.000286474508437579,
+   "lrFirst": 0.0003593910515999538,
+   "lrLast": 0.0002869363202215559,
+   "memory": null,
+   "seconds": {
+    "total": 489.4889385700226,
+    "train": 437.2455327510834
+   },
+   "train": {
+    "boxMean": 0.5057705877224604,
+    "clsMean": 0.33196600526571274,
+    "ignoredEntries": 26953,
+    "lossMax": 3.3209261894226074,
+    "lossMean": 2.860818950335185,
+    "lossMin": 2.4209699630737305,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9082658300548725,
+   "bestEpoch": 32,
+   "checkpointSha256": "3df442092e0be46364585d65eef71d724c9143599e24af5e0b506fcb66839a9e",
+   "dev": {
+    "backgroundClsShare": 0.2063700768760365,
+    "box": 0.5220000489240004,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5236718064380326,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.2912650969255133
+     },
+     "medium": {
+      "boxPerCell": 0.5067958732806066,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.2280448851050201
+     },
+     "small": {
+      "boxPerCell": 0.5427807966938214,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.21921465563776213
+     },
+     "very-small": {
+      "boxPerCell": 0.5922137182851505,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.25724337168697825
+     }
+    },
+    "cls": 0.34109847132583015,
+    "clsByClass": {
+     "button": 0.04071969775963121,
+     "checkbox": 0.011411797591461284,
+     "icon": 0.01452685311581788,
+     "link": 0.08622269911444046,
+     "radio": 0.008728983963666281,
+     "select": 0.07208417005732953,
+     "tab": 0.038375267280871386,
+     "textbox": 0.06902899155517953
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.951098715945832,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9082658300548725,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 33,
+   "globalStep": 4950,
+   "gradNorm": {
+    "clippedSteps": 2,
+    "max": 14.386334419250488,
+    "mean": 3.5900614007314045,
+    "min": 1.3092395067214966
+   },
+   "lrAfter": 0.00022103975346886168,
+   "lrFirst": 0.000286474508437579,
+   "lrLast": 0.00022145029818031913,
+   "memory": null,
+   "seconds": {
+    "total": 493.60053539276123,
+    "train": 436.71548771858215
+   },
+   "train": {
+    "boxMean": 0.5048479447762172,
+    "clsMean": 0.3330004502336184,
+    "ignoredEntries": 26953,
+    "lossMax": 3.544764995574951,
+    "lossMean": 2.857240155537923,
+    "lossMin": 2.389242649078369,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9014196121230973,
+   "bestEpoch": 34,
+   "checkpointSha256": "a3388e26e31da4cef6634fc8c25b66cac83eda88ab8b87c7fa3b25ae55110fc9",
+   "dev": {
+    "backgroundClsShare": 0.22484130791883167,
+    "box": 0.5133796899211291,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5064238216217122,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.276370195769435
+     },
+     "medium": {
+      "boxPerCell": 0.5175946689086293,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.22090883962451738
+     },
+     "small": {
+      "boxPerCell": 0.5431695523044897,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.22423234880969922
+     },
+     "very-small": {
+      "boxPerCell": 0.6141136333786325,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.26159421548687295
+     }
+    },
+    "cls": 0.3345211625174515,
+    "clsByClass": {
+     "button": 0.03984019311811362,
+     "checkbox": 0.011460070309377545,
+     "icon": 0.01421596463330929,
+     "link": 0.08436409129253135,
+     "radio": 0.008698557132568877,
+     "select": 0.07099068962148691,
+     "tab": 0.03773872856240345,
+     "textbox": 0.06721286582415625
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.9014196121230973,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9014196121230973,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 34,
+   "globalStep": 5100,
+   "gradNorm": {
+    "clippedSteps": 6,
+    "max": 22.218109130859375,
+    "mean": 3.912088199456533,
+    "min": 1.5211261510849
+   },
+   "lrAfter": 0.00016349021371744827,
+   "lrFirst": 0.00022103975346886168,
+   "lrLast": 0.00016384696021172016,
+   "memory": null,
+   "seconds": {
+    "total": 490.3082699775696,
+    "train": 443.4656319618225
+   },
+   "train": {
+    "boxMean": 0.5057931047677994,
+    "clsMean": 0.33271612226963043,
+    "ignoredEntries": 26953,
+    "lossMax": 3.2879693508148193,
+    "lossMean": 2.8616816409428916,
+    "lossMin": 2.425534725189209,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.9014196121230973,
+   "bestEpoch": 34,
+   "checkpointSha256": "79306513128594dbee3044da05d5a0de55e004dc4278a269bac94b2e3e32f674",
+   "dev": {
+    "backgroundClsShare": 0.20889360242602936,
+    "box": 0.5156294383694465,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.51114342835106,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.285116722080197
+     },
+     "medium": {
+      "boxPerCell": 0.5148245309456254,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.22409614169690265
+     },
+     "small": {
+      "boxPerCell": 0.5409589485359663,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.21928807406397283
+     },
+     "very-small": {
+      "boxPerCell": 0.6070178522225063,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2565499668718532
+     }
+    },
+    "cls": 0.3357140331951905,
+    "clsByClass": {
+     "button": 0.040123831700035306,
+     "checkbox": 0.011275866349357953,
+     "icon": 0.014222786516831933,
+     "link": 0.08510262811552252,
+     "radio": 0.00854068790356684,
+     "select": 0.07125870867132802,
+     "tab": 0.037698342403938934,
+     "textbox": 0.06749117968622201
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.913861225042423,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.9014196121230973,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 35,
+   "globalStep": 5250,
+   "gradNorm": {
+    "clippedSteps": 0,
+    "max": 8.974872589111328,
+    "mean": 3.2705144794782,
+    "min": 1.5150539875030518
+   },
+   "lrAfter": 0.00011418070123306981,
+   "lrFirst": 0.00016349021371744827,
+   "lrLast": 0.0001144814500493889,
+   "memory": null,
+   "seconds": {
+    "total": 512.9039957523346,
+    "train": 459.03890109062195
+   },
+   "train": {
+    "boxMean": 0.5038143203655878,
+    "clsMean": 0.3295989847183228,
+    "ignoredEntries": 26953,
+    "lossMax": 3.4252705574035645,
+    "lossMean": 2.8486705923080446,
+    "lossMin": 2.5375776290893555,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.8988236236778895,
+   "bestEpoch": 36,
+   "checkpointSha256": "658029968e9dd8ecefbc3b84632d1c1ab5fa86fa82a7c5b06fda4a25ce278871",
+   "dev": {
+    "backgroundClsShare": 0.21754197894836047,
+    "box": 0.5132721751737306,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5113530897966745,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.27872360018809195
+     },
+     "medium": {
+      "boxPerCell": 0.5066957964395106,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.21946111634356702
+     },
+     "small": {
+      "boxPerCell": 0.5362820114257939,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.22070508917673312
+     },
+     "very-small": {
+      "boxPerCell": 0.5941824327690457,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2512597046094314
+     }
+    },
+    "cls": 0.3324627478092363,
+    "clsByClass": {
+     "button": 0.03972531804799884,
+     "checkbox": 0.011279286551157529,
+     "icon": 0.01408031178142871,
+     "link": 0.08419469555730236,
+     "radio": 0.008505238684019699,
+     "select": 0.0707922497480988,
+     "tab": 0.03741537550936291,
+     "textbox": 0.06647027415087489
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.8988236236778895,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.8988236236778895,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 36,
+   "globalStep": 5400,
+   "gradNorm": {
+    "clippedSteps": 1,
+    "max": 17.545665740966797,
+    "mean": 3.225723729133606,
+    "min": 1.3648345470428467
+   },
+   "lrAfter": 7.341522555726948e-05,
+   "lrFirst": 0.00011418070123306981,
+   "lrLast": 7.365812247917408e-05,
+   "memory": null,
+   "seconds": {
+    "total": 478.79375767707825,
+    "train": 438.8865580558777
+   },
+   "train": {
+    "boxMean": 0.5011549073457718,
+    "clsMean": 0.3296451878547668,
+    "ignoredEntries": 26953,
+    "lossMax": 3.4331717491149902,
+    "lossMean": 2.8354197136561075,
+    "lossMin": 2.433720111846924,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.8988236236778895,
+   "bestEpoch": 36,
+   "checkpointSha256": "c67896e89dd463eb382122f6771f0e23177f965dc2ae9799208e7164e35e9956",
+   "dev": {
+    "backgroundClsShare": 0.23628176468727982,
+    "box": 0.5137525260410789,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.51013202992787,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.2728073692067005
+     },
+     "medium": {
+      "boxPerCell": 0.5112041430716598,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.21453605604999065
+     },
+     "small": {
+      "boxPerCell": 0.5393106470964757,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.21411062955022636
+     },
+     "very-small": {
+      "boxPerCell": 0.5951347345718218,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2465588154464922
+     }
+    },
+    "cls": 0.3331603556212249,
+    "clsByClass": {
+     "button": 0.03988195908068084,
+     "checkbox": 0.011394728223503684,
+     "icon": 0.014136815233707078,
+     "link": 0.08398980004075357,
+     "radio": 0.008609697359048514,
+     "select": 0.07068672578890296,
+     "tab": 0.03743510259242758,
+     "textbox": 0.06702552891099474
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.9019229858266193,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.8988236236778895,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 37,
+   "globalStep": 5550,
+   "gradNorm": {
+    "clippedSteps": 3,
+    "max": 12.649343490600586,
+    "mean": 3.0786968676249185,
+    "min": 1.2301785945892334
+   },
+   "lrAfter": 4.1445119403485106e-05,
+   "lrFirst": 7.341522555726948e-05,
+   "lrLast": 4.1628666890679786e-05,
+   "memory": null,
+   "seconds": {
+    "total": 213.2146601676941,
+    "train": 194.9125759601593
+   },
+   "train": {
+    "boxMean": 0.5009194393952687,
+    "clsMean": 0.33010153790314994,
+    "ignoredEntries": 26953,
+    "lossMax": 3.438150405883789,
+    "lossMean": 2.83469873269399,
+    "lossMin": 2.433156967163086,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.8948467840429055,
+   "bestEpoch": 38,
+   "checkpointSha256": "5cb7eac97334fcae3f4e2abb7c34801655b09c6b82f9afacae1daef7db4a265a",
+   "dev": {
+    "backgroundClsShare": 0.22191389346663337,
+    "box": 0.51225450472183,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5066087852301693,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.27996059398857354
+     },
+     "medium": {
+      "boxPerCell": 0.515071160564435,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.21592272009445052
+     },
+     "small": {
+      "boxPerCell": 0.5385943967421654,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.2133373979490909
+     },
+     "very-small": {
+      "boxPerCell": 0.5945055694420929,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.24591722292287588
+     }
+    },
+    "cls": 0.33357426043375527,
+    "clsByClass": {
+     "button": 0.04003639989631758,
+     "checkbox": 0.011252754810834124,
+     "icon": 0.014148505310565272,
+     "link": 0.08388500865549044,
+     "radio": 0.008446354017368074,
+     "select": 0.07124104695556471,
+     "tab": 0.03742582485353322,
+     "textbox": 0.06713836466307256
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.8948467840429055,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.8948467840429055,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 38,
+   "globalStep": 5700,
+   "gradNorm": {
+    "clippedSteps": 8,
+    "max": 37.400360107421875,
+    "mean": 4.049439124266306,
+    "min": 1.4241642951965332
+   },
+   "lrAfter": 1.8467489107293486e-05,
+   "lrFirst": 4.1445119403485106e-05,
+   "lrLast": 1.8590555528484406e-05,
+   "memory": null,
+   "seconds": {
+    "total": 210.93287205696106,
+    "train": 194.2506387233734
+   },
+   "train": {
+    "boxMean": 0.5007517407337825,
+    "clsMean": 0.3281131143371264,
+    "ignoredEntries": 26953,
+    "lossMax": 3.3601267337799072,
+    "lossMean": 2.831871822675069,
+    "lossMin": 2.366663694381714,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.8933307699017696,
+   "bestEpoch": 39,
+   "checkpointSha256": "a485425dfb4ea7f73d91707d4e9a8eb6a10a7a0be36f8dbe6d95f71e26025c0d",
+   "dev": {
+    "backgroundClsShare": 0.22229329645444698,
+    "box": 0.5122024978316733,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5073908325684813,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.27757401027573114
+     },
+     "medium": {
+      "boxPerCell": 0.512515495627933,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.21700907502371508
+     },
+     "small": {
+      "boxPerCell": 0.5371198469659191,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.2158532486212704
+     },
+     "very-small": {
+      "boxPerCell": 0.6021617003674684,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2507154207021495
+     }
+    },
+    "cls": 0.33231828074340325,
+    "clsByClass": {
+     "button": 0.03999717651036403,
+     "checkbox": 0.011262667305409979,
+     "icon": 0.014083021384425914,
+     "link": 0.08387458951718878,
+     "radio": 0.008417565390174407,
+     "select": 0.07095756305913678,
+     "tab": 0.03737660213728079,
+     "textbox": 0.0663490970119012
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.8933307699017696,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": true,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.8933307699017696,
+    "sinceImprovement": 0,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 39,
+   "globalStep": 5850,
+   "gradNorm": {
+    "clippedSteps": 4,
+    "max": 18.89504051208496,
+    "mean": 3.3794560956954958,
+    "min": 1.3770612478256226
+   },
+   "lrAfter": 4.6239994003080486e-06,
+   "lrFirst": 1.8467489107293486e-05,
+   "lrLast": 4.685826010084709e-06,
+   "memory": null,
+   "seconds": {
+    "total": 31445.45361351967,
+    "train": 31431.955458641052
+   },
+   "train": {
+    "boxMean": 0.5023825190464656,
+    "clsMean": 0.3317615654071172,
+    "ignoredEntries": 26953,
+    "lossMax": 3.6558940410614014,
+    "lossMean": 2.8436741638183594,
+    "lossMin": 2.3486948013305664,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  },
+  {
+   "bestDevLoss": 2.8933307699017696,
+   "bestEpoch": 39,
+   "checkpointSha256": "6b5b42e77df4b8dc5cb852d5f46caa34185dd77cb940e8a414e44607b68fcfde",
+   "dev": {
+    "backgroundClsShare": 0.22120984301006655,
+    "box": 0.5128717314866601,
+    "bySizeBucket": {
+     "large": {
+      "boxPerCell": 0.5073259226822268,
+      "cells": 29935,
+      "positiveClassFocalPerCell": 0.28041158086612183
+     },
+     "medium": {
+      "boxPerCell": 0.5154880954368265,
+      "cells": 10761,
+      "positiveClassFocalPerCell": 0.21586143788967713
+     },
+     "small": {
+      "boxPerCell": 0.5393669616826802,
+      "cells": 2833,
+      "positiveClassFocalPerCell": 0.21250180977022232
+     },
+     "very-small": {
+      "boxPerCell": 0.5934853139829575,
+      "cells": 779,
+      "positiveClassFocalPerCell": 0.2464216568092403
+     }
+    },
+    "cls": 0.33358761135761494,
+    "clsByClass": {
+     "button": 0.04012821582972921,
+     "checkbox": 0.011205904030540309,
+     "icon": 0.014215473101547006,
+     "link": 0.08382082956838854,
+     "radio": 0.008384827995181192,
+     "select": 0.07105419940216404,
+     "tab": 0.037414941749671894,
+     "textbox": 0.06736321631338074
+    },
+    "ignoredEntries": 6999,
+    "loss": 2.8979462687909154,
+    "positiveCells": 44308,
+    "samples": 160
+   },
+   "devImproved": false,
+   "earlyStopping": {
+    "action": "record-only",
+    "bestForPatience": 2.8933307699017696,
+    "sinceImprovement": 1,
+    "wouldStopAtEpoch": 30
+   },
+   "epoch": 40,
+   "globalStep": 6000,
+   "gradNorm": {
+    "clippedSteps": 2,
+    "max": 20.067916870117188,
+    "mean": 3.4461519066492716,
+    "min": 1.2887482643127441
+   },
+   "lrAfter": 0.0,
+   "lrFirst": 4.6239994003080486e-06,
+   "lrLast": 2.0561675362351625e-10,
+   "memory": null,
+   "seconds": {
+    "total": 161.27305960655212,
+    "train": 148.17459988594055
+   },
+   "train": {
+    "boxMean": 0.501981213092804,
+    "clsMean": 0.3271181712547938,
+    "ignoredEntries": 26953,
+    "lossMax": 3.350600242614746,
+    "lossMean": 2.8370242341359457,
+    "lossMin": 2.3927090167999268,
+    "positiveCells": 168250,
+    "samples": 600,
+    "steps": 150
+   }
+  }
+ ],
+ "failure": null,
+ "finalLearningRate": 0.0,
+ "g10": {
+  "approval": {
+   "approved": true,
+   "approvedBy": "project owner",
+   "approvedOn": "2026-11-02",
+   "decision": "M22.9 owner authorisation: G10 thresholds approved for candidate 2"
+  },
+  "configSha256": "5cbb059fff57304c36a4ae47d54012ebda2defc9db7154786e2944f7fedbbddf",
+  "evidenceSha256": "404e0b286a8efdd4a76c389e7e0b2babd07e39303417f62002d55a8b5c29b533",
+  "thresholdsSha256": "fcce918a5341dc97350bbe3b85c9c21de95a04e32d85f23cf1a3f64b7dce78b1",
+  "version": "g10-approved-1"
+ },
+ "gitCommit": "95b0ffb43fd9303291b4d79c63f12419c9db9410",
+ "gitTrackedChanges": false,
+ "label": "UNADOPTED",
+ "modelParameters": 61468,
+ "optimizerSteps": 6000,
+ "preflight": {
+  "acceptance": {
+   "claimed": true,
+   "reason": "G10-approved visible positives meet every cell minimum (still subject to the owner's acceptance of the candidate)"
+  },
+  "plan": {
+   "checkpoints": 40,
+   "cpuThreads": 8,
+   "devBatchesPerEvaluation": 40,
+   "devEvaluations": 40,
+   "earlyStoppingAction": "record-only",
+   "logicalCpus": 16,
+   "maxEpochs": 40,
+   "maxSteps": 6000,
+   "partialOcclusion": "ignore-mask",
+   "stepsPerEpoch": 150
+  },
+  "tensorCheck": {
+   "dev": {
+    "boxesOutsideLetterbox": 0,
+    "ignoreMask": {
+     "cases": {
+      "full": 128,
+      "partial": 128,
+      "partialOutsideLetterbox": 0,
+      "partialWithVisibleRegion": 128
+     },
+     "ignoredByClass": {
+      "button": 817,
+      "checkbox": 521,
+      "icon": 518,
+      "link": 1319,
+      "radio": 563,
+      "select": 1223,
+      "tab": 785,
+      "textbox": 1253
+     },
+     "ignoredEntries": 6999,
+     "ignoredOnCellsPositiveForAnotherClass": 24,
+     "positiveConflicts": 40,
+     "positiveConflictsByClass": {
+      "button": 0,
+      "checkbox": 0,
+      "icon": 0,
+      "link": 40,
+      "radio": 0,
+      "select": 0,
+      "tab": 0,
+      "textbox": 0
+     },
+     "samplesWithIgnoredEntries": 87
+    },
+    "imageShape": [
+     3,
+     640,
+     640
+    ],
+    "positiveCells": 44308,
+    "samples": 160,
+    "samplesWithTargetsButNoPositiveCell": 0,
+    "targets": 1408
+   },
+   "train": {
+    "boxesOutsideLetterbox": 0,
+    "ignoreMask": {
+     "cases": {
+      "full": 480,
+      "partial": 480,
+      "partialOutsideLetterbox": 0,
+      "partialWithVisibleRegion": 480
+     },
+     "ignoredByClass": {
+      "button": 2856,
+      "checkbox": 1995,
+      "icon": 2083,
+      "link": 4415,
+      "radio": 2072,
+      "select": 4299,
+      "tab": 3061,
+      "textbox": 6172
+     },
+     "ignoredEntries": 26953,
+     "ignoredOnCellsPositiveForAnotherClass": 156,
+     "positiveConflicts": 14,
+     "positiveConflictsByClass": {
+      "button": 0,
+      "checkbox": 0,
+      "icon": 0,
+      "link": 0,
+      "radio": 3,
+      "select": 6,
+      "tab": 5,
+      "textbox": 0
+     },
+     "samplesWithIgnoredEntries": 340
+    },
+    "imageShape": [
+     3,
+     640,
+     640
+    ],
+    "positiveCells": 168250,
+    "samples": 600,
+    "samplesWithTargetsButNoPositiveCell": 0,
+    "targets": 5280
+   }
+  }
+ },
+ "runConfigFile": "tools/detector/configs/train-v2-first-run.APPROVED.json",
+ "runConfigSha256": "e2cd897ce8837a181a2f99ff12e4793433069fc7ea52931fcdb333732c2aa248",
+ "runId": "first-run-01",
+ "schedulerStep": 6000,
+ "schemaVersion": "train-v2-run-config/2",
+ "seed": 20261102,
+ "sessions": [
+  {
+   "endedAt": "2026-11-03T08:08:37Z",
+   "resume": false,
+   "startedAt": "2026-11-02T20:31:58Z"
+  }
+ ],
+ "startedAt": "2026-11-02T20:31:58Z",
+ "status": "COMPLETED",
+ "stopEpoch": 40,
+ "t1ReferenceSha256": "ba6d9e93695b22d17d9dc2b8193966132af85a6a031b08eb453d1d20a05179d0",
+ "torch": {
+  "deterministicAlgorithms": true,
+  "device": "cpu",
+  "interopThreads": 10,
+  "mkldnn": true,
+  "threads": 8
+ }
+}

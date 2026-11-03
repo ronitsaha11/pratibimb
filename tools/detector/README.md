@@ -10,8 +10,10 @@ M22, and nothing in the v2 tooling imports or calls `train.py`.
 |---|---|
 | `data_v2.py` | Loads a v2 synthetic candidate's TRAIN and DEV **separately**, and refuses any other split before touching a file. It checks frame sets, SHA-256s and sizes; derives `captureSize` from the frame; checks each annotation's sample, class, box and size bucket. It keeps **positives only**, applies the G10 policy below, and reports exclusions by category, class and size bucket. `load_accepted_split` loads a split **as an accepted dataset**: approved G10 only. `V2SplitDataset` feeds the unchanged `data.sample_to_tensors` |
 | `dry_run_v2.py` | Loads TRAIN and DEV, checks they share nothing, reports counts and exclusions. With `--tensors` it runs every sample through the v1 input path; adding `--ignore-mask` also totals the ignore masks. No model |
-| `train_v2.py` | The separate v2 entry point: **PRE-FLIGHT ONLY** (M22.9). See "Training" below |
+| `train_v2.py` | The separate v2 entry point: `--preflight` (M22.9; writes nothing) and `--train` (M22.13: the one owner-authorised run, needing an APPROVED configuration). See "Training" below |
+| `loss_v2.py` | `targets.detector_loss` with the partial-occlusion ignore mask: ignored classification entries contribute zero; bitwise equal to the legacy loss under an empty mask (M22.13) |
 | `occlusion_mask_v2.py` | The partial-occlusion classification ignore mask (M22.12): a pure helper. For each partial-occlusion case, it ignores that class's channel wherever a cell's receptive field (31 px, exact for `UiHead`) sees the control's visible part. Positives always win; full occlusion ignores nothing; box targets are untouched |
+| `configs/train-v2-first-run.APPROVED.json` | The same configuration with the owner's M22.13 approval for one run: the only configuration `--train` was run with |
 | `configs/train-v2-first-run.PROPOSED.json` | The canonical first-run configuration, schema `train-v2-run-config/2` (M22.12): **proposed, pending owner approval** |
 | `configs/train-v2-first-experiment.PROPOSED.json` | The M22.9 proposal, schema 1: kept as history; the validator refuses it |
 | `tests/` | The pytest suite (synthetic candidates and a synthetic repository in a temp directory; never a real dataset or model) |
@@ -47,7 +49,11 @@ npm run test:py
 
 **In CI:** the `detector-adapter` job installs the pins on Python 3.13 and runs the same runner in strict mode.
 
-## Training: pre-flight only
+## Training
+
+**M22.13:** `--train` ran once: `artifacts/models/t1-ui-head-v2-first-run-01` (git-ignored), COMPLETED, best checkpoint epoch 39, UNADOPTED. It refuses while a v2 run directory exists; a further run needs a new owner authorisation. The record is at `artifacts/experiments/M22.13-first-training-run/`.
+
+### Pre-flight
 
 ```bash
 python tools/detector/train_v2.py --preflight --candidate=2 \
@@ -69,7 +75,7 @@ python tools/detector/train_v2.py --preflight --candidate=2 \
 
 It prints the plan as JSON.
 
-**What it does not do:** it has **no training step**: no model is built, no optimizer, no forward or backward pass, no checkpoint, no prediction. Without `--preflight` it refuses. Training needs a separate owner authorisation.
+**What pre-flight does not do:** it builds no model, no optimizer, no forward or backward pass, no checkpoint and no prediction. `--train` adds the training step and nothing else: no decode, no detection metric, no export. With neither flag, the command refuses.
 
 **Design and review:**
 - `artifacts/experiments/M22.7-training-adapter/train-v2-design.md`;
