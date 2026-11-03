@@ -313,6 +313,90 @@ def step_summary(durations):
     }
 
 
+class StepTimer:
+    """
+    Per-step durations from one clock (M22.17). `start()` and `stop()` never raise for a clock
+    failure: a step whose start or stop read fails, or whose duration is not a finite non-negative
+    number, is recorded as UNTIMED with the reason - never given a substituted duration - and the
+    training step it brackets carries on untouched.
+    """
+
+    def __init__(self, clock):
+        self.clock = clock
+        self.timed = []  # (step number in the epoch, seconds)
+        self.untimed = []  # {"step": n, "reason": ...}
+        self._step = 0
+        self._t0 = None
+        self._why = None
+
+    def _read(self, when):
+        try:
+            t = self.clock()
+        except OBSERVATION_ERRORS as e:
+            return None, f"{when}: {type(e).__name__}: {e}"
+        if not _num(t):
+            return None, f"{when}: the clock returned {t!r}"
+        return t, None
+
+    def start(self):
+        self._step += 1
+        self._t0, self._why = self._read("start")
+
+    def stop(self):
+        if self._t0 is None:
+            self.untimed.append({"step": self._step, "reason": self._why or "start was not recorded"})
+            return
+        t, why = self._read("stop")
+        self._t0, t0 = None, self._t0
+        if why:
+            self.untimed.append({"step": self._step, "reason": why})
+            return
+        d = t - t0
+        if not (_num(d) and d >= 0):
+            self.untimed.append({"step": self._step, "reason": f"duration {d!r} is not a finite non-negative number"})
+            return
+        self.timed.append((self._step, d))
+
+    def summary(self):
+        """`step_summary` over the TIMED steps only, plus how many steps were untimed and why; the
+        slowest step is named by its real position in the epoch."""
+        out = step_summary([d for _, d in self.timed])
+        if self.timed:
+            pos = int(out["slowestStepInEpoch"]["value"]) - 1
+            out["slowestStepInEpoch"] = derived(self.timed[pos][0], "step", out["slowestStepInEpoch"]["basis"] + "; the step's position in the epoch")
+        out["untimedSteps"] = len(self.untimed)
+        if self.untimed:
+            out["untimed"] = list(self.untimed)
+        return out
+
+
+BETWEEN_SESSIONS = ("not measured: no process was running between sessions, and monotonic clocks do not survive a restart, "
+                    "so no elapsed time is derived across one")
+
+
+def run_timing(sessions, epochs):
+    """
+    Run-level timing over every session of one run (M22.17). Each session's elapsed time is local to
+    its own process; the accumulated figure is their SUM, derived only when every session has a
+    measured elapsed time, and it excludes the gaps between sessions, which are stated as not measured.
+    """
+    out = {"sessions": len(sessions), "betweenSessions": unavailable(BETWEEN_SESSIONS)}
+    vals, missing = [], []
+    for i, ses in enumerate(sessions, 1):
+        e = (ses.get("timing") or {}).get("elapsedSeconds") if isinstance(ses.get("timing"), dict) else None
+        if isinstance(e, dict) and e.get("kind") == MEASURED and _num(e.get("value")):
+            vals.append(e["value"])
+        else:
+            missing.append(f"session {ses.get('index', i)}")
+    out["sessionElapsedSecondsSum"] = (derived(sum(vals), "s", f"sum of {len(vals)} session-local perf_counter elapsed times; excludes time between sessions")
+                                       if not missing else unavailable(f"no measured elapsed time for {', '.join(missing)}"))
+    epoch_s = [e["timing"]["epoch"]["elapsedSeconds"]["value"] for e in epochs
+               if isinstance(e.get("timing"), dict) and isinstance(e["timing"].get("epoch"), dict)
+               and e["timing"]["epoch"].get("elapsedSeconds", {}).get("kind") == MEASURED]
+    out["epochElapsedRatioToMedian"] = epoch_ratios(epoch_s) if epochs and len(epoch_s) == len(epochs) else unavailable("an epoch lacks a measured elapsed time")
+    return out
+
+
 def epoch_ratios(epoch_seconds):
     """Each epoch's elapsed time over the run's median epoch time (derived; no threshold applied)."""
     if not epoch_seconds:

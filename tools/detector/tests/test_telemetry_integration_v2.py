@@ -106,6 +106,7 @@ class Harness:
         monkeypatch.setattr(torch, "save", trap("torch.save"))
         monkeypatch.setattr(torch, "set_num_threads", lambda n: None)  # no process-wide side effect
         monkeypatch.setattr(torch, "use_deterministic_algorithms", lambda *a, **k: None)
+        monkeypatch.setattr(torch, "set_rng_state", lambda state: None)  # a resume restores RNG state: no global side effect
 
         # ── pre-flight, data and checkpoint doubles ──
         plan = {
@@ -153,15 +154,18 @@ class Harness:
 
         monkeypatch.setattr(train_v2, "dev_loss", fake_dev)
 
+        self.store = {}
+
         def fake_write(path, payload, model):
             assert not os.path.exists(path)
             h.calls["checkpoints"].append(dict(payload))
+            h.store[os.path.basename(path)] = dict(payload)
             h.clock.advance(CKPT_SECONDS)
             h.clock.phase = "train"
             return "%064x" % payload["epoch"], 1000 + payload["epoch"]
 
         monkeypatch.setattr(train_v2, "_write_checkpoint", fake_write)
-        monkeypatch.setattr(train_v2, "verify_checkpoint", lambda *a, **k: {})
+        monkeypatch.setattr(train_v2, "verify_checkpoint", lambda path, sha, ref, meta: h.store.get(os.path.basename(path), {}))
 
         # ── model, loss and optimisation doubles ──
         class FakeModel:
@@ -185,6 +189,9 @@ class Harness:
             def state_dict(self):
                 return {}
 
+            def load_state_dict(self, state):
+                pass
+
         class FakeOpt:
             def __init__(self, params, lr, weight_decay):
                 self.param_groups, self.state = [{"lr": lr}], {}
@@ -198,6 +205,9 @@ class Harness:
             def state_dict(self):
                 return {"fake": True}
 
+            def load_state_dict(self, state):
+                assert state == {"fake": True}
+
         class FakeSched:
             def __init__(self, opt, T_max, eta_min):
                 self.opt, self.last_epoch, self.T_max = opt, 0, T_max
@@ -209,6 +219,9 @@ class Harness:
 
             def state_dict(self):
                 return {"last_epoch": self.last_epoch}
+
+            def load_state_dict(self, state):
+                self.last_epoch = state["last_epoch"]
 
         import head
         import loss_v2
@@ -237,7 +250,32 @@ class Harness:
                                                                 ticks=h.clock.ticks_fn if ticks else None, platform_name="win32" if ticks else "linux"))
         import time
 
-        monkeypatch.setattr(time, "perf_counter", h.clock.perf_fn)  # the per-step timer in run_training
+        self.step_faults = {}  # (global step, "start" | "stop") -> "raise" | "nan" | "text" | "backwards"
+        self._reading = None
+        real_timer = tel.StepTimer
+
+        class HarnessStepTimer(real_timer):
+            """The real StepTimer; it only tells the harness which step and which read is happening."""
+
+            def _read(self, when):
+                h._reading = (len(h.calls["checkpoints"]) * N_TRAIN + self._step, when)
+                return super()._read(when)
+
+        monkeypatch.setattr(tel, "StepTimer", HarnessStepTimer)
+
+        def step_clock():  # what StepTimer reads at the start and the end of every step
+            fault = h.step_faults.get(h._reading)
+            if fault == "raise":
+                raise OSError(f"injected clock failure at step {h._reading[0]} {h._reading[1]}")
+            if fault == "nan":
+                return float("nan")
+            if fault == "text":
+                return "not a time"
+            if fault == "backwards":
+                return h.clock.perf - 100.0
+            return h.clock.perf
+
+        monkeypatch.setattr(time, "perf_counter", step_clock)  # the per-step timer in run_training
         real_memory = tel.process_memory
         script = iter([{"workingSet": 100_000_000, "peakWorkingSet": 150_000_000, "private": 90_000_000}])
 
@@ -257,8 +295,18 @@ class Harness:
             plat = "win32" if memory == "windows" else "sunos5"
             monkeypatch.setattr(tel, "process_memory", lambda: real_memory(plat))
 
-    def run(self):
-        return train_v2.run_training(self.root, 2, "g10.json", "g10-evidence.json", "build.json", self.run_config, "harness-01", t1_expected="e" * 64)
+    def run(self, resume=False, hooks=None):
+        return train_v2.run_training(self.root, 2, "g10.json", "g10-evidence.json", "build.json", self.run_config, "harness-01",
+                                     resume=resume, t1_expected="e" * 64, _hooks=hooks)
+
+    def restart(self, perf=5.0):
+        """A new process: a fresh fake clock whose monotonic values are SMALLER than the last
+        session's, as after a restart; UTC continues forward."""
+        old = self.clock
+        new = FakeClock()
+        new.perf, new.cpu, new.biased_ms, new.unbiased = perf, 1.0, 1_000, 10_000
+        new.base = old.base + datetime.timedelta(seconds=(old.perf - 1000.0) + 3600.0 - (perf - 1000.0))
+        self.clock = new
 
     def record_text(self):
         with open(os.path.join(self.out, "run-record.json"), "r", encoding="utf-8") as f:

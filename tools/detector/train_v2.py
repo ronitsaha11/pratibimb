@@ -696,7 +696,8 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
     clocks = tel.Clocks()
     session_start = clocks.snapshot()
     threads = cfg["determinism"]["cpuThreads"]
-    record["sessions"].append({"startedAt": _now(), "resume": resume})
+    session_index = len(record["sessions"]) + 1  # sessions are appended, never rewritten (M22.17)
+    record["sessions"].append({"index": session_index, "startedAt": _now(), "resume": resume, "epochsCompleted": []})
     _write_json_atomic(record_path, record)
 
     def close_session():
@@ -743,7 +744,8 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
         record["modelParameters"] = sum(p.numel() for p in model.parameters())
         record["torch"] = {"threads": torch.get_num_threads(), "interopThreads": torch.get_num_interop_threads(), "deterministicAlgorithms": torch.are_deterministic_algorithms_enabled(),
                            "mkldnn": bool(torch.backends.mkldnn.is_available()), "device": "cpu"}
-        record["hardware"] = tel.observe(lambda: tel.hardware(torch.get_num_threads(), torch.get_num_interop_threads(), "cpu"))
+        record["sessions"][-1]["hardware"] = tel.observe(lambda: tel.hardware(torch.get_num_threads(), torch.get_num_interop_threads(), "cpu"))
+        record.setdefault("hardware", record["sessions"][-1]["hardware"])  # the first session's; each session keeps its own
         start_epoch, global_step = 1, 0
         best, best_epoch = None, None
         es = {"bestForPatience": None, "sinceImprovement": 0, "wouldStopAtEpoch": None, "action": es_cfg["action"]}
@@ -781,9 +783,9 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
                 fail("F3", f"epoch {epoch}: the TRAIN order is not a permutation")
             losses, clss, boxes, norms, lrs, steps_log = [], [], [], [], [], []
             consumed = pos_cells = ign = clipped = 0
-            step_seconds = []
+            step_timer = tel.StepTimer(time.perf_counter)  # observation only: never raises, never invents a duration
             for b in range(spe):
-                s0 = time.perf_counter()
+                step_timer.start()
                 if global_step >= max_steps or sched.last_epoch != global_step:
                     fail("F3", f"step accounting: global step {global_step}, scheduler step {sched.last_epoch}, max {max_steps}")
                 idx = torch.from_numpy(order[b * B:(b + 1) * B].copy())
@@ -820,7 +822,7 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
                 norms.append(gn)
                 lrs.append(lr)
                 steps_log.append({"step": global_step, "lr": lr, "loss": lv, "cls": cv, "box": bv, "gradNorm": gn})
-                step_seconds.append(time.perf_counter() - s0)
+                step_timer.stop()
                 if "after_step" in hooks:
                     hooks["after_step"](epoch, global_step)
             if consumed != t_train["n"] or pos_cells != int(t_train["P"].sum()) or ign != int(t_train["IG"].sum()):
@@ -857,15 +859,16 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
             timing = {
                 "epoch": tel.observe(lambda: tel.interval(e0, e_end, threads)), "train": tel.observe(lambda: tel.interval(e0, e_train, threads)),
                 "dev": tel.observe(lambda: tel.interval(e_train, e_dev, threads)), "checkpoint": tel.observe(lambda: tel.interval(e_dev, e_end, threads)),
-                "steps": tel.observe(lambda: tel.step_summary(step_seconds)),
+                "steps": tel.observe(step_timer.summary),
             }
 
             def compat(phase):  # the M22.13 "seconds" field, from the same validated monotonic measurement
                 v = timing[phase].get("elapsedSeconds", timing[phase])
                 return v["value"] if v.get("kind") == tel.MEASURED else v
             record["checkpoints"].append({"epoch": epoch, "file": name, "sha256": sha, "bytes": size, "verified": True})
+            record["sessions"][-1]["epochsCompleted"].append(epoch)
             record["epochs"].append({
-                "epoch": epoch, "globalStep": global_step, "lrFirst": lrs[0], "lrLast": lrs[-1], "lrAfter": opt.param_groups[0]["lr"],
+                "epoch": epoch, "session": session_index, "globalStep": global_step, "lrFirst": lrs[0], "lrLast": lrs[-1], "lrAfter": opt.param_groups[0]["lr"],
                 "train": {"lossMean": sum(losses) / len(losses), "clsMean": sum(clss) / len(clss), "boxMean": sum(boxes) / len(boxes), "lossMin": min(losses), "lossMax": max(losses),
                           "samples": consumed, "steps": len(losses), "positiveCells": pos_cells, "ignoredEntries": ign},
                 "gradNorm": {"mean": sum(norms) / len(norms), "min": min(norms), "max": max(norms), "clippedSteps": clipped},
@@ -894,11 +897,7 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
             fail("F6", "the T1 artifact changed")
         record.update(status="COMPLETED", completedAt=_now(), stopEpoch=E, optimizerSteps=global_step, finalLearningRate=opt.param_groups[0]["lr"], schedulerStep=sched.last_epoch)
         close_session()
-        epoch_s = [e["timing"]["epoch"]["elapsedSeconds"]["value"] for e in record["epochs"] if e.get("timing", {}).get("epoch", {}).get("elapsedSeconds", {}).get("kind") == tel.MEASURED]
-        record["timing"] = tel.observe(lambda: {
-            "sessions": len(record["sessions"]),
-            "epochElapsedRatioToMedian": tel.epoch_ratios(epoch_s) if len(epoch_s) == len(record["epochs"]) else tel.unavailable("an epoch lacks a measured elapsed time"),
-        })
+        record["timing"] = tel.observe(lambda: tel.run_timing(record["sessions"], record["epochs"]))
         _write_json_atomic(record_path, record)
         return record
     except TrainingFailure as e:
