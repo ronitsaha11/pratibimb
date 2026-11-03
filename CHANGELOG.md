@@ -35,6 +35,12 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.7 — DOM-only Phase 1 implemented in product builds (OD-P, OD-R).** `runTask` no longer wires a perception
+  pass in a product build (`host-lib/task-perception.ts`, build-time `__EVIDENCE_BUILD__`), so a product task captures
+  no frame and runs neither the UI head (T1) nor TR-01; the handoff always declares the structural floor. The UI head
+  is packaged only in evidence builds; `ORT_SMOKE` reports it absent in a product build. Evidence builds, TR-01's
+  packaging and hash checks, permissions (including `tabCapture`), CSP and egress are unchanged. Adds 18 regression
+  tests; adjusts the M13 CSP harness's product-phase model-load check accordingly. Not browser-verified; not accepted.
 - **M23.6 — OD-R recorded: APPROVED — OPTION A, DOM-only Phase 1 (implementation not authorised).** Normal Phase 1
   task execution is to capture no browser frames and run neither T1 nor TR-01; DOM observation and the structural
   handoff remain. Updates the proposed ADR-0015 (new §3.6; still PROPOSED), marks the exclusions in the acceptance

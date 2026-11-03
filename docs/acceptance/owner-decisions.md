@@ -355,3 +355,12 @@ Each sub-decision is separate.
 - FR-01;
 - Phase 2.
 
+## M23.7 — implementation status of OD-P and OD-R
+
+| ID | Decision | Implementation |
+|---|---|---|
+| OD-P | T1 out of active Phase 1 execution | **M23.7: IMPLEMENTED IN PRODUCT BUILDS** (owner-authorised): a product task takes no perception pass, so it captures no frame and runs neither T1 nor TR-01. T1 is not packaged in product builds. Evidence builds are unchanged. Verified by unit, static, mutation and build checks on W1; **not browser-verified, not accepted** (`artifacts/experiments/M23.7-dom-only-implementation/`) |
+| OD-R | Option A, DOM-only Phase 1 | same |
+
+**Not changed by the implementation:** OD-O, OD-Q, OD-F, OD-N (ADR-0015 stays PROPOSED), GOV-01, OD-E1, OD-K, OD-L, OD-M, and the browser, cross-machine, independent-human, real-site, performance and security decisions all remain **AWAITING OWNER APPROVAL**.
+

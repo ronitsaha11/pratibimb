@@ -1,7 +1,8 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
-> - **M23.6:** **OD-R APPROVED — OPTION A: DOM-ONLY PHASE 1** (owner-selected; implementation not authorised). Normal Phase 1 tasks are to capture no frames and run neither T1 nor TR-01.
+> - **M23.7:** the DOM-only Phase 1 is **implemented in product builds** (owner-authorised; not browser-verified; not accepted). See `artifacts/experiments/M23.7-dom-only-implementation/`.
+> - **M23.6:** **OD-R APPROVED — OPTION A: DOM-ONLY PHASE 1** (owner-selected; implementation not authorised at the time). Normal Phase 1 tasks are to capture no frames and run neither T1 nor TR-01.
 > - **M23.3:** the proposed architecture record is `docs/adr/ADR-0015-phase-1-local-structure-only-architecture.md` (**PROPOSED — AWAITING OWNER APPROVAL**). New engineers should start with `phase-1-data-flow-and-components.md`.
 > - **Owner direction (M23.2, 2026-11-03): PHASED ARCHITECTURE.**
 >   - **Phase 1** is the current local, loopback, structure-only product, and these documents are its proposed acceptance scope.

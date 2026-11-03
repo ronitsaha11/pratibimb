@@ -27,7 +27,7 @@ Vision-language and frame-based reasoning are Phase 2 (`phase-2-future-capabilit
 - **TR-01** is retained as a separate component.
 - **Model assets** are not changed.
 
-**Today's runtime is still the one described in §2** (it captures and runs T1 and TR-01 on gesture-granted passes) **until a separately authorised implementation lands** (`dom-only-phase-1-implementation-outline-PROPOSED.md`).
+**Implementation (M23.7):** **M23.7: IMPLEMENTED IN PRODUCT BUILDS** (owner-authorised): a product task takes no perception pass, so it captures no frame and runs neither T1 nor TR-01. T1 is not packaged in product builds. Evidence builds are unchanged. Verified by unit, static, mutation and build checks on W1; **not browser-verified, not accepted** (`artifacts/experiments/M23.7-dom-only-implementation/`). §2 describes the source **before** M23.7; evidence builds still behave that way.
 
 ## 2. Current implementation facts
 

@@ -121,6 +121,14 @@ const EGRESS_EVIDENCE_PROBE = process.env.EGRESS_EVIDENCE_PROBE === "1";
  */
 const EVIDENCE_BUILD = E6_PROBE || STRUCTURAL_PROBE || TR01_PROBE || EGRESS_EVIDENCE_PROBE || WORKER_FRAME;
 /**
+ * M23.7 (OD-P, OD-R) — THE SAME FLAG DECIDES WHETHER A TASK LOOKS AT PIXELS.
+ *
+ * A product build runs DOM-only tasks: no frame capture, no UI head (T1), no TR-01 in a task run
+ * (`host-lib/task-perception.ts`), and the UI head is not packaged. An evidence build is unchanged:
+ * its tasks keep the perception pass and the UI head is packaged as before. TR-01's packaging and its
+ * hash check below are unchanged in both, and so are the permissions.
+ */
+/**
  * The side panel's one inline <style>, admitted by its SHA-256 rather than by 'unsafe-inline'. Line
  * endings are normalised because the bundler emits LF whatever the checkout has; the M13 harness
  * re-hashes the BUILT page's <style> and fails if it is not this hash.
@@ -153,7 +161,7 @@ export default defineConfig({
     // Substituted at build time so the degraded path is absent from a product bundle rather than
     // present behind a runtime check, the same rule `#e6-probe` follows.
     // M18: the endpoint a panel-started task reasons through — the same two constants the CSP pins.
-    define: { __M3_WORKER_FRAME__: JSON.stringify(WORKER_FRAME), __REASONER_ENDPOINT__: JSON.stringify(`${HOST_COLLECTOR_ORIGIN}${HOST_REASONER_PATH}`) },
+    define: { __M3_WORKER_FRAME__: JSON.stringify(WORKER_FRAME), __EVIDENCE_BUILD__: JSON.stringify(EVIDENCE_BUILD), __REASONER_ENDPOINT__: JSON.stringify(`${HOST_COLLECTOR_ORIGIN}${HOST_REASONER_PATH}`) },
     resolve: {
       alias: {
         "@pratibimb/agent": join(ROOT, "packages", "agent", "src", "index.ts"),
@@ -195,8 +203,11 @@ export default defineConfig({
         if (!existsSync(src)) throw new Error(`missing ${src} (run: npm ci)`);
         assets.push({ absoluteSrc: src, relativeDest: name });
       }
-      if (!existsSync(MODEL)) throw new Error(`missing ${MODEL}`);
-      assets.push({ absoluteSrc: MODEL, relativeDest: "t1-ui-head.onnx" });
+      // M23.7 (OD-P): the UI head ships only in an evidence build. A product build neither needs nor carries it.
+      if (EVIDENCE_BUILD) {
+        if (!existsSync(MODEL)) throw new Error(`missing ${MODEL}`);
+        assets.push({ absoluteSrc: MODEL, relativeDest: "t1-ui-head.onnx" });
+      }
       // M10.4: TR-01, git-ignored like the UI head, and REFUSED at build time unless its bytes are
       // exactly the pinned artifact. The worker hashes it again at runtime before any session.
       if (!existsSync(TR01_MODEL)) {
