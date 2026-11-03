@@ -1,7 +1,7 @@
 # Phase 1 architecture scope
 
 > **Status:** the **direction** is owner-selected (M23.2, 2026-11-03). The **acceptance criteria** are **PROPOSED — AWAITING OWNER APPROVAL**.
-> - **Not an ADR:** this is not an ADR or a constitution amendment. The conflicts it creates are listed in `artifacts/experiments/M23.2-phased-architecture-decision/decision.md` §4 (RC-01 to RC-10).
+> - **Not an ADR:** this is not an ADR or a constitution amendment. The proposed architecture ADR is **ADR-0015 (PROPOSED — AWAITING OWNER APPROVAL, M23.3)**. The conflicts it creates are listed in `artifacts/experiments/M23.2-phased-architecture-decision/decision.md` §4 (RC-01 to RC-10).
 > - **Not a claim of acceptance:** it does not say that any Phase 1 capability has passed acceptance.
 
 ## 1. Owner-selected direction
@@ -16,19 +16,25 @@ Vision-language and frame-based reasoning are Phase 2 (`phase-2-future-capabilit
 |---|---|---|
 | Browser | Chrome MV3 extension (WXT); run in Chrome for Testing 153 on W1. A `build:firefox` script exists; **the product has never been run in Firefox** | `apps/extension/`; M19, M20 |
 | Capture | gesture-authorised; structural change signal | ADR-0009, ADR-0010 |
-| Local perception | in the offscreen document, `ensurePerception` loads the packaged original **T1 UI head (UNADOPTED)**, then **TR-01** text regions for redaction. Clicks come only from DOM elements. No face detector is in the product path (INFERENCE) | `apps/extension/host/offscreen/main.ts`; `apps/extension/host-lib/perception-realm.ts`; M21; M23.1 |
+| Local perception | in the offscreen document on every pass:<br>• **T1** (UNADOPTED; bytes not integrity-checked) runs on the captured frame. Its output is fused and can relabel the `source` of existing DOM elements, but adds no element to the handoff.<br>• **TR-01** (hash-verified) runs on a frame copy in a worker, and masks visual regions **in the local frame only**.<br>• No product code reads the sanitized frame.<br>• No face detector is in the product path (INFERENCE) | `apps/extension/host/offscreen/main.ts`; `apps/extension/host-lib/perception-realm.ts`; `docs/acceptance/t1-tr01-status-reconciliation.md` |
 | Sanitisation | values become typed references; memory-only vault; ledger; verifier | `packages/privacy`; INV-04 to INV-10 |
 | Consent | just-in-time, one-time panel consent with a masked local preview | ADR-0014 |
 | Handoff | structure-only JSON (references, no frame, no value) | ADR-0012 §8 |
 | Frame egress | **impossible in production** (three locks) | ADR-0012 §16 |
 | Reasoner | launcher (`npm run reasoner`) with pin verification; a front on `127.0.0.1:8995` that refuses foreign origins, hosts, paths, methods, non-JSON and value-shaped text; a keyed llama.cpp `b10956` model server on `127.0.0.1:8977`; `Qwen2.5-0.5B-Instruct` Q4_K_M. Registry **`PINNED`, not `ADOPTED`**; correctness PROVISIONAL; deterministic planner fallback | `scripts/reasoner/`; `packages/reasoner`; M20; model registry |
-| Network | CSP v2: one endpoint, `http://127.0.0.1:8995/v1/chat/completions` | ADR-0013 |
+| Network | CSP v2: one endpoint, `http://127.0.0.1:8995/v1/chat/completions`, reached only through `sendVerified` | ADR-0013 |
 | Plan and action | allowlist VALIDATE, REFRESH, human grant, single-use permit, RE-HYDRATE, **click only**, VERIFY RESULT | `packages/plan`, `packages/agent`; ADR-0005 to ADR-0008 (PROPOSED) |
 | Loop | at most 5 turns; clarification; declared outcome | `packages/orchestrator/src/loop.ts`; M14, M17, M18 |
 
-**Unknowns carried forward:**
-- whether vision-only fused elements appear in the reasoner handoff (M23.2);
-- whether the reasoner request passes through the attested egress sender end to end (QG-04-S item S4).
+**Resolved by the M23.3 source trace** (`phase-1-data-flow-and-components.md`, `t1-tr01-status-reconciliation.md`):
+- **Vision-only elements:** they **cannot** enter the DOM-based handoff.
+- **The egress path:** the reasoner request goes through `sendVerified` (`packages/egress/src/guard.ts`), **not** the `qg04.ts` frame attestation, which has no product caller.
+
+**Still UNKNOWN:**
+- **U-1:** a complete proof that no extension message carries frame bytes.
+- **U-2:** wider indirect influence of T1.
+- **U-3:** the effect of T1 latency or failure on outcomes.
+- **U-4:** whether a machine's packaged T1 bytes equal `ba6d9e93…` (no integrity check exists).
 
 ## 3. Proposed Phase 1 acceptance requirements
 

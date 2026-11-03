@@ -5,6 +5,7 @@
 > - **What it does not do:** approve anything, or reclassify any historical record.
 > - **Criterion IDs** (FUN-, BRW-, PRV-, SEC-, RSN-, ACT-, REL-, PRF-, XM-, HUM-, CI-, GOV-) refer to `core-product-acceptance-PROPOSED.md` §5.
 > - **Evidence types** A–H are defined there, in §4.
+> - **Updated in M23.3** with the source trace: stage rows 1–5 follow `phase-1-data-flow-and-components.md`. The proposed architecture decision is ADR-0015 (PROPOSED — AWAITING OWNER APPROVAL).
 > - **Updated in M23.2** for the owner's **phased architecture** direction (2026-11-03). Each deliverable now states what is **Phase 1** (the current structure-only product) and what is **Phase 2** (future, not authorised). §1.5 summarises. The original requirements are quoted unchanged.
 
 ## 1. The brief's deliverables
@@ -78,10 +79,10 @@ It runs at most **5 turns** (`MAX_TASK_TURNS`, `packages/orchestrator/src/loop.t
 | # | Stage | Implementation (FACT: module exists) | As-built note | Evidence | Gap | Criteria |
 |---|---|---|---|---|---|---|
 | 1 | OBSERVE | `packages/perception/src/capture.ts`, `elementGraph.ts`, `changeDetection.ts`; `packages/extension-transport/src/observation.ts` | gesture-authorised capture (ADR-0009); structural change signal (ADR-0010) | A; B; C (M4, M5) | other browsers | BRW-04 |
-| 2 | PERCEIVE | `packages/perception/src/textRegion.ts` (TR-01), `fusion.ts`, `coordinates.ts`; `apps/extension/host-lib/perception-realm.ts` | the original T1 head (**UNADOPTED**) runs, then TR-01. Clicks come only from DOM elements. No faces in the product | A; B (QG-02 criteria 1–6) | criterion 7 executor half | ACT-06, PRV-03 |
+| 2 | PERCEIVE | `apps/extension/host/offscreen/main.ts` (`ensurePerception`); `apps/extension/host-lib/perception-realm.ts`; `packages/perception/src/fusion.ts`, `textRegion.ts` | **frames are captured and processed locally.**<br>• **T1** (UNADOPTED, bytes unverified) runs on every pass, and its output is fused; it can relabel DOM `source`, but adds no element to the handoff.<br>• **TR-01** (hash-verified) masks visual regions in the local frame.<br>• No faces in the product | A; B (QG-02 criteria 1–6; M10, M21) | criterion 7 executor half; U-1 to U-4 | ACT-06, PRV-03 |
 | 3 | SANITIZE | `packages/privacy/src/sanitize.ts`, `classify.ts`, `pixelRedaction.ts`, `vault.ts`, `tokens.ts` | values become references; the vault is memory-only | A; B; G | the Rule 2 metrics | PRV-01 to PRV-04, PRV-06 |
 | 4 | VERIFY (egress gate) | `packages/egress/src/guard.ts`, `qg04.ts`, `handoffContract.ts`; `packages/privacy/src/literalCheck.ts` | **structure-only handoff.** Production frame egress is impossible (three locks, ADR-0012 §16) | A; G (M12) | the QG-04 structure-only definition and signature | SEC-03, SEC-04, SEC-05 |
-| 5 | REASON | `packages/reasoner/src/localModel.ts`, `contract.ts`; `scripts/reasoner/` | **a local loopback text LLM, not the constitution's "server VLM"** (G-1) | LOOP-2; M20 (W1) | ADR; adoption | RSN-01 to RSN-07 |
+| 5 | REASON | `packages/reasoner/src/localModel.ts` (`contextFor`, `planSchema`) → `packages/egress/src/guard.ts` (`sendVerified`); `scripts/reasoner/` | **a local loopback text LLM, not the constitution's "server VLM"** (RC-01). It receives the planning view only (goal, textbox `{id,name,empty}`, button `{id,name,enabled}`, references `{token,class,hint}`) | LOOP-2; M20 (W1) | ADR-0015 approval; adoption | RSN-01 to RSN-07 |
 | 6 | PLAN | `packages/plan/src/schema.ts`, `index.ts` | placeholder plan; `EXECUTABLE_ACTIONS = ["click"]` | A | — | RSN-05, ACT-01 |
 | 7 | VALIDATE (execution gate) | `packages/plan/src/validate.ts` | allowlist; no best-effort parse | A | — | RSN-05, ACT-02 |
 | 8 | REFRESH (execution gate) | `packages/agent/src/actionFreshness.ts`, `hitTest.ts` | a failed check re-observes. **ADR-0005 tolerances and ADR-0007 IoU are PENDING** | A; B (M2-EXEC, 50 of 50) | approved tolerances | ACT-02, ACT-03 |

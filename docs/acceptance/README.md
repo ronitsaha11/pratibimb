@@ -1,6 +1,7 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
+> - **M23.3:** the proposed architecture record is `docs/adr/ADR-0015-phase-1-local-structure-only-architecture.md` (**PROPOSED — AWAITING OWNER APPROVAL**). New engineers should start with `phase-1-data-flow-and-components.md`.
 > - **Owner direction (M23.2, 2026-11-03): PHASED ARCHITECTURE.**
 >   - **Phase 1** is the current local, loopback, structure-only product, and these documents are its proposed acceptance scope.
 >   - **Phase 2** (vision-language and frame-based reasoning) is future scope and **not authorised**.
@@ -54,6 +55,10 @@
 | `owner-decisions.md` | Resolved (P-1 to P-3), awaiting the owner (OD-A to OD-M), and blocked or not authorised, kept separate; questions, context, options and proposed recommendations |
 | `phase-1-architecture-scope.md` | M23.2: the owner-selected Phase 1 architecture, its implementation facts, proposed requirements, open decisions and prohibitions |
 | `phase-2-future-capability-register.md` | M23.2: Phase 2 capabilities P2-01 to P2-07, all `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` |
+| `phase-1-data-flow-and-components.md` | M23.3: the **main Phase 1 architecture description**, source-traced stage by stage (modules, inputs, outputs, boundaries, evidence, unknowns) |
+| `t1-tr01-status-reconciliation.md` | M23.3: what T1 and TR-01 actually do, kept separate across present / loaded / invoked / consumed / adopted; T1's downstream influence; the T1 integrity gap |
+| `reconciliation-matrix-RC-01-to-RC-12.md` | M23.3: each frozen or governing document against the implementation and the Phase 1 scope, with the proposed action and the approval it needs |
+| `proposed-amendment-language-PROPOSED.md` | M23.3: draft wording A-1 to A-9 for frozen or conflicting documents. Not applied |
 | `release-readiness-checklist-PROPOSED.md` | Mandatory, owner-approved optional, future, and deferred (FR-01) items |
 
 ## How this proposal was made

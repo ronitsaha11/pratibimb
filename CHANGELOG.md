@@ -35,6 +35,13 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.3 — Phase 1 architecture reconciliation; ADR-0015 proposed.** A static source trace
+  (`docs/acceptance/phase-1-data-flow-and-components.md`) finds that the T1 UI head is loaded and run on every
+  perception pass, unadopted and with no build-time or runtime integrity check. Its output can relabel DOM
+  `source` and set handoff capability metadata, but adds no element and never reaches the reasoner request.
+  TR-01 masks the local frame only, and the only product egress is `sendVerified`. Adds ADR-0015 (PROPOSED —
+  AWAITING OWNER APPROVAL), the RC-01 to RC-12 matrix, draft amendment language A-1 to A-9 (not applied) and
+  owner decisions OD-N to OD-Q. No code, existing ADR, frozen text, gate, invariant or blocker changed.
 - **M23.2 — owner decision: phased architecture.** Recorded in
   `artifacts/experiments/M23.2-phased-architecture-decision/`. Phase 1 is the current local, loopback,
   structure-only product; Phase 2 (vision-language and frame-based reasoning) is not authorised. Adds

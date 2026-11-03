@@ -2,7 +2,7 @@
 
 > **Status (updated M23.2, 2026-11-03):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
-> - **Not resolved by it:** every OD-A to OD-M decision stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
+> - **Not resolved by it:** every OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
 > - **Unaffected:** no ADR, gate, invariant, blocker or threshold is changed by this register.
@@ -28,7 +28,7 @@
 | OD-C | Independent human validation | HUM-01, FUN-01 | AWAITING OWNER APPROVAL |
 | OD-D | Real-site scope | FUN-01, FUN-05, PRV-02, SEC-07 | AWAITING OWNER APPROVAL |
 | OD-E | Security acceptance: QG-04-S scope and sign-off (E1), F-M13-1 (E2), B-02 (E3), the ADR-0006 tier (E4), the ADR-0005/0007/0008 values (E5 to E7), other proposed ADRs (E8) | SEC-02, SEC-03, SEC-06, ACT-02 to ACT-05 | AWAITING OWNER APPROVAL |
-| OD-F | Visual-only PII (a Phase 1 gap, not moved to Phase 2) | PRV-03, PRV-04, release sequence 1 | AWAITING OWNER APPROVAL |
+| OD-F | Visual-only PII, including **TR-01 redaction acceptance** (a Phase 1 gap, not moved to Phase 2; TR-01 masks only the local frame, M23.3) | PRV-03, PRV-04, release sequence 1 | AWAITING OWNER APPROVAL |
 | OD-G | Firefox evidence | BRW-02, BRW-03 | AWAITING OWNER APPROVAL |
 | OD-H | Performance targets | PRF-03, QG-05 thresholds, RSN-06 | AWAITING OWNER APPROVAL |
 | OD-I | FR-01 stays excluded | GOV-07 | AWAITING OWNER APPROVAL (current record: excluded) |
@@ -36,6 +36,10 @@
 | OD-K | Formal record of the Phase 1 REASON stage (K1); deliverable judgement (K2) | RSN-07, QG-01, deliverables 1 and 3 | AWAITING OWNER APPROVAL (direction recorded by P-1; formal record missing) |
 | OD-L | Register hygiene (B-03, registry byte count, the M23.0 audit) | GOV-04 | AWAITING OWNER APPROVAL |
 | OD-M | Phase 2 architecture proposal: whether, when, and its scope | P2-01 to P2-07 | AWAITING OWNER APPROVAL |
+| OD-N | **ADR-0015 approval** (Phase 1 architecture record) | RSN-07, RC-01 to RC-12, QG-01 ADR item | AWAITING OWNER APPROVAL |
+| OD-O | **T1 artifact integrity and reproducibility policy:** T1 bytes have no build-time or runtime check (M23.3) | every product measurement (U-4); ADR-0003 | AWAITING OWNER APPROVAL |
+| OD-P | **Whether T1 stays active before formal adoption:** it runs unadopted on every pass | RC-12; PRF-01 timings | AWAITING OWNER APPROVAL |
+| OD-Q | **T1's exact downstream influence:** whether the source trace is sufficient, or a further trace is required (U-2, U-3) | RC-12 | AWAITING OWNER APPROVAL |
 
 ## Blocked or not authorised
 
@@ -253,3 +257,23 @@ Each sub-decision is separate.
 - **Detector research is separate:** it stays FR-01 and is blocked by B-07. Phase 2 does not reactivate it.
 
 **PROPOSED — AWAITING OWNER APPROVAL:** schedule the Phase 2 proposal only after Phase 1 acceptance is decided (GOV-01). That way Phase 2 does not reopen the Phase 1 scope.
+
+## OD-N to OD-Q — added by M23.3
+
+**Context (FACT, source trace; `docs/acceptance/t1-tr01-status-reconciliation.md`):**
+- **T1 runs:** the T1 UI head is loaded and run on every perception pass, and its output is fused.
+- **What T1 output reaches:** handoff metadata (`source` relabelling, `capability`, `scale_to_css`), the run report, and pass timing.
+- **What it does not reach:** it adds no element to the handoff, and it is not in the reasoner request.
+- **Integrity:** its bytes are verified neither at build time nor at runtime. TR-01's are verified at both.
+- **ADR-0003** (packaging and runtime identity) is PROPOSED, not implemented.
+
+| ID | Question | Options (none chosen) |
+|---|---|---|
+| OD-N | Approve ADR-0015? | approve; amend; reject (the repository stays as it is) |
+| OD-O | T1 integrity policy | require a build-time and runtime hash pin, as for TR-01 (source work, needing its own authorisation); accept the gap, with every measurement labelled; package T1 only in evidence builds |
+| OD-P | T1 before adoption | keep it running unadopted, as recorded; disable it in the product (source work); keep it but exclude its metadata from the handoff (source work) |
+| OD-Q | Downstream influence | accept the M23.3 trace as sufficient; require a further trace of U-1 to U-3 (documentation or measurement, separately authorised) |
+
+**PROPOSED — AWAITING OWNER APPROVAL:**
+- decide OD-O before any further product measurement is quoted, because every measurement depends on an unverified file;
+- whatever is decided, nothing here is a T1 adoption, and FR-01 stays deferred and not authorised.
