@@ -5,6 +5,7 @@
 > - **What it does not do:** approve anything, or reclassify any historical record.
 > - **Criterion IDs** (FUN-, BRW-, PRV-, SEC-, RSN-, ACT-, REL-, PRF-, XM-, HUM-, CI-, GOV-) refer to `core-product-acceptance-PROPOSED.md` §5.
 > - **Evidence types** A–H are defined there, in §4.
+> - **Updated in M23.2** for the owner's **phased architecture** direction (2026-11-03). Each deliverable now states what is **Phase 1** (the current structure-only product) and what is **Phase 2** (future, not authorised). §1.5 summarises. The original requirements are quoted unchanged.
 
 ## 1. The brief's deliverables
 
@@ -19,7 +20,7 @@ The four deliverables are quoted from `docs/architecture/vision.md` ("Deliverabl
 | **Chrome** | MV3 extension, built and run in Chrome for Testing 153 on W1 | C: M19 and M20, person-run in the real side panel | D, E, H for the product | BRW-01 | OD-B, OD-C |
 | **Firefox** | a `build:firefox` script exists, but **the product has never been run in Firefox** | **none for the product**. Firefox evidence exists only for the coordinate-contract fixture (QG-02, hosted CI run `34485366327`), the model runtime (M8.2) and spikes (S-02, S-05) | build, run and test the product | BRW-02, BRW-03 | **OD-A**, **OD-G** |
 | **Local vision model: TR-01** | `PP-OCRv4_mobile_det` text-region detector, in the product perception pass on the gesture route. **It feeds redaction, not decisions** | B: M10 (synthetic) | product evidence of visual-only protection | PRV-03 | OD-F |
-| **Local vision model: T1** (UI-element detector) | **UNADOPTED.** The product ships the DOM-only floor, and detector research is FR-01 (deferred, not authorised) | — | — | out of scope (FR-01) | OD-I |
+| **Local vision model: T1** (UI-element detector) | **UNADOPTED.** *Corrected in M23.2:* the original T1 head is loaded and run in the product perception pass (`apps/extension/host/offscreen/main.ts`, `ensurePerception`). Clicks come only from DOM elements (M21). Whether vision-only elements reach the reasoner handoff is UNKNOWN. Detector research is FR-01 (deferred, not authorised) | source read (M23.2); M21 | the handoff question (UNKNOWN) | out of scope (FR-01) | OD-I |
 | **Local vision model: a VLM** | **none.** A VLM is not part of the structure-only design. The constitution lists "a local VLM in the normal path" under *Not building* (§10) | — | — | — | — |
 | **Local vision model: faces** (YuNet) | referenced only in `packages/perception/src/detector.ts` and its test. INFERENCE: not in the product path | — | product integration, or an exclusion | PRV-03 | OD-F |
 
@@ -53,6 +54,17 @@ The four deliverables are quoted from `docs/architecture/vision.md` ("Deliverabl
 | **Real-site runs** | **none.** The validated scope is synthetic loopback pages | — | an approved real-site scope; legal and ToS review (AUDIT-0004 D5) | FUN-01, PRV-02 | **OD-D** |
 | **"Visibly"** | real side panel, masked preview, per-stage timings (M19, M20) | C | an independent observer | HUM-01 | OD-C |
 
+## 1.5 Phase mapping (M23.2)
+
+**Direction:** owner-selected. **Acceptance consequences:** PROPOSED — AWAITING OWNER APPROVAL.
+
+| Deliverable | Phase 1 (current structure-only product) | Phase 2 (future; NOT AUTHORISED) | Still open in Phase 1 |
+|---|---|---|---|
+| 1. Extension, Chrome and Firefox, local vision model | Chrome MV3; TR-01 local visual redaction | a VLM or frame-based local visual reasoning (P2-01, P2-03) | Firefox (OD-A, OD-G); whether TR-01-for-redaction meets "a vision model executing locally" (OD-K2) |
+| 2. Privacy filter, demonstrated | textual and DOM PII to references; consent; masked preview; no frame leaves | the server tripwire (P2-06) | visual-only PII and faces (OD-F); the Rule 2 metrics (PRV-02, PRV-04) |
+| 3. Server with an open-weight LLM or VLM | a loopback-hosted open-weight **text** LLM, structure-only | a VLM; frame-based context; server infrastructure (P2-01, P2-02, P2-04) | the ADR record (RC-01, RC-02); reasoner adoption (RSN-06); whether Phase 1 meets Deliverable 3 (OD-K2) |
+| 4. End-to-end task, visibly assisting | bounded synthetic tasks, at most 5 turns, click only | visual-context scoring (P2-05) | repeated runs, cross-machine, independent operator, real sites (OD-B, OD-C, OD-D) |
+
 ## 2. The 12-stage pipeline
 
 **Stage names** are from constitution §1, which is frozen.
@@ -66,7 +78,7 @@ It runs at most **5 turns** (`MAX_TASK_TURNS`, `packages/orchestrator/src/loop.t
 | # | Stage | Implementation (FACT: module exists) | As-built note | Evidence | Gap | Criteria |
 |---|---|---|---|---|---|---|
 | 1 | OBSERVE | `packages/perception/src/capture.ts`, `elementGraph.ts`, `changeDetection.ts`; `packages/extension-transport/src/observation.ts` | gesture-authorised capture (ADR-0009); structural change signal (ADR-0010) | A; B; C (M4, M5) | other browsers | BRW-04 |
-| 2 | PERCEIVE | `packages/perception/src/textRegion.ts` (TR-01), `fusion.ts`, `coordinates.ts` | TR-01 is in the product pass. **No UI detector** (T1 unadopted; DOM-only floor) and no faces in the product | A; B (QG-02 criteria 1–6) | criterion 7 executor half | ACT-06, PRV-03 |
+| 2 | PERCEIVE | `packages/perception/src/textRegion.ts` (TR-01), `fusion.ts`, `coordinates.ts`; `apps/extension/host-lib/perception-realm.ts` | the original T1 head (**UNADOPTED**) runs, then TR-01. Clicks come only from DOM elements. No faces in the product | A; B (QG-02 criteria 1–6) | criterion 7 executor half | ACT-06, PRV-03 |
 | 3 | SANITIZE | `packages/privacy/src/sanitize.ts`, `classify.ts`, `pixelRedaction.ts`, `vault.ts`, `tokens.ts` | values become references; the vault is memory-only | A; B; G | the Rule 2 metrics | PRV-01 to PRV-04, PRV-06 |
 | 4 | VERIFY (egress gate) | `packages/egress/src/guard.ts`, `qg04.ts`, `handoffContract.ts`; `packages/privacy/src/literalCheck.ts` | **structure-only handoff.** Production frame egress is impossible (three locks, ADR-0012 §16) | A; G (M12) | the QG-04 structure-only definition and signature | SEC-03, SEC-04, SEC-05 |
 | 5 | REASON | `packages/reasoner/src/localModel.ts`, `contract.ts`; `scripts/reasoner/` | **a local loopback text LLM, not the constitution's "server VLM"** (G-1) | LOOP-2; M20 (W1) | ADR; adoption | RSN-01 to RSN-07 |
@@ -79,11 +91,11 @@ It runs at most **5 turns** (`MAX_TASK_TURNS`, `packages/orchestrator/src/loop.t
 | 11 | VERIFY RESULT | `packages/agent/src/verifyResult.ts`; `packages/orchestrator/src/postconditions.ts` | postconditions (M18; E8 on W2) | A; B | ADR-0007 tolerance | ACT-03 |
 | 12 | Repeat, or stop and ask | `packages/orchestrator/src/loop.ts`, `clarification.ts`, `declaration.ts` | at most 5 turns; clarification (M17); declared outcome (M18) | A; B (M15) | C/D coverage of the stop paths | FUN-02, FUN-04 |
 
-**Observation (INFERENCE, from the rows above).** The implemented loop covers every frozen stage, and none is removed or reordered. Two stages are realised differently from the constitution's wording:
+**Observation (INFERENCE, from the rows above).** The implemented loop covers every frozen stage, and none is removed or reordered. Two stages are realised differently from the constitution's wording. Under the owner's phased direction, both differences are the **intended Phase 1** design; the formal reconciliation is M23.2 RC-01 and RC-02:
 - **stage 4** carries structure instead of a frame;
 - **stage 5** is a local text LLM instead of a server VLM.
 
-Stage 2 runs without a UI detector or faces. Whether those differences are acceptable is recorded as G-1, OD-F and OD-K, and is not decided here.
+Stage 2 runs an unadopted UI head whose detections never become targets, and no face detector. Whether those differences are acceptable is recorded as G-1, OD-F and OD-K, and is not decided here.
 
 ## 3. Evidence by type
 

@@ -7,6 +7,7 @@
 >   - **sign any gate**, or mark any checkbox;
 >   - **change any ADR or security invariant**, or weaken any criterion.
 > - **What happens on approval:** the gate texts would be amended in a separate, owner-authorised change, together with any ADR the owner requires.
+> - **Updated in M23.2** for the owner's phased direction. The mappings below are for **Phase 1**, the current structure-only product. Phase 2 capabilities stay outside Phase 1 gates unless separately approved. **M23.2 signs no gate and alters no gate definition.**
 
 ## 1. Why a mapping is needed (FACT)
 
@@ -48,6 +49,7 @@
 | **Current status (FACT)** | **CONDITIONAL; QG-03a OPEN** (per `agentos/state.md` and the model registry). The text-region WASM correctness input was decided (Option A, approved 2026-09-25) |
 | **Applies?** | yes, to **each model in the product path**:<br>• **TR-01**, in the extension (all four browser cells apply);<br>• **the local reasoner** (`Qwen2.5-0.5B-Instruct` Q4_K_M under llama.cpp, *outside* the extension) |
 | **Gap (INFERENCE)** | QG-03's four cells (Chrome and Firefox, WebGPU and WASM) describe **in-browser** inference. The reasoner runs in a native process, so those cells do not describe it. QG-03 has no stated form for a native loopback model |
+| **Phase 1 need (M23.2)** | The acceptance model must define how a **native loopback language reasoner** is assessed: its cells, correctness reference and benchmark. **No model certification or performance threshold is proposed here** (OD-H, RSN-06). Phase 2 VLM candidates are not assessed under Phase 1 |
 | **Proposed scope** | **PROPOSED — AWAITING OWNER APPROVAL:**<br>(a) TR-01: QG-03 as written;<br>(b) the reasoner: pin, licence from the pinned revision, launcher hash verification, a benchmark artifact, and correctness against an owner-approved reference. **The thresholds for (b) are TBD** (OD-H, RSN-06);<br>(c) T1: out of scope (FR-01; unadopted) |
 | **Proposed evidence** | the existing M8.2 TR-01 cells; a reasoner adoption record (registry `PINNED` → `ADOPTED` only after the owner's bar) |
 | **Owner decision** | the reasoner adoption bar (RSN-06); the registry byte-count discrepancy (G-5) |
@@ -69,8 +71,9 @@
   - **B-02** stays **OPEN**: Playwright does not observe the offscreen document; raw CDP does.
 
 **Proposed approach.** **PROPOSED — AWAITING OWNER APPROVAL.** QG-04 would be split into two sub-gates with separate signatures:
-- **QG-04-S**, the **structure-only egress gate**, applies to the shipped product.
-- **QG-04-F**, the **frame egress gate**, keeps the current items unchanged.
+- **QG-04-S**, the **structure-only egress gate**, is the proposed **Phase 1** security gate for the shipped product.
+- **QG-04-F**, the **frame egress gate**, keeps the current items unchanged. It belongs to any future frame pathway (Phase 2, P2-02) and stays **BLOCKED**.
+- **Both need approval:** each requires its own approvals and evidence. **M23.2 signs neither.**
 - **Frame egress stays blocked:** QG-04-F stays unsigned and production frame egress stays impossible (three locks, ADR-0012 §16) until its own items pass.
 
 Nothing in QG-04-F is relaxed. Only the gate's scope is stated.
@@ -110,11 +113,11 @@ Nothing in QG-04-F is relaxed. Only the gate's scope is stated.
 |---|---|
 | **Current status (FACT)** | **PARTIAL:** one of six metrics, the visual-context evaluator for T1, which is itself unadopted (FR-01). The M20 benchmark exists for W1 latency and working set |
 | **Applies?** | yes. Note that the **visual-context** metric (element mAP) depends on a UI detector the product does not ship |
-| **Proposed scope** | **PROPOSED — AWAITING OWNER APPROVAL:** for the core product, QG-05 covers:<br>• PII detection (Rule 2; recall ≥ 0.98 is the contract's target);<br>• redaction metrics, with an evidence source replacing the server tripwire (OD-F);<br>• client resources;<br>• latency (p50/p95, cold and warm, per stage);<br>• task success after privacy (the two-row ablation, FUN-05).<br>Visual context on the DOM-only product is measured as **grounding accuracy**, not detector mAP. The detector mAP slice moves to FR-01 |
+| **Proposed scope** | **PROPOSED — AWAITING OWNER APPROVAL:** for the Phase 1 core product, QG-05 covers:<br>• PII detection (Rule 2; recall ≥ 0.98 is the contract's target);<br>• redaction metrics, with an evidence source replacing the server tripwire (OD-F);<br>• client resources;<br>• latency (p50/p95, cold and warm, per stage);<br>• task success after privacy (the two-row ablation, FUN-05).<br>Visual context on the DOM-only product is measured as **grounding accuracy**, not detector mAP. The detector mAP slice moves to FR-01, which stays deferred and not authorised. The phased direction does **not** reactivate detector research. Frame-based visual-context scoring is Phase 2 (P2-05) |
 | **Thresholds** | only PII recall ≥ 0.98 is authoritative (benchmark contract Rule 2). **All other thresholds TBD** (OD-H); Rule 5 budgets are projected, not targets |
 | **Owner decision** | the metric set; the corpus (OD-D); the redaction evidence source (OD-F); thresholds (OD-H) |
 
-### QG-06 — Release
+### QG-06 — Release (proposed Phase 1 release checklist: `release-readiness-checklist-PROPOSED.md`)
 
 | | |
 |---|---|
@@ -124,7 +127,7 @@ Nothing in QG-04-F is relaxed. Only the gate's scope is stated.
 | **Proposed scope** | **PROPOSED — AWAITING OWNER APPROVAL:**<br>(a) the Firefox items follow OD-A and OD-G;<br>(b) the demonstration sequences are redefined for the shipped architecture (GOV-05). The PAN-card element is conditional on OD-F. Sequence 3's fallback becomes "frame withheld, user told" (S10). Sequence 4 is the owner's call: the shipped reasoner is already loopback-only, so whether a separate offline sequence is still meaningful is an owner judgement (INFERENCE);<br>(c) the four Invariant-E mechanisms map to S1 (lint), S6 (interception), S2 (CSP v2, the reasoner endpoint) and S4 (payload hash);<br>(d) "rehearsed ten times" is kept for demonstration sequences, while the bounded task-set repetition count (REL-01) is a separate owner decision |
 | **Owner decision** | OD-A, OD-G, GOV-05, REL-01 N |
 
-## 3. Proposed gate order for core-product acceptance (INFERENCE)
+## 3. Proposed gate order for Phase 1 acceptance (INFERENCE)
 
 ```
 GOV-01 (this definition approved)

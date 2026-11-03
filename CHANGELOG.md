@@ -35,6 +35,14 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.2 — owner decision: phased architecture.** Recorded in
+  `artifacts/experiments/M23.2-phased-architecture-decision/`. Phase 1 is the current local, loopback,
+  structure-only product; Phase 2 (vision-language and frame-based reasoning) is not authorised. Adds
+  `docs/acceptance/phase-1-architecture-scope.md` and `phase-2-future-capability-register.md`; the M23.1
+  proposal becomes the Phase 1 scope (still PROPOSED); the owner-decision register separates resolved,
+  awaiting and blocked items; ten reconciliation items are listed. Corrects M23.1's "DOM-only floor"
+  wording: the unadopted T1 head runs in the perception pass, and clicks stay DOM-only. No ADR,
+  constitution text, gate, invariant, blocker, CSP or permission changed. FR-01 deferred; B-07 blocked.
 - **M23.1 — core-product acceptance definition (PROPOSED — AWAITING OWNER APPROVAL).** `docs/acceptance/`
   proposes what core-product acceptance means for the shipped architecture: 59 criteria in 12
   categories with eight separate evidence types, traceability of the brief's deliverables and the

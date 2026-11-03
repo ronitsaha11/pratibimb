@@ -4,11 +4,16 @@
 > - **What it is:** this document proposes what "the PratiBimb core product is accepted" should mean.
 > - **What it does not do:** it approves nothing, signs no quality gate, changes no ADR, frozen specification or security invariant, lifts no blocker, and authorises no implementation or execution.
 > - **Every classification below is a proposal.** That covers every mandatory, optional or out-of-scope label and every proposed test.
+> - **Updated in M23.2 (2026-11-03)** for the owner's **phased architecture** direction:
+>   - the matrix in §5 is now the proposed **Phase 1** acceptance scope;
+>   - the original vision-language and frame-based capabilities are listed in §5.13 as **Phase 2 future scope**.
+>   - **The proposal itself remains PROPOSED — AWAITING OWNER APPROVAL.** The phased direction approves none of its criteria or classifications.
 > - **It stands alone.** Its companions only add detail:
 >   - `traceability-matrix.md`;
 >   - `quality-gate-mapping-PROPOSED.md`;
 >   - `owner-decisions.md`;
->   - `release-readiness-checklist-PROPOSED.md`.
+>   - `release-readiness-checklist-PROPOSED.md`;
+>   - `phase-1-architecture-scope.md` and `phase-2-future-capability-register.md` (M23.2).
 
 ## 1. Why this is needed (FACT)
 
@@ -21,13 +26,21 @@
   - consent is given in the panel (ADR-0014, accepted).
 - **The consequence:** some gate items no longer apply as written, and a gate cannot be signed against an undefined target.
 
+### 1.1 Owner direction (M23.2)
+
+**PHASED ARCHITECTURE**, selected by the owner on 2026-11-03 (`artifacts/experiments/M23.2-phased-architecture-decision/`):
+- **Phase 1:** the current local, loopback-only, structure-based reasoning architecture.
+- **Phase 2:** future vision-language and browser-frame-based reasoning, subject to separate architecture, security, legal and owner approvals. **Not authorised.**
+
+**What the direction does not do:** it amends no ADR or constitution text, approves no part of this proposal, signs no gate, authorises no frame egress, and lifts no blocker. Its conflicts with frozen documents are listed in that record's §4 (RC-01 to RC-10).
+
 ## 2. The product as built (FACT, with sources)
 
 | Element | As built | Source |
 |---|---|---|
 | Client | Chrome MV3 extension (WXT). A Firefox build script exists (`apps/extension/package.json` `build:firefox`); the product has not been run in Firefox | `apps/extension/`; M20 |
 | Local vision | **TR-01** (`PP-OCRv4_mobile_det`) text-region detector in the product perception pass, for redaction (`UNREAD_REGION`) | `artifacts/experiments/M10-visual-redaction-integration/` |
-| UI detector | **T1 UNADOPTED**: the product ships the DOM-only floor; clicks target DOM elements only | `agentos/state.md` (M21); FR-01 |
+| UI detector | **T1 UNADOPTED.** *Corrected in M23.2:* the earlier wording "the product ships the DOM-only floor" was imprecise. FACT (source read): the offscreen perception pass (`ensurePerception`) loads the packaged original T1 head (`t1-ui-head.onnx`) and runs it before TR-01. Clicks come only from DOM elements; a vision-only detection never becomes a target (M21). UNKNOWN: whether vision-only fused elements appear in the reasoner handoff. Detector performance is FR-01 (deferred, not authorised) | `apps/extension/host/offscreen/main.ts`; `apps/extension/host-lib/perception-realm.ts`; `agentos/state.md` (M21) |
 | Faces | a YuNet `FaceDetector` role is recorded as ACCEPT (wasm, webgpu) in `packages/perception/src/detector.ts`. FACT: it is referenced only there and in that file's test; no file under `apps/` references it. INFERENCE (from that FACT): **face detection is not in the product path** | `git grep` over `apps/` and `packages/` (M23.1) |
 | Reasoner | **local** llama.cpp `b10956` serving `Qwen2.5-0.5B-Instruct` Q4_K_M on `127.0.0.1`. A **text** LLM, not a VLM: it never sees a pixel or a value. Registry status **`PINNED`, not `ADOPTED`**; correctness **PROVISIONAL**; `MODEL_PATH = EXPERIMENTAL`, `FALLBACK_PATH = VERIFIED` (deterministic planner) | `agentos/registry/model-registry.md`; `artifacts/experiments/LOOP-2-local-reasoner-egress/`; M20 |
 | Handoff | structure-only JSON: manifest and references; **no frame**. Production frame egress is impossible by three locks | ADR-0012 §8, §16; `artifacts/experiments/M12-qg04-enforcement/` |
@@ -40,6 +53,7 @@
 ### 2.1 Governance gaps this proposal surfaces (FACT; not resolved here)
 
 - **G-1. The constitution was not amended for the local reasoner.** Constitution §1 (REASON = "server VLM") and §2 (wire = WebP frame and manifest; server = FastAPI, vLLM, Qwen3-VL) are frozen. **No ADR or constitution amendment records the local loopback text LLM as the product's REASON stage.** ADR-0013 pins its endpoint, and ADR-0012 defines structure-only as the frame path's fallback. Constitution §10 also lists "a local VLM in the normal path" under *Not building*; the shipped reasoner is a local **text** LLM in the normal path. Whether that falls inside the exclusion is an owner question (INFERENCE).
+- **G-1, after M23.2:** the owner's phased direction now records the *intent*: Phase 1 is local, loopback and structure-only. It is **not** an ADR or a constitution amendment, so the formal record is still missing (RC-01, RC-02, RC-06).
 - **G-2. QG-04 is out of step with practice.** QG-04 states "No code may make a network call until this gate passes", while the shipped product calls the loopback reasoner. QG-04 is **UNSIGNED**, and its M12 matrix assessed the frame path.
 - **G-3. The reasoner is not adopted.** It is `PINNED`, not `ADOPTED`; adoption "needs QG-03 and a benchmark artifact" (registry).
 - **G-4. B-03 is stale.** B-03 ("no vLLM host") is still `BLOCKED` although the product no longer uses a server.
@@ -76,7 +90,9 @@ These hold whatever is approved:
 - **Plans don't count:** a design or a pre-registration is **not** executed evidence.
 - **Thresholds are owner-set:** a numeric threshold that no authoritative source gives is **TBD**, and needs an owner decision.
 
-## 5. Acceptance matrix (PROPOSED — AWAITING OWNER APPROVAL)
+## 5. Acceptance matrix — Phase 1 scope (PROPOSED — AWAITING OWNER APPROVAL)
+
+Following the owner's phased direction (M23.2), §5.1 to §5.12 are the proposed **Phase 1** acceptance scope, for the current structure-only product. Phase 2 capabilities are **not** Phase 1 criteria (§5.13).
 
 **How to read it:**
 - **Class:** M = mandatory, O = optional, X = out of scope, OD = owner decision required before classification.
@@ -139,7 +155,7 @@ These hold whatever is approved:
 | RSN-04 | The reasoner never receives pixels or values: structure-only handoff with references | ADR-0012 §8; INV-07; LOOP-2 | M | implemented | A; LOOP-2 (request body carried only tokens) | product-build re-check | request-body inspection in the bounded set | — | — | PARTIAL |
 | RSN-05 | Reasoner output parsed and validated client-side; no best-effort parse | INV-12; `packages/plan` | M | `parsePlan` / `validatePlan` | A | — | fuzzed or invalid plan cases | — | — | EVIDENCED (A) |
 | RSN-06 | Reasoner **adoption** (registry: `PINNED`, not `ADOPTED`; correctness PROVISIONAL) | model registry | **OD** | — | LOOP-2; M20 benchmark (one machine) | an adoption bar | per the bar the owner sets | **owner** | G-3 | NOT EVIDENCED |
-| RSN-07 | An architecture record for the local text LLM as the REASON stage | constitution §1–§2 (frozen) | M (governance) | — | — | ADR or constitution amendment | — | **owner + ADR** (G-1) | — | NOT EVIDENCED |
+| RSN-07 | An architecture record for the local text LLM as the Phase 1 REASON stage | constitution §1–§2 (frozen); M23.2 RC-01, RC-02 | M (governance) | — | M23.2 records the owner's **direction**, not an ADR | ADR or constitution amendment | — | **owner + ADR** (G-1, OD-K1) | — | NOT EVIDENCED |
 
 ### 5.6 Action safety and verification
 
@@ -202,6 +218,25 @@ These hold whatever is approved:
 | GOV-06 | Release from `main` via PR; the M22 branch published and merged, or explicitly excluded | CONTRIBUTING; M22.19 register R-10 | M | — | — | decision | — | **owner (OD-J)** | — | NOT EVIDENCED |
 | GOV-07 | FR-01 excluded from core acceptance | FR-01; M22.19 | M (statement) | — | the FR-01 register | — | — | owner may change scope (OD-I) | — | EVIDENCED (as recorded) |
 
+### 5.13 Phase 2 future scope (not Phase 1 criteria)
+
+These capabilities come from the brief and the constitution, and **their history is not rewritten**. Under the owner's phased direction they are **not required** for the proposed Phase 1 baseline. Each is `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` (`phase-2-future-capability-register.md`).
+
+| ID | Capability | Original source | Phase 1 consequence | Reconciliation |
+|---|---|---|---|---|
+| P2-01 | Vision-language reasoning | brief Deliverable 3; constitution §1 stage 5 | none; RSN-* covers the text reasoner | RC-01, RC-05 |
+| P2-02 | Browser-frame visual context to a reasoner | brief; constitution §2 | SEC-04 requires that it stays **impossible** | QG-04-F; RC-02 |
+| P2-03 | Joint visual and structural model architecture | brief; dossier | none | RC-03 |
+| P2-04 | Server or remote inference infrastructure | constitution §2, §10 | none | RC-02, RC-03; B-03 |
+| P2-05 | Visual-context scoring on clean and redacted frames | rubric; benchmark contract Rule 2 | QG-05 Phase 1 metric set excludes it (proposed) | RC-08 |
+| P2-06 | Server PII tripwire | constitution §2; INV-21 | PRV-04 needs another evidence source (OD-F) | RC-09 |
+| P2-07 | Offline-mode local VLM | constitution §10 v1.1; release sequence 4 | GOV-05 | RC-03, RC-07 |
+
+**Still Phase 1 decisions, not moved to Phase 2:**
+- **Visual-only PII protection (PRV-03, OD-F):** a gap in the shipped product.
+- **Firefox (BRW-02, BRW-03, OD-A):** the brief names it for the client.
+- **Face-detection validation.**
+
 ## 6. The gates
 
 `quality-gate-mapping-PROPOSED.md` maps QG-01–QG-06 onto the shipped architecture and proposes revised scopes. QG-04 gets a structure-only definition for owner review.
@@ -210,7 +245,7 @@ These hold whatever is approved:
 
 ## 7. Owner decisions
 
-`owner-decisions.md` frames OD-A to OD-J: browser scope, cross-machine, human validation, real-site scope, security acceptance, privacy, Firefox, performance, deferred research, and branch publication. **None is decided here.**
+`owner-decisions.md` frames OD-A to OD-M: browser scope, cross-machine, human validation, real-site scope, security acceptance, privacy, Firefox, performance, deferred research, branch publication, the REASON-stage record, register hygiene, and the Phase 2 proposal. **None is decided here.** M23.2 resolved only the phased direction (P-1 to P-3).
 
 ## 8. Release readiness
 

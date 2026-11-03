@@ -1,26 +1,50 @@
 # Owner-decision register — core-product acceptance
 
-> **Status: every decision below is OPEN (M23.1, 2026-11-03).**
+> **Status (updated M23.2, 2026-11-03):**
+> - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
+> - **Not resolved by it:** every OD-A to OD-M decision stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
 > - **Unaffected:** no ADR, gate, invariant, blocker or threshold is changed by this register.
 > - **Recording a decision:** a decision is recorded only when the owner states it. It is then written into the governing record (an ADR, the gate file, the blocker register or this file) in a separate change.
 > - **References:** criterion IDs refer to `core-product-acceptance-PROPOSED.md` §5.
 
+## Resolved by M23.2 (owner, 2026-11-03)
+
+| ID | Decision | Record | Limits |
+|---|---|---|---|
+| P-1 | **Phased architecture direction:** Phase 1, then Phase 2 | `artifacts/experiments/M23.2-phased-architecture-decision/` | a roadmap direction; **not** an ADR or constitution amendment |
+| P-2 | **Phase 1 target architecture:** the current local, loopback, structure-only product | `phase-1-architecture-scope.md` | the *intended* architecture; **not** a claim of acceptance |
+| P-3 | **Original VLM and frame-based functionality deferred to Phase 2** | `phase-2-future-capability-register.md` | Phase 2 is **NOT AUTHORISED** for implementation or execution |
+
+## Awaiting owner approval
+
 | ID | Decision | Blocks | Status |
 |---|---|---|---|
-| OD-A | Browser scope | BRW-02, BRW-03, BRW-04, QG-03 cells, QG-06 | OPEN |
-| OD-B | Cross-machine requirement | XM-01, FUN-01, RSN-01, PRF-01, REL-02 | OPEN |
-| OD-C | Independent human validation | HUM-01, FUN-01 | OPEN |
-| OD-D | Real-site scope | FUN-01, FUN-05, PRV-02, SEC-07 | OPEN |
-| OD-E | Security acceptance | SEC-02, SEC-03, SEC-06, ACT-02–ACT-05 | OPEN |
-| OD-F | Visual-only PII | PRV-03, PRV-04, release sequence 1 | OPEN |
-| OD-G | Firefox evidence | BRW-02, BRW-03 | OPEN |
-| OD-H | Performance targets | PRF-03, QG-05 thresholds, RSN-06 | OPEN |
-| OD-I | FR-01 stays excluded | GOV-07 | OPEN (current record: excluded) |
-| OD-J | Branch publication and hosted CI | CI-01, GOV-06 | OPEN |
-| OD-K | Architecture record for the shipped REASON stage | RSN-07, QG-01, deliverables 1 and 3 | OPEN |
-| OD-L | Register hygiene (B-03, registry byte count, the M23.0 audit) | GOV-04 | OPEN |
+| GOV-01 | M23.1 acceptance-definition approval (the Phase 1 scope) | every criterion | AWAITING OWNER APPROVAL |
+| — | Phase 1 mandatory and optional classification (51 M, 1 O, 7 OD as proposed) | the matrix | AWAITING OWNER APPROVAL |
+| OD-A | Browser scope: Chrome only, or Chrome and Firefox, for Phase 1 | BRW-02, BRW-03, BRW-04, QG-03 cells, QG-06 | AWAITING OWNER APPROVAL |
+| OD-B | Cross-machine requirement | XM-01, FUN-01, RSN-01, PRF-01, REL-02 | AWAITING OWNER APPROVAL |
+| OD-C | Independent human validation | HUM-01, FUN-01 | AWAITING OWNER APPROVAL |
+| OD-D | Real-site scope | FUN-01, FUN-05, PRV-02, SEC-07 | AWAITING OWNER APPROVAL |
+| OD-E | Security acceptance: QG-04-S scope and sign-off (E1), F-M13-1 (E2), B-02 (E3), the ADR-0006 tier (E4), the ADR-0005/0007/0008 values (E5 to E7), other proposed ADRs (E8) | SEC-02, SEC-03, SEC-06, ACT-02 to ACT-05 | AWAITING OWNER APPROVAL |
+| OD-F | Visual-only PII (a Phase 1 gap, not moved to Phase 2) | PRV-03, PRV-04, release sequence 1 | AWAITING OWNER APPROVAL |
+| OD-G | Firefox evidence | BRW-02, BRW-03 | AWAITING OWNER APPROVAL |
+| OD-H | Performance targets | PRF-03, QG-05 thresholds, RSN-06 | AWAITING OWNER APPROVAL |
+| OD-I | FR-01 stays excluded | GOV-07 | AWAITING OWNER APPROVAL (current record: excluded) |
+| OD-J | Branch publication and hosted CI | CI-01, GOV-06 | AWAITING OWNER APPROVAL |
+| OD-K | Formal record of the Phase 1 REASON stage (K1); deliverable judgement (K2) | RSN-07, QG-01, deliverables 1 and 3 | AWAITING OWNER APPROVAL (direction recorded by P-1; formal record missing) |
+| OD-L | Register hygiene (B-03, registry byte count, the M23.0 audit) | GOV-04 | AWAITING OWNER APPROVAL |
+| OD-M | Phase 2 architecture proposal: whether, when, and its scope | P2-01 to P2-07 | AWAITING OWNER APPROVAL |
+
+## Blocked or not authorised
+
+| Item | Status | Basis |
+|---|---|---|
+| QG-04-F and production frame egress | **BLOCKED** | ADR-0012 §13 (B1, B2, B4, B5, B6 open); three locks (§16) |
+| B-07 and FR-01 detector evaluation | **BLOCKED** (B-07); FR-01 **DEFERRED — NOT AUTHORISED FOR EXECUTION** | `agentos/blockers.md`; `agentos/registry/future-research-register.md` |
+| Any new visual-frame data-transfer pathway | **NOT AUTHORISED** | M23.2 decision §3, §6 |
+| Phase 2 implementation or execution | **NOT AUTHORISED** | M23.2 decision |
 
 ---
 
@@ -173,7 +197,7 @@ Each sub-decision is separate.
 **Context (FACT):**
 - **FR-01** is `DEFERRED — NOT AUTHORISED FOR EXECUTION` (`agentos/registry/future-research-register.md`).
 - **B-07** (the M22 evaluation restriction) is `BLOCKED`.
-- **The product ships the DOM-only floor.** T1 and the epoch-39 checkpoint are UNADOPTED.
+- **T1 is not adopted.** The original T1 head runs in the product perception pass, but its detections never become click targets (M21; corrected in M23.2). T1 and the epoch-39 checkpoint are UNADOPTED.
 
 **PROPOSED — AWAITING OWNER APPROVAL:** FR-01 stays excluded, and no core criterion depends on a UI detector. Changing this needs a separate owner authorisation, and it does not lift B-07.
 
@@ -208,6 +232,8 @@ Each sub-decision is separate.
 
 **PROPOSED — AWAITING OWNER APPROVAL:** K1 is a precondition of QG-01's ADR item and of any release claim about the architecture.
 
+**After M23.2.** The owner's phased direction (P-1, P-2) states the intent that Phase 1 is local, loopback and structure-only. **K1 is still open:** the direction is not an ADR, and the conflicts it must reconcile are M23.2 RC-01 to RC-10. **K2 is narrowed, not closed:** the owner has placed the VLM and frame-based parts of Deliverables 1 and 3 in Phase 2. Whether Phase 1 alone is presented as meeting those deliverables remains the owner's judgement.
+
 ## OD-L — Register hygiene
 
 | Sub | Item | Context (FACT) |
@@ -215,3 +241,15 @@ Each sub-decision is separate.
 | L1 | **B-03** ("No vLLM host") is still `BLOCKED` | the shipped product uses no server; whether B-03 is superseded is an owner call |
 | L2 | **Registry byte count:** 491 358 496 B in the model registry; 491 400 032 B in the M20 pin | reported in M20; unreconciled |
 | L3 | **The M23.0 audit** was delivered in conversation, not as a repository record | record it, or leave this proposal as its only trace |
+
+## OD-M — Phase 2 architecture proposal
+
+**Question.** Whether and when a Phase 2 architecture proposal is prepared, and what it covers.
+
+**Context (FACT).**
+- **Scope:** Phase 2 holds P2-01 to P2-07 (`phase-2-future-capability-register.md`).
+- **The old design is not presumed:** the dossier's FastAPI + vLLM + WebP design is not presumed reusable unchanged.
+- **Frame egress stays blocked:** any frame pathway needs QG-04-F, a separate security review, and the legal and owner approvals.
+- **Detector research is separate:** it stays FR-01 and is blocked by B-07. Phase 2 does not reactivate it.
+
+**PROPOSED — AWAITING OWNER APPROVAL:** schedule the Phase 2 proposal only after Phase 1 acceptance is decided (GOV-01). That way Phase 2 does not reopen the Phase 1 scope.

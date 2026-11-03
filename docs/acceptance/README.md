@@ -1,6 +1,10 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
-> **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03).**
+> **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
+> - **Owner direction (M23.2, 2026-11-03): PHASED ARCHITECTURE.**
+>   - **Phase 1** is the current local, loopback, structure-only product, and these documents are its proposed acceptance scope.
+>   - **Phase 2** (vision-language and frame-based reasoning) is future scope and **not authorised**.
+>   - **What the direction does not do:** approve the acceptance proposal, amend any ADR or the constitution, sign any gate, or lift any blocker. See `artifacts/experiments/M23.2-phased-architecture-decision/`.
 > - **What this folder is:** a proposal of what "the core product is accepted" should mean.
 > - **What it does not do:** approve anything, sign any gate, change any ADR, frozen specification, gate, security invariant, blocker or threshold, or authorise any implementation, test run, training, inference or evaluation.
 
@@ -24,7 +28,7 @@
 2. **Criteria:** 59 criteria in 12 categories (51 proposed mandatory, 1 optional, 7 awaiting an owner decision before classification), each with a source, a proposed class, evidence, the missing evidence and a proposed test.
 3. **Thresholds:** only one numeric threshold is authoritative today, PII recall ≥ 0.98 (benchmark contract Rule 2). Every other threshold is **TBD** and names the owner decision it needs.
 4. **QG-04 split:** QG-04 would become **QG-04-S**, a structure-only gate of 11 binary items for the shipped product, and **QG-04-F**, the frame gate, unchanged and still blocked. Nothing is relaxed.
-5. **Owner decisions:** twelve framed decisions (OD-A to OD-L). The first three are approving this definition, choosing the QG-04 structure (OD-E1), and recording the REASON-stage substitution (OD-K).
+5. **Owner decisions:** thirteen framed decisions (OD-A to OD-M; OD-M added in M23.2). Only the phased direction (P-1 to P-3) is resolved. The first three are approving this definition, choosing the QG-04 structure (OD-E1), and recording the REASON-stage substitution (OD-K).
 6. **FR-01 stays excluded:** FR-01 (detector research) stays `DEFERRED — NOT AUTHORISED FOR EXECUTION`, and B-07 stays `BLOCKED`. No core criterion depends on a UI detector.
 
 **Evidence status of the 59 proposed criteria** (FACT, counted from §5 of the proposal):
@@ -47,7 +51,9 @@
 | `core-product-acceptance-PROPOSED.md` | **The standalone proposal:** the architecture as built, governance gaps (G-1 to G-6), frozen constraints, the evidence standard, and the 12-category acceptance matrix |
 | `traceability-matrix.md` | The brief's four deliverables and the 12-stage pipeline, traced to modules and evidence |
 | `quality-gate-mapping-PROPOSED.md` | QG-01 to QG-06 mapped onto the shipped architecture; the QG-04-S proposal |
-| `owner-decisions.md` | Decisions OD-A to OD-L: questions, context, options, and proposed recommendations |
+| `owner-decisions.md` | Resolved (P-1 to P-3), awaiting the owner (OD-A to OD-M), and blocked or not authorised, kept separate; questions, context, options and proposed recommendations |
+| `phase-1-architecture-scope.md` | M23.2: the owner-selected Phase 1 architecture, its implementation facts, proposed requirements, open decisions and prohibitions |
+| `phase-2-future-capability-register.md` | M23.2: Phase 2 capabilities P2-01 to P2-07, all `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` |
 | `release-readiness-checklist-PROPOSED.md` | Mandatory, owner-approved optional, future, and deferred (FR-01) items |
 
 ## How this proposal was made

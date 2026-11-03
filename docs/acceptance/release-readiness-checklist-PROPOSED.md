@@ -1,9 +1,10 @@
-# Core-product release-readiness checklist — PROPOSED — AWAITING OWNER APPROVAL
+# Phase 1 release-readiness checklist — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03).**
 > - **Unchecked:** every box is unchecked. Nothing here is signed, and ticking a box needs the evidence its criterion names.
 > - **Classifications:** they follow `core-product-acceptance-PROPOSED.md` §5, and are proposals.
 > - **Release workflow:** `agentos/workflows/release.md` is unchanged and still governs. This checklist proposes how it would read for the shipped architecture.
+> - **Phase 1 only (M23.2):** following the owner's phased direction, this is the proposed **Phase 1** release checklist for the current structure-only product. Phase 2 capabilities (`phase-2-future-capability-register.md`) are outside it unless separately approved. **Selecting the direction does not tick any box.**
 
 ## 1. Mandatory (proposed)
 
@@ -68,12 +69,14 @@
 - [ ] **RSN-06:** reasoner adoption (`PINNED` → `ADOPTED`) against an owner-set bar.
 - [ ] **FUN-04:** clarification and declared outcomes kept in the acceptance scope.
 
-## 3. Future enhancements (not core; listed so they are not lost)
+## 3. Phase 2 and other future capabilities (outside Phase 1; NOT AUTHORISED)
+
+Each Phase 2 entry is `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` (P2-01 to P2-07).
 
 - Frame egress to a server (QG-04-F): B1, B2, B4, B5 and B6 in ADR-0012 §13. **Stays blocked.**
 - A server VLM per the dossier (constitution §2; B-03).
 - The offline-mode sequence with a local VLM (constitution §10 v1.1).
-- Visual-only PII beyond TR-01 masking: faces in the product path; signature and ID-card classes (§10 v1.1).
+- Visual-only PII beyond TR-01 masking: signature and ID-card classes (§10 v1.1). **The Phase 1 visual-only PII and face-detection gaps are not moved here;** they remain under OD-F in §1 and §2.
 
 ## 4. Deferred: FR-01
 
