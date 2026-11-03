@@ -35,6 +35,26 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.19 — M22 scope amended (owner Option B) and engineering scope closed.** The objective is now
+  M22's engineering foundation (the v2 dataset pipeline, candidate 2, approved G10, the adapter,
+  occlusion-aware training, the v2 pipeline, one verified training run, telemetry and resume). The
+  original detector-performance question, H1–H5 and any T1 vs T1-v2 comparison are deferred to
+  **FR-01, not authorised for execution**. No detection result exists, nothing is adopted, and the
+  evaluation restriction is registered unchanged as **B-07**. An outstanding register carries 17
+  items. Not an evaluation approval.
+- **M22.18 — M22 status and closure audit (read-only; recorded in M22.19).** Found the original
+  question unanswered and the runner block unregistered. Corrected an earlier claim: no commit
+  subject exceeds the limit counted after the `: `.
+- **M22.17 — per-step timing and multi-session resume telemetry.** `StepTimer` records failed reads
+  as untimed and never substitutes a duration; sessions are append-only and epochs name their
+  session; run duration is only a sum of session-local times. Verified with fakes. No training.
+- **M22.16 — telemetry integration assurance.** A fake-only harness found that telemetry exceptions
+  could escape `run_training` or replace a failure code; fixed with `observe`. No training.
+- **M22.15 — training telemetry.** Fixed the M22.13 null memory reading (a missing ctypes
+  prototype hidden by a catch-all); monotonic, phase-resolved timing; every value tagged measured,
+  derived or unavailable. No training.
+- **M22.14 — DEV evaluation design (design only; recorded in M22.19).** Never executed or approved;
+  deferred to FR-01.
 - **M22.13 — the first v2 T1 retraining run (owner-authorised, one run; no detection evaluation, no
   export, no TEST).**
   - `tools/detector/loss_v2.py`: the legacy loss with ignored classification entries set to zero; bitwise

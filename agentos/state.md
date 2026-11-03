@@ -9,10 +9,10 @@
 
 | Field | Value |
 |---|---|
-| **Date** | 2026-10-30 (UTC) |
-| **Phase** | Product implementation. Milestones through M21 merged on `main` (last: #92, `077f139`). **M22 in progress on a local branch; its detector evaluation is not run.** |
+| **Date** | 2026-11-03 (UTC) |
+| **Phase** | Product implementation. Milestones through M21 merged on `main` (last: #92, `077f139`). **M22, on a local branch: engineering scope CLOSED (M22.19, owner Option B); detector-performance research DEFERRED to FR-01, not authorised; no detector evaluation has run.** |
 | **Health** | 🟠 **AMBER.** The product runs end to end on W1 from a clean checkout, and its latency and resources are measured. The open decisions (J7/B5, D1–D4) and the unadopted visual detector are unchanged. |
-| **Next** | An authorised route for the M22 evaluation runner; the owner's decision on a new T1 dataset version (M22.1). The open decisions below are unchanged. |
+| **Next** | The owner decisions in the M22.19 outstanding register (branch publication and hosted CI, F6, the assignment-order and pixel/label ADRs, seeds and budget). FR-01 is not authorised, and the M22 evaluation stays blocked (B-07). The open decisions below are unchanged. |
 | **Product code written** | **Yes**: `packages/*` and `apps/extension`. See "Current state" below. |
 
 > **Correction forward.** Until M20 this snapshot still read 2026-09-07 and "Product code written:
@@ -42,6 +42,12 @@
 | **M22.11 (research, read-only):** target-assignment and loss audit of candidate 2 through the real `assign_targets`. 0 grid-cell collisions; the larger object wins a shared cell, contrary to the code comment (confirmed defect, 0 effect here); 25.9 % of very-small TRAIN objects train through the nearest cell only (IoU ceiling ≥ 0.533); 7,405 visible partial-occlusion cells were negatively supervised, with no ignore path (confirmed defect). **No training, no model, no TEST** | FACT (measured on W1) | `artifacts/experiments/M22.11-target-assignment-audit/` |
 | **M22.12:** partial-occlusion classification ignore mask (`occlusion_mask_v2.py`): exact 31 px receptive field checked against `UiHead`, positives take precedence, full occlusion ignores nothing; candidate 2 has 26,953 TRAIN / 6,999 DEV ignored entries. First-run configuration reconciled into the validated schema 2 (`train-v2-first-run.PROPOSED.json`, **PENDING OWNER APPROVAL**), pre-flight PASS. ADR proposal for the assignment order (smaller wins; `targets.py` unchanged). **No training, no optimizer, no inference, no weights, no TEST** | FACT (tests and pre-flight on W1) | `artifacts/experiments/M22.12-occlusion-mask-and-config/` |
 | **M22.13 (owner-authorised, one run):** the v2 training loop and the masked loss were implemented (bitwise equal to `detector_loss` with an empty mask); the one authorised training run on candidate 2 **COMPLETED**: 40 epochs, exactly 6,000 optimizer steps, a fresh `UiHead`, CPU, deterministic, partial-occlusion ignore mask. DEV loss fell from 3.983 to 2.893; best checkpoint epoch 39 (`a485425d…`); 40 checkpoints verified; T1 and both candidates unchanged. **Training execution only: no detection evaluation, no T1 baseline, no export, no TEST; the candidate is UNADOPTED** | FACT (run and verification on W1) | `artifacts/experiments/M22.13-first-training-run/` |
+| **M22.14 (design only, recorded retrospectively in M22.19):** a DEV detection-evaluation design, delivered in conversation and never executed or approved. Its five owner decisions were never taken; deferred to FR-01. **Not an authorisation** | FACT (read-only inspection) | `artifacts/experiments/M22.14-dev-evaluation-design/` |
+| **M22.15:** training telemetry (`telemetry_v2.py`). The M22.13 null memory reading was a missing ctypes prototype hidden by a catch-all, reproduced and fixed; durations are now monotonic. **No training, no inference** | FACT (tests on W1) | `artifacts/experiments/M22.15-training-observability/` |
+| **M22.16:** telemetry integration verified through a fake-only harness; a latent defect (telemetry exceptions escaping `run_training`, or replacing a failure code) was found and fixed with `observe`. **No training, no model** | FACT (harness on W1; fakes) | `artifacts/experiments/M22.16-telemetry-integration-assurance/` |
+| **M22.17:** per-step timing guarded (`StepTimer`: untimed steps stated, never substituted); sessions append-only with an index, `epochsCompleted` and their own hardware; run duration only as a sum of session-local times. **No training, no model** | FACT (harness on W1; fakes) | `artifacts/experiments/M22.17-resume-timing-assurance/` |
+| **M22.18 (audit, read-only; recorded in M22.19):** M22's original question and H1–H5 are unanswered, and detection performance is UNKNOWN; the runner block was missing from the blocker register; recommended an owner decision or a separately approved scope change | FACT (records read) | `artifacts/experiments/M22.18-closure-audit/` |
+| **M22.19 — scope amended by the owner (Option B, 2026-11-03):** **M22 engineering scope CLOSED**: the v2 dataset pipeline, candidate 2, approved G10, the adapter, occlusion-aware training, the v2 pipeline, one verified training run, telemetry and resume. **Detector-performance research DEFERRED to FR-01, NOT AUTHORISED FOR EXECUTION.** No detection result exists; nothing adopted; the evaluation restriction (B-07) is unchanged. 17 items carried in the outstanding register (hosted CI never run; 6 owner decisions) | FACT (owner decision; records) | `artifacts/experiments/M22.19-scope-amendment-closure/`, `agentos/registry/future-research-register.md` |
 
 `t1-ui-v1`, the model, thresholds, interfaces and contracts are unchanged. T1 stays UNADOPTED.
 
@@ -189,6 +195,7 @@ reliability or privacy-metric claim.**
 > | — | **B-04** | Fork PRs can neither merge nor run CI *(new)* |
 > | — | **B-05** | `main` unprotected *(new)* |
 > | — | **B-06** | Line endings unmanaged *(new)* |
+> | — | **B-07** | M22 evaluation blocked by a safety classifier *(new, M22.19)* |
 
 | # | Blocker | Severity | Resolution path |
 |---|---|---|---|

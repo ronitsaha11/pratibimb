@@ -4,6 +4,11 @@ The legacy pipeline: `data.py` (v1 loader), `train.py` (v1 trainer, `t1-ui-v1` �
 `artifacts/models/t1-ui-head`), `head.py`, `targets.py` and the QG harness scripts. It is unchanged by
 M22, and nothing in the v2 tooling imports or calls `train.py`.
 
+**Scope (M22.19).** The v2 tooling here is M22's engineering deliverable, and that scope is closed. **No
+detection result exists for T1 or T1-v2.** Detector-performance research is deferred to **FR-01**
+(`agentos/registry/future-research-register.md`), which is **not authorised for execution**, and the M22
+evaluation restriction remains in force (`agentos/blockers.md` B-07). The epoch-39 checkpoint is UNADOPTED.
+
 ## The v2 data adapter (M22.7–M22.9)
 
 | File | Does |
@@ -12,11 +17,12 @@ M22, and nothing in the v2 tooling imports or calls `train.py`.
 | `dry_run_v2.py` | Loads TRAIN and DEV, checks they share nothing, reports counts and exclusions. With `--tensors` it runs every sample through the v1 input path; adding `--ignore-mask` also totals the ignore masks. No model |
 | `train_v2.py` | The separate v2 entry point: `--preflight` (M22.9; writes nothing) and `--train` (M22.13: the one owner-authorised run, needing an APPROVED configuration). See "Training" below |
 | `loss_v2.py` | `targets.detector_loss` with the partial-occlusion ignore mask: ignored classification entries contribute zero; bitwise equal to the legacy loss under an empty mask (M22.13) |
+| `telemetry_v2.py` | Observation-only training telemetry (M22.15–M22.17). Monotonic phase timing with UTC boundaries; process CPU share; per-step timing (`StepTimer`: failed reads stated as untimed); Windows memory and suspend evidence; append-only sessions and run timing. Every value is tagged measured, derived or unavailable-with-reason, and no telemetry failure reaches the training control flow |
 | `occlusion_mask_v2.py` | The partial-occlusion classification ignore mask (M22.12): a pure helper. For each partial-occlusion case, it ignores that class's channel wherever a cell's receptive field (31 px, exact for `UiHead`) sees the control's visible part. Positives always win; full occlusion ignores nothing; box targets are untouched |
 | `configs/train-v2-first-run.APPROVED.json` | The same configuration with the owner's M22.13 approval for one run: the only configuration `--train` was run with |
 | `configs/train-v2-first-run.PROPOSED.json` | The canonical first-run configuration, schema `train-v2-run-config/2` (M22.12): **proposed, pending owner approval** |
 | `configs/train-v2-first-experiment.PROPOSED.json` | The M22.9 proposal, schema 1: kept as history; the validator refuses it |
-| `tests/` | The pytest suite (synthetic candidates and a synthetic repository in a temp directory; never a real dataset or model) |
+| `tests/` | The pytest suite (synthetic candidates and a synthetic repository in a temp directory; never a real dataset, real weights or TEST). `test_training_v2.py` runs the real training loop with the real `UiHead` architecture on a 3-frame synthetic fixture; the telemetry integration and resume tests replace every model, data and checkpoint operation with fakes |
 | `requirements-test.txt` | The suite's exact dependency pins (CPU torch) |
 
 **G10 policy.** The adapter requires a G10 threshold configuration that records its approval status, plus the evidence computed from it (`tools/dataset/v2/audit-candidate.mjs --g10-out`).
@@ -51,7 +57,7 @@ npm run test:py
 
 ## Training
 
-**M22.13:** `--train` ran once: `artifacts/models/t1-ui-head-v2-first-run-01` (git-ignored), COMPLETED, best checkpoint epoch 39, UNADOPTED. It refuses while a v2 run directory exists; a further run needs a new owner authorisation. The record is at `artifacts/experiments/M22.13-first-training-run/`.
+**M22.13:** `--train` ran once: `artifacts/models/t1-ui-head-v2-first-run-01` (git-ignored), COMPLETED, best checkpoint epoch 39, UNADOPTED. It refuses while a v2 run directory exists; a further run needs a new owner authorisation. The record is at `artifacts/experiments/M22.13-first-training-run/`. That run predates the M22.15–M22.17 telemetry, and **no real run has produced it yet**.
 
 ### Pre-flight
 
