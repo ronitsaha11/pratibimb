@@ -35,6 +35,12 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.1 — core-product acceptance definition (PROPOSED — AWAITING OWNER APPROVAL).** `docs/acceptance/`
+  proposes what core-product acceptance means for the shipped architecture: 59 criteria in 12
+  categories with eight separate evidence types, traceability of the brief's deliverables and the
+  12-stage pipeline, a QG-01–QG-06 mapping with a structure-only QG-04-S proposal, owner decisions
+  OD-A–OD-L and a release checklist. Approves nothing, signs no gate, changes no ADR, invariant,
+  blocker or threshold. FR-01 stays deferred and B-07 blocked.
 - **M22.19 — M22 scope amended (owner Option B) and engineering scope closed.** The objective is now
   M22's engineering foundation (the v2 dataset pipeline, candidate 2, approved G10, the adapter,
   occlusion-aware training, the v2 pipeline, one verified training run, telemetry and resume). The
