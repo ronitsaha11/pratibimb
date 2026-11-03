@@ -1,7 +1,7 @@
 ---
 id: M22-small-target-recall
 title: "M22 — small-target recall of the T1 head"
-status: IN PROGRESS — design and fixture audit only; NO DETECTOR HAS BEEN RUN
+status: SCOPE AMENDED (M22.19, owner Option B) — engineering scope CLOSED; the original detector question DEFERRED to FR-01 (not authorised); NO DETECTOR HAS BEEN RUN
 date: 2026-11-01
 label: FACT (fixture audit) / no detector result exists
 classification: ENGINEERING INVESTIGATION of the UNADOPTED T1 head — not J7, not adoption
@@ -61,3 +61,19 @@ CHROME_PATH="<Chrome for Testing chrome.exe>" node tests/browser/perception/audi
 
 `M22_AUDIT_DRY_RUN=1` writes nothing; otherwise each run writes a new record named by its start
 time. DEV specs only; the TEST split is never generated.
+
+## Scope amendment (M22.19, owner Option B, 2026-11-03)
+
+> **Appended:** this section was added in M22.19. Everything above is the original M22 record, unchanged.
+
+**The amended objective:**
+- **The owner's decision:** M22's objective was amended by the project owner (Option B, 2026-11-03).
+- **What M22 now delivers:** the engineering foundation for small-target detector research: the reproducible synthetic dataset pipeline, candidate 2, approved G10 evidence, the v2 adapter, partial-occlusion-aware training, the separate v2 training pipeline, one completed and verified training run, and telemetry and resume assurance. That scope is **closed** (`../M22.19-scope-amendment-closure/`).
+
+**The question above is deferred, not answered:**
+- the question in `design.md` §1 and hypotheses **H1–H5** are **unanswered and untested**;
+- they are **deferred** to **FR-01** (`agentos/registry/future-research-register.md`), which is **not authorised for execution**;
+- no detector has been run on any M22 cell, and nothing about T1's or T1-v2's small-target recall is established.
+
+**What the amendment is not:** an evaluation approval, a resolution of the safety-classifier block, or permission to run the blocked evaluation by any route (`agentos/blockers.md` B-07).
+

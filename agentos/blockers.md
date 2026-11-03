@@ -104,6 +104,19 @@ documentation asserting a thing is fixed is not evidence that it is fixed.
 
 ---
 
+### B-07 · The M22 small-target evaluation is blocked
+
+| Field | Value |
+|---|---|
+| **Status** | **`BLOCKED`** (recorded 2026-11-03, M22.19; the block dates from M22, 2026-11-01) |
+| **Owner** | Human — project owner |
+| **Dependency** | an attempt to create the M22 evaluation runner was **stopped by a safety classifier**; the runner was never written (`artifacts/experiments/M22-small-target-recall/README.md`) |
+| **Restriction in force** | the blocked operation is not to be recreated, renamed, rewritten, split or disguised, nor routed through another tool, runtime, script or execution environment, nor obtained by any alternative means. The M22.14 design (`artifacts/experiments/M22.14-dev-evaluation-design/`) is **not** permission to execute. The owner's Option B scope change (M22.19) is **not** permission to evaluate T1 or T1-v2. No TEST access |
+| **Impact** | no detection result exists for T1 or T1-v2. M22's original question and hypotheses H1–H5 are unanswered; they are deferred to **FR-01** (`agentos/registry/future-research-register.md`), which is not authorised for execution |
+| **Resolution path** | **none recorded.** The block was applied by a safety classifier and is outside this repository's control; any change to M22's evaluation status also needs the project owner's decision. No workaround is recorded or implied |
+
+---
+
 ## Resolved
 
 ### B-05 · `main` has no branch protection, and `agentos/state.md` claims otherwise
