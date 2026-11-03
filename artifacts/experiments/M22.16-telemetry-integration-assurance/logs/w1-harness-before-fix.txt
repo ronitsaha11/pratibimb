@@ -1,0 +1,10 @@
+# M22.16 harness run against the M22.15 code (commit b91b3af), before the fix. W1, 2026-11-03.
+# The unsupported-platform failure was a defect in the test itself (it validated whole epoch records); the other six are the integration defect.
+FAILED tools/detector/tests/test_telemetry_integration_v2.py::test_unsupported_platforms_are_explained_in_the_record
+FAILED tools/detector/tests/test_telemetry_integration_v2.py::test_malformed_clocks_become_explicitly_unavailable_and_training_is_unchanged[backwards]
+FAILED tools/detector/tests/test_telemetry_integration_v2.py::test_malformed_clocks_become_explicitly_unavailable_and_training_is_unchanged[nan_cpu]
+FAILED tools/detector/tests/test_telemetry_integration_v2.py::test_malformed_clocks_become_explicitly_unavailable_and_training_is_unchanged[garbage_ticks]
+FAILED tools/detector/tests/test_telemetry_integration_v2.py::test_malformed_clocks_become_explicitly_unavailable_and_training_is_unchanged[nan_ticks]
+FAILED tools/detector/tests/test_telemetry_integration_v2.py::test_a_failing_memory_reader_does_not_change_training
+FAILED tools/detector/tests/test_telemetry_integration_v2.py::test_a_training_failure_keeps_its_own_code_even_when_telemetry_breaks
+7 failed, 3 passed in 12.47s
