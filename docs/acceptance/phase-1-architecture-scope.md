@@ -10,6 +10,25 @@ Phase 1 is **the current local, loopback-only, structure-based reasoning archite
 
 Vision-language and frame-based reasoning are Phase 2 (`phase-2-future-capability-register.md`). Phase 2 is **not authorised**.
 
+## 1.1 Owner-selected perception scope (OD-P, OD-R) — not implemented
+
+**OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (owner, 2026-11-03), together with OD-P. Both are **SELECTED BY OWNER — IMPLEMENTATION NOT AUTHORISED**.
+
+**Excluded from normal Phase 1 task execution:**
+- browser-frame capture;
+- T1 inference (and loading, as a product dependency);
+- TR-01 invocation;
+- visual-only PII masking based on a captured frame.
+
+**What stays:** DOM-based observation and the structural handoff remain the intended Phase 1 perception.
+
+**Outside the scope of normal task execution:**
+- **Evidence builds** (separately authorised) are not part of normal task execution.
+- **TR-01** is retained as a separate component.
+- **Model assets** are not changed.
+
+**Today's runtime is still the one described in §2** (it captures and runs T1 and TR-01 on gesture-granted passes) **until a separately authorised implementation lands** (`dom-only-phase-1-implementation-outline-PROPOSED.md`).
+
 ## 2. Current implementation facts
 
 | Element | As implemented (FACT) | Source |

@@ -3,6 +3,7 @@
 > **Status (updated M23.2, 2026-11-03):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
+> - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03). **Implementation not authorised; runtime unchanged.**
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -18,11 +19,12 @@
 | P-2 | **Phase 1 target architecture:** the current local, loopback, structure-only product | `phase-1-architecture-scope.md` | the *intended* architecture; **not** a claim of acceptance |
 | P-3 | **Original VLM and frame-based functionality deferred to Phase 2** | `phase-2-future-capability-register.md` | Phase 2 is **NOT AUTHORISED** for implementation or execution |
 
-## Selected by the owner, implementation pending (M23.4)
+## Selected by the owner, implementation not authorised (M23.4, M23.6)
 
 | ID | Decision | Status | Limits |
 |---|---|---|---|
 | OD-P | **T1 must not remain an active inference dependency in the Phase 1 product.** Required future outcome:<br>• T1 is neither loaded nor invoked in normal Phase 1 operation;<br>• it is not a required dependency for perception or task execution;<br>• Phase 1 keeps its DOM-based observation, grounding and click safety without it;<br>• T1 remains UNADOPTED;<br>• FR-01 remains deferred and not authorised | **OWNER DECISION SELECTED (2026-11-03): IMPLEMENTATION PENDING SEPARATE AUTHORISATION** | **T1 is NOT disabled.** The source still loads and runs it. No code, package, model or runtime change is authorised by the selection (`artifacts/experiments/M23.4-t1-disablement-impact/`) |
+| OD-R | **APPROVED — OPTION A: DOM-ONLY PHASE 1** (owner, 2026-11-03). In normal Phase 1 task execution:<br>• no browser-frame capture;<br>• no T1 loading or inference as a product dependency;<br>• no TR-01 invocation.<br>DOM-based discovery and the structural handoff stay, as do grounding, click eligibility, consent and human approval, the five-turn cap, freshness and postconditions | **SELECTED BY OWNER — IMPLEMENTATION NOT AUTHORISED** | **Not implemented:** frames are still captured on gesture-granted passes, and T1 and TR-01 still run on them. Evidence builds are out of scope. Model assets are not deleted or modified (`artifacts/experiments/M23.6-dom-only-phase-1-decision/`) |
 
 ## Awaiting owner approval
 
@@ -310,16 +312,46 @@ Each sub-decision is separate.
 | GOV-01 | Phase 1 acceptance framework | — |
 | OD-E1 | QG-04-S scope | — |
 | OD-K / OD-L | formal document reconciliation | RC-01 to RC-12 |
-| **OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled.** TR-01 would then mask a local frame that no product code reads (`tr01-privacy-acceptance-assessment.md` §4) | **M23.5:** options A, B and C compared (`phase-1-perception-options-comparison.md`). **PROPOSED — AWAITING OWNER APPROVAL: Option A, a DOM-only Phase 1** (`od-r-frame-capture-recommendation-PROPOSED.md`). Not decided; no change authorised |
+| **OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled** | **SELECTED (M23.6): Option A, DOM-only Phase 1.** Implementation not authorised (see the M23.6 section below) |
 
 ## M23.5 — OD-R prepared
 
 | ID | Status |
 |---|---|
 | OD-P | **SELECTED:** disable T1; implementation pending separate authorisation; **T1 not disabled** |
-| OD-R | **AWAITING OWNER APPROVAL.** Recommendation: Option A (no frame capture in ordinary Phase 1 task runs) |
+| OD-R | *(M23.5 status, superseded by M23.6:)* awaiting the owner; recommendation Option A. **M23.6: SELECTED, Option A** |
 | OD-O, OD-Q, OD-F, OD-N, GOV-01, OD-E1 | **AWAITING OWNER APPROVAL** (unchanged) |
 
 **If OD-R = A:**
 - OD-F narrows to TR-01 as a dormant, evidence-build capability.
 - OD-K2 must record that no local vision model executes in task runs.
+
+## M23.6 — status after OD-R
+
+**Selected by the owner** (each one: **implementation not authorised**; runtime not implemented):
+- **OD-P:** T1 out of active Phase 1 execution.
+- **OD-R:** Option A, DOM-only Phase 1.
+
+**Still awaiting owner approval:**
+
+| ID | Decision |
+|---|---|
+| OD-O | T1 integrity policy, for any possible future reactivation |
+| OD-Q | completeness of the T1 influence analysis |
+| OD-F | TR-01 acceptance, for any future use. TR-01 is retained as a separate component, and is not invoked in normal Phase 1 tasks |
+| OD-N | ADR-0015 approval. ADR-0015 is updated with §3.6 and stays PROPOSED |
+| GOV-01 | Phase 1 acceptance approval |
+| OD-E1 | QG-04-S scope and sign-off |
+| OD-K, OD-L | formal document reconciliation, including OD-K2's record that Phase 1 does not fulfil the brief's visual requirements |
+| OD-M | Phase 2 architecture and timing |
+| OD-A, OD-B, OD-C, OD-D, OD-G | browser, cross-machine, independent-human, real-site and Firefox acceptance |
+| OD-H, OD-E2 to OD-E8 | performance targets and the remaining security decisions |
+
+**Not authorised:**
+- T1 disablement implementation;
+- frame-capture removal implementation;
+- TR-01 changes;
+- detector evaluation;
+- FR-01;
+- Phase 2.
+

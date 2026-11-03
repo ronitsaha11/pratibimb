@@ -32,6 +32,11 @@
 - **Phase 1:** the current local, loopback-only, structure-based reasoning architecture.
 - **Phase 2:** future vision-language and browser-frame-based reasoning, subject to separate architecture, security, legal and owner approvals. **Not authorised.**
 
+**Perception scope (M23.6):** OD-P and **OD-R (APPROVED — OPTION A: DOM-ONLY PHASE 1)** are owner-selected. Both are **SELECTED BY OWNER — IMPLEMENTATION NOT AUTHORISED**.
+- **Excluded from normal Phase 1 task execution:** browser-frame capture, T1 inference, TR-01 invocation, and visual-only PII masking based on a captured frame.
+- **The brief is not fulfilled on these points:** the brief's visual requirements are **not** fulfilled by Phase 1; they are deferred to separate decisions (P2-08, OD-K2).
+- **The criteria are unchanged:** every criterion and classification below stays PROPOSED.
+
 **What the direction does not do:** it amends no ADR or constitution text, approves no part of this proposal, signs no gate, authorises no frame egress, and lifts no blocker. Its conflicts with frozen documents are listed in that record's §4 (RC-01 to RC-10).
 
 ## 2. The product as built (FACT, with sources)
@@ -130,7 +135,7 @@ Following the owner's phased direction (M23.2), §5.1 to §5.12 are the proposed
 |---|---|---|---|---|---|---|---|---|---|---|
 | PRV-01 | Textual and DOM PII (channels D1 DOM semantics, D2 pattern and checksum) becomes references **before** the handoff | security invariants (channels); constitution §2 | M | `packages/privacy` | A; B (M2 page-value boundary, 42 of 42 checks); G | C/D/E | per-class cases in the bounded set | — | — | PARTIAL |
 | PRV-02 | PII detection per-class precision, recall and F1; **target recall ≥ 0.98**; precision on a decoy set | benchmark contract Rule 2 | M | — (metric not produced) | none | corpus and run | Rule 2 measurement on the accepted corpus | corpus (OD-D); real-layout data needs legal review (AUDIT-0004 D5) | OD-D | NOT EVIDENCED |
-| PRV-03 | **Visual-only PII protection** (text present only in pixels; faces) | brief ("blurring faces, blacking out passwords, masking PII"); M9 | **OD** (OD-F) | TR-01 `UNREAD_REGION` redaction; faces not in the product path (INFERENCE, §2) | B (M10, synthetic); **"Product visual-only PII protection NOT VERIFIED"** (M9) | verification evidence; J7 for stream frames | see OD-F | OD-F | OD-F | NOT EVIDENCED |
+| PRV-03 | **Visual-only PII protection** (text present only in pixels; faces) | brief ("blurring faces, blacking out passwords, masking PII"); M9 | **OD** (OD-F) | TR-01 `UNREAD_REGION` redaction exists, but **OD-R (M23.6) excludes frame capture and TR-01 from normal Phase 1 tasks**; faces are not in the product path | B (M10, synthetic); **"Product visual-only PII protection NOT VERIFIED"** (M9) | verification evidence, if the owner keeps the criterion | see OD-F | OD-F | OD-F, OD-R | NOT EVIDENCED |
 | PRV-04 | Redaction metrics: residual leakage, over-redaction area ratio, block rate | benchmark contract Rule 2 | M | verifier, ledger | A (unit) | the metrics. The server tripwire source does not exist (no server) | Rule 2 redaction metrics with an owner-approved evidence source | evidence source (OD-F) | PRV-03 | NOT EVIDENCED |
 | PRV-05 | Explicit private-data consent: just in time, once, masked preview; Deny honoured | ADR-0014 | M | implemented | A; C (M19, M20: Allow once, Deny) | D, E | consent cases in the bounded set | — | — | PARTIAL |
 | PRV-06 | Vault memory-only; destroyed at session end, tab change and origin change (unconditionally on origin change) | INV-04–INV-06 | M | implemented | A (M12 QG-04 item 10 MET) | G for the origin-change destruction in the product | negative test of each destruction trigger | — | — | PARTIAL |
@@ -235,6 +240,7 @@ These capabilities come from the brief and the constitution, and **their history
 | P2-05 | Visual-context scoring on clean and redacted frames | rubric; benchmark contract Rule 2 | QG-05 Phase 1 metric set excludes it (proposed) | RC-08 |
 | P2-06 | Server PII tripwire | constitution §2; INV-21 | PRV-04 needs another evidence source (OD-F) | RC-09 |
 | P2-07 | Offline-mode local VLM | constitution §10 v1.1; release sequence 4 | GOV-05 | RC-03, RC-07 |
+| P2-08 | Frame-based local perception in task runs: frame capture, UI detection (T1), TR-01 masking | brief Deliverables 1–2; constitution §10 (UI detector, YuNet) | **excluded from normal Phase 1 tasks** (OD-R, M23.6); PRV-03 is then a non-egress statement (OD-F) | OD-O (T1), OD-F (TR-01), P2-08 |
 
 **Still Phase 1 decisions, not moved to Phase 2:**
 - **Visual-only PII protection (PRV-03, OD-F):** a gap in the shipped product.

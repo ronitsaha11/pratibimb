@@ -59,6 +59,10 @@
 - [ ] **CI-03:** line endings (B-06) resolved.
 - [ ] **GOV-05:** demonstration sequences redefined for the shipped architecture and rehearsed ten times (release workflow step 9).
 
+## 1.1 Perception scope (OD-R, M23.6)
+
+- [ ] **Implementation:** the separately authorised implementation of OD-P and OD-R is complete. In normal Phase 1 tasks there is no frame capture, no T1 and no TR-01, with the regression evidence in `dom-only-phase-1-implementation-outline-PROPOSED.md`.
+
 ## 2. Owner-approved optional (classification depends on the decision named)
 
 - [ ] **BRW-02, BRW-03:** Firefox product build; Firefox on Linux (OD-A, OD-G). **Mandatory if OD-A chooses option 2 or 3.**

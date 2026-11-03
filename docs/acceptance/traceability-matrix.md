@@ -66,6 +66,10 @@ The four deliverables are quoted from `docs/architecture/vision.md` ("Deliverabl
 | 3. Server with an open-weight LLM or VLM | a loopback-hosted open-weight **text** LLM, structure-only | a VLM; frame-based context; server infrastructure (P2-01, P2-02, P2-04) | the ADR record (RC-01, RC-02); reasoner adoption (RSN-06); whether Phase 1 meets Deliverable 3 (OD-K2) |
 | 4. End-to-end task, visibly assisting | bounded synthetic tasks, at most 5 turns, click only | visual-context scoring (P2-05) | repeated runs, cross-machine, independent operator, real sites (OD-B, OD-C, OD-D) |
 
+**OD-R (M23.6): APPROVED — OPTION A: DOM-ONLY PHASE 1** (selected; **implementation not authorised**).
+- **Excluded from normal Phase 1 tasks:** browser-frame capture, T1 inference, TR-01 invocation, and frame-based visual-only PII masking.
+- **The visual parts of Deliverables 1 and 2 are therefore not fulfilled by Phase 1.** They are deferred or excluded, and need separate Phase 2 decisions (P2-08). The brief's original requirements are unchanged.
+
 ## 2. The 12-stage pipeline
 
 **Stage names** are from constitution §1, which is frozen.

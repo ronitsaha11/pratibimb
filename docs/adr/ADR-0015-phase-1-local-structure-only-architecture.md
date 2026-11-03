@@ -1,8 +1,8 @@
 ---
 id: ADR-0015
 title: "Phase 1 architecture: local perception, structure-only handoff, local loopback reasoner; vision-language reasoning deferred to Phase 2"
-version: 1.0
-status: PROPOSED — AWAITING OWNER APPROVAL (M23.3, 2026-11-03). Not approved, not adopted. Records the owner's phased direction (M23.2) and the source-traced Phase 1 architecture; it authorises no implementation, no Phase 2 work and no frame egress
+version: 1.1
+status: PROPOSED — AWAITING OWNER APPROVAL (M23.3, 2026-11-03). Not approved, not adopted. Records the owner's phased direction (M23.2) and the source-traced Phase 1 architecture; it authorises no implementation, no Phase 2 work and no frame egress. Updated M23.6 (2026-11-03): records the owner-selected OD-P (T1 out of active Phase 1 execution) and OD-R (Option A, DOM-only Phase 1). Implementation NOT authorised; runtime unchanged
 owner: pratibimb-architect
 proposed_by: pratibimb-architect (M23.3 documentation milestone)
 created: 2026-11-03
@@ -20,7 +20,8 @@ evidence: artifacts/experiments/M23.3-phase-1-architecture-reconciliation/; docs
 > **STATUS: PROPOSED — AWAITING OWNER APPROVAL.**
 > - **What it records:**
 >   - the owner's phased direction (M23.2, 2026-11-03);
->   - the Phase 1 architecture, as the source implements it at `3e6a2e6`.
+>   - the Phase 1 architecture, as the source implements it at `3e6a2e6`;
+>   - **(M23.6)** the owner-selected Phase 1 perception scope: OD-P and OD-R (Option A), §3.6. **Selected, not implemented.**
 > - **What it does not do:**
 >   - it is not approved, and it adopts no model;
 >   - it supersedes no ADR, and amends no constitution text;
@@ -48,7 +49,13 @@ evidence: artifacts/experiments/M23.3-phase-1-architecture-reconciliation/; docs
 - **Phase 1:** the current local, loopback-only, structure-based reasoning architecture.
 - **Phase 2:** future vision-language and frame-based reasoning, subject to separate architecture, security, legal and owner approvals.
 
-**A correction from M23.2 and M23.3.** M23.2 and the M23.3 source trace also corrected an earlier record: the original T1 UI head is **loaded and run** by the product perception pass.
+**A correction from M23.2 and M23.3.** M23.2 and the M23.3 source trace also corrected an earlier record: the original T1 UI head is **loaded and run** by the product perception pass. M23.4 refined this: the session is created on the first perception call, and inference runs only on passes that capture a frame.
+
+**Owner decisions after M23.3:**
+- **OD-P** (M23.4, 2026-11-03): T1 must not remain an active inference dependency in Phase 1.
+- **OD-R** (M23.6, 2026-11-03): **APPROVED — OPTION A: DOM-ONLY PHASE 1.**
+
+Both are **SELECTED BY OWNER — IMPLEMENTATION NOT AUTHORISED.** §3.1 to §3.4 describe the source **as it is today**; §3.6 states the **intended** Phase 1 scope.
 
 ## 2. Problem statement
 
@@ -61,16 +68,16 @@ It must do this without silently rewriting frozen text, and without upgrading an
 
 ## 3. Proposed decision
 
-### 3.1 Phase 1 components (as implemented)
+### 3.1 Phase 1 components (as implemented today; the intended scope is §3.6)
 
 **Labels:** "Implemented" means the code exists and is wired, per source. "Status" is the governance status. Neither is an acceptance.
 
 | Component | Implementation | Status |
 |---|---|---|
 | Client | Chrome MV3 extension (WXT). Permissions: `offscreen`, `sidePanel`, `activeTab`, `tabCapture`. Host permission `http://127.0.0.1/*` | **Firefox is not run** (OD-A, OD-G) |
-| Capture | gesture-authorised tab capture into the offscreen document (ADR-0009) | approved ADR |
-| T1 UI head | loaded (ORT WASM) and run on **every** perception pass; its output fused with the DOM graph | **UNADOPTED. Bytes not integrity-checked** (§3.4). Performance is FR-01, deferred and not authorised |
-| TR-01 | text-region detector on a copy of the full frame in a dedicated worker. `UNREAD_REGION` masks filled in place into the **local** frame | hash-verified at build and run time; **visual-only PII protection NOT VERIFIED** (M9) |
+| Capture | gesture-authorised tab capture into the offscreen document (ADR-0009) | approved ADR. **Intended: no capture during normal Phase 1 task execution (OD-R; §3.6)** |
+| T1 UI head | loaded (ORT WASM) on the first perception call; inference on every pass that **captures a frame** (gesture grant); its output fused with the DOM graph *(corrected M23.4)*. **Intended: excluded from active Phase 1 execution (OD-P; §3.6)** | **UNADOPTED. Bytes not integrity-checked** (§3.4). Performance is FR-01, deferred and not authorised |
+| TR-01 | text-region detector on a copy of the full frame in a dedicated worker. `UNREAD_REGION` masks filled in place into the **local** frame | hash-verified at build and run time; **visual-only PII protection NOT VERIFIED** (M9). **Intended: not invoked in normal Phase 1 task execution; retained as a separate component (OD-R; §3.6)** |
 | Sanitisation | values classified in the page realm, then replaced by typed references; a memory-only vault | existing invariants |
 | Handoff | the verified handoff (DOM elements and references). The reasoner receives a **planning view**: goal, textbox `{id,name,empty}`, button `{id,name,enabled}`, references `{token,class,hint}` | ADR-0012 §8 (structure-only) |
 | Egress | `sendVerified` (`packages/egress/src/guard.ts`): verified handoff, loopback destination, declared tokens only, value-aware residual scan, digest, record, then send. One serialised string | ADR-0013 §3 |
@@ -79,7 +86,7 @@ It must do this without silently rewriting frozen text, and without upgrading an
 
 ### 3.2 The boundary between local visual processing and the reasoner
 
-- **Frames are captured and processed locally in Phase 1.** Production frame **egress** is impossible. The three locks of ADR-0012 §16 still hold.
+- **Today, frames are captured and processed locally** on gesture-granted passes; **intended (OD-R):** no capture in normal Phase 1 task execution. Production frame **egress** is impossible. The three locks of ADR-0012 §16 still hold.
 - **Pixels exist only in two places:** the offscreen document, and a copy in the TR-01 worker.
 - **No product code reads the sanitized frame or its WebP encoding.** Their only readers sit behind an evidence-build alias.
 - **The only data sent off the extension** is the JSON planning view, through `sendVerified`, to the CSP v2 endpoint.
@@ -124,6 +131,43 @@ T1's bytes are checked neither at build time nor at runtime. TR-01's are checked
 - **Frame egress needs QG-04-F:** any frame pathway needs QG-04-F, a separate security review, and the legal and owner approvals.
 - **Detector research stays separate:** it stays under FR-01, blocked by B-07.
 
+### 3.6 Owner-selected Phase 1 perception scope (OD-P, OD-R) — selected, not implemented
+
+**Decision record:**
+- **OD-R:** APPROVED — OPTION A: DOM-ONLY PHASE 1 (owner, 2026-11-03).
+- **OD-P:** T1 out of active Phase 1 execution (owner, 2026-11-03).
+- **Status of both: SELECTED BY OWNER — IMPLEMENTATION NOT AUTHORISED.** The runtime is unchanged (§3.1).
+
+**Scope.** In **normal Phase 1 task execution**:
+1. **no browser-frame capture;**
+2. **no T1 model loading or inference** as a product dependency;
+3. **no TR-01 invocation;**
+4. DOM-based element discovery and the structural handoff (the handoff declares the structural floor: `backend: "none"`, `tiers_fired: ["T0","T2"]`, `source: "dom"`);
+5. the existing grounding and click-eligibility safeguards;
+6. the existing consent and human-approval requirements;
+7. the existing five-turn cap;
+8. the existing freshness and postcondition verification.
+
+**Out of scope of this decision:**
+- **Evidence builds:** separately authorised evidence-build operation (`TR01_PROBE`, `M3_WORKER_FRAME`, the other probe aliases) is **not** normal task execution. This decision does not remove it, and does not pre-authorise any future diagnostic workflow.
+- **Model assets:** T1 and TR-01 assets are **not** deleted or modified.
+- **TR-01 stays:** it remains a separately retained, integrity-verified component, unless decided otherwise (OD-F).
+- **ADR-0009 is unchanged:** it continues to govern capture wherever capture is separately authorised.
+
+**Excluded from normal Phase 1 tasks, and deferred:** browser-frame capture, T1 inference, TR-01 invocation, and visual-only PII masking based on a captured frame. Any return of these to the product needs separate decisions (Phase 2, P2-08). For T1 it also needs OD-O's integrity prerequisites.
+
+**Unchanged by OD-P and OD-R:**
+- production frame egress (impossible);
+- the structure-only JSON handoff and `sendVerified`;
+- the loopback endpoint, CSP and permissions;
+- the QG-04-S and QG-04-F definitions;
+- fail-closed behaviour, the five-turn cap and click-only execution;
+- consent and human approval;
+- grounding and postconditions;
+- B-07 and FR-01.
+
+No alternative frame-transfer route is introduced.
+
 ## 4. Compatibility with existing ADRs
 
 | ADR | Relationship |
@@ -153,6 +197,7 @@ This is a statement of applicability, **not a weakening**.
 2. **Treat M23.2's direction as sufficient.** Rejected: M23.2 is a direction record, not an ADR (`AGENTS.md` §4.1).
 3. **Describe T1 as absent ("DOM-only floor").** Rejected: the source shows it loaded, run and fused.
 4. **Adopt T1 because it runs.** Rejected: running is not adoption, and its performance is unvalidated (FR-01).
+5. **Keep frame capture with T1 off** (OD-R Option B), **or keep it for a named consumer** (Option C). Not selected by the owner. Option B has no identified product consumer, and no Option C consumer exists (M23.5).
 
 ## 7. Consequences
 
@@ -165,14 +210,18 @@ This is a statement of applicability, **not a weakening**.
   - the registry note.
 - **The brief is not edited.** A submission-facing mapping (A-5) is needed instead.
 - **The M23.1 acceptance proposal** describes Phase 1 accordingly, and remains PROPOSED.
-- **Every product measurement depends on an unverified T1 file** until OD-O is decided (U-4).
+- **Product measurements in which T1 inference ran depend on an unverified T1 file** until OD-O is decided (U-4). The M20 benchmark ran no T1 inference (`detectorRan = 0`) *(corrected M23.4)*.
+- **(M23.6) OD-P and OD-R need separate implementation milestones:** T1 disablement, and frame-capture removal from normal task execution. Both must preserve the existing structural fallback, DOM grounding and click safety.
+- **(M23.6) In normal Phase 1 tasks, no local vision model executes.** The brief's Deliverables 1 and 2 visual requirements are **not** fulfilled by Phase 1. They are deferred to separate decisions (OD-K2, A-5, P2-08).
+- **(M23.6) Not recalculated or claimed:** historical M20 evidence is not recalculated, and no performance improvement is claimed.
 
 ## 8. Open decisions (required approvals)
 
 These are listed in `docs/acceptance/owner-decisions.md`:
 - approval of this ADR (OD-N);
 - the T1 integrity and reproducibility policy (OD-O);
-- whether T1 stays active before formal adoption (OD-P);
+- ~~whether T1 stays active before formal adoption~~: **OD-P SELECTED** (T1 out of active Phase 1 execution); **implementation not authorised**;
+- ~~frame capture after T1 removal~~: **OD-R SELECTED** (Option A); **implementation not authorised**;
 - T1's exact downstream influence (OD-Q);
 - TR-01 redaction acceptance (OD-F);
 - the Phase 1 acceptance definition (GOV-01);

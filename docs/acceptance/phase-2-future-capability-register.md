@@ -24,6 +24,7 @@
 | P2-05 | Visual-context scoring as the rubric defines it (clean and redacted frames) | vision rubric (25%); benchmark contract Rule 2 | P2-02; a corpus (OD-D) | `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` |
 | P2-06 | Server-side PII tripwire | constitution §2; INV-21 | P2-04 | `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` |
 | P2-07 | Offline-mode local VLM sequence | constitution §10 v1.1; release sequence 4 | P2-01; constitution §10 conflict | `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` |
+| P2-08 *(M23.6)* | Frame-based local perception in task runs: browser-frame capture, UI-element detection (T1), and TR-01 frame masking | brief Deliverables 1–2; constitution §10 | **excluded from normal Phase 1 tasks by OD-R (Option A).** T1 returns only under OD-O's prerequisites and a new decision. TR-01 is retained as a separate component, its use decided under OD-F. Any frame path that leaves the device needs QG-04-F | `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` |
 
 ## Not in this register
 

@@ -35,6 +35,12 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.6 — OD-R recorded: APPROVED — OPTION A, DOM-only Phase 1 (implementation not authorised).** Normal Phase 1
+  task execution is to capture no browser frames and run neither T1 nor TR-01; DOM observation and the structural
+  handoff remain. Updates the proposed ADR-0015 (new §3.6; still PROPOSED), marks the exclusions in the acceptance
+  documents, records that the brief's visual requirements are not fulfilled by Phase 1 (P2-08), and adds a
+  dependency-ordered implementation outline (design only). The runtime is unchanged; no existing ADR, gate, CSP,
+  permission or model asset changed.
 - **M23.5 — Phase 1 perception boundary: OD-R prepared (documentation only).** Maps the capture chain and every
   known frame consumer from source, inventories the existing fallback test evidence (the M20 benchmark already
   completed 6 tasks with no frame), and compares a DOM-only Phase 1 (A), capture kept with T1 off (B) and capture
