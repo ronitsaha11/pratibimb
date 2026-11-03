@@ -35,6 +35,11 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.5 — Phase 1 perception boundary: OD-R prepared (documentation only).** Maps the capture chain and every
+  known frame consumer from source, inventories the existing fallback test evidence (the M20 benchmark already
+  completed 6 tasks with no frame), and compares a DOM-only Phase 1 (A), capture kept with T1 off (B) and capture
+  for a named consumer (C). Recommends A for the owner's consideration; drafts ADR-0015 clauses for each outcome
+  (not applied). No code, capture, model, test, schema, CSP, permission or ADR changed.
 - **M23.4 — OD-P selected: T1 to be disabled from active Phase 1 execution (not implemented).** Records the
   owner's policy and its impact (`artifacts/experiments/M23.4-t1-disablement-impact/`). A tested no-T1 fallback
   already exists (`MODEL_ASSET_UNAVAILABLE` → `NO_DETECTOR` → structural-floor handoff). Adds the OD-O integrity

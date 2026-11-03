@@ -310,4 +310,16 @@ Each sub-decision is separate.
 | GOV-01 | Phase 1 acceptance framework | — |
 | OD-E1 | QG-04-S scope | — |
 | OD-K / OD-L | formal document reconciliation | RC-01 to RC-12 |
-| **New: OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled.** TR-01 would then mask a local frame that no product code reads (`tr01-privacy-acceptance-assessment.md` §4) | a question only; no change is proposed or authorised |
+| **OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled.** TR-01 would then mask a local frame that no product code reads (`tr01-privacy-acceptance-assessment.md` §4) | **M23.5:** options A, B and C compared (`phase-1-perception-options-comparison.md`). **PROPOSED — AWAITING OWNER APPROVAL: Option A, a DOM-only Phase 1** (`od-r-frame-capture-recommendation-PROPOSED.md`). Not decided; no change authorised |
+
+## M23.5 — OD-R prepared
+
+| ID | Status |
+|---|---|
+| OD-P | **SELECTED:** disable T1; implementation pending separate authorisation; **T1 not disabled** |
+| OD-R | **AWAITING OWNER APPROVAL.** Recommendation: Option A (no frame capture in ordinary Phase 1 task runs) |
+| OD-O, OD-Q, OD-F, OD-N, GOV-01, OD-E1 | **AWAITING OWNER APPROVAL** (unchanged) |
+
+**If OD-R = A:**
+- OD-F narrows to TR-01 as a dormant, evidence-build capability.
+- OD-K2 must record that no local vision model executes in task runs.

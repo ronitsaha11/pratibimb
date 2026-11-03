@@ -65,6 +65,11 @@
 | `m20-benchmark-limitation-note.md` | M23.4: what the M20 benchmark can and cannot support (it ran no T1 inference) |
 | `adr-0015-change-proposal-PROPOSED.md` | M23.4: changes C-1 to C-10 to the proposed ADR-0015; not applied |
 | `t1-disablement-implementation-readiness-PROPOSED.md` | M23.4: design-only plan for a future, separately authorised T1 disablement |
+| `frame-capture-and-consumer-map.md` | M23.5: the capture chain from gesture grant to egress boundary, and every known frame-byte consumer |
+| `fallback-test-evidence-matrix.md` | M23.5: existing tests and records for the no-T1 and no-frame fallbacks, and the regression tests still needed |
+| `phase-1-perception-options-comparison.md` | M23.5: Options A (DOM-only), B (capture kept), C (capture for a named consumer) |
+| `od-r-frame-capture-recommendation-PROPOSED.md` | M23.5: the OD-R recommendation (Option A); not decided |
+| `adr-0015-od-r-clauses-PROPOSED.md` | M23.5: ADR-0015 clause drafts for each OD-R outcome; not applied |
 | `release-readiness-checklist-PROPOSED.md` | Mandatory, owner-approved optional, future, and deferred (FR-01) items |
 
 ## How this proposal was made
