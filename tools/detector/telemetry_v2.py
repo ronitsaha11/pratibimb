@@ -106,6 +106,21 @@ def _check(obj, path):
         raise TelemetryError(f"{path}: non-finite number")
 
 
+# The failures an observation can raise. Deliberately a list, not a catch-all: a MemoryError, a
+# KeyboardInterrupt or a SystemExit is not an observation failure and must reach the caller.
+OBSERVATION_ERRORS = (TelemetryError, TypeError, ValueError, ArithmeticError, OSError, AttributeError, KeyError, IndexError)
+
+
+def observe(fn):
+    """Compute one observation (`fn()`) and validate it. If computing or validating it fails, the
+    result is an explicit unavailable entry naming the failure, and the caller - the training loop -
+    carries on exactly as if telemetry did not exist (M22.16)."""
+    try:
+        return checked(fn())
+    except OBSERVATION_ERRORS as e:
+        return unavailable(f"telemetry failed: {type(e).__name__}: {e}")
+
+
 def checked(value):
     """`value` if it validates; otherwise an explicit unavailable entry naming the defect. Telemetry
     never stops a training run, and an invalid observation is recorded as invalid, not dropped."""
@@ -219,7 +234,14 @@ class Clocks:
         self.platform_name = name
 
     def snapshot(self):
-        snap = {"utc": self.utc(), "perf": self.perf(), "cpu": self.cpu(), "ticks": None, "ticksError": None}
+        """Never raises for a clock failure: a clock that fails leaves its field None and says why,
+        and `interval` then reports that interval as unavailable."""
+        snap = {"utc": None, "perf": None, "cpu": None, "ticks": None, "ticksError": None, "errors": []}
+        for key, fn in (("utc", self.utc), ("perf", self.perf), ("cpu", self.cpu)):
+            try:
+                snap[key] = fn()
+            except OBSERVATION_ERRORS as e:
+                snap["errors"].append(f"{key}: {type(e).__name__}: {e}")
         if self.ticks is None:
             snap["ticksError"] = f"no suspend-aware tick pair on platform {self.platform_name!r}"
         else:
@@ -235,7 +257,12 @@ SUSPEND_BASIS = ("(GetTickCount64 elapsed, which includes time the system was su
 
 
 def interval(start, end, cpu_threads=None):
-    """Telemetry for the time between two snapshots."""
+    """Telemetry for the time between two snapshots. Raises TelemetryError for an unusable pair;
+    callers use `observe`, which turns that into an explicit unavailable entry."""
+    missing = [f"{which} {e}" for which, s in (("start", start), ("end", end)) for e in s.get("errors", [])]
+    missing += [f"{which} {k}" for which, s in (("start", start), ("end", end)) for k in ("utc", "perf", "cpu") if s.get(k) is None]
+    if missing:
+        raise TelemetryError(f"clock snapshot incomplete: {'; '.join(missing)}")
     elapsed = end["perf"] - start["perf"]
     cpu = end["cpu"] - start["cpu"]
     if not (_num(elapsed) and _num(cpu)) or elapsed < 0 or cpu < 0:

@@ -701,7 +701,7 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
 
     def close_session():
         record["sessions"][-1]["endedAt"] = _now()
-        record["sessions"][-1]["timing"] = tel.checked(tel.interval(session_start, clocks.snapshot(), threads))
+        record["sessions"][-1]["timing"] = tel.observe(lambda: tel.interval(session_start, clocks.snapshot(), threads))
 
     def fail(code, message):
         record["status"] = "FAILED"
@@ -743,7 +743,7 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
         record["modelParameters"] = sum(p.numel() for p in model.parameters())
         record["torch"] = {"threads": torch.get_num_threads(), "interopThreads": torch.get_num_interop_threads(), "deterministicAlgorithms": torch.are_deterministic_algorithms_enabled(),
                            "mkldnn": bool(torch.backends.mkldnn.is_available()), "device": "cpu"}
-        record["hardware"] = tel.checked(tel.hardware(torch.get_num_threads(), torch.get_num_interop_threads(), "cpu"))
+        record["hardware"] = tel.observe(lambda: tel.hardware(torch.get_num_threads(), torch.get_num_interop_threads(), "cpu"))
         start_epoch, global_step = 1, 0
         best, best_epoch = None, None
         es = {"bestForPatience": None, "sinceImprovement": 0, "wouldStopAtEpoch": None, "action": es_cfg["action"]}
@@ -853,11 +853,16 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
             if check_t1(repo_root, t1_expected) != t1_ref:
                 fail("F6", "the T1 artifact changed")
             e_end = clocks.snapshot()
-            timing = tel.checked({
-                "epoch": tel.interval(e0, e_end, threads), "train": tel.interval(e0, e_train, threads),
-                "dev": tel.interval(e_train, e_dev, threads), "checkpoint": tel.interval(e_dev, e_end, threads),
-                "steps": tel.step_summary(step_seconds),
-            })
+            # Each observation separately, so one failing phase cannot erase the others (M22.16).
+            timing = {
+                "epoch": tel.observe(lambda: tel.interval(e0, e_end, threads)), "train": tel.observe(lambda: tel.interval(e0, e_train, threads)),
+                "dev": tel.observe(lambda: tel.interval(e_train, e_dev, threads)), "checkpoint": tel.observe(lambda: tel.interval(e_dev, e_end, threads)),
+                "steps": tel.observe(lambda: tel.step_summary(step_seconds)),
+            }
+
+            def compat(phase):  # the M22.13 "seconds" field, from the same validated monotonic measurement
+                v = timing[phase].get("elapsedSeconds", timing[phase])
+                return v["value"] if v.get("kind") == tel.MEASURED else v
             record["checkpoints"].append({"epoch": epoch, "file": name, "sha256": sha, "bytes": size, "verified": True})
             record["epochs"].append({
                 "epoch": epoch, "globalStep": global_step, "lrFirst": lrs[0], "lrLast": lrs[-1], "lrAfter": opt.param_groups[0]["lr"],
@@ -865,15 +870,17 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
                           "samples": consumed, "steps": len(losses), "positiveCells": pos_cells, "ignoredEntries": ign},
                 "gradNorm": {"mean": sum(norms) / len(norms), "min": min(norms), "max": max(norms), "clippedSteps": clipped},
                 "dev": d, "devImproved": improved, "bestEpoch": best_epoch, "bestDevLoss": best, "earlyStopping": dict(es),
-                "seconds": {"train": e_train["perf"] - e0["perf"], "total": e_end["perf"] - e0["perf"]},  # monotonic (perf_counter); detail in "timing"
-                "timing": timing, "memory": tel.checked(tel.process_memory()), "checkpointSha256": sha,
+                "seconds": {"train": compat("train"), "total": compat("epoch")},  # monotonic (perf_counter), or unavailable with why; detail in "timing"
+                "timing": timing, "memory": tel.observe(tel.process_memory), "checkpointSha256": sha,
             })
             record["best"] = {"epoch": best_epoch, "devLoss": best, "file": f"checkpoint-e{best_epoch:02d}.pt",
                               "sha256": next(c["sha256"] for c in record["checkpoints"] if c["epoch"] == best_epoch), "rule": cfg["checkpoint"]["best"]}
             record["earlyStopping"] = dict(es)
             _write_json_atomic(record_path, record)
             _write_json_atomic(os.path.join(out, "best-checkpoint.json"), record["best"])
-            print(json.dumps({"epoch": epoch, "step": global_step, "train": round(record["epochs"][-1]["train"]["lossMean"], 6), "dev": round(d["loss"], 6), "best": best_epoch, "seconds": round(record["epochs"][-1]["seconds"]["total"], 1)}), file=sys.stderr, flush=True)
+            total_s = record["epochs"][-1]["seconds"]["total"]
+            print(json.dumps({"epoch": epoch, "step": global_step, "train": round(record["epochs"][-1]["train"]["lossMean"], 6), "dev": round(d["loss"], 6), "best": best_epoch,
+                              "seconds": round(total_s, 1) if isinstance(total_s, (int, float)) else "unavailable"}), file=sys.stderr, flush=True)
             if "after_epoch" in hooks:
                 hooks["after_epoch"](epoch)
 
@@ -888,7 +895,7 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
         record.update(status="COMPLETED", completedAt=_now(), stopEpoch=E, optimizerSteps=global_step, finalLearningRate=opt.param_groups[0]["lr"], schedulerStep=sched.last_epoch)
         close_session()
         epoch_s = [e["timing"]["epoch"]["elapsedSeconds"]["value"] for e in record["epochs"] if e.get("timing", {}).get("epoch", {}).get("elapsedSeconds", {}).get("kind") == tel.MEASURED]
-        record["timing"] = tel.checked({
+        record["timing"] = tel.observe(lambda: {
             "sessions": len(record["sessions"]),
             "epochElapsedRatioToMedian": tel.epoch_ratios(epoch_s) if len(epoch_s) == len(record["epochs"]) else tel.unavailable("an epoch lacks a measured elapsed time"),
         })

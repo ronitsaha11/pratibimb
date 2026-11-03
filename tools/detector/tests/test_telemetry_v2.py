@@ -62,7 +62,7 @@ def test_a_clock_going_backwards_or_non_finite_is_refused(start, end):
 
 def test_clocks_snapshot_uses_the_injected_clocks_and_reports_tick_failures():
     c = tel.Clocks(perf=lambda: 1.5, cpu=lambda: 0.25, utc=lambda: "T", ticks=lambda: (7, 9))
-    assert c.snapshot() == {"utc": "T", "perf": 1.5, "cpu": 0.25, "ticks": (7, 9), "ticksError": None}
+    assert c.snapshot() == {"utc": "T", "perf": 1.5, "cpu": 0.25, "ticks": (7, 9), "ticksError": None, "errors": []}
 
     def broken():
         raise OSError("QueryUnbiasedInterruptTime failed, Win32 error 5")
@@ -71,6 +71,15 @@ def test_clocks_snapshot_uses_the_injected_clocks_and_reports_tick_failures():
     assert s["ticks"] is None and "Win32 error 5" in s["ticksError"]
     s = tel.Clocks(platform_name="linux").snapshot()
     assert s["ticks"] is None and "no suspend-aware tick pair" in s["ticksError"]
+
+    def bad_perf():
+        raise OSError("clock unavailable")
+
+    s = tel.Clocks(perf=bad_perf, cpu=lambda: 0.0, utc=lambda: "T", ticks=lambda: (1, 2)).snapshot()  # M22.16: never raises
+    assert s["perf"] is None and s["errors"] == ["perf: OSError: clock unavailable"]
+    with pytest.raises(tel.TelemetryError, match="snapshot incomplete: start perf: OSError"):
+        tel.interval(s, s)
+    assert tel.observe(lambda: tel.interval(s, s))["kind"] == tel.UNAVAILABLE
 
 
 @pytest.mark.skipif(not WINDOWS, reason="the Windows tick pair")
@@ -267,7 +276,10 @@ def test_the_trainer_times_with_a_monotonic_clock_and_reads_memory_only_through_
     assert not any(attr == "time" and getattr(v, "id", "") == "time" for v, attr in calls), "time.time() is adjustable: not for durations"
     names = {n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
     assert "peak_memory" not in names  # the defective reader is gone
-    assert any(attr == "process_memory" for _, attr in calls) and any(attr == "interval" for _, attr in calls)
+    refs = {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)}
+    assert {"process_memory", "interval"} <= refs  # memory and timing come from telemetry_v2 ...
+    assert not any(attr in ("checked",) for _, attr in calls)  # ... and every observation goes through observe (M22.16)
+    assert sum(1 for _, attr in calls if attr == "observe") >= 9
 
 
 def test_telemetry_never_swallows_errors_silently():
