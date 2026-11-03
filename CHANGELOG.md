@@ -35,6 +35,12 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.4 — OD-P selected: T1 to be disabled from active Phase 1 execution (not implemented).** Records the
+  owner's policy and its impact (`artifacts/experiments/M23.4-t1-disablement-impact/`). A tested no-T1 fallback
+  already exists (`MODEL_ASSET_UNAVAILABLE` → `NO_DETECTOR` → structural-floor handoff). Adds the OD-O integrity
+  policy proposal, the TR-01 acceptance assessment (OD-F), an M20 limitation note, ADR-0015 changes C-1 to
+  C-10 (not applied) and a design-only readiness plan. Corrects M23.3: T1 inference runs only on frame-capturing
+  passes, and the M20 benchmark ran none. No code, packaging, model, CSP, permission, egress or ADR changed.
 - **M23.3 — Phase 1 architecture reconciliation; ADR-0015 proposed.** A static source trace
   (`docs/acceptance/phase-1-data-flow-and-components.md`) finds that the T1 UI head is loaded and run on every
   perception pass, unadopted and with no build-time or runtime integrity check. Its output can relabel DOM

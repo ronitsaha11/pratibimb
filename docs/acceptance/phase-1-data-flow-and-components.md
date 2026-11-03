@@ -68,7 +68,7 @@ See `t1-tr01-status-reconciliation.md` for the full tables. In brief:
 
 **T1:**
 - **Packaging:** git-ignored, and packaged **without** a build-time or runtime hash check.
-- **Execution:** loaded and run on every perception pass; its output is fused.
+- **Execution:** the session is created on the first perception call. Inference runs on every pass that captures a frame (a gesture grant is needed), and its output is fused. *(corrected M23.4: the T1 session is created on the first perception call (`ensurePerception`); inference runs only on a pass that obtained a frame, which needs a person's gesture grant. Passes refused before capture, such as `NO_ACTIVE_TAB_GRANT`, run no inference)*.
 - **Effect on the handoff:**
   - it can relabel an existing DOM element's `source` (`dom` → `dom+vision`) in the handoff;
   - it sets `capability.tiers_fired` (`["T0","T1","T2"]`), `capability.backend` and `capture.scale_to_css` when the pass ran;

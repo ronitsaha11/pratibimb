@@ -59,6 +59,12 @@
 | `t1-tr01-status-reconciliation.md` | M23.3: what T1 and TR-01 actually do, kept separate across present / loaded / invoked / consumed / adopted; T1's downstream influence; the T1 integrity gap |
 | `reconciliation-matrix-RC-01-to-RC-12.md` | M23.3: each frozen or governing document against the implementation and the Phase 1 scope, with the proposed action and the approval it needs |
 | `proposed-amendment-language-PROPOSED.md` | M23.3: draft wording A-1 to A-9 for frozen or conflicting documents. Not applied |
+| `t1-dependency-and-disablement-impact.md` | M23.4: every T1 dependency, the existing no-T1 fallback, direct and indirect effects of disablement (OD-P selected; **not implemented**) |
+| `t1-artifact-integrity-policy-PROPOSED.md` | M23.4: OD-O prerequisites I-1 to I-7 for any future T1 reactivation (proposed) |
+| `tr01-privacy-acceptance-assessment.md` | M23.4: TR-01's trace and the OD-F acceptance options; visual-only PII not verified |
+| `m20-benchmark-limitation-note.md` | M23.4: what the M20 benchmark can and cannot support (it ran no T1 inference) |
+| `adr-0015-change-proposal-PROPOSED.md` | M23.4: changes C-1 to C-10 to the proposed ADR-0015; not applied |
+| `t1-disablement-implementation-readiness-PROPOSED.md` | M23.4: design-only plan for a future, separately authorised T1 disablement |
 | `release-readiness-checklist-PROPOSED.md` | Mandatory, owner-approved optional, future, and deferred (FR-01) items |
 
 ## How this proposal was made

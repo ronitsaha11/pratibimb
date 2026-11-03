@@ -2,7 +2,8 @@
 
 > **Status (updated M23.2, 2026-11-03):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
-> - **Not resolved by it:** every OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
+> - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
+> - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
 > - **Unaffected:** no ADR, gate, invariant, blocker or threshold is changed by this register.
@@ -16,6 +17,12 @@
 | P-1 | **Phased architecture direction:** Phase 1, then Phase 2 | `artifacts/experiments/M23.2-phased-architecture-decision/` | a roadmap direction; **not** an ADR or constitution amendment |
 | P-2 | **Phase 1 target architecture:** the current local, loopback, structure-only product | `phase-1-architecture-scope.md` | the *intended* architecture; **not** a claim of acceptance |
 | P-3 | **Original VLM and frame-based functionality deferred to Phase 2** | `phase-2-future-capability-register.md` | Phase 2 is **NOT AUTHORISED** for implementation or execution |
+
+## Selected by the owner, implementation pending (M23.4)
+
+| ID | Decision | Status | Limits |
+|---|---|---|---|
+| OD-P | **T1 must not remain an active inference dependency in the Phase 1 product.** Required future outcome:<br>• T1 is neither loaded nor invoked in normal Phase 1 operation;<br>• it is not a required dependency for perception or task execution;<br>• Phase 1 keeps its DOM-based observation, grounding and click safety without it;<br>• T1 remains UNADOPTED;<br>• FR-01 remains deferred and not authorised | **OWNER DECISION SELECTED (2026-11-03): IMPLEMENTATION PENDING SEPARATE AUTHORISATION** | **T1 is NOT disabled.** The source still loads and runs it. No code, package, model or runtime change is authorised by the selection (`artifacts/experiments/M23.4-t1-disablement-impact/`) |
 
 ## Awaiting owner approval
 
@@ -37,9 +44,19 @@
 | OD-L | Register hygiene (B-03, registry byte count, the M23.0 audit) | GOV-04 | AWAITING OWNER APPROVAL |
 | OD-M | Phase 2 architecture proposal: whether, when, and its scope | P2-01 to P2-07 | AWAITING OWNER APPROVAL |
 | OD-N | **ADR-0015 approval** (Phase 1 architecture record) | RSN-07, RC-01 to RC-12, QG-01 ADR item | AWAITING OWNER APPROVAL |
-| OD-O | **T1 artifact integrity and reproducibility policy:** T1 bytes have no build-time or runtime check (M23.3) | every product measurement (U-4); ADR-0003 | AWAITING OWNER APPROVAL |
-| OD-P | **Whether T1 stays active before formal adoption:** it runs unadopted on every pass | RC-12; PRF-01 timings | AWAITING OWNER APPROVAL |
+| OD-O | **T1 artifact integrity policy for any future reactivation or adoption:** T1 bytes have no build-time or runtime check (M23.3). Proposal: `t1-artifact-integrity-policy-PROPOSED.md` (M23.4) | any measurement with T1 inference (U-4); ADR-0003 | AWAITING OWNER APPROVAL |
+| OD-P | **Whether T1 stays active before formal adoption** | RC-12; PRF-01 timings | **SELECTED (owner, 2026-11-03, M23.4): disable T1 from active Phase 1 execution.** IMPLEMENTATION PENDING SEPARATE AUTHORISATION. See the M23.4 sections below |
 | OD-Q | **T1's exact downstream influence:** whether the source trace is sufficient, or a further trace is required (U-2, U-3) | RC-12 | AWAITING OWNER APPROVAL |
+
+## Not authorised (M23.4)
+
+Each of these is a separate item. **None is authorised.**
+- **T1 disablement implementation:** source, packaging or runtime changes. The readiness plan is design only (`t1-disablement-implementation-readiness-PROPOSED.md`).
+- **T1 integrity code changes.**
+- **TR-01 product integration changes.**
+- **Detector evaluation.**
+- **FR-01 execution.**
+- **Phase 2 implementation.**
 
 ## Blocked or not authorised
 
@@ -261,7 +278,7 @@ Each sub-decision is separate.
 ## OD-N to OD-Q — added by M23.3
 
 **Context (FACT, source trace; `docs/acceptance/t1-tr01-status-reconciliation.md`):**
-- **T1 runs:** the T1 UI head is loaded and run on every perception pass, and its output is fused.
+- **T1 runs:** the T1 UI head is loaded on the first perception call and runs on every pass that captures a frame, and its output is fused (corrected M23.4).
 - **What T1 output reaches:** handoff metadata (`source` relabelling, `capability`, `scale_to_css`), the run report, and pass timing.
 - **What it does not reach:** it adds no element to the handoff, and it is not in the reasoner request.
 - **Integrity:** its bytes are verified neither at build time nor at runtime. TR-01's are verified at both.
@@ -275,5 +292,22 @@ Each sub-decision is separate.
 | OD-Q | Downstream influence | accept the M23.3 trace as sufficient; require a further trace of U-1 to U-3 (documentation or measurement, separately authorised) |
 
 **PROPOSED — AWAITING OWNER APPROVAL:**
-- decide OD-O before any further product measurement is quoted, because every measurement depends on an unverified file;
+- decide OD-O before quoting any product measurement in which T1 inference ran, because such measurements depend on an unverified file. The M20 benchmark ran no T1 inference (corrected M23.4);
 - whatever is decided, nothing here is a T1 adoption, and FR-01 stays deferred and not authorised.
+
+## M23.4 — decision status after OD-P
+
+**Selected:** OD-P only.
+
+**Awaiting owner approval** (unchanged in kind, kept separate):
+
+| ID | Decision | M23.4 input |
+|---|---|---|
+| OD-O | T1 artifact integrity policy for any future reactivation | `t1-artifact-integrity-policy-PROPOSED.md` |
+| OD-Q | whether the source trace establishes T1's indirect influence | `t1-dependency-and-disablement-impact.md` (direct and indirect effects separated) |
+| OD-F | TR-01 visual-redaction product acceptance | `tr01-privacy-acceptance-assessment.md` |
+| OD-N | ADR-0015 approval | `adr-0015-change-proposal-PROPOSED.md` (annotated changes, not applied) |
+| GOV-01 | Phase 1 acceptance framework | — |
+| OD-E1 | QG-04-S scope | — |
+| OD-K / OD-L | formal document reconciliation | RC-01 to RC-12 |
+| **New: OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled.** TR-01 would then mask a local frame that no product code reads (`tr01-privacy-acceptance-assessment.md` §4) | a question only; no change is proposed or authorised |
