@@ -25,7 +25,7 @@ import train_v2  # noqa: E402
 from data_v2 import AdapterError  # noqa: E402
 from test_data_v2 import add_occluder_provenance, approve, edit, read_json, write_candidate, write_json  # noqa: E402
 
-RUNTIME_MODULES = ("train_v2.py", "data_v2.py", "dry_run_v2.py", "occlusion_mask_v2.py", "loss_v2.py")
+RUNTIME_MODULES = ("train_v2.py", "data_v2.py", "dry_run_v2.py", "occlusion_mask_v2.py", "loss_v2.py", "telemetry_v2.py")
 PROPOSED = os.path.join(DETECTOR, "configs", "train-v2-first-run.PROPOSED.json")  # schema 2 (M22.12)
 PROPOSED_M22_9 = os.path.join(DETECTOR, "configs", "train-v2-first-experiment.PROPOSED.json")  # schema 1, kept as history
 

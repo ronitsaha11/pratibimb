@@ -48,6 +48,9 @@ TRAINING (`run_training`, M22.13), after that pre-flight:
     zero), backward, clipping that refuses non-finite gradients, AdamW, one cosine scheduler step;
   - each epoch: all TRAIN samples once, then the full-split DEV loss (eval mode, no grad, the same
     mask), a checkpoint written atomically and verified, the T1 hash re-checked, the record updated;
+  - every epoch also records observation-only telemetry (`telemetry_v2`, M22.15): monotonic elapsed
+    and process-CPU time per phase (train, DEV, checkpoint) with UTC start and end, per-step timing
+    summaries, process memory, and Windows suspend evidence; unavailable values say why;
   - the best checkpoint is the strict minimum DEV loss (ties keep the earlier epoch); early
     stopping is recorded and, when record-only, never stops the run;
   - every failure condition stops the run and records it; an interruption is resumable only under
@@ -446,32 +449,6 @@ def candidate_fingerprint(root):
     return out
 
 
-def peak_memory():
-    """This process's peak working set, where the platform reports it (no new dependency)."""
-    try:
-        if os.name == "nt":
-            import ctypes
-            from ctypes import wintypes
-
-            class Counters(ctypes.Structure):
-                _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD), ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-                            ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t), ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
-                            ("QuotaNonPagedPoolUsage", ctypes.c_size_t), ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t)]
-
-            c = Counters()
-            c.cb = ctypes.sizeof(Counters)
-            k32 = ctypes.windll.kernel32
-            k32.GetCurrentProcess.restype = wintypes.HANDLE
-            if ctypes.windll.psapi.GetProcessMemoryInfo(k32.GetCurrentProcess(), ctypes.byref(c), c.cb):
-                return {"peakWorkingSetBytes": int(c.PeakWorkingSetSize), "workingSetBytes": int(c.WorkingSetSize)}
-            return None
-        import resource
-
-        return {"peakResidentBytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024}
-    except Exception:  # an observation, never a reason to stop
-        return None
-
-
 def prepare_split(root, data, expected):
     """
     Every sample of one accepted split as training tensors, built by the UNCHANGED v1 input path
@@ -714,12 +691,22 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
             "preflight": {"plan": plan["runConfiguration"]["plan"], "tensorCheck": plan["tensorCheck"], "acceptance": plan["acceptance"]},
             "epochs": [], "checkpoints": [], "best": None, "earlyStopping": None, "sessions": [], "failure": None,
         }
+    import telemetry_v2 as tel
+
+    clocks = tel.Clocks()
+    session_start = clocks.snapshot()
+    threads = cfg["determinism"]["cpuThreads"]
     record["sessions"].append({"startedAt": _now(), "resume": resume})
     _write_json_atomic(record_path, record)
+
+    def close_session():
+        record["sessions"][-1]["endedAt"] = _now()
+        record["sessions"][-1]["timing"] = tel.checked(tel.interval(session_start, clocks.snapshot(), threads))
 
     def fail(code, message):
         record["status"] = "FAILED"
         record["failure"] = {"code": code, "message": message, "at": _now()}
+        close_session()
         _write_json_atomic(record_path, record)
         raise TrainingFailure(code, message)
 
@@ -756,6 +743,7 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
         record["modelParameters"] = sum(p.numel() for p in model.parameters())
         record["torch"] = {"threads": torch.get_num_threads(), "interopThreads": torch.get_num_interop_threads(), "deterministicAlgorithms": torch.are_deterministic_algorithms_enabled(),
                            "mkldnn": bool(torch.backends.mkldnn.is_available()), "device": "cpu"}
+        record["hardware"] = tel.checked(tel.hardware(torch.get_num_threads(), torch.get_num_interop_threads(), "cpu"))
         start_epoch, global_step = 1, 0
         best, best_epoch = None, None
         es = {"bestForPatience": None, "sinceImprovement": 0, "wouldStopAtEpoch": None, "action": es_cfg["action"]}
@@ -787,13 +775,15 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
         _write_json_atomic(record_path, record)
         model.train()
         for epoch in range(start_epoch, E + 1):
-            t0 = time.time()
+            e0 = clocks.snapshot()
             order = rng.permutation(t_train["n"])
             if not np.array_equal(np.sort(order), np.arange(t_train["n"])):
                 fail("F3", f"epoch {epoch}: the TRAIN order is not a permutation")
             losses, clss, boxes, norms, lrs, steps_log = [], [], [], [], [], []
             consumed = pos_cells = ign = clipped = 0
+            step_seconds = []
             for b in range(spe):
+                s0 = time.perf_counter()
                 if global_step >= max_steps or sched.last_epoch != global_step:
                     fail("F3", f"step accounting: global step {global_step}, scheduler step {sched.last_epoch}, max {max_steps}")
                 idx = torch.from_numpy(order[b * B:(b + 1) * B].copy())
@@ -830,14 +820,16 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
                 norms.append(gn)
                 lrs.append(lr)
                 steps_log.append({"step": global_step, "lr": lr, "loss": lv, "cls": cv, "box": bv, "gradNorm": gn})
+                step_seconds.append(time.perf_counter() - s0)
                 if "after_step" in hooks:
                     hooks["after_step"](epoch, global_step)
             if consumed != t_train["n"] or pos_cells != int(t_train["P"].sum()) or ign != int(t_train["IG"].sum()):
                 fail("F3", f"epoch {epoch}: consumed {consumed} samples, {pos_cells} positive cells, {ign} ignored entries")
             if not _finite_state(model, opt):
                 fail("F2", f"epoch {epoch}: non-finite weights or optimizer state")
-            train_seconds = time.time() - t0
+            e_train = clocks.snapshot()
             d = dev_loss(model, t_dev, B, w)
+            e_dev = clocks.snapshot()
             improved = best is None or d["loss"] < best  # strict: a tie keeps the earlier epoch
             if improved:
                 best, best_epoch = d["loss"], epoch
@@ -860,6 +852,12 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
             sha, size = _write_checkpoint(os.path.join(out, name), payload, model)
             if check_t1(repo_root, t1_expected) != t1_ref:
                 fail("F6", "the T1 artifact changed")
+            e_end = clocks.snapshot()
+            timing = tel.checked({
+                "epoch": tel.interval(e0, e_end, threads), "train": tel.interval(e0, e_train, threads),
+                "dev": tel.interval(e_train, e_dev, threads), "checkpoint": tel.interval(e_dev, e_end, threads),
+                "steps": tel.step_summary(step_seconds),
+            })
             record["checkpoints"].append({"epoch": epoch, "file": name, "sha256": sha, "bytes": size, "verified": True})
             record["epochs"].append({
                 "epoch": epoch, "globalStep": global_step, "lrFirst": lrs[0], "lrLast": lrs[-1], "lrAfter": opt.param_groups[0]["lr"],
@@ -867,7 +865,8 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
                           "samples": consumed, "steps": len(losses), "positiveCells": pos_cells, "ignoredEntries": ign},
                 "gradNorm": {"mean": sum(norms) / len(norms), "min": min(norms), "max": max(norms), "clippedSteps": clipped},
                 "dev": d, "devImproved": improved, "bestEpoch": best_epoch, "bestDevLoss": best, "earlyStopping": dict(es),
-                "seconds": {"train": train_seconds, "total": time.time() - t0}, "memory": peak_memory(), "checkpointSha256": sha,
+                "seconds": {"train": e_train["perf"] - e0["perf"], "total": e_end["perf"] - e0["perf"]},  # monotonic (perf_counter); detail in "timing"
+                "timing": timing, "memory": tel.checked(tel.process_memory()), "checkpointSha256": sha,
             })
             record["best"] = {"epoch": best_epoch, "devLoss": best, "file": f"checkpoint-e{best_epoch:02d}.pt",
                               "sha256": next(c["sha256"] for c in record["checkpoints"] if c["epoch"] == best_epoch), "rule": cfg["checkpoint"]["best"]}
@@ -887,26 +886,33 @@ def run_training(repo_root, candidate_n, g10_config, g10_evidence, build_config,
         if check_t1(repo_root, t1_expected) != t1_ref:
             fail("F6", "the T1 artifact changed")
         record.update(status="COMPLETED", completedAt=_now(), stopEpoch=E, optimizerSteps=global_step, finalLearningRate=opt.param_groups[0]["lr"], schedulerStep=sched.last_epoch)
-        record["sessions"][-1]["endedAt"] = _now()
+        close_session()
+        epoch_s = [e["timing"]["epoch"]["elapsedSeconds"]["value"] for e in record["epochs"] if e.get("timing", {}).get("epoch", {}).get("elapsedSeconds", {}).get("kind") == tel.MEASURED]
+        record["timing"] = tel.checked({
+            "sessions": len(record["sessions"]),
+            "epochElapsedRatioToMedian": tel.epoch_ratios(epoch_s) if len(epoch_s) == len(record["epochs"]) else tel.unavailable("an epoch lacks a measured elapsed time"),
+        })
         _write_json_atomic(record_path, record)
         return record
     except TrainingFailure as e:
         if record.get("status") != "FAILED":  # raised outside fail(), e.g. a checkpoint that does not verify
             record["status"] = "FAILED"
             record["failure"] = {"code": e.code, "message": str(e), "at": _now()}
+            close_session()
             _write_json_atomic(record_path, record)
         raise
     except SafetyError as e:
         fail("F6", str(e))
     except KeyboardInterrupt:
         record["status"] = "INTERRUPTED"
-        record["sessions"][-1]["endedAt"] = _now()
+        close_session()
         _write_json_atomic(record_path, record)
         raise
     except Exception as e:  # F13: recorded by type only (no paths, no stack data)
         if record.get("status") != "FAILED":
             record["status"] = "FAILED"
             record["failure"] = {"code": "F13", "message": type(e).__name__, "at": _now()}
+            close_session()
             _write_json_atomic(record_path, record)
         raise
 
