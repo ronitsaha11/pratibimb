@@ -1,9 +1,10 @@
-# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9)
+# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10)
 
 > **Status:** what M23.8's tests establish about M23.7's boundary (M23.8, 2026-11-04, at `740a245` plus tests).
 > - **What "behavioural" means here:** the real `background.ts`, `offscreen/main.ts`, task run, orchestrator, privacy boundary, execution gate and egress guard ran in Node under a fake `chrome`, with every capture, model and worker API counted (`apps/extension/test/support/simulatedExtension.ts`). **It is a model of a browser, not a browser.**
 > - **Evidence type:** in the terms of `core-product-acceptance-PROPOSED.md` §4, all of this is **type A** (unit and integration). None of it is type B to H. **No browser ran. No acceptance criterion is approved or re-rated by it.**
 > - **Nothing real was involved:** no frame, no model file, no worker, no model server.
+> - **M23.10:** §7 adds OD-V. Tests and a mutation check; no harness was run.
 > - **M23.9:** §6 adds OD-S. It is the one row here with a real build behind it. That build was made and read, not run.
 
 ## 1. The M23.7 boundary, requirement by requirement
@@ -103,6 +104,24 @@ The commands, exit codes and counts are in `artifacts/experiments/M23.8-dom-only
 | Evidence: missing or invalid grants refused | no grant; a grant ended by navigation; a grant on another tab. Expiry is in `captureAuthority.test.ts`, unchanged | **behavioural** (doubles); **unit** | PASS | Chrome's `activeTab` |
 | Evidence: invalid stream ids refused | **by the fake browser only.** The handler has no check of its own (F-4), and none was added | **behavioural** (doubles) | PASS as stated | whether Chrome refuses one (UNKNOWN) |
 | Evidence: reply shapes unchanged | exact field lists and failure shapes | **behavioural** (doubles) | PASS | — |
-| Evidence harnesses | **six refuse (OD-V)**; one cannot run on a product build (OD-U) | **static** | **NOT PRESERVED, by necessity. Reported** | — |
+| Evidence harnesses | **six refuse (OD-V)**; one cannot run on a product build (OD-U) | **static** | **NOT PRESERVED, by necessity. Reported.** *M23.10: resolved for the six, §7* | — |
 
 Commands, exit codes and counts: `artifacts/experiments/M23.9-diagnostic-hook-isolation/decision.md`.
+
+## 7. OD-V: the six harnesses' build contract (M23.10)
+
+| Requirement | Actual evidence | Kind | Result | Not established |
+|---|---|---|---|---|
+| Product and evidence workers may differ, and must | `build-separation.test.mjs` (1, D): passes when they differ, refuses when identical | **unit** (synthetic builds) | PASS | two real builds |
+| Product hooks absent | the M23.9 inspection, run through the contract. Any one marker fails alone (6, 7). On the real M23.9 build: `boundaryProblems: []` | **unit**; **real build output** (product half only) | PASS | — |
+| Evidence hooks registered | (3, 8): each required name, removed one at a time, fails. The names are tied to source | **unit**; **static** | PASS | **a real evidence bundle** |
+| Evidence workers agree | (C): drift fails. The configuration and the worker's module graph support the expectation | **unit**; **configuration executed** | PASS on fixtures. **The real comparison is UNVERIFIED** | two real evidence builds |
+| `content.js` guard | (4, 9): a modified file fails | **unit** | RETAINED | — |
+| Manifest guard | (5, 10): a change in any field fails | **unit** | RETAINED | — |
+| CSP, hosts and permissions outside the approved variation | (11): `<all_urls>`, a new permission, `tabCapture` removed, a changed `script-src`, a wider `connect-src` all fail | **unit** | RETAINED | Chrome's enforcement |
+| Nothing unexamined reads as checked | (12): a missing build is a problem; a dry run is `DRY_RUN_NOT_EVIDENCE`. The real product build alone gets `NOT_EXAMINED` | **unit**; **real build output** | PASS | — |
+| All six wired, with their own checks kept | `build-separation.test.mjs`, seven tests per harness, read as text | **static** | PASS | **a real run of any of them** |
+| The checks catch regressions | 58 deliberate mutations, 58 caught (`w1-m23-10-mutation-check.json`) | **mutation** | PASS | — |
+| OD-U harnesses not touched | not wired into the contract (test); no diff | **static**; `git diff` | UNCHANGED | — |
+
+Commands, exit codes and counts: `artifacts/experiments/M23.10-evidence-harness-reconciliation/decision.md`.

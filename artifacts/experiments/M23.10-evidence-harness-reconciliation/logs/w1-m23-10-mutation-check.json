@@ -1,0 +1,296 @@
+{
+  "what": "each mutation was applied to one working-tree file, the contract's test file was run, and the file was restored. A non-zero exit means the mutation was caught. No build, browser or model was involved.",
+  "testFile": "tests/browser/support/build-separation.test.mjs",
+  "results": [
+    {
+      "mutation": "contract: stop comparing content.js across builds",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: stop comparing the manifest route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: stop comparing permissions",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: stop comparing host permissions",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: stop checking connect-src",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: ignore the product's boundary problems",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: ignore missing worker registrations",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: ignore missing offscreen handlers",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: stop comparing the two evidence workers",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: stop comparing the two evidence content scripts",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: stop comparing the two evidence manifests",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: allow identical product and evidence workers",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: REINTRODUCE the old blanket worker equality",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: a missing evidence build is skipped",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: a missing reference build is skipped",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: a missing product build is skipped",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: an unexamined build reports a pass",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: a dry run reads as checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: the cross-build checks never enforced",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "contract: the reference flag is the build under test's",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: stop looking for STREAM_CONSUME",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: stop looking for perceiveOnce",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-gesture-redaction: drop the contract's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-gesture-redaction: drop the content and manifest refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-gesture-redaction: leave content.js out of the comparison",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-gesture-redaction: skip the reference build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-gesture-redaction: drop connect-src's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-gesture-redaction: restore the old guard",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-webp-loopback: drop the contract's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-webp-loopback: drop the content and manifest refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-webp-loopback: leave content.js out of the comparison",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-webp-loopback: skip the reference build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-webp-loopback: drop connect-src's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-webp-loopback: restore the old guard",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-artifact-verifier: drop the contract's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-artifact-verifier: drop the content and manifest refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-artifact-verifier: leave content.js out of the comparison",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-artifact-verifier: skip the reference build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-artifact-verifier: drop connect-src's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-artifact-verifier: restore the old guard",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-capture-determinism: drop the contract's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-capture-determinism: drop the content and manifest refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-capture-determinism: leave content.js out of the comparison",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-capture-determinism: skip the reference build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-capture-determinism: drop connect-src's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-capture-determinism: restore the old guard",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-j7: drop the contract's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-j7: drop the content and manifest refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-j7: leave content.js out of the comparison",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-j7: skip the reference build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-j7: drop connect-src's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-j7: restore the old guard",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-re1: drop the contract's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-re1: drop the content and manifest refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-re1: leave content.js out of the comparison",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-re1: skip the reference build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-re1: drop connect-src's refusal",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-re1: restore the old guard",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}

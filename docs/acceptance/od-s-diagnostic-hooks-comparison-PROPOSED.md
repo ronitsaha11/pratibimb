@@ -2,7 +2,7 @@
 
 > **Status (M23.9, 2026-11-04): the owner selected Option B, and M23.9 implemented it in product builds** (`artifacts/experiments/M23.9-diagnostic-hook-isolation/`). Not browser-verified. The comparison below is as prepared in M23.8, with corrections marked.
 > - **Correction:** M23.8 said Option B left evidence workflows "unchanged where they already use an evidence flag". **That was wrong, and this comparison is what the owner decided from.** Six of those harnesses refuse unless both builds' `background.js` are byte-identical, and Option B means they cannot be. See OD-V below.
-> - **Nothing else here was decided by M23.9:** OD-T, OD-U and OD-V await the owner.
+> - **M23.9 decided nothing else here. Since then:** the owner selected OD-V, and M23.10 implemented it. OD-T and OD-U await the owner.
 > - **Basis:** `diagnostic-hook-boundary-map.md`.
 
 ## The question
@@ -54,8 +54,8 @@ M23.7 removed frame capture, T1 and TR-01 from ordinary product tasks. Two test-
 
 Neither is changed in M23.8 or M23.9. See `evidence-build-preservation-assessment.md` §3 and §5.
 
-**OD-V was added by M23.9:**
+**OD-V was added by M23.9, and implemented by M23.10 (owner, 2026-11-04):** the guard is replaced by `tests/browser/support/build-separation.mjs`. As proposed below, plus a required difference between the workers and a required set of evidence hooks.
 
 | ID | Item | Why it is separate |
 |---|---|---|
-| **OD-V** | **Six evidence harnesses refuse unless the product and evidence `background.js` are byte-identical,** recording that "the evidence build's capture route" is "the product's". Since OD-S a product has no capture route, so that claim and that check no longer fit. **Options:** (A) keep comparing `content.js` and the manifest's route, and replace the worker comparison with two checks: the product bundle names no hook, and two evidence builds with different flags have the same worker; (B) compare workers with the gated code removed, which is fragile on minified output; (C) drop the worker comparison and state that the measured route is the evidence build's alone. **PROPOSED — AWAITING OWNER APPROVAL: A.** Under any of them, those harnesses' records can no longer say "the product's capture route" | test scope, and what those records may claim. Until it is decided, the six refuse, fail-closed |
+| **OD-V** | **Six evidence harnesses refuse unless the product and evidence `background.js` are byte-identical,** recording that "the evidence build's capture route" is "the product's". Since OD-S a product has no capture route, so that claim and that check no longer fit. **Options:** (A) keep comparing `content.js` and the manifest's route, and replace the worker comparison with two checks: the product bundle names no hook, and two evidence builds with different flags have the same worker; (B) compare workers with the gated code removed, which is fragile on minified output; (C) drop the worker comparison and state that the measured route is the evidence build's alone. *(As proposed in M23.9.)* Under any of them, those harnesses' records can no longer say "the product's capture route" | test scope, and what those records may claim. Until it is decided, the six refuse, fail-closed |

@@ -1,13 +1,14 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.9, 2026-11-04):**
+> **Status (updated M23.10, 2026-11-04):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
 > - **Implemented in M23.7 (owner-authorised), product builds only:** OD-P and OD-R. M23.8 tested the boundary under a simulated extension. **Neither is browser-verified or accepted.**
 > - **Prepared in M23.8:** OD-S, OD-T and OD-U.
 > - **Selected and implemented in M23.9:** **OD-S: APPROVED — OPTION B** (2026-11-04), implemented in product builds. **Not browser-verified.**
-> - **Awaiting the owner:** OD-T, OD-U, and OD-V (added by M23.9).
+> - **Selected and implemented in M23.10:** **OD-V** (2026-11-04), in the six harness contracts. **No harness was run.**
+> - **Awaiting the owner:** OD-T and OD-U.
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -406,7 +407,7 @@ Each sub-decision is separate.
 
 | ID | Decision | Input | Status |
 |---|---|---|---|
-| OD-V | **The byte-identity guard in six evidence harnesses** (`run-gesture-redaction`, `run-webp-loopback`, `run-artifact-verifier`, `run-capture-determinism`, `run-stream-j7`, `run-stream-re1`). They refuse unless both builds' `background.js` match, which OD-S makes impossible. How should the guard change, and what may those records claim? | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `evidence-build-preservation-assessment.md` §5. **PROPOSED — AWAITING OWNER APPROVAL: option A there** | **AWAITING OWNER APPROVAL.** Until then the six refuse, fail-closed |
+| OD-V | **The byte-identity guard in six evidence harnesses** (`run-gesture-redaction`, `run-webp-loopback`, `run-artifact-verifier`, `run-capture-determinism`, `run-stream-j7`, `run-stream-re1`). They refuse unless both builds' `background.js` match, which OD-S makes impossible. How should the guard change, and what may those records claim? | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `evidence-build-preservation-assessment.md` §5. **PROPOSED — AWAITING OWNER APPROVAL: option A there** | *(M23.9 status, superseded by M23.10 below:)* awaiting the owner; until then the six refuse, fail-closed |
 
 **Still awaiting the owner, unchanged by M23.9:**
 - **OD-T:** the product's visible capture wording.
@@ -421,3 +422,25 @@ Each sub-decision is separate.
 **Needs a separate authorisation:** the human browser smoke run, and any evidence-build run.
 
 **Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 is unchanged.**
+
+## M23.10 — status after OD-V
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-V | **SELECTED (owner, 2026-11-04):** replace only the six harnesses' cross-build worker equality. Keep the `content.js`, manifest, permission, host-permission and CSP comparisons. Require product hooks absent, evidence hooks present, evidence workers consistent, and product and evidence workers different | **M23.10: IMPLEMENTED in the harness contracts,** `tests/browser/support/build-separation.mjs`. 58 of 58 deliberate regressions caught | **No harness was run; no evidence build was made. Evidence-build runtime UNVERIFIED.** Two parts of the contract rest on inference until a real run (`artifacts/experiments/M23.10-evidence-harness-reconciliation/`) |
+
+**Remains implemented:** OD-P, OD-R and OD-S, in product builds. Not browser-verified, not accepted.
+
+**Still awaiting the owner, unchanged by M23.10:**
+- **OD-T:** the product's visible capture wording.
+- **OD-U:** `run-gesture-capture.mjs` and `run-gesture-acts.mjs`, their build scope, and the four checks that cannot pass on a DOM-only product build. Not moved, retired, weakened or rewritten.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**

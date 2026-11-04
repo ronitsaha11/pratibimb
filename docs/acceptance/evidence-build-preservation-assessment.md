@@ -1,7 +1,7 @@
-# Evidence-build preservation assessment (M23.8, updated M23.9)
+# Evidence-build preservation assessment (M23.8, updated M23.9, M23.10)
 
-> **Status:** assessment at `740a245` (M23.8, 2026-11-04), updated for OD-S (M23.9). **§5 is the current position on the harnesses, and corrects §1.**
-> - **No evidence build was made.** It would package the T1 asset, so neither M23.7, M23.8 nor M23.9 built one.
+> **Status:** assessment at `740a245` (M23.8, 2026-11-04), updated for OD-S (M23.9). **§5 and §6 are the current position on the harnesses, and §5 corrects §1.**
+> - **No evidence build was made.** It would package the T1 asset, so none of M23.7, M23.8, M23.9 or M23.10 built one.
 > - **Runtime preservation of evidence builds is UNVERIFIED.** What follows establishes what the configuration selects and what the wiring asks for, under fakes. It does not establish that an evidence build runs.
 > - **No model file was loaded, read or hashed.**
 
@@ -50,7 +50,7 @@ A separately authorised run: build with an evidence flag, then run an evidence h
 
 ## 5. What OD-S changed (M23.9): read, not run
 
-**The M23.8 OD-S comparison said flagged harnesses were unchanged. It had not followed its own observation above to its consequence.**
+**The M23.8 OD-S comparison said flagged harnesses were unchanged. It had not followed its own observation above to its consequence.** *The first row below is superseded by §6 (M23.10).*
 
 | Harness | Effect of M23.9 | Status |
 |---|---|---|
@@ -64,3 +64,19 @@ A separately authorised run: build with an evidence flag, then run an evidence h
 **What was preserved, by source and test double only:** both hooks and all four drivers; their code (moved verbatim); sender checks; the gesture-grant requirement; stream ownership; TR-01's context and integrity checks; reply shapes (`apps/extension/test/diagnosticHooks.test.ts`).
 
 **Still UNVERIFIED:** whether an evidence build compiles and runs after M23.9.
+
+## 6. OD-V implemented (M23.10): read and tested, not run
+
+**The six harnesses no longer refuse on a differing worker.** They judge `tests/browser/support/build-separation.mjs`. Their `content.js`, manifest-route and `connect-src` comparisons, and their own measurement checks, are retained. The mapping is in `artifacts/experiments/M23.10-evidence-harness-reconciliation/README.md` §3.
+
+| Question | Position | Evidence type |
+|---|---|---|
+| Would an evidence build satisfy the contract? | **UNVERIFIED.** No evidence build was made | — |
+| Do `TR01_PROBE=1` and `STRUCTURAL_PROBE=1` give the same worker? | **INFERENCE:** same substituted values and manifest; they differ only in aliases the worker's module graph does not import. A real run refuses if this is wrong | configuration executed; module graph with the product's flags |
+| Do all the required names survive into a real evidence bundle? | **Partly measured:** five were found in the real minified M23.7 bundle. The other four are inferred. A wrong name refuses | an earlier build's record; INFERENCE |
+| Can an unexamined build read as checked? | **No:** a missing build is a problem, and a dry run has its own status | tests; a real product build |
+| Do the six pass from start to finish? | **UNKNOWN.** They need a person's click, a real browser, T1 and TR-01, and a separate authorisation | — |
+
+**Still needing the owner (OD-U):** `run-gesture-capture.mjs` and `run-gesture-acts.mjs` are not touched. `run-gesture-capture.mjs` still throws on a product build.
+
+**Evidence-build runtime preservation remains UNVERIFIED.**

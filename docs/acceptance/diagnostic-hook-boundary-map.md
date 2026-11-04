@@ -1,6 +1,7 @@
-# Diagnostic-hook reachability and boundary map (M23.8, updated M23.9)
+# Diagnostic-hook reachability and boundary map (M23.8, updated M23.9, M23.10)
 
 > **Status (M23.9, 2026-11-04): OD-S Option B is implemented. Both hooks exist only in an evidence build.** A real product build was inspected and contains neither (`artifacts/experiments/M23.9-diagnostic-hook-isolation/`). §1, §2, §6 and §8 are current. §3 to §5 are the M23.8 audit, and now describe an evidence build.
+> - **M23.10 (OD-V):** no hook changed. Six harnesses now check this boundary through a contract: §9.
 > - **M23.8's audit:** of `PERCEIVE_ONCE` and `STREAM_CONSUME` at `740a245` (2026-11-04).
 > - **Method:** source reading, an inspection of the existing M23.7 product build, and tests that run the real handlers through the real listeners under a fake `chrome` (`apps/extension/test/diagnosticHooks.test.ts`).
 > - **Not a browser validation.** What Chrome itself would deliver or honour is not established here, and is marked UNKNOWN.
@@ -117,3 +118,16 @@
 | The capture authority, with `getMediaStreamId` and `ticketFor` | changing it was forbidden; the toolbar's grant and the panel's status use it | `ticketFor` has no caller (source, tested; one occurrence in the built worker, its definition) |
 | `tabCapture`, `activeTab` | changing them was forbidden | nothing in a product build uses `tabCapture` now. A separate owner decision |
 | TR-01's model and worker | changing them was forbidden | packaged with its integrity check; the product bundle has no way to start it |
+
+## 9. How a harness now checks this boundary (M23.10, OD-V)
+
+`tests/browser/support/build-separation.mjs` holds the contract for six evidence harnesses. **It changes how the boundary is checked. The boundary itself is unchanged, and no access to a hook is broadened.**
+
+| The contract requires | So a harness refuses if |
+|---|---|
+| The product build passes `inspectProductBuild` | any hook, driver, capture ticket or capture call is in the product bundle |
+| The evidence build names every required hook, sender and handler | one has gone missing from the worker or the offscreen document |
+| Two evidence builds (`TR01_PROBE=1`, `STRUCTURAL_PROBE=1`) have the same worker | the worker varies by evidence flag |
+| The product's and the evidence build's workers differ | they are identical, so a gate has been lost |
+
+**This reads built files. It does not establish that a hook works.** No harness has run, and evidence-build behaviour stays UNVERIFIED at run time.

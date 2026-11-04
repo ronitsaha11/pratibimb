@@ -35,6 +35,12 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.10 — Evidence harnesses judge a build-separation contract (OD-V; harnesses, tests and documentation only).** Six
+  harnesses no longer require product and evidence `background.js` to be byte-identical, which OD-S made impossible.
+  `tests/browser/support/build-separation.mjs` requires product hooks absent, evidence hooks present, two evidence builds'
+  workers the same, and product and evidence workers different. Their `content.js`, manifest, permission and CSP
+  comparisons and their own checks are retained. A missing build can never read as checked. 58 of 58 deliberate regressions
+  caught. No harness or build ran; evidence-build runtime stays unverified; OD-U and OD-T await the owner.
 - **M23.9 — Diagnostic hooks removed from product builds (OD-S, Option B).** `PERCEIVE_ONCE`, `STREAM_CONSUME`, their
   four worker drivers, the worker's `CAPTURE_FRAME` handler and the references that kept the capture path alive now sit
   behind the existing evidence flag. A real product build names none of them and has no capture call; its manifest,
