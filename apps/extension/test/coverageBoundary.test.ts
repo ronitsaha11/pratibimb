@@ -70,6 +70,11 @@ const EXERCISED_BY_TESTS = [
  * Every entry either touches a `chrome.*` API, a WXT global or the live DOM, so exercising it in
  * Node would mean faking the browser rather than testing the file. What covers them instead is the
  * browser harnesses under `tests/browser/extension/`, which run the real thing.
+ *
+ * M23.8: `support/simulatedExtension.ts` now runs `host/background.ts`, `host/offscreen/main.ts`,
+ * `extension-run.ts`, `extension-ports.ts`, `messages.ts` and `transport-chrome.ts` in Node, under a fake
+ * `chrome`, to observe what a task asks for. They stay on this list on purpose: that rig is a model of a
+ * browser, and what it shows about them says nothing about Chrome.
  */
 const EXERCISED_ONLY_IN_A_BROWSER = [
   "e6/probe.ts",

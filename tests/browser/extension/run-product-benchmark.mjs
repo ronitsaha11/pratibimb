@@ -344,7 +344,7 @@ const record = {
       sha256: PIN.model.sha256,
       endpoint: ENDPOINT,
     },
-    perception: "DOM/text structure only in this workload: the product build captures no frame without the person's toolbar gesture (ADR-0009), and this harness makes none",
+    perception: "DOM/text structure only: a product task takes no perception pass and asks for no frame (M23.7, OD-R), whether or not a person invoked the toolbar",
     node: process.version,
     date: startedAt.toISOString(),
   },

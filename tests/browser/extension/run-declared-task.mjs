@@ -36,6 +36,7 @@ import { cpus, release as osRelease, tmpdir } from "node:os";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { startReasonerService } from "../demo/reasoner-service.mjs";
+import { domOnlyTaskChecks, summariseHandoff } from "../support/dom-only-checks.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
 const WS = resolveWorkstation();
@@ -172,12 +173,15 @@ try {
         declaredDone: t.declaredDone,
         observedFrame: t.initialObservation?.frameId ?? null,
         afterFrame: t.observation?.frameId ?? null,
+        handoff: summariseHandoff(t.handoff),
       })),
       modelRequests: exchanges.length,
       modelProposals: exchanges.map((e) => e.modelContent),
       modelRequestTripwire: exchanges.map((e) => e.tripwire),
       egress: (result?.egress ?? []).map((e) => (e.record ? { sent: true, destination: e.record.destination } : { sent: false, cause: e.refusal?.cause ?? null })),
       perception: (result?.ports?.perception ?? []).map((p) => ({ ran: p.ran, refusal: p.refusal?.code ?? null, route: p.route })),
+      perceptionBoot: result?.perceptionBoot ?? null,
+      modelRequestBodies: service.captures.slice(capturesBefore).map((c) => c.body),
       page: truth,
     });
     const r = runs.at(-1);
@@ -212,7 +216,8 @@ const judge = (r) => {
     everyTurnFromTheLocalModel: r.turns.every((t) => t.reasonerKind === "LOCAL_MODEL" && t.fallback === null),
     noValueShapedTextReachedTheModel: r.modelRequestTripwire.every((w) => Array.isArray(w) && w.length === 0),
     allEgressLoopbackReasoner: r.egress.every((e) => !e.sent || e.destination === REASONER_URL),
-    productBuildCapturedNoFrame: r.perception.every((p) => p.ran === false && p.refusal === "NO_ACTIVE_TAB_GRANT"),
+    // M23.8: replaces a check that held for any run once a product task's perception array became empty.
+    ...domOnlyTaskChecks({ perception: r.perception, perceptionBoot: r.perceptionBoot, handoffs: r.turns.map((t) => t.handoff), modelRequests: r.modelRequestBodies }),
     onlyTheDeclaredControlWasClicked: Object.entries(r.page.clicks ?? {}).every(([k, v]) => (k === r.scenario ? v <= 1 : v === 0)),
   };
   if (clicked !== selector) {
@@ -236,7 +241,11 @@ const judge = (r) => {
     theControlReallyWasClickedOnce: r.page.clicks?.callback === 1,
   };
 };
-for (const r of runs) r.judged = judge(r);
+for (const r of runs) {
+  r.judged = judge(r);
+  // Judged, and now gone: the record keeps what the model was shown out of itself.
+  delete r.modelRequestBodies;
+}
 const allHeld = failure === null && runs.length === RUN.length && runs.every((r) => Object.values(r.judged).every(Boolean));
 const record = {
   experiment: "M18 — user-declared click outcomes, in the real extension, with the real local model (not a J7 experiment)",
@@ -253,7 +262,7 @@ const record = {
     "one run per scenario on one synthetic page; no reliability claim",
     "the panel page ran in its own popup window, because a harness cannot open Chrome's side panel; the page, its code and its messages are the shipped ones, but Chrome's side-panel surface itself was not exercised",
     "the harness operated the panel's controls as an operator; no person was in the loop",
-    "perception ran the product's no-gesture floor: no frame was captured (no toolbar invocation occurred), and none left the client",
+    "a product task takes no perception pass (M23.7): no frame was captured or asked for, and none left the client",
   ],
   recordedAt: new Date().toISOString(),
   provenance: { ...provenanceOf(WS), os: `${process.platform} ${osRelease()}`, cpu: cpus()[0]?.model ?? "unknown", node: process.version, playwright: require2("playwright/package.json").version, headless: false },

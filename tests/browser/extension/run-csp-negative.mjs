@@ -36,6 +36,7 @@ import { cpus, release as osRelease, tmpdir } from "node:os";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { Cdp } from "../support/cdp-offscreen.mjs";
+import { ortSmokeCheck } from "../support/csp-product-phase.mjs";
 import { startFrameSink } from "../support/frame-sink.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
@@ -291,10 +292,9 @@ async function attackPhase({ name, expectSinkReachable }) {
       : Object.values(P.attacks).every((v) => v.sinkArrivals.length === 0),
     offscreenReloadsWithoutViolation: P.legitimate.offscreenReloadViolations.length === 0,
     // M23.7 (OD-P): only an evidence build packages the UI head. A product build must still bootstrap the
-    // pinned ORT runtime under this CSP, and must say the UI head is absent rather than load it.
-    ...(name === "evidence"
-      ? { ortAndModelLoad: P.legitimate.ortSmoke?.ok === true || P.legitimate.ortSmoke?.status === "OK" || P.legitimate.ortSmoke?.sessionCreated === true }
-      : { ortRuntimeWithoutUiHead: P.legitimate.ortSmoke?.ortBootstrapped === true && P.legitimate.ortSmoke?.stage === "UI_HEAD_NOT_IN_PRODUCT_BUILD" }),
+    // pinned ORT runtime under this CSP, and must say the UI head is absent rather than load it. M23.8: the
+    // condition lives in `csp-product-phase.mjs`, so it can be tested without running this harness.
+    ...ortSmokeCheck(name, P.legitimate.ortSmoke),
     sidePanelStyledAndRunning: P.legitimate.sidePanel.bodyMargin === "12px" && P.legitimate.sidePanel.hostStatus === "ok" && P.legitimate.sidePanel.violations.length === 0,
     ...(name === "evidence" ? { perceptionPassUnderNewCsp: P.legitimate.perceptionPass.error === null && P.legitimate.perceptionPass.detectorRan === true && P.legitimate.perceptionPass.violationsDuringPass.length === 0, tr01WorkerAttacked: P.tr01WorkerAttached === true } : {}),
   };
