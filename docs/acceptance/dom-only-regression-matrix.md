@@ -1,9 +1,10 @@
-# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10)
+# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11)
 
 > **Status:** what M23.8's tests establish about M23.7's boundary (M23.8, 2026-11-04, at `740a245` plus tests).
 > - **What "behavioural" means here:** the real `background.ts`, `offscreen/main.ts`, task run, orchestrator, privacy boundary, execution gate and egress guard ran in Node under a fake `chrome`, with every capture, model and worker API counted (`apps/extension/test/support/simulatedExtension.ts`). **It is a model of a browser, not a browser.**
 > - **Evidence type:** in the terms of `core-product-acceptance-PROPOSED.md` §4, all of this is **type A** (unit and integration). None of it is type B to H. **No browser ran. No acceptance criterion is approved or re-rated by it.**
 > - **Nothing real was involved:** no frame, no model file, no worker, no model server.
+> - **M23.11:** §8 adds OD-U. Tests and a mutation check; neither harness was run.
 > - **M23.10:** §7 adds OD-V. Tests and a mutation check; no harness was run.
 > - **M23.9:** §6 adds OD-S. It is the one row here with a real build behind it. That build was made and read, not run.
 
@@ -122,6 +123,26 @@ Commands, exit codes and counts: `artifacts/experiments/M23.9-diagnostic-hook-is
 | Nothing unexamined reads as checked | (12): a missing build is a problem; a dry run is `DRY_RUN_NOT_EVIDENCE`. The real product build alone gets `NOT_EXAMINED` | **unit**; **real build output** | PASS | — |
 | All six wired, with their own checks kept | `build-separation.test.mjs`, seven tests per harness, read as text | **static** | PASS | **a real run of any of them** |
 | The checks catch regressions | 58 deliberate mutations, 58 caught (`w1-m23-10-mutation-check.json`) | **mutation** | PASS | — |
-| OD-U harnesses not touched | not wired into the contract (test); no diff | **static**; `git diff` | UNCHANGED | — |
+| OD-U harnesses not touched | not wired into the contract (test); no diff | **static**; `git diff` | UNCHANGED *(M23.10; see §8)* | — |
 
 Commands, exit codes and counts: `artifacts/experiments/M23.10-evidence-harness-reconciliation/decision.md`.
+
+## 8. OD-U: the two gesture harnesses (M23.11)
+
+| Requirement | Actual evidence | Kind | Result | Not established |
+|---|---|---|---|---|
+| Product build refused | the real product build: identity `PRODUCT`, refused | **real build output**, gate called directly; **unit** | PASS | — |
+| Evidence build accepted by the selection logic | synthetic evidence builds | **unit** | PASS | **a real evidence build** |
+| Missing artifacts fail closed | each missing file, and an empty directory | **unit** | PASS | — |
+| Unknown identity fails closed | 14 disagreeing builds, each required name alone, and an unreadable manifest | **unit** | PASS | — |
+| No automatic build | no child process or build command in either harness; no `process.env` in the contract | **static** | PASS | — |
+| No browser on refusal | the gate runs first, unconditionally, read from both harnesses; a fake browser never starts | **static**; **unit** | PASS | — |
+| Assertions preserved | both `checks` blocks pinned by SHA-256 to `20914f1`; 41 names | **static** | UNCHANGED | **whether they pass** |
+| Output schema | record fields, `build` entries and file names | **static** | UNCHANGED | — |
+| Grant and stream authority | each harness's sequence under a controlled gesture authority | **behavioural** (simulated) | PASS, those evaluated | a real browser |
+| One contract | both harnesses call one function; identity agrees with `judgeBuildSeparation` | **static**; **unit** | PASS | — |
+| Worker differences are not failures | no comparison in either harness; any worker's bytes accepted | **static**; **unit** | PASS | — |
+| The six OD-V harnesses | no diff; they do not take this gate; their 73 tests pass | `git diff`; **static** | UNCHANGED | — |
+| The checks catch regressions | 47 deliberate mutations, 47 caught | **mutation** | PASS | — |
+
+Commands, exit codes and counts: `artifacts/experiments/M23.11-gesture-harness-isolation/decision.md`.

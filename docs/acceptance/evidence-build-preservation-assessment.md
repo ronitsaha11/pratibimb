@@ -1,7 +1,7 @@
-# Evidence-build preservation assessment (M23.8, updated M23.9, M23.10)
+# Evidence-build preservation assessment (M23.8, updated M23.9, M23.10, M23.11)
 
-> **Status:** assessment at `740a245` (M23.8, 2026-11-04), updated for OD-S (M23.9). **§5 and §6 are the current position on the harnesses, and §5 corrects §1.**
-> - **No evidence build was made.** It would package the T1 asset, so none of M23.7, M23.8, M23.9 or M23.10 built one.
+> **Status:** assessment at `740a245` (M23.8, 2026-11-04), updated for OD-S (M23.9). **§5 to §7 are the current position on the harnesses, and §5 corrects §1.**
+> - **No evidence build was made.** It would package the T1 asset, so none of M23.7, M23.8, M23.9, M23.10 or M23.11 built one.
 > - **Runtime preservation of evidence builds is UNVERIFIED.** What follows establishes what the configuration selects and what the wiring asks for, under fakes. It does not establish that an evidence build runs.
 > - **No model file was loaded, read or hashed.**
 
@@ -29,6 +29,8 @@
 - **Any harness below.** None was run in M23.7 or M23.8.
 
 ## 3. Harnesses: what M23.7 changed for each (read, not run)
+
+*The first two rows are superseded by §7 (M23.11).*
 
 **"Evidence builds are unchanged" (M23.7) is true of builds with an evidence flag. It is not the whole story.** Two human-in-the-loop harnesses and one evaluation harness are defined on the *product* build, and M23.7 did not report the effect on them.
 
@@ -77,6 +79,22 @@ A separately authorised run: build with an evidence flag, then run an evidence h
 | Can an unexamined build read as checked? | **No:** a missing build is a problem, and a dry run has its own status | tests; a real product build |
 | Do the six pass from start to finish? | **UNKNOWN.** They need a person's click, a real browser, T1 and TR-01, and a separate authorisation | — |
 
-**Still needing the owner (OD-U):** `run-gesture-capture.mjs` and `run-gesture-acts.mjs` are not touched. `run-gesture-capture.mjs` still throws on a product build.
+*(M23.10 status; see §7.)* **Still needing the owner (OD-U):** `run-gesture-capture.mjs` and `run-gesture-acts.mjs` are not touched. `run-gesture-capture.mjs` still throws on a product build.
 
 **Evidence-build runtime preservation remains UNVERIFIED.**
+
+## 7. OD-U implemented (M23.11): read and tested, not run
+
+**`run-gesture-capture.mjs` and `run-gesture-acts.mjs` are evidence-build-only.** The inventory is in `artifacts/experiments/M23.11-gesture-harness-isolation/README.md` §3. All 41 checks are byte-identical to `20914f1`.
+
+| Question | Position | Evidence type |
+|---|---|---|
+| Is a product build refused before Chrome? | **Yes.** The real product build gets identity `PRODUCT`, refused | gate on a real build, called directly; order read from both harnesses |
+| Is a missing or unidentifiable build refused? | **Yes** | synthetic builds; a fake browser |
+| Would a real evidence build be accepted? | **UNVERIFIED.** Only synthetic ones have been. INFERENCE from the configuration and partly measured names. A wrong inference refuses | — |
+| Do the grant and stream checks hold under fakes? | **Yes,** those evaluated | simulated extension |
+| Do either harness's 41 checks pass today? | **UNKNOWN.** Each harness's only recorded real run passed on 2026-09-24 | — |
+
+**Before authorising a real run:** both harnesses would overwrite their tracked September records.
+
+**Evidence-build runtime validation remains outstanding.**

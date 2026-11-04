@@ -1,0 +1,241 @@
+{
+  "what": "each mutation was applied to one working-tree file, the gate's test file was run, and the file was restored. A non-zero exit means the mutation was caught. Neither harness was executed. No build, browser or model was involved.",
+  "testFile": "tests/browser/support/gesture-harness-gate.test.mjs",
+  "results": [
+    {
+      "mutation": "identity: anything is a product",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: a missing build is not reported",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: an unreadable build is called evidence",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: disagreeing signals are called evidence",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: ignore connect-src",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: ignore missing worker names",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: ignore missing offscreen names",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: T1 not needed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: TR-01 not needed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: ORT not needed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: an unsubstituted flag is fine",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: the manifest is not held to the product's",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: the worker route and <all_urls> may disagree",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identity: E6 not looked for",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "selection: a missing build accepted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "selection: a product build accepted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "selection: an unknown build accepted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "selection: the worker-frame build accepted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "selection: the E6 build accepted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "gate: never calls refuse",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "gate: an environment variable skips it",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a refusal suggests building a product",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "another harness takes the gate",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: the gate removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: the gate moved after Chrome",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: the gate made conditional",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: a build step added",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: its <all_urls> guard removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: its captureVisibleTab guard removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: a check made vacuous",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: a record field dropped",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: described as the product's again",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: a verdict that ignores failed checks",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: its own identity logic added",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M4: compares workers across builds",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: the gate removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: the gate moved after Chrome",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: the gate made conditional",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: a build step added",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: its <all_urls> guard removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: its captureVisibleTab guard removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: a check made vacuous",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: a record field dropped",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: described as the product's again",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: a verdict that ignores failed checks",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: its own identity logic added",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "M5: compares workers across builds",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}

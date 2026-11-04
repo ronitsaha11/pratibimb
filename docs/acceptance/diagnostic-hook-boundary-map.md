@@ -1,6 +1,7 @@
-# Diagnostic-hook reachability and boundary map (M23.8, updated M23.9, M23.10)
+# Diagnostic-hook reachability and boundary map (M23.8, updated M23.9, M23.10, M23.11)
 
 > **Status (M23.9, 2026-11-04): OD-S Option B is implemented. Both hooks exist only in an evidence build.** A real product build was inspected and contains neither (`artifacts/experiments/M23.9-diagnostic-hook-isolation/`). §1, §2, §6 and §8 are current. §3 to §5 are the M23.8 audit, and now describe an evidence build.
+> - **M23.11 (OD-U):** no hook changed. Two more harnesses that call these hooks are now evidence-build-only: §10.
 > - **M23.10 (OD-V):** no hook changed. Six harnesses now check this boundary through a contract: §9.
 > - **M23.8's audit:** of `PERCEIVE_ONCE` and `STREAM_CONSUME` at `740a245` (2026-11-04).
 > - **Method:** source reading, an inspection of the existing M23.7 product build, and tests that run the real handlers through the real listeners under a fake `chrome` (`apps/extension/test/diagnosticHooks.test.ts`).
@@ -131,3 +132,9 @@
 | The product's and the evidence build's workers differ | they are identical, so a gate has been lost |
 
 **This reads built files. It does not establish that a hook works.** No harness has run, and evidence-build behaviour stays UNVERIFIED at run time.
+
+## 10. Which harnesses may reach these hooks (M23.11, OD-U)
+
+`run-gesture-capture.mjs` calls `consumeProbe`, `perceiveOnce`, `ticketProbe` and `mintStreamId`. `run-gesture-acts.mjs` calls none of them, but its tasks reach `CAPTURE_FRAME` through a perception pass, which only an evidence build has. **Both are now evidence-build-only,** refused on a product build before Chrome can start.
+
+`identifyBuild` in `tests/browser/support/build-separation.mjs` decides, from `connect-src`, the hooks' names and T1's presence by file name. It adds no access to a hook and changes no check on one. **No real evidence build has been examined:** that the gate accepts one is shown on synthetic builds only.

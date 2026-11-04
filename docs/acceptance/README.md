@@ -1,7 +1,8 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
-> - **M23.10:** **OD-V is implemented:** six evidence harnesses judge a build-separation contract instead of requiring equal workers. None was run, and evidence-build runtime stays unverified. OD-T and OD-U await the owner. See `artifacts/experiments/M23.10-evidence-harness-reconciliation/`.
+> - **M23.11:** **OD-U is implemented:** the two gesture harnesses are evidence-build-only, and refuse a product build before Chrome can start. Neither was run, and evidence-build runtime validation is outstanding. OD-T awaits the owner. See `artifacts/experiments/M23.11-gesture-harness-isolation/`.
+> - **M23.10:** **OD-V is implemented:** six evidence harnesses judge a build-separation contract instead of requiring equal workers. None was run. See `artifacts/experiments/M23.10-evidence-harness-reconciliation/`.
 > - **M23.9:** **OD-S (Option B) is implemented in product builds:** a real product build contains neither diagnostic hook. Not browser-verified. See `artifacts/experiments/M23.9-diagnostic-hook-isolation/`.
 > - **M23.8:** the boundary is **tested under a simulated extension**, not a browser. Diagnostic hooks were audited and left unchanged. See `artifacts/experiments/M23.8-dom-only-boundary-assurance/`.
 > - **M23.7:** the DOM-only Phase 1 is **implemented in product builds** (owner-authorised; not browser-verified; not accepted). See `artifacts/experiments/M23.7-dom-only-implementation/`.
@@ -77,7 +78,7 @@
 | `adr-0015-od-r-clauses-PROPOSED.md` | M23.5: ADR-0015 clause drafts for each OD-R outcome; not applied |
 | `dom-only-regression-matrix.md` | M23.8: M23.7's boundary, requirement by requirement, with what was tested and how, and what was not |
 | `diagnostic-hook-boundary-map.md` | M23.8, updated M23.9: who can reach `PERCEIVE_ONCE` and `STREAM_CONSUME` (since M23.9, in evidence builds only), what they do, and the route classification |
-| `od-s-diagnostic-hooks-comparison-PROPOSED.md` | M23.8: retain, evidence builds only, or remove. **The owner selected B; M23.9 implemented it,** and corrects what M23.8 said about evidence workflows. Also OD-T, OD-U, and OD-V (implemented, M23.10) |
+| `od-s-diagnostic-hooks-comparison-PROPOSED.md` | M23.8: retain, evidence builds only, or remove. **The owner selected B; M23.9 implemented it,** and corrects what M23.8 said about evidence workflows. Also OD-T, and OD-U and OD-V (implemented, M23.11 and M23.10) |
 | `evidence-build-preservation-assessment.md` | M23.8: what the configuration selects, what each harness now needs, and what is unverified at run time |
 | `dom-only-browser-smoke-procedure-PROPOSED.md` | M23.8: a person-run procedure for a separately authorised browser run. Not run |
 | `dom-only-phase-1-implementation-outline-PROPOSED.md` | M23.6: OD-R implications, and a dependency-ordered outline for the future, separately authorised DOM-only implementation |

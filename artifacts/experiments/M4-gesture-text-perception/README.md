@@ -160,6 +160,8 @@ understanding, production readiness. **The canvas identifier is not protected**,
 
 ## Reproducibility
 
+**Since M23.11 (OD-U) these steps no longer work as written:** this harness is evidence-build-only and refuses a product build. This record describes what ran at the time. A run now needs an evidence build and the owner's authorisation (`artifacts/experiments/M23.11-gesture-harness-isolation/`).
+
 ```bash
 npm run build -w @pratibimb/extension     # product build — required for gesture evidence
 CHROME_PATH="<chrome for testing 153>" node tests/browser/extension/run-gesture-capture.mjs

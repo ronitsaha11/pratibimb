@@ -1,6 +1,6 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.10, 2026-11-04):**
+> **Status (updated M23.11, 2026-11-04):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
@@ -8,7 +8,8 @@
 > - **Prepared in M23.8:** OD-S, OD-T and OD-U.
 > - **Selected and implemented in M23.9:** **OD-S: APPROVED — OPTION B** (2026-11-04), implemented in product builds. **Not browser-verified.**
 > - **Selected and implemented in M23.10:** **OD-V** (2026-11-04), in the six harness contracts. **No harness was run.**
-> - **Awaiting the owner:** OD-T and OD-U.
+> - **Selected and implemented in M23.11:** **OD-U: OPTION B** (2026-11-04), in the two gesture harnesses. **Neither was run.**
+> - **Awaiting the owner:** OD-T.
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -383,7 +384,7 @@ Each sub-decision is separate.
 |---|---|---|---|
 | OD-S | **Diagnostic capture hooks** (`PERCEIVE_ONCE`, `STREAM_CONSUME`, the `__host` drivers): (A) retain in product builds, (B) move to evidence builds only, (C) remove | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `diagnostic-hook-boundary-map.md` | *(M23.8 status, superseded by M23.9 below:)* awaiting the owner |
 | OD-T | **The product's visible capture wording:** the side panel's "Click the toolbar button to let PratiBimb look at this tab" and the toolbar title "perceive this tab", neither true of a product task | same comparison document | **AWAITING OWNER APPROVAL.** A product text change |
-| OD-U | **`run-gesture-capture.mjs` and `run-gesture-acts.mjs`:** re-scope to an evidence build, or retire the four checks a product build can no longer pass | `evidence-build-preservation-assessment.md` §3 | **AWAITING OWNER APPROVAL** |
+| OD-U | **`run-gesture-capture.mjs` and `run-gesture-acts.mjs`:** re-scope to an evidence build, or retire the four checks a product build can no longer pass | `evidence-build-preservation-assessment.md` §3 | *(M23.8 status, superseded by M23.11 below:)* awaiting the owner |
 
 **Still awaiting the owner, unchanged:**
 - OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
@@ -435,11 +436,34 @@ Each sub-decision is separate.
 
 **Still awaiting the owner, unchanged by M23.10:**
 - **OD-T:** the product's visible capture wording.
-- **OD-U:** `run-gesture-capture.mjs` and `run-gesture-acts.mjs`, their build scope, and the four checks that cannot pass on a DOM-only product build. Not moved, retired, weakened or rewritten.
+- **OD-U:** *(M23.10 status, superseded by M23.11 below.)* `run-gesture-capture.mjs` and `run-gesture-acts.mjs`, their build scope, and the four checks that cannot pass on a DOM-only product build. Not moved, retired, weakened or rewritten.
 - OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
 - GOV-01, OD-E1, OD-K, OD-L, OD-M;
 - OD-A to OD-D, OD-G;
 - OD-H, OD-E2 to OD-E8.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.11 — status after OD-U
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-U | **OPTION B (owner, 2026-11-04):** `run-gesture-capture.mjs` and `run-gesture-acts.mjs` belong exclusively to the evidence-build workflow, with their assertions and purpose preserved | **M23.11: IMPLEMENTED in the harnesses, after the static and synthetic tests passed.** One fail-closed gate, called first. The real product build is refused. All 41 checks are byte-identical to `20914f1`. 47 of 47 deliberate regressions caught | **Neither harness was run; no evidence build was made. Evidence-build runtime validation is outstanding.** A real run would overwrite their tracked records (`artifacts/experiments/M23.11-gesture-harness-isolation/`) |
+
+**Remains implemented:** OD-P, OD-R, OD-S and OD-V. Not browser-verified, not accepted.
+
+**Still awaiting the owner, unchanged by M23.11:**
+- **OD-T:** the product's visible capture wording. Nothing changed.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**For the owner's next review of the PROPOSED criteria, not changed here:** `BRW-04` and the scope's "Capture: gesture-authorised" still read as product capability. See the M23.11 decision record.
 
 **Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
 

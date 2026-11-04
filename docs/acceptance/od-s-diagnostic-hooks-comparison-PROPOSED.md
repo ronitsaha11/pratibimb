@@ -2,7 +2,7 @@
 
 > **Status (M23.9, 2026-11-04): the owner selected Option B, and M23.9 implemented it in product builds** (`artifacts/experiments/M23.9-diagnostic-hook-isolation/`). Not browser-verified. The comparison below is as prepared in M23.8, with corrections marked.
 > - **Correction:** M23.8 said Option B left evidence workflows "unchanged where they already use an evidence flag". **That was wrong, and this comparison is what the owner decided from.** Six of those harnesses refuse unless both builds' `background.js` are byte-identical, and Option B means they cannot be. See OD-V below.
-> - **M23.9 decided nothing else here. Since then:** the owner selected OD-V, and M23.10 implemented it. OD-T and OD-U await the owner.
+> - **M23.9 decided nothing else here. Since then:** the owner selected OD-V and OD-U, implemented in M23.10 and M23.11. OD-T awaits the owner.
 > - **Basis:** `diagnostic-hook-boundary-map.md`.
 
 ## The question
@@ -52,7 +52,7 @@ M23.7 removed frame capture, T1 and TR-01 from ordinary product tasks. Two test-
 | **OD-T** | **The product's visible text still describes capture.** The side panel's Capture field says "Not authorised. Click the toolbar button to let PratiBimb look at this tab." The toolbar title says "PratiBimb: perceive this tab". A product task needs no such click and looks at no pixels (FACT: `host/sidepanel/main.ts`; build inspection). A person following the panel would be misled about what is happening | a product text change; applies under A, B and C |
 | **OD-U** | **`run-gesture-capture.mjs` and `run-gesture-acts.mjs` are defined on the product build, and M23.7 made some of their checks unreachable there:** `theDetectorRanOnThePinnedArtifact`, `fusionJoinedDomAndVision`, `everyCaptureUsedTheStreamRoute`, `successPerceivedVisually`. M23.7 did not report this. Whether to re-scope them to an evidence build, or retire those checks | test scope; applies under A and B |
 
-Neither is changed in M23.8 or M23.9. See `evidence-build-preservation-assessment.md` §3 and §5.
+Neither is changed in M23.8 or M23.9. See `evidence-build-preservation-assessment.md` §3 and §5. **M23.11 implemented OD-U (Option B, owner, 2026-11-04):** both harnesses are evidence-build-only. OD-T remains open.
 
 **OD-V was added by M23.9, and implemented by M23.10 (owner, 2026-11-04):** the guard is replaced by `tests/browser/support/build-separation.mjs`. As proposed below, plus a required difference between the workers and a required set of evidence hooks.
 

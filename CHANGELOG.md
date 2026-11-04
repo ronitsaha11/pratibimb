@@ -35,6 +35,11 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.11 — Gesture harnesses are evidence-build-only (OD-U, Option B; harnesses, tests and documentation only).**
+  `run-gesture-capture.mjs` and `run-gesture-acts.mjs` call one fail-closed gate first, which identifies a build from
+  `connect-src`, the hooks' names and T1's presence by file name. A product, missing or unidentifiable build is refused before
+  Chrome can start, and neither harness can build. All 41 checks are byte-identical to before. 47 of 47 deliberate
+  regressions caught. Neither harness or any build ran; evidence-build runtime validation is outstanding; OD-T awaits the owner.
 - **M23.10 — Evidence harnesses judge a build-separation contract (OD-V; harnesses, tests and documentation only).** Six
   harnesses no longer require product and evidence `background.js` to be byte-identical, which OD-S made impossible.
   `tests/browser/support/build-separation.mjs` requires product hooks absent, evidence hooks present, two evidence builds'
