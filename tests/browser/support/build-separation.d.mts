@@ -30,3 +30,19 @@ export function judgeBuildSeparation(builds?: {
   readonly measuredRoute: string;
   readonly establishes: string;
 };
+
+export type BuildIdentity = "PRODUCT" | "EVIDENCE" | "UNKNOWN" | "MISSING";
+type ExpectedFiles = { readonly ortFiles: readonly string[]; readonly tr01File: string };
+export function identifyBuild(
+  directory: string,
+  expected?: ExpectedFiles
+): { readonly identity: BuildIdentity; readonly reasons: readonly string[]; readonly workerFrameRoute: boolean; readonly e6Probe: boolean; readonly productProblems?: readonly string[] };
+export function selectGestureEvidenceBuild(
+  directory: string,
+  expected?: ExpectedFiles
+): { readonly accepted: boolean; readonly identity: BuildIdentity; readonly reasons: readonly string[]; readonly refusal: string | null };
+export function requireGestureEvidenceBuild(
+  directory: string,
+  refuse: (message: string) => void,
+  expected?: ExpectedFiles
+): ReturnType<typeof selectGestureEvidenceBuild>;

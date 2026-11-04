@@ -506,8 +506,9 @@ describe("what OD-S means for the harnesses", () => {
     // The contract itself is tested in `tests/browser/support/build-separation.test.mjs`.
   });
 
-  it("OD-U: the M4 harness is defined on the product build and calls two drivers that build no longer has", () => {
+  it("OD-U, implemented (M23.11): the M4 harness still calls both drivers, and is refused any build that lacks them", () => {
     const code = harness("run-gesture-capture");
+    expect(code).toContain("requireGestureEvidenceBuild(EXT, refuse);");
     expect(code).toContain("globalThis.__host.consumeProbe()");
     expect(code).toContain("globalThis.__host.perceiveOnce(tabId, frameId)");
     expect(code).toMatch(/rebuild WITHOUT M3_WORKER_FRAME=1/);

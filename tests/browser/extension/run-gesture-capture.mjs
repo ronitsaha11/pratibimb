@@ -14,14 +14,17 @@
  * stands in for a grant — the whole point is to exercise the browser's own security boundary, and a
  * boundary you talked your way around is not one you tested.
  *
- * WHAT IT RUNS ON. The **product build**: `host_permissions: ["http://127.0.0.1/*"]`, no
- * `<all_urls>`, and no `captureVisibleTab` anywhere in the bundle. It refuses to start otherwise, so
- * this evidence cannot accidentally be taken on the degraded build.
+ * WHAT IT RUNS ON (M23.11, OD-U). **An evidence build, and nothing else:** a DOM-only product build has no
+ * capture route and none of the hooks this calls. It also needs `host_permissions: ["http://127.0.0.1/*"]`,
+ * no `<all_urls>`, and no `captureVisibleTab` anywhere in the bundle, so this evidence cannot accidentally be
+ * taken on the degraded build. `tests/browser/support/build-separation.mjs` decides which build it was given.
+ * It refuses to start otherwise, and it never builds one. Until M23.7 this ran on the product build.
  *
  * WHAT IT PROVES, IF IT PASSES. That a person's click produces an `activeTab` grant; that the grant
  * mints an opaque handle; that the handle reaches the offscreen realm as a STRING; that
  * `getUserMedia` and `ImageCapture.grabFrame` turn it into an `ImageBitmap` in that realm; and that
- * the worker's own recording of everything it saw contains no pixels.
+ * the worker's own recording of everything it saw contains no pixels, in that evidence build. It says nothing
+ * about a product task, which captures nothing.
  *
  * Usage: CHROME_PATH="<chrome for testing>" node tests/browser/extension/run-gesture-capture.mjs
  */
@@ -32,6 +35,7 @@ import { join } from "node:path";
 import { cpus, release as osRelease, tmpdir } from "node:os";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
+import { requireGestureEvidenceBuild } from "../support/build-separation.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
 const WS = resolveWorkstation();
@@ -46,14 +50,20 @@ const refuse = (message) => {
   process.exit(2);
 };
 
+/**
+ * M23.11 (OD-U): THIS HARNESS IS EVIDENCE-BUILD-ONLY, AND IT CHECKS FIRST. Before Chrome, the fixture server or any
+ * prompt. It reads what is in `.output` and refuses a product build, a missing one, or one whose identity cannot be
+ * established. It never builds, and has nothing to fall back to.
+ */
+requireGestureEvidenceBuild(EXT, refuse);
+
 const require2 = createRequire(import.meta.url);
 const { chromium } = require2("playwright");
 const executablePath = process.env.CHROME_PATH;
 if (!executablePath || !existsSync(executablePath)) refuse("set CHROME_PATH to the Chrome for Testing binary");
-if (!existsSync(join(EXT, "manifest.json"))) refuse(`no built host at ${EXT} (run: npm run build -w @pratibimb/extension)`);
 
 /**
- * THIS EVIDENCE IS ABOUT THE PRODUCT BUILD, SO IT CHECKS THAT IT HAS ONE.
+ * THIS EVIDENCE IS ABOUT THE GESTURE ROUTE, SO IT CHECKS THAT IT HAS ONLY THAT.
  *
  * A gesture-route run taken on the degraded build would be worth nothing and would look identical
  * in the log. Both halves are checked: the manifest must not carry `<all_urls>`, and the bundle
@@ -66,7 +76,7 @@ if (hostPermissions.includes("<all_urls>")) {
   refuse("this build carries <all_urls>; rebuild WITHOUT M3_WORKER_FRAME=1 before taking gesture evidence");
 }
 if (workerSource.includes("tabs.captureVisibleTab")) {
-  refuse("this build contains a captureVisibleTab call; it is the degraded build, not the product one");
+  refuse("this build contains a captureVisibleTab call; it is the degraded build, not a gesture-route evidence build");
 }
 const buildHash = createHash("sha256").update(workerSource).digest("hex");
 
@@ -240,6 +250,7 @@ const record = {
     "one operator, one click, one page, one browser cell",
     "no claim about detection quality; the detector numbers here are CONDITIONAL as in M3.1",
     "no claim of production readiness",
+    "measured on an evidence build; a DOM-only product build has no capture route (OD-R, OD-S, OD-U)",
   ],
   build: { hostPermissions, backgroundSha256: buildHash, workerFrameEnabled: false },
   recordedAt: new Date().toISOString(),

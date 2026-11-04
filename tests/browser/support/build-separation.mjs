@@ -26,11 +26,11 @@
  * `inspectProductBuild` reads model files by name only.
  */
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { connectSrcOf, manifestRouteSha } from "./build-route.mjs";
-import { PRODUCT_CSP } from "./csp-product-phase.mjs";
+import { PRODUCT_CSP, productManifestProblems } from "./csp-product-phase.mjs";
 import { EXPECTED_PRODUCT_FILES, inspectProductBuild } from "./product-build-inspection.mjs";
 
 /** The one permitted `connect-src` for an evidence build (ADR-0013). */
@@ -144,4 +144,97 @@ export function judgeBuildSeparation({ product = null, reference = null, evidenc
     measuredRoute: "the evidence build's",
     establishes: "what the built files contain; not that either build runs",
   };
+}
+
+/**
+ * M23.11 (OD-U) — WHICH BUILD IS THIS? Asked of what the build contains, because a directory's name proves nothing:
+ * every variant is written to the same `.output/chrome-mv3`.
+ *
+ * No marker is invented. These are the differences the build configuration already makes:
+ *   - `connect-src`, which `wxt.config.ts` selects by build type (ADR-0013);
+ *   - the hooks' names, which are in one build and not the other (M23.9);
+ *   - T1, packaged only in an evidence build (M23.7), judged by file name and never opened.
+ *
+ * EVERY SIGNAL MUST AGREE, or the answer is UNKNOWN. A build with the product's policy and an evidence build's
+ * hooks is neither, and is treated as neither.
+ */
+export function identifyBuild(directory, expected = EXPECTED_PRODUCT_FILES) {
+  const needed = ["manifest.json", "background.js", join("content-scripts", "content.js"), "chunks"];
+  const missing = needed.filter((path) => !existsSync(join(directory, path)));
+  if (missing.length > 0) return { identity: "MISSING", reasons: missing.map((path) => `MISSING:${path.replace(/\\/g, "/")}`), workerFrameRoute: false, e6Probe: false };
+
+  let seen;
+  let manifest;
+  let workerText;
+  let offscreenText;
+  let contentText;
+  let rootFiles;
+  let productProblems;
+  try {
+    seen = snapshot(directory);
+    manifest = JSON.parse(readFileSync(join(directory, "manifest.json"), "utf8"));
+    workerText = readFileSync(join(directory, "background.js"), "utf8");
+    contentText = readFileSync(join(directory, "content-scripts", "content.js"), "utf8");
+    offscreenText = readdirSync(join(directory, "chunks"))
+      .filter((name) => name.startsWith("offscreen-") && name.endsWith(".js"))
+      .map((name) => readFileSync(join(directory, "chunks", name), "utf8"))
+      .join("\n");
+    rootFiles = readdirSync(directory);
+    productProblems = inspectProductBuild(directory, expected).problems;
+  } catch {
+    return { identity: "UNKNOWN", reasons: ["UNREADABLE_BUILD"], workerFrameRoute: false, e6Probe: false };
+  }
+
+  const e6Probe = contentText.includes("E6_CLICK") || contentText.includes("E6_TYPE");
+  if (productProblems.length === 0) return { identity: "PRODUCT", reasons: [], workerFrameRoute: false, e6Probe };
+
+  // M3_WORKER_FRAME is one flag bringing the route and `<all_urls>` together, so one without the other is not a build.
+  const allUrls = seen.hostPermissions.includes("<all_urls>");
+  const workerFrame = workerText.includes("tabs.captureVisibleTab");
+  const reasons = [];
+  if (allUrls !== workerFrame) reasons.push("WORKER_FRAME_ROUTE_AND_ALL_URLS_DISAGREE");
+  if (seen.connectSrc !== EVIDENCE_CONNECT_SRC) reasons.push("CONNECT_SRC_IS_NOT_THE_EVIDENCE_POLICY");
+  for (const name of EVIDENCE_REQUIRED_NAMES.worker) if (!seen.workerNames.includes(name)) reasons.push(`WORKER_LACKS:${name}`);
+  for (const name of EVIDENCE_REQUIRED_NAMES.offscreen) if (!seen.offscreenNames.includes(name)) reasons.push(`OFFSCREEN_LACKS:${name}`);
+  if (!rootFiles.includes("t1-ui-head.onnx")) reasons.push("T1_NOT_PACKAGED");
+  if (!rootFiles.includes(expected.tr01File)) reasons.push("TR01_NOT_PACKAGED");
+  for (const file of expected.ortFiles) if (!rootFiles.includes(file)) reasons.push(`ORT_FILE_MISSING:${file}`);
+  if (offscreenText.includes("__EVIDENCE_BUILD__")) reasons.push("EVIDENCE_FLAG_NOT_SUBSTITUTED");
+  // The evidence policy is the product's with one source widened (ADR-0013), so everything else is held to the product's.
+  const asProduct = structuredClone(manifest);
+  const csp = asProduct.content_security_policy?.extension_pages;
+  if (typeof csp === "string") asProduct.content_security_policy.extension_pages = csp.replace(/connect-src [^;]*/, `connect-src ${PRODUCT_CSP["connect-src"]}`);
+  if (allUrls && workerFrame) asProduct.host_permissions = seen.hostPermissions.filter((host) => host !== "<all_urls>");
+  for (const problem of productManifestProblems(asProduct)) reasons.push(`MANIFEST:${problem}`);
+
+  return reasons.length === 0
+    ? { identity: "EVIDENCE", reasons: [], workerFrameRoute: workerFrame, e6Probe }
+    : { identity: "UNKNOWN", reasons, productProblems, workerFrameRoute: workerFrame, e6Probe };
+}
+
+/**
+ * M23.11 (OD-U) — MAY A GESTURE HARNESS RUN ON THIS BUILD? Only on an evidence build with the gesture route alone.
+ *
+ * It decides and starts nothing, and it has no way to build. So a refusal cannot be turned into a run by a fallback.
+ * The two refusals inside the evidence family carry over what these harnesses have always needed: the degraded
+ * worker-frame route would look identical in their logs, and E6's content-script mechanisms consult no permit, so a
+ * click count taken beside them would not be a count of what the gates allowed.
+ */
+export function selectGestureEvidenceBuild(directory, expected = EXPECTED_PRODUCT_FILES) {
+  const found = identifyBuild(directory, expected);
+  const AUTHORISE = "These harnesses never build one. An evidence build and a run each need the owner's authorisation.";
+  let refusal = null;
+  if (found.identity === "MISSING") refusal = `no build to examine (${found.reasons.join(", ")}). There is no fallback to any other build. ${AUTHORISE}`;
+  else if (found.identity === "PRODUCT") refusal = `this is a product build. OD-U: this harness is evidence-build-only, because a DOM-only product has no capture route and no diagnostic hooks. ${AUTHORISE}`;
+  else if (found.identity !== "EVIDENCE") refusal = `this build's identity cannot be established, so it is refused (${found.reasons.join(", ")}). ${AUTHORISE}`;
+  else if (found.workerFrameRoute) refusal = "this evidence build carries the degraded worker-frame route (M3_WORKER_FRAME=1); gesture evidence taken on it would look identical in the log. Use an evidence build without that flag";
+  else if (found.e6Probe) refusal = "this evidence build carries E6's content-script mechanisms (E6_PROBE=1), which consult no permit. Use an evidence build without that flag";
+  return { accepted: refusal === null, identity: found.identity, reasons: found.reasons, refusal };
+}
+
+/** The gate both gesture harnesses call first. `refuse` is theirs, and exits. */
+export function requireGestureEvidenceBuild(directory, refuse, expected = EXPECTED_PRODUCT_FILES) {
+  const selection = selectGestureEvidenceBuild(directory, expected);
+  if (!selection.accepted) refuse(selection.refusal);
+  return selection;
 }

@@ -323,9 +323,10 @@ describe("the six harnesses, read as text", () => {
     }
   });
 
-  it("OD-U is not resolved: the two gesture harnesses are not wired into this contract", () => {
+  it("the two gesture harnesses use this module's gate and not this comparison: they make no builds to compare (OD-U, M23.11)", () => {
     for (const name of ["run-gesture-capture", "run-gesture-acts"]) {
-      expect(harness(name), name).not.toMatch(/build-separation|judgeBuildSeparation/);
+      expect(harness(name), name).toContain("requireGestureEvidenceBuild(EXT, refuse);");
+      expect(harness(name), name).not.toMatch(/judgeBuildSeparation|snapshotEvidenceBuild/);
     }
     expect(harness("run-gesture-capture")).toContain("globalThis.__host.consumeProbe()");
   });

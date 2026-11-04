@@ -13,9 +13,12 @@
  * or permit from the previous one could still apply. So a person authorises each act separately,
  * which is what a per-invocation grant means.
  *
- * IT RUNS ON THE PRODUCT BUILD and refuses to start on any other: it reads the built manifest and
- * the built worker and stops if `<all_urls>` is present or `captureVisibleTab` appears anywhere.
- * Evidence for the product route taken on the degraded build would look identical in the log.
+ * IT RUNS ON AN EVIDENCE BUILD AND REFUSES TO START ON ANY OTHER (M23.11, OD-U). A DOM-only product task takes
+ * no perception pass, so several of these checks could never hold on a product build; they are kept, and they
+ * belong here. `tests/browser/support/build-separation.mjs` decides which build it was given, and it never builds
+ * one. It also reads the built manifest and the built worker and stops if `<all_urls>` is present or
+ * `captureVisibleTab` appears anywhere: evidence for the gesture route taken on the degraded build would look
+ * identical in the log. Until M23.7 this ran on the product build.
  *
  * Usage: CHROME_PATH="<chrome for testing>" node tests/browser/extension/run-gesture-acts.mjs
  */
@@ -26,6 +29,7 @@ import { join } from "node:path";
 import { cpus, release as osRelease, tmpdir } from "node:os";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
+import { requireGestureEvidenceBuild } from "../support/build-separation.mjs";
 import { startReasonerService } from "../demo/reasoner-service.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 import { attribute, installProbe, SEQUENCE_LENGTH } from "./single-action-probe.mjs";
@@ -46,11 +50,17 @@ const refuse = (message) => {
   process.exit(2);
 };
 
+/**
+ * M23.11 (OD-U): THIS HARNESS IS EVIDENCE-BUILD-ONLY, AND IT CHECKS FIRST. Before Chrome, the fixture server or any
+ * prompt. It reads what is in `.output` and refuses a product build, a missing one, or one whose identity cannot be
+ * established. It never builds, and has nothing to fall back to.
+ */
+requireGestureEvidenceBuild(EXT, refuse);
+
 const require2 = createRequire(import.meta.url);
 const { chromium } = require2("playwright");
 const executablePath = process.env.CHROME_PATH;
 if (!executablePath || !existsSync(executablePath)) refuse("set CHROME_PATH to the Chrome for Testing binary");
-if (!existsSync(join(EXT, "manifest.json"))) refuse(`no built host at ${EXT} (run: npm run build -w @pratibimb/extension)`);
 
 const manifest = JSON.parse(readFileSync(join(EXT, "manifest.json"), "utf8"));
 const workerSource = readFileSync(join(EXT, "background.js"), "utf8");
@@ -324,7 +334,7 @@ const record = {
     "a person clicked the extension's toolbar action once per act; Chrome revokes activeTab on " +
     "navigation and each act begins with a fresh document, so each act was authorised separately",
   claim:
-    "the complete product loop — capture, local perception, fusion, sanitization, reasoner, plan, " +
+    "the complete loop in an evidence build — capture, local perception, fusion, sanitization, reasoner, plan, " +
     "validation, human authorization, capability release, local rehydration, one guarded click and " +
     "result verification — on frames a person authorised, obtained through an opaque handle the " +
     "worker could not read",
@@ -334,6 +344,7 @@ const record = {
     "detector numbers remain CONDITIONAL; no accuracy claim",
     "no local text perception: the tier reports its own absence",
     "no claim of production readiness",
+    "measured on an evidence build; a DOM-only product task captures nothing and runs no detector (OD-R, OD-S, OD-U)",
   ],
   build: { hostPermissions, backgroundSha256: buildHash },
   recordedAt: new Date().toISOString(),
