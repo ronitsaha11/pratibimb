@@ -23,6 +23,7 @@ import { join, relative as relativePath } from "node:path";
 import { build as bundle } from "esbuild";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { evidenceReferenceFlags } from "../../../tests/browser/support/build-separation.mjs";
 import { parseCsp, PRODUCT_CSP, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
 import { EXPECTED_PRODUCT_FILES } from "../../../tests/browser/support/product-build-inspection.mjs";
 import { ORT_PIN } from "../../../packages/security/src/generated/ortPin";
@@ -172,6 +173,9 @@ interface GateRemoved {
   readonly replacement: string;
 }
 
+/** Which source files each entry point took, from the last bundle: its module graph, with the product's flags. */
+let lastInputs: Readonly<Record<string, readonly string[]>> = {};
+
 /** The extension's own code as `wxt.config.ts`'s product flags and aliases leave it: entry point to text. */
 async function productBundle(removed?: GateRemoved): Promise<Readonly<Record<string, string>>> {
   const config = await loadConfig();
@@ -195,6 +199,7 @@ async function productBundle(removed?: GateRemoved): Promise<Readonly<Record<str
     treeShaking: true,
     minifySyntax: true,
     logLevel: "silent",
+    metafile: true,
     define: { ...vite.define },
     plugins: [
       {
@@ -217,6 +222,7 @@ async function productBundle(removed?: GateRemoved): Promise<Readonly<Record<str
       },
     ],
   });
+  lastInputs = Object.fromEntries(Object.entries(result.metafile.outputs).map(([output, meta]) => [output.replace(/\\/g, "/").replace(/^in-memory\//, ""), Object.keys(meta.inputs)]));
   return Object.fromEntries(result.outputFiles.map((file) => [relativePath(join(APP, "in-memory"), file.path).replace(/\\/g, "/"), file.text]));
 }
 
@@ -295,6 +301,40 @@ describe("M23.9 (OD-S) — the product bundle, from source: what its flags and a
       }, 30_000);
     }
   });
+});
+
+describe("M23.10 (OD-V) — why two evidence builds' workers should match: the configuration, and the worker's own imports", () => {
+  const reference = Object.keys(evidenceReferenceFlags()) as Flag[];
+
+  it("the reference flag is one of the real five, and not the build under test's", () => {
+    expect(reference).toEqual(["STRUCTURAL_PROBE"]);
+    expect(FLAGS).toContain(reference[0]);
+    expect(reference).not.toContain("TR01_PROBE");
+  });
+
+  it("with either flag, the configuration substitutes the same values and writes the same manifest", async () => {
+    const underTest = await loadConfig(["TR01_PROBE"]);
+    const definesAndManifest = { define: underTest.vite().define, manifest: underTest.manifest };
+    const other = await loadConfig(reference);
+    expect({ define: other.vite().define, manifest: other.manifest }).toEqual(definesAndManifest);
+  });
+
+  it("they differ only in aliases the worker does not import, because its module graph has no probe", async () => {
+    const underTest = (await loadConfig(["TR01_PROBE"])).alias;
+    const other = (await loadConfig(reference)).alias;
+    const differing = Object.keys(underTest).filter((name) => underTest[name] !== other[name]);
+    expect(differing.sort()).toEqual(["#structural-probe", "#tr01-instrument", "#tr01-probe"]);
+    await productBundle();
+    const workerInputs = lastInputs["host/background.js"];
+    expect(workerInputs?.length, "the worker's module graph was read").toBeGreaterThan(3);
+    // With a product's flags each alias resolves to a stub under `probe/` or `e6/`, so a worker importing one would show it.
+    expect(workerInputs!.filter((input) => /(^|\/)(probe|e6)\//.test(input))).toEqual([]);
+    // The offscreen document does take them, so the search can find one.
+    expect(lastInputs["host/offscreen/main.js"]!.filter((input) => /(^|\/)probe\//.test(input)).length).toBeGreaterThan(0);
+  }, 30_000);
+
+  // This establishes an expectation, not a fact: no evidence build was compared here. A harness's real run
+  // makes the comparison, and refuses if the expectation is wrong.
 });
 
 describe("TR-01's integrity check is unchanged, in every build", () => {

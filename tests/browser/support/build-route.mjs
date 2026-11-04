@@ -6,6 +6,10 @@
  * build names the whole collector origin (its test sink). Everything else in the manifest must still
  * be byte-identical, so the route hash covers the manifest with that ONE source normalised, and the
  * difference itself is recorded and checked separately — never ignored.
+ *
+ * M23.10 (OD-V): the worker is no longer part of what must match across those two builds. A product build has no
+ * capture route, and `build-separation.mjs` holds the contract that replaced that comparison. The manifest
+ * comparison here is unchanged.
  */
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";

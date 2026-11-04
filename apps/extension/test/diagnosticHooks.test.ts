@@ -492,18 +492,18 @@ describe("ORT_SMOKE: the M13 harness's positive control, unchanged by OD-S", () 
   });
 });
 
-describe("what OD-S costs the harnesses: pinned, and not changed here. Each is an owner decision", () => {
+describe("what OD-S means for the harnesses", () => {
   const harness = (name: string): string => readFileSync(new URL(`../../../tests/browser/extension/${name}.mjs`, import.meta.url), "utf8");
 
-  it("OD-V: six evidence harnesses refuse unless the two builds' workers are byte-identical, and now they cannot be", () => {
+  it("OD-V, implemented (M23.10): six evidence harnesses expect the two builds' workers to differ, and judge them by a contract", () => {
     // The worker reads the flag, so a product and an evidence `background.js` must differ. That is OD-S itself.
     expect(withoutComments(read("host/background.ts"))).toMatch(/__EVIDENCE_BUILD__/);
     for (const name of ["run-gesture-redaction", "run-webp-loopback", "run-artifact-verifier", "run-capture-determinism", "run-stream-j7", "run-stream-re1"]) {
       const code = harness(name);
-      expect(code, name).toMatch(/background: (sha|shaFile)\(join\(EXT, "background\.js"\)\)/);
-      expect(code, name).toMatch(/routeIdenticalToProduct: JSON\.stringify\(\{ \.\.\.productRoute, connectSrc: null \}\) === JSON\.stringify\(\{ \.\.\.evidenceRoute, connectSrc: null \}\)/);
-      expect(code, name).toMatch(/if \((!DRY && )?!buildFacts\.routeIdenticalToProduct\) refuse\(/);
+      expect(code, name).not.toContain("routeIdenticalToProduct");
+      expect(code, name).toMatch(/if \(separation\.problems\.length > 0\) refuse\(/);
     }
+    // The contract itself is tested in `tests/browser/support/build-separation.test.mjs`.
   });
 
   it("OD-U: the M4 harness is defined on the product build and calls two drivers that build no longer has", () => {

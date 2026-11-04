@@ -33,6 +33,12 @@
  *
  * This is NOT a J7 re-run: one image, one scale, no RE-1 scoring, no gate verdict.
  *
+ * BUILDS (M23.10, OD-V): the product build, a reference evidence build (STRUCTURAL_PROBE=1), then the evidence
+ * build under test (TR01_PROBE=1). `tests/browser/support/build-separation.mjs` is the contract: the product has no
+ * diagnostic hook, the evidence build has them all, the two evidence builds' workers match, and the product's and
+ * the evidence build's workers differ. Their content scripts and manifest routes must still be byte-identical. A
+ * product build has no capture route (OD-R, OD-S), so this measures the evidence build's, and says nothing of a product's.
+ *
  * Usage: CHROME_PATH="<chrome for testing>" [M12_CD_N=10] [M12_CD_DPR=1] [M12_CD_IMAGE=H1] \
  *          node tests/browser/extension/run-capture-determinism.mjs
  */
@@ -46,6 +52,7 @@ import { isDeepStrictEqual } from "node:util";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { connectSrcOf, manifestRouteSha } from "../support/build-route.mjs";
+import { evidenceReferenceFlags, judgeBuildSeparation, snapshotEvidenceBuild, snapshotProductBuild } from "../support/build-separation.mjs";
 import { decodePng } from "../support/png-decode.mjs";
 import { fixturesDir } from "../support/m82-baseline.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
@@ -90,20 +97,30 @@ const build = (env) => execSync("npm run build", { cwd: APP, env: { ...process.e
 console.log("building the PRODUCT extension…");
 build({});
 const productRoute = routeFiles();
+const productBuild = snapshotProductBuild(EXT);
+console.log("building the REFERENCE evidence extension (another evidence flag, to compare workers)…");
+build(evidenceReferenceFlags({ dryRun: false }));
+const referenceBuild = snapshotEvidenceBuild(EXT);
 console.log("building the EVIDENCE extension (TR01_PROBE=1)…");
 build({ TR01_PROBE: "1" });
 const evidenceRoute = routeFiles();
+const evidenceBuild = snapshotEvidenceBuild(EXT);
+const separation = judgeBuildSeparation({ product: productBuild, reference: referenceBuild, evidence: evidenceBuild, dryRun: false });
 const buildFacts = {
   productRoute,
   evidenceRoute,
-  routeIdenticalToProduct: JSON.stringify({ ...productRoute, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, connectSrc: null }),
+  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical. The worker does not: since
+  // OD-S it must differ, and `separation` requires that, along with everything that replaced the comparison.
+  sharedRouteIdenticalToProduct: JSON.stringify({ ...productRoute, background: null, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, background: null, connectSrc: null }),
+  separation,
   connectSrcDiffersOnlyByCollector: productRoute.connectSrc === "'self' http://127.0.0.1:8995/v1/chat/completions" && evidenceRoute.connectSrc === "'self' http://127.0.0.1:8995",
   noCaptureVisibleTab: !readFileSync(join(EXT, "background.js"), "utf8").includes("captureVisibleTab"),
   tr01Sha256: TR01_SHA256,
 };
-if (!buildFacts.routeIdenticalToProduct) refuse(`the evidence build's capture route differs from the product's: ${JSON.stringify(buildFacts)}`);
+if (!buildFacts.sharedRouteIdenticalToProduct) refuse(`the evidence build's content script or manifest route differs from the product's: ${JSON.stringify(buildFacts)}`);
+if (separation.problems.length > 0) refuse(`the build-separation contract failed (${separation.problems.join(", ")}): ${JSON.stringify(buildFacts)}`);
 if (!buildFacts.connectSrcDiffersOnlyByCollector) refuse(`the evidence build's connect-src is not the product's widened to the collector origin: ${JSON.stringify(buildFacts)}`);
-if (!buildFacts.noCaptureVisibleTab) refuse("this is not the product capture route");
+if (!buildFacts.noCaptureVisibleTab) refuse("this is not the gesture capture route");
 
 const wait = (ms) => new Promise((ok) => setTimeout(ok, ms));
 const banner = (page, text) =>
@@ -126,7 +143,7 @@ const record = {
   invocationMethod: "a person clicked the extension's toolbar action once; nothing in this process produced, simulated or substituted for the click",
   notAJ7Run: "one image, one device scale, no RE-1 scoring and no gate verdict; this does not re-run J7 and does not alter G1-G4",
   config: { run: RUN, capturePasses: N, inferencesPerFixedInput: INFER, dpr: DPR, image: IMAGE, heldOutPngSha256: shaFile(PNG) },
-  frozen: { tr01Sha256: TR01_SHA256, detectorHost: "createTr01Host — the same factory the product wires at apps/extension/host/offscreen/main.ts:101, differing only in the instrumented worker spawn seam" },
+  frozen: { tr01Sha256: TR01_SHA256, detectorHost: "createTr01Host — the same factory the evidence build's realm wires in apps/extension/host/offscreen/main.ts, differing only in the instrumented worker spawn seam" },
   build: buildFacts,
   failure: null,
 };

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * M10.6 — THE REAL PRODUCT PERCEPTION PASS ON THE REAL GESTURE ROUTE. **HUMAN-IN-THE-LOOP.**
+ * M10.6 — THE REAL PERCEPTION PASS ON THE REAL GESTURE ROUTE, IN AN EVIDENCE BUILD. **HUMAN-IN-THE-LOOP.**
  *
  *   a person's toolbar click → activeTab → getMediaStreamId → offscreen getUserMedia → ImageBitmap
  *     → UI head → TR-01 (full frame, worker) → UNREAD_REGION → fail-closed plan → canonical geometry
@@ -10,12 +10,15 @@
  * runs first; the harness then stops and waits for one real click per browser window.
  *
  * BUILDS, done here so the evidence says what it ran:
- *   1. the PRODUCT build — its background.js, content.js and manifest are hashed;
- *   2. the EVIDENCE build (TR01_PROBE=1), which adds only the offscreen probe and the worker's
- *      measurement instrument. The run REFUSES unless its background.js, content.js and manifest are
- *      byte-identical to the product build's: the capture route, the permissions and the page side are
- *      the product's, exactly. No `<all_urls>`, no captureVisibleTab.
- *   3. After the run, the product build is restored in `.output`.
+ *   1. the PRODUCT build — its background.js, content.js and manifest are hashed, and it must carry no
+ *      diagnostic hook (M23.9);
+ *   2. a REFERENCE evidence build (STRUCTURAL_PROBE=1), to compare workers with (M23.10, OD-V);
+ *   3. the EVIDENCE build (TR01_PROBE=1), the build under test. The run REFUSES unless its content.js and
+ *      manifest route are byte-identical to the product build's, its worker matches the reference's and
+ *      differs from the product's, and it has every hook. `tests/browser/support/build-separation.mjs` is
+ *      the contract. The permissions and the page side are the product's. The capture route is the evidence
+ *      build's: a product build has none (OD-R, OD-S). No `<all_urls>`, no captureVisibleTab.
+ *   4. After the run, the product build is restored in `.output`.
  *
  * PER WINDOW (one per device scale; Chrome is launched with --force-device-scale-factor):
  *   preflight — fresh profile, extension loaded, fixture ready, content script attested, tab active,
@@ -27,7 +30,7 @@
  *   passes through the offscreen document's own `perceiveTab` (the PERCEIVE_ONCE path):
  *     cold, then N warm (latency); a pass with TR-01's deadline tightened to 50 ms (timeout → whole
  *     regions) and a recovery pass; two passes with a region corrupted INSIDE the realm (REFUSED);
- *     one plain product PERCEIVE_ONCE, whose reply is what the service worker received;
+ *     one plain PERCEIVE_ONCE, whose reply is what the service worker received;
  *   the pass TIMELINE — the realm's stage seam and the worker's DETECT post, in order, with the
  *   DETECT's dimensions (the full frame);
  *   RE-1 ON STREAM FRAMES (the DPR-1 window only; M9 J7): each frozen held-out screenshot is shown
@@ -53,6 +56,7 @@ import { redactionMask } from "../../../packages/privacy/src/redactionGeometry.t
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { scoreImage } from "../support/redaction-metrics.mjs";
 import { connectSrcOf, manifestRouteSha } from "../support/build-route.mjs";
+import { evidenceReferenceFlags, judgeBuildSeparation, snapshotEvidenceBuild, snapshotProductBuild } from "../support/build-separation.mjs";
 import { fixturesDir, loadBaseline } from "../support/m82-baseline.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
@@ -122,16 +126,25 @@ const build = (env) => execSync("npm run build", { cwd: APP, env: { ...process.e
 console.log("building the PRODUCT extension…");
 build({});
 const productRoute = routeFiles();
+const productBuild = snapshotProductBuild(EXT);
+console.log("building the REFERENCE evidence extension (another evidence flag, to compare workers)…");
+build(evidenceReferenceFlags({ dryRun: DRY }));
+const referenceBuild = snapshotEvidenceBuild(EXT);
 console.log(`building the EVIDENCE extension (TR01_PROBE=1${DRY ? ", M3_WORKER_FRAME=1 — DRY RUN" : ""})…`);
 build(DRY ? { TR01_PROBE: "1", M3_WORKER_FRAME: "1" } : { TR01_PROBE: "1" });
 const evidenceRoute = routeFiles();
+const evidenceBuild = snapshotEvidenceBuild(EXT);
+const separation = judgeBuildSeparation({ product: productBuild, reference: referenceBuild, evidence: evidenceBuild, dryRun: DRY });
 const manifest = JSON.parse(readFileSync(join(EXT, "manifest.json"), "utf8"));
 const background = readFileSync(join(EXT, "background.js"), "utf8");
 const offscreenChunks = readdirSync(join(EXT, "chunks")).filter((f) => f.startsWith("offscreen-")).map((f) => readFileSync(join(EXT, "chunks", f), "utf8")).join("");
 const buildFacts = {
   productRoute,
   evidenceRoute,
-  routeIdenticalToProduct: JSON.stringify({ ...productRoute, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, connectSrc: null }),
+  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical. The worker does not: since
+  // OD-S it must differ, and `separation` requires that, along with everything that replaced the comparison.
+  sharedRouteIdenticalToProduct: JSON.stringify({ ...productRoute, background: null, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, background: null, connectSrc: null }),
+  separation,
   // ADR-0013: the one permitted difference — the evidence build widens the reasoner endpoint to the collector origin.
   connectSrcDiffersOnlyByCollector: productRoute.connectSrc === "'self' http://127.0.0.1:8995/v1/chat/completions" && evidenceRoute.connectSrc === "'self' http://127.0.0.1:8995",
   hostPermissions: manifest.host_permissions ?? [],
@@ -141,8 +154,9 @@ const buildFacts = {
   probePresent: offscreenChunks.includes("TR01_PROBE_ONLY_FROM_SERVICE_WORKER"),
 };
 if (!DRY && !buildFacts.connectSrcDiffersOnlyByCollector) refuse(`the evidence build's connect-src is not the product's widened to the collector origin: ${JSON.stringify(buildFacts)}`);
-if (!DRY && !buildFacts.routeIdenticalToProduct) refuse(`the evidence build's capture route differs from the product's: ${JSON.stringify(buildFacts)}`);
-if (!DRY && (!buildFacts.noAllUrls || !buildFacts.noCaptureVisibleTab)) refuse("this is not the product capture route");
+if (!DRY && !buildFacts.sharedRouteIdenticalToProduct) refuse(`the evidence build's content script or manifest route differs from the product's: ${JSON.stringify(buildFacts)}`);
+if (separation.problems.length > 0) refuse(`the build-separation contract failed (${separation.problems.join(", ")}): ${JSON.stringify(buildFacts)}`);
+if (!DRY && (!buildFacts.noAllUrls || !buildFacts.noCaptureVisibleTab)) refuse("this is not the gesture capture route");
 if (!buildFacts.probePresent) refuse("the evidence build carries no probe");
 
 // ── helpers ─────────────────────────────────────────────────────────────────────────────────────
