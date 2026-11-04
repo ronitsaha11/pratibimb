@@ -2,6 +2,7 @@
 
 > **Status:** decision preparation for **OD-R** (frame capture after T1 removal). M23.5, 2026-11-03.
 > - **Nothing chosen or authorised:** no option is chosen, and none is authorised for implementation.
+> - **Since then:** M23.7 implemented OD-P and OD-R in product builds, and M23.8 tested the boundary under a simulated extension. Not browser-verified, not accepted. This document's statements about what the runtime does describe the source when it was written, and still describe evidence builds.
 > - **Context:** OD-P (T1 disabled from active Phase 1 execution) is selected but **not implemented.** T1 still loads and runs on passes that capture a frame.
 > - **Basis:** `frame-capture-and-consumer-map.md` and `fallback-test-evidence-matrix.md`.
 

@@ -3,6 +3,7 @@
 > **Status:** static source map at `a165c7a` (M23.5, 2026-11-03).
 > - **Nothing run or touched:** no frame was captured, no model was loaded, and no code was changed.
 > - **Labels:** FACT (source, cited), INFERENCE, or UNKNOWN.
+> - **Since then:** M23.7 took capture out of product tasks, so the chain below now describes evidence builds and the diagnostic path. M23.8 audited that path: `diagnostic-hook-boundary-map.md`.
 
 ## 1. The capture chain
 

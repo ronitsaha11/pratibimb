@@ -10,9 +10,9 @@ Phase 1 is **the current local, loopback-only, structure-based reasoning archite
 
 Vision-language and frame-based reasoning are Phase 2 (`phase-2-future-capability-register.md`). Phase 2 is **not authorised**.
 
-## 1.1 Owner-selected perception scope (OD-P, OD-R) — not implemented
+## 1.1 Owner-selected perception scope (OD-P, OD-R)
 
-**OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (owner, 2026-11-03), together with OD-P. Both are **SELECTED BY OWNER — IMPLEMENTATION NOT AUTHORISED**.
+**OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (owner, 2026-11-03), together with OD-P. **Status: implemented in product builds (M23.7); boundary tested under a simulated extension (M23.8); not browser-verified, not accepted.**
 
 **Excluded from normal Phase 1 task execution:**
 - browser-frame capture;
@@ -35,7 +35,7 @@ Vision-language and frame-based reasoning are Phase 2 (`phase-2-future-capabilit
 |---|---|---|
 | Browser | Chrome MV3 extension (WXT); run in Chrome for Testing 153 on W1. A `build:firefox` script exists; **the product has never been run in Firefox** | `apps/extension/`; M19, M20 |
 | Capture | gesture-authorised; structural change signal | ADR-0009, ADR-0010 |
-| Local perception | in the offscreen document:<br>• **T1** (UNADOPTED; bytes not integrity-checked) is loaded on the first perception call and runs on every pass that captures a frame. **Owner policy OD-P (M23.4): T1 is to be disabled from active Phase 1 execution. This is not yet implemented.** Its output is fused and can relabel the `source` of existing DOM elements, but adds no element to the handoff.<br>• **TR-01** (hash-verified) runs on a frame copy in a worker, and masks visual regions **in the local frame only**.<br>• No product code reads the sanitized frame.<br>• No face detector is in the product path (INFERENCE) | `apps/extension/host/offscreen/main.ts`; `apps/extension/host-lib/perception-realm.ts`; `docs/acceptance/t1-tr01-status-reconciliation.md` |
+| Local perception | in the offscreen document:<br>• **T1** (UNADOPTED; bytes not integrity-checked): **out of product builds since M23.7 (OD-P).** In an evidence build it is loaded on the first perception call and runs on every pass that captures a frame. Its output is fused and can relabel the `source` of existing DOM elements, but adds no element to the handoff.<br>• **TR-01** (hash-verified) runs on a frame copy in a worker, and masks visual regions **in the local frame only**.<br>• No product code reads the sanitized frame.<br>• No face detector is in the product path (INFERENCE) | `apps/extension/host/offscreen/main.ts`; `apps/extension/host-lib/perception-realm.ts`; `docs/acceptance/t1-tr01-status-reconciliation.md` |
 | Sanitisation | values become typed references; memory-only vault; ledger; verifier | `packages/privacy`; INV-04 to INV-10 |
 | Consent | just-in-time, one-time panel consent with a masked local preview | ADR-0014 |
 | Handoff | structure-only JSON (references, no frame, no value) | ADR-0012 §8 |

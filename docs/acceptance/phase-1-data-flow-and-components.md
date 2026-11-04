@@ -1,7 +1,7 @@
 # Phase 1 — actual data flow and components
 
 > **Status:** source-traced description of the product **as implemented**. M23.3, 2026-11-03, at `3e6a2e6`.
-> - **Updated M23.7:** this trace was made at `3e6a2e6`. **In a product build, M23.7 removed the task perception pass:** stages 1b and 2 (capture, T1, TR-01) no longer run in normal tasks, T1 is not packaged, and the handoff always declares the structural floor. **Evidence builds still follow the trace below.** See `artifacts/experiments/M23.7-dom-only-implementation/`.
+> - **Updated M23.7:** this trace was made at `3e6a2e6`. **In a product build, M23.7 removed the task perception pass:** stages 1b and 2 (capture, T1, TR-01) no longer run in normal tasks, T1 is not packaged, and the handoff always declares the structural floor. **Evidence builds still follow the trace below.** See `artifacts/experiments/M23.7-dom-only-implementation/`. **M23.8** tested this under a simulated extension (`dom-only-regression-matrix.md`) and audited what remains reachable (`diagnostic-hook-boundary-map.md`).
 > - **What it is not:** an acceptance statement. "Implemented" here means the code exists and is wired; it does **not** mean the behaviour is verified or accepted. Acceptance criteria remain **PROPOSED — AWAITING OWNER APPROVAL** (`core-product-acceptance-PROPOSED.md`).
 > - **The architecture decision:** recorded as proposed in `docs/adr/ADR-0015-phase-1-local-structure-only-architecture.md` (**PROPOSED — AWAITING OWNER APPROVAL**).
 > - **Method:** static source reading only. No model was loaded, no inference was run, and no frame or dataset was read.

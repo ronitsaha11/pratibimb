@@ -35,6 +35,14 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.8 — DOM-only boundary assurance and regression hardening (tests and documentation only).** A rig runs the real
+  worker, offscreen document, task run, gates and egress guard under a fake `chrome`, counting every capture, model and
+  worker request: an ordinary task leaves them all at zero, and a regression double fails the checks. Audits
+  `PERCEIVE_ONCE` and `STREAM_CONSUME`: both ship in the product bundle and accept any context of this extension,
+  correcting M23.7's "DevTools-only". Replaces the vacuous checks in two harnesses, extracts and tests M13's
+  product-phase condition, and adds a read-only build inspection. Prepares OD-S, OD-T and OD-U and a person-run smoke
+  procedure (not run). Finds that two M4 and M5 harnesses depend on the product build, which M23.7 did not report. No
+  browser ran; no product source, model, CSP, permission or ADR changed.
 - **M23.7 — DOM-only Phase 1 implemented in product builds (OD-P, OD-R).** `runTask` no longer wires a perception
   pass in a product build (`host-lib/task-perception.ts`, build-time `__EVIDENCE_BUILD__`), so a product task captures
   no frame and runs neither the UI head (T1) nor TR-01; the handoff always declares the structural floor. The UI head

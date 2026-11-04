@@ -1,9 +1,11 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.2, 2026-11-03):**
+> **Status (updated M23.8, 2026-11-04):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
-> - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03). **Implementation not authorised; runtime unchanged.**
+> - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
+> - **Implemented in M23.7 (owner-authorised), product builds only:** OD-P and OD-R. M23.8 tested the boundary under a simulated extension. **Neither is browser-verified or accepted.**
+> - **Prepared in M23.8:** OD-S, OD-T and OD-U. None is decided.
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -19,7 +21,9 @@
 | P-2 | **Phase 1 target architecture:** the current local, loopback, structure-only product | `phase-1-architecture-scope.md` | the *intended* architecture; **not** a claim of acceptance |
 | P-3 | **Original VLM and frame-based functionality deferred to Phase 2** | `phase-2-future-capability-register.md` | Phase 2 is **NOT AUTHORISED** for implementation or execution |
 
-## Selected by the owner, implementation not authorised (M23.4, M23.6)
+## Selected by the owner; implemented in product builds (M23.4, M23.6, M23.7)
+
+The table's Status and Limits columns are as recorded at selection. **Current status of both: implemented in product builds (M23.7); boundary tested under a simulated extension (M23.8); not browser-verified, not accepted.** See the M23.7 and M23.8 sections below.
 
 | ID | Decision | Status | Limits |
 |---|---|---|---|
@@ -312,7 +316,7 @@ Each sub-decision is separate.
 | GOV-01 | Phase 1 acceptance framework | — |
 | OD-E1 | QG-04-S scope | — |
 | OD-K / OD-L | formal document reconciliation | RC-01 to RC-12 |
-| **OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled** | **SELECTED (M23.6): Option A, DOM-only Phase 1.** Implementation not authorised (see the M23.6 section below) |
+| **OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled** | **SELECTED (M23.6): Option A, DOM-only Phase 1.** *(M23.4 status, superseded:)* implementation not authorised. **M23.7: implemented in product builds** (see the sections below) |
 
 ## M23.5 — OD-R prepared
 
@@ -327,6 +331,8 @@ Each sub-decision is separate.
 - OD-K2 must record that no local vision model executes in task runs.
 
 ## M23.6 — status after OD-R
+
+*(M23.6 status, superseded by M23.7 below.)*
 
 **Selected by the owner** (each one: **implementation not authorised**; runtime not implemented):
 - **OD-P:** T1 out of active Phase 1 execution.
@@ -364,3 +370,24 @@ Each sub-decision is separate.
 
 **Not changed by the implementation:** OD-O, OD-Q, OD-F, OD-N (ADR-0015 stays PROPOSED), GOV-01, OD-E1, OD-K, OD-L, OD-M, and the browser, cross-machine, independent-human, real-site, performance and security decisions all remain **AWAITING OWNER APPROVAL**.
 
+## M23.8 — status after the assurance milestone
+
+**Selected by the owner, and implemented in product builds:** OD-P and OD-R. Tested under a simulated extension (`dom-only-regression-matrix.md`). **Not browser-verified, not accepted.**
+
+**New; awaiting the owner:**
+
+| ID | Decision | M23.8 input | Status |
+|---|---|---|---|
+| OD-S | **Diagnostic capture hooks** (`PERCEIVE_ONCE`, `STREAM_CONSUME`, the `__host` drivers): (A) retain in product builds, (B) move to evidence builds only, (C) remove | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `diagnostic-hook-boundary-map.md`. **PROPOSED — AWAITING OWNER APPROVAL: option B** | **AWAITING OWNER APPROVAL.** Any change needs its own authorisation |
+| OD-T | **The product's visible capture wording:** the side panel's "Click the toolbar button to let PratiBimb look at this tab" and the toolbar title "perceive this tab", neither true of a product task | same comparison document | **AWAITING OWNER APPROVAL.** A product text change |
+| OD-U | **`run-gesture-capture.mjs` and `run-gesture-acts.mjs`:** re-scope to an evidence build, or retire the four checks a product build can no longer pass | `evidence-build-preservation-assessment.md` §3 | **AWAITING OWNER APPROVAL** |
+
+**Still awaiting the owner, unchanged:**
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**Needs a separate authorisation, not a decision between options:** the human browser smoke run (`dom-only-browser-smoke-procedure-PROPOSED.md`), and any evidence-build run.
+
+**Not authorised:** detector evaluation, FR-01, Phase 2, frame egress.

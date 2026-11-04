@@ -1,6 +1,7 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
+> - **M23.8:** the boundary is **tested under a simulated extension**, not a browser. Diagnostic hooks are audited and left unchanged; OD-S, OD-T and OD-U await the owner. See `artifacts/experiments/M23.8-dom-only-boundary-assurance/`.
 > - **M23.7:** the DOM-only Phase 1 is **implemented in product builds** (owner-authorised; not browser-verified; not accepted). See `artifacts/experiments/M23.7-dom-only-implementation/`.
 > - **M23.6:** **OD-R APPROVED — OPTION A: DOM-ONLY PHASE 1** (owner-selected; implementation not authorised at the time). Normal Phase 1 tasks are to capture no frames and run neither T1 nor TR-01.
 > - **M23.3:** the proposed architecture record is `docs/adr/ADR-0015-phase-1-local-structure-only-architecture.md` (**PROPOSED — AWAITING OWNER APPROVAL**). New engineers should start with `phase-1-data-flow-and-components.md`.
@@ -72,6 +73,11 @@
 | `phase-1-perception-options-comparison.md` | M23.5: Options A (DOM-only), B (capture kept), C (capture for a named consumer) |
 | `od-r-frame-capture-recommendation-PROPOSED.md` | M23.5: the OD-R recommendation (Option A); not decided |
 | `adr-0015-od-r-clauses-PROPOSED.md` | M23.5: ADR-0015 clause drafts for each OD-R outcome; not applied |
+| `dom-only-regression-matrix.md` | M23.8: M23.7's boundary, requirement by requirement, with what was tested and how, and what was not |
+| `diagnostic-hook-boundary-map.md` | M23.8: who can reach `PERCEIVE_ONCE` and `STREAM_CONSUME`, what they do, and the route classification |
+| `od-s-diagnostic-hooks-comparison-PROPOSED.md` | M23.8: retain, evidence builds only, or remove; recommendation B; not decided |
+| `evidence-build-preservation-assessment.md` | M23.8: what the configuration selects, what each harness now needs, and what is unverified at run time |
+| `dom-only-browser-smoke-procedure-PROPOSED.md` | M23.8: a person-run procedure for a separately authorised browser run. Not run |
 | `dom-only-phase-1-implementation-outline-PROPOSED.md` | M23.6: OD-R implications, and a dependency-ordered outline for the future, separately authorised DOM-only implementation |
 | `release-readiness-checklist-PROPOSED.md` | Mandatory, owner-approved optional, future, and deferred (FR-01) items |
 

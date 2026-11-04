@@ -1,0 +1,46 @@
+{
+  "what": "static inspection of an existing product build: manifest, file names and JavaScript text. No model file was opened, nothing was built, and no browser was started",
+  "workstation": "W1",
+  "gitHead": "740a245b00da00767ff1d7df6ee2ffd4d8ac1019",
+  "buildManifestWrittenAt": "2026-11-03T18:06:18.802Z",
+  "recordedAt": "2026-11-04T11:43:03.067Z",
+  "problems": [],
+  "files": [
+    "background.js",
+    "content-scripts/content.js",
+    "manifest.json",
+    "offscreen.html",
+    "ort-wasm-simd-threaded.jsep.mjs",
+    "ort-wasm-simd-threaded.jsep.wasm",
+    "ort.all.min.js",
+    "sidepanel.html",
+    "tr01-ppocrv4-mobile-det.onnx",
+    "tr01-worker.js"
+  ],
+  "manifest": {
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ],
+    "host_permissions": [
+      "http://127.0.0.1/*"
+    ],
+    "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+    "actionTitle": "PratiBimb: perceive this tab"
+  },
+  "bundle": {
+    "offscreenHandlesPerceiveOnce": true,
+    "offscreenHandlesStreamConsume": true,
+    "offscreenHasTheProductRefusal": true,
+    "offscreenStillNamesT1": true,
+    "workerControlPlaneHasPerceiveOnce": true,
+    "workerControlPlaneHasConsumeProbe": true,
+    "workerControlPlaneHasMintStreamId": true,
+    "workerMintsCaptureHandles": true,
+    "contentScriptNamesEitherHook": false,
+    "sidePanelNamesEitherHook": false,
+    "sidePanelStillAsksForTheToolbarGesture": true
+  }
+}
