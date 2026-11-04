@@ -6,9 +6,11 @@
  * that by making those names directories, which any attempt to read would throw on.
  *
  * It reports two different things and keeps them apart:
- *   - `problems`: differences from the product boundary (ADR-0013, OD-P, OD-R). Empty is the only pass.
- *   - `bundle`: facts about what ships, including the diagnostic hooks OD-S is about. Those are not
- *     problems today; they are what the owner is being asked to decide about.
+ *   - `problems`: differences from the product boundary (ADR-0013, OD-P, OD-R, OD-S). Empty is the only pass.
+ *   - `bundle`: facts about what ships, which are nobody's verdict.
+ *
+ * M23.9 (OD-S, Option B): the diagnostic hooks were facts here while the owner decided about them. The owner
+ * has, so any of them in a product bundle is now a problem.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
@@ -25,6 +27,23 @@ export const EXPECTED_PRODUCT_FILES = Object.freeze({
   ortFiles: Object.freeze(["ort.all.min.js", "ort-wasm-simd-threaded.jsep.wasm", "ort-wasm-simd-threaded.jsep.mjs"]),
   tr01File: "tr01-ppocrv4-mobile-det.onnx",
 });
+
+/**
+ * Names that exist only in an evidence build since M23.9. A product bundle naming one of these has kept a
+ * hook, a driver, the capture ticket, or the realm's capture call, which only those reached.
+ */
+export const DIAGNOSTIC_HOOK_MARKERS = Object.freeze([
+  "PERCEIVE_ONCE",
+  "STREAM_CONSUME",
+  "perceiveOnce",
+  "consumeProbe",
+  "mintStreamId",
+  "ticketProbe",
+  "CAPTURE_FRAME",
+  "CAPTURE_TICKET",
+  "chromeMediaSourceId",
+  "grabFrame",
+]);
 
 const walk = (root, relative = "", out = []) => {
   for (const name of readdirSync(join(root, relative)).sort()) {
@@ -51,11 +70,17 @@ export function inspectProductBuild(directory, expected) {
   const offscreen = textOf((f) => f.startsWith("chunks/offscreen-"));
   const content = textOf((f) => f.startsWith("content-scripts/"));
   const sidepanel = textOf((f) => f.startsWith("chunks/sidepanel-") || f === "sidepanel.html");
+  // All the extension's own text. ORT's bundle is the runtime's and is not ours to name things in.
+  const everything = textOf((f) => !(expected.ortFiles ?? []).includes(f));
 
   const problems = [...productManifestProblems(manifest), ...productPackageProblems(rootFiles, expected)];
   if (includes(offscreen, "__EVIDENCE_BUILD__")) problems.push("EVIDENCE_FLAG_NOT_SUBSTITUTED");
   if (includes(background, "captureVisibleTab")) problems.push("WORKER_FRAME_ROUTE_IN_BUNDLE");
   if (includes(offscreen, "TR01_DETECT_PROBE") || includes(offscreen, '"TR01_PROBE"')) problems.push("TR01_PROBE_IN_BUNDLE");
+  for (const marker of DIAGNOSTIC_HOOK_MARKERS) {
+    if (includes(everything, marker)) problems.push(`DIAGNOSTIC_HOOK_IN_BUNDLE:${marker}`);
+  }
+  if (/\.getUserMedia\s*\(/.test(everything)) problems.push("CAPTURE_CALL_IN_BUNDLE");
 
   return {
     problems,
@@ -67,6 +92,9 @@ export function inspectProductBuild(directory, expected) {
       actionTitle: manifest.action?.default_title ?? null,
     },
     bundle: {
+      namesEachHookMarker: Object.fromEntries(DIAGNOSTIC_HOOK_MARKERS.map((marker) => [marker, includes(everything, marker)])),
+      callsGetUserMedia: /\.getUserMedia\s*\(/.test(everything),
+      offscreenCanStartTr01: includes(offscreen, "tr01-worker"),
       offscreenHandlesPerceiveOnce: includes(offscreen, "PERCEIVE_ONCE"),
       offscreenHandlesStreamConsume: includes(offscreen, "STREAM_CONSUME"),
       offscreenHasTheProductRefusal: includes(offscreen, "UI_HEAD_NOT_IN_PRODUCT_BUILD"),

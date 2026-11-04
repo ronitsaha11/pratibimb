@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { inspectProductBuild } from "./product-build-inspection.mjs";
+import { DIAGNOSTIC_HOOK_MARKERS, inspectProductBuild } from "./product-build-inspection.mjs";
 
 const EXPECTED = { ortFiles: ["ort.all.min.js", "ort-wasm-simd-threaded.jsep.wasm"], tr01File: "tr01-ppocrv4-mobile-det.onnx" };
 
@@ -29,7 +29,7 @@ afterEach(() => {
   dir = undefined;
 });
 
-function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const k="PERCEIVE_ONCE",s="STREAM_CONSUME",r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx";', background = "const h={perceiveOnce(){},consumeProbe(){},mintStreamId(){}};chrome.tabCapture.getMediaStreamId;", sidepanel = 'const c="Click the toolbar button";' } = {}) {
+function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx",p=typeof navigator.mediaDevices?.getUserMedia;', background = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;", sidepanel = 'const c="Click the toolbar button";' } = {}) {
   dir = mkdtempSync(join(tmpdir(), "m238-build-"));
   mkdirSync(join(dir, "chunks"));
   mkdirSync(join(dir, "content-scripts"));
@@ -64,18 +64,47 @@ describe("inspectProductBuild", () => {
     expect(report.files).toContain("tr01-ppocrv4-mobile-det.onnx");
   });
 
-  it("states the diagnostic hooks as facts, not as problems: they are the owner's decision", () => {
+  it("reports what ships as facts: no hook, a panel that still asks for the toolbar (OD-T), an authority that can still mint", () => {
     const { problems, bundle } = inspectProductBuild(syntheticBuild(), EXPECTED);
     expect(problems).toEqual([]);
     expect(bundle).toMatchObject({
-      offscreenHandlesPerceiveOnce: true,
-      offscreenHandlesStreamConsume: true,
-      workerControlPlaneHasPerceiveOnce: true,
-      workerControlPlaneHasConsumeProbe: true,
+      offscreenHandlesPerceiveOnce: false,
+      offscreenHandlesStreamConsume: false,
+      workerControlPlaneHasPerceiveOnce: false,
+      workerControlPlaneHasConsumeProbe: false,
+      workerControlPlaneHasMintStreamId: false,
+      callsGetUserMedia: false,
       contentScriptNamesEitherHook: false,
       sidePanelNamesEitherHook: false,
       sidePanelStillAsksForTheToolbarGesture: true,
+      workerMintsCaptureHandles: true,
     });
+    expect(Object.values(bundle.namesEachHookMarker).every((named) => named === false)).toBe(true);
+  });
+
+  it("M23.9 (OD-S): fails a product bundle naming any hook, driver or capture ticket, wherever it is", () => {
+    expect(DIAGNOSTIC_HOOK_MARKERS).toEqual(expect.arrayContaining(["PERCEIVE_ONCE", "STREAM_CONSUME", "perceiveOnce", "consumeProbe", "CAPTURE_FRAME"]));
+    for (const marker of DIAGNOSTIC_HOOK_MARKERS) {
+      for (const where of ["offscreen", "background", "sidepanel"]) {
+        const report = inspectProductBuild(syntheticBuild({ [where]: `const k="${marker}";` }), EXPECTED);
+        expect(report.problems, `${marker} in ${where}`).toContain(`DIAGNOSTIC_HOOK_IN_BUNDLE:${marker}`);
+        rmSync(dir, { recursive: true, force: true });
+      }
+    }
+  });
+
+  it("M23.9 (OD-S): fails a bundle that calls getUserMedia, and not one that only asks whether it exists", () => {
+    const calling = inspectProductBuild(syntheticBuild({ offscreen: "await navigator.mediaDevices.getUserMedia({});" }), EXPECTED);
+    expect(calling.problems).toEqual(["CAPTURE_CALL_IN_BUNDLE"]);
+    expect(calling.bundle.callsGetUserMedia).toBe(true);
+    rmSync(dir, { recursive: true, force: true });
+    expect(inspectProductBuild(syntheticBuild(), EXPECTED).bundle.callsGetUserMedia).toBe(false);
+  });
+
+  it("does not hold ORT's own bundle to names it never chose", () => {
+    const build = syntheticBuild();
+    writeFileSync(join(build, "ort.all.min.js"), 'const unrelated="grabFrame";');
+    expect(inspectProductBuild(build, EXPECTED).problems).toEqual([]);
   });
 
   it("fails a build that packages T1", () => {

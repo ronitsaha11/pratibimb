@@ -61,7 +61,8 @@ describe("A — a product task captures no frame", () => {
   const runTask = bodyOf(main, "runTask");
 
   it("the task's perception port is passed only through the policy, under the build's evidence flag", () => {
-    expect(runTask).toContain('...taskPerception<NonNullable<ExtensionRunDeps["perceive"]>>(__EVIDENCE_BUILD__,');
+    // M23.9: the flag also sits in place, so a product bundler drops the closure and the realm behind it.
+    expect(runTask).toMatch(/\.\.\.\(__EVIDENCE_BUILD__\s+\? taskPerception<NonNullable<ExtensionRunDeps\["perceive"\]>>\(__EVIDENCE_BUILD__,[\s\S]*?\)\s+: \{\}\),/);
     // No unguarded `perceive:` key remains in the task's dependencies.
     expect(runTask).not.toMatch(/^\s*perceive\s*:/m);
   });
@@ -69,7 +70,7 @@ describe("A — a product task captures no frame", () => {
   it("the only route from a task to the perception realm is inside that policy call", () => {
     const calls = runTask.match(/ensurePerception\(/g) ?? [];
     expect(calls).toHaveLength(1);
-    const guarded = runTask.slice(runTask.indexOf("...taskPerception<"));
+    const guarded = runTask.slice(runTask.indexOf("? taskPerception<"));
     expect(guarded.indexOf("ensurePerception(")).toBeGreaterThan(0);
     expect(guarded.indexOf("ensurePerception(")).toBeLessThan(guarded.indexOf("perceptionBoot:"));
   });

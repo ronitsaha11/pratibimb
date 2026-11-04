@@ -9,8 +9,18 @@
  * bytes (TR-01) or an exception (T1), and the T1 asset is only ever a path on a list. Nothing is copied
  * and no evidence build is produced, so this says what the CONFIGURATION selects. Whether an evidence
  * build still WORKS at run time is unverified (`docs/acceptance/evidence-build-preservation-assessment.md`).
+ *
+ * M23.9 (OD-S): a flag read at run time cannot show what a bundler leaves out, and a real `wxt build` needs a
+ * git-ignored model. So the extension's own TypeScript is also bundled here, in memory, with this
+ * configuration's product flags and aliases, and the result is searched. Only ever with the product's flags:
+ * no evidence variant is built, nothing is written, no asset is touched and nothing runs. It is esbuild and
+ * not WXT's Rollup; an actual product build is inspected by `tests/browser/extension/inspect-product-build.mjs`.
  */
 import { createHash } from "node:crypto";
+import { readFileSync as readSourceFile } from "node:fs";
+import { join, relative as relativePath } from "node:path";
+
+import { build as bundle } from "esbuild";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { parseCsp, PRODUCT_CSP, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
@@ -24,7 +34,7 @@ interface Asset {
 }
 interface LoadedConfig {
   readonly alias: Readonly<Record<string, string>>;
-  readonly vite: () => { readonly define: Readonly<Record<string, string>> };
+  readonly vite: () => { readonly define: Readonly<Record<string, string>>; readonly resolve: { readonly alias: Readonly<Record<string, string>> } };
   readonly manifest: { readonly permissions: readonly string[]; readonly host_permissions: readonly string[]; readonly content_security_policy: { readonly extension_pages: string }; readonly [key: string]: unknown };
   readonly hooks: { readonly "build:publicAssets": (wxt: unknown, assets: Asset[]) => void };
 }
@@ -149,6 +159,141 @@ describe("a product build", () => {
     expect(productManifestProblems(manifest)).toEqual([]);
     expect(manifest.permissions).toContain("tabCapture");
     expect(parseCsp(manifest.content_security_policy.extension_pages)?.["connect-src"]).toBe(PRODUCT_CSP["connect-src"]);
+  });
+});
+
+const APP = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+const ENTRY_POINTS = ["host/background.ts", "host/offscreen/main.ts", "host/sidepanel/main.ts", "host/content.ts", "host/tr01-worker.ts"];
+
+/** A regression, for the negative controls: one file's text, with one gate taken out. */
+interface GateRemoved {
+  readonly file: string;
+  readonly gate: string;
+  readonly replacement: string;
+}
+
+/** The extension's own code as `wxt.config.ts`'s product flags and aliases leave it: entry point to text. */
+async function productBundle(removed?: GateRemoved): Promise<Readonly<Record<string, string>>> {
+  const config = await loadConfig();
+  const vite = config.vite();
+  expect(vite.define.__EVIDENCE_BUILD__, "this helper builds the product's flags, and only those").toBe("false");
+  const aliases: Readonly<Record<string, string>> = {
+    ...Object.fromEntries(Object.entries(config.alias).map(([name, target]) => [name, join(APP, target)])),
+    ...vite.resolve.alias,
+  };
+  const result = await bundle({
+    absWorkingDir: APP,
+    entryPoints: ENTRY_POINTS,
+    outbase: APP,
+    outdir: join(APP, "in-memory"),
+    entryNames: "[dir]/[name]",
+    bundle: true,
+    write: false,
+    format: "esm",
+    platform: "browser",
+    target: "es2022",
+    treeShaking: true,
+    minifySyntax: true,
+    logLevel: "silent",
+    define: { ...vite.define },
+    plugins: [
+      {
+        name: "wxt-aliases",
+        setup(build) {
+          build.onResolve({ filter: /^(#|@pratibimb\/)/ }, (args) => {
+            const path = aliases[args.path];
+            if (path === undefined) throw new Error(`no alias for ${args.path}`);
+            return { path };
+          });
+          if (removed === undefined) return;
+          const target = join(APP, removed.file).replace(/\\/g, "/");
+          build.onLoad({ filter: /\.ts$/ }, (args) => {
+            if (args.path.replace(/\\/g, "/") !== target) return undefined;
+            const code = readSourceFile(args.path, "utf8").replace(/\r\n/g, "\n");
+            if (!code.includes(removed.gate)) throw new Error(`the gate is not in ${removed.file}: ${removed.gate}`);
+            return { contents: code.replace(removed.gate, removed.replacement), loader: "ts" };
+          });
+        },
+      },
+    ],
+  });
+  return Object.fromEntries(result.outputFiles.map((file) => [relativePath(join(APP, "in-memory"), file.path).replace(/\\/g, "/"), file.text]));
+}
+
+describe("M23.9 (OD-S) — the product bundle, from source: what its flags and aliases leave", () => {
+  /**
+   * Names, not behaviour. esbuild keeps identifiers here (`minifyIdentifiers` is off), so a function that
+   * survived tree-shaking is found by its name. Comments are dropped, so a mention in one is not a match.
+   */
+  const ABSENT = [
+    "PERCEIVE_ONCE",
+    "STREAM_CONSUME",
+    "perceiveOnce",
+    "consumeProbe",
+    "mintStreamId",
+    "ticketProbe",
+    "CAPTURE_FRAME",
+    "CAPTURE_TICKET",
+    "perceiveTab",
+    "ensurePerception",
+    "createPerceptionRealm",
+    "chromeMediaSourceId",
+    "grabFrame",
+    "createTr01Host",
+    "spawnTr01Worker",
+    "textRegionHost",
+  ];
+
+  it("names no hook, no driver, no ticket and no capture path, in any entry point", async () => {
+    const outputs = await productBundle();
+    expect(Object.keys(outputs).sort()).toEqual(["host/background.js", "host/content.js", "host/offscreen/main.js", "host/sidepanel/main.js", "host/tr01-worker.js"]);
+    for (const [entry, text] of Object.entries(outputs)) {
+      for (const name of ABSENT) expect(text.includes(name), `${name} in ${entry}`).toBe(false);
+    }
+  }, 30_000);
+
+  it("calls no `getUserMedia`: the side-effect-free surface probe only asks whether it exists", async () => {
+    const offscreen = (await productBundle())["host/offscreen/main.js"]!;
+    expect(offscreen).not.toMatch(/\.getUserMedia\s*\(/);
+    expect(offscreen).toMatch(/typeof navigator\.mediaDevices\?\.getUserMedia/);
+  }, 30_000);
+
+  it("still carries the whole product: the task path, the panel's routes and the M13 positive control", async () => {
+    const outputs = await productBundle();
+    const offscreen = outputs["host/offscreen/main.js"]!;
+    const worker = outputs["host/background.js"]!;
+    for (const kind of ["RUN_TASK", "TASK_PREPARE", "TASK_START", "TASK_STATUS", "GRANT_DECIDE", "CONSENT_DECIDE", "CLARIFY_DECIDE", "BOUNDARY_COLLECT", "TRANSPORT_OBSERVE", "ORT_SMOKE", "REALM_PROBE", "UI_HEAD_NOT_IN_PRODUCT_BUILD"]) {
+      expect(offscreen.includes(kind), kind).toBe(true);
+    }
+    for (const kind of ["HOST_STATUS", "TO_PAGE_BOUNDARY", "HELLO", "RELAY_ECHO", "toOffscreen", "captureState", "captureStatus"]) {
+      expect(worker.includes(kind), kind).toBe(true);
+    }
+  }, 30_000);
+
+  it("keeps the gesture authority: the toolbar's grant, the panel's status and `tabCapture`", async () => {
+    const worker = (await productBundle())["host/background.js"]!;
+    expect(worker).toMatch(/chrome\.tabCapture\.getMediaStreamId/);
+    expect(worker).toContain("capture.grant(");
+    expect(worker).toContain("capture.status(");
+  }, 30_000);
+
+  describe("the negative controls: take any one gate out, and the same search finds what it was keeping out", () => {
+    const MAIN = "host/offscreen/main.ts";
+    const WORKER = "host/background.ts";
+    const CONTROLS: readonly (GateRemoved & { readonly output: string; readonly finds: string })[] = [
+      { file: MAIN, gate: '__EVIDENCE_BUILD__ && msg.kind === "PERCEIVE_ONCE"', replacement: 'msg.kind === "PERCEIVE_ONCE"', output: "host/offscreen/main.js", finds: "PERCEIVE_ONCE" },
+      { file: MAIN, gate: '__EVIDENCE_BUILD__ && msg.kind === "STREAM_CONSUME"', replacement: 'msg.kind === "STREAM_CONSUME"', output: "host/offscreen/main.js", finds: "STREAM_CONSUME" },
+      { file: MAIN, gate: "__EVIDENCE_BUILD__ &&\n    serveTr01Probe(", replacement: "serveTr01Probe(", output: "host/offscreen/main.js", finds: "perceiveTab" },
+      { file: MAIN, gate: "...(__EVIDENCE_BUILD__\n        ? taskPerception<", replacement: "...(true\n        ? taskPerception<", output: "host/offscreen/main.js", finds: "ensurePerception" },
+      { file: WORKER, gate: "...(__EVIDENCE_BUILD__\n      ? {", replacement: "...(true\n      ? {", output: "host/background.js", finds: "perceiveOnce" },
+      { file: WORKER, gate: '__EVIDENCE_BUILD__ && msg?.kind === "CAPTURE_FRAME"', replacement: 'msg?.kind === "CAPTURE_FRAME"', output: "host/background.js", finds: "CAPTURE_FRAME" },
+    ];
+    for (const control of CONTROLS) {
+      it(`${control.file}: without \`${control.gate.replace(/\n\s*/g, " ")}\`, it finds ${control.finds}`, async () => {
+        const outputs = await productBundle(control);
+        expect(outputs[control.output]!.includes(control.finds)).toBe(true);
+      }, 30_000);
+    }
   });
 });
 

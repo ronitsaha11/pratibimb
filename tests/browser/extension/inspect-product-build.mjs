@@ -9,7 +9,9 @@
  *
  * Exit 0: no boundary problem. Exit 1: a problem, listed. Exit 2: no build to inspect.
  *
- * Usage: node tests/browser/extension/inspect-product-build.mjs [--record <directory>]
+ * M23.9: `--label` names the record, so a later milestone's does not take an earlier one's name.
+ *
+ * Usage: node tests/browser/extension/inspect-product-build.mjs [--record <directory> [--label <name>]]
  */
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
@@ -43,8 +45,10 @@ console.log(JSON.stringify(record, null, 2));
 const at = process.argv.indexOf("--record");
 if (at !== -1) {
   const directory = resolve(process.argv[at + 1] ?? ".");
+  const labelAt = process.argv.indexOf("--label");
+  const label = labelAt === -1 ? "current" : (process.argv[labelAt + 1] ?? "current");
   mkdirSync(directory, { recursive: true });
-  const target = assertOwnEvidencePath(join(directory, evidenceFileName(workstation, "m23-7-product-build-inspection.json")), workstation);
+  const target = assertOwnEvidencePath(join(directory, evidenceFileName(workstation, `${label}-product-build-inspection.json`)), workstation);
   writeFileSync(target, `${JSON.stringify(record, null, 2)}\n`, "utf8");
   console.log(`written: ${target.slice(ROOT.length + 1).replace(/\\/g, "/")}`);
 }

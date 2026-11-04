@@ -211,12 +211,21 @@ export interface RigOptions {
   readonly page?: PageSpec;
   readonly model?: ModelScript;
   /**
-   * A REGRESSION, on purpose: `task-perception.ts` stops gating. It stands in for someone wiring the
-   * perception pass back into a product task, so a test can show the checks would catch that.
+   * A REGRESSION, on purpose: the build's gates stop gating, so a task gets its perception pass back and
+   * the realm may load T1. It stands in for someone wiring perception back into a product task, so a
+   * test can show the checks would catch that. Since M23.9 the gate is the flag itself, in place.
    */
   readonly reintroducePerceptionInProductTasks?: boolean;
   /** How the fake TR-01 worker answers INIT. */
   readonly tr01?: "READY" | "INIT_FAILED";
+  /**
+   * The fake `getUserMedia`, playing the browser's part: refuse a stream id the fake `getMediaStreamId`
+   * did not mint. Off by default, and the extension's own code does not make this check (M23.8, F-4).
+   * It models what M3.1 recorded of Chrome and establishes nothing about Chrome.
+   */
+  readonly browserHonoursOnlyMintedStreamIds?: boolean;
+  /** Collects the context `host/offscreen/main.ts` hands the TR-01 probe, if it hands it any. */
+  readonly tr01ProbeContexts?: unknown[];
 }
 
 export interface Sender {
@@ -271,10 +280,15 @@ interface HostControlPlane {
   readonly grantPeek: () => Promise<{ pending: unknown }>;
   readonly grantDecide: (granted: boolean) => Promise<unknown>;
   readonly toOffscreen: (message: object) => Promise<unknown>;
+  readonly captureState: () => { grants: readonly unknown[]; workerFrameEnabled: boolean };
+}
+
+/** What only an evidence build's control plane has (M23.9, OD-S). Read through `driversOf`. */
+export interface EvidenceDrivers {
   readonly perceiveOnce: (tabId: number, frameId: number) => Promise<unknown>;
   readonly consumeProbe: () => Promise<unknown>;
   readonly mintStreamId: (tabId: number) => Promise<unknown>;
-  readonly captureState: () => { grants: readonly unknown[]; workerFrameEnabled: boolean };
+  readonly ticketProbe: (tabId: number, documentId?: string) => Promise<unknown>;
 }
 
 export interface Rig {
@@ -290,10 +304,12 @@ export interface Rig {
   readonly mediaSourceIds: readonly string[];
   /** Live media handed back: tracks stopped and bitmaps closed. */
   readonly released: { readonly tracks: number; readonly bitmaps: number };
-  readonly host: HostControlPlane;
+  readonly host: HostControlPlane & Partial<EvidenceDrivers>;
   visualActivity(): VisualActivity;
   /** The toolbar click: a person invoking the extension on the tab. */
   clickToolbar(): void;
+  /** The tab starting to load another document, which is what revokes a grant. */
+  navigate(): void;
   /** Deliver a message to the offscreen listener with a sender the test chooses. */
   sendToOffscreen(message: object, sender: Sender): Promise<unknown>;
   /** Deliver a message to the service worker's listener with a sender the test chooses. */
@@ -361,6 +377,8 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
   const offscreenListeners: Listener[] = [];
   const connectListeners: ((port: unknown) => void)[] = [];
   const actionListeners: ((tab: { id: number }) => void)[] = [];
+  const updatedListeners: ((tabId: number, change: { status?: string }) => void)[] = [];
+  const mintedStreamIds = new Set<string>();
   let registering: "sw" | "offscreen" = "sw";
 
   const offscreenSender: Sender = { id: EXTENSION_ID, url: `${EXTENSION_ROOT}offscreen.html` };
@@ -455,11 +473,13 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
       // A fresh handle each time, as Chrome's are: the capture authority refuses one it has seen.
       getMediaStreamId: async () => {
         counters.mintedStreamIds += 1;
-        return `opaque-stream-handle-${counters.mintedStreamIds}`;
+        const handle = `opaque-stream-handle-${counters.mintedStreamIds}`;
+        mintedStreamIds.add(handle);
+        return handle;
       },
     },
     tabs: {
-      onUpdated: { addListener: () => undefined },
+      onUpdated: { addListener: (listener: (tabId: number, change: { status?: string }) => void) => updatedListeners.push(listener) },
       onRemoved: { addListener: () => undefined },
       captureVisibleTab: async () => {
         counters.workerFrameCaptures += 1;
@@ -478,7 +498,7 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
   vi.stubGlobal("chrome", fakeChrome);
 
   // ── what `wxt.config.ts` would have substituted, and what a page load would have defined ───────
-  vi.stubGlobal("__EVIDENCE_BUILD__", options.evidenceBuild);
+  vi.stubGlobal("__EVIDENCE_BUILD__", options.evidenceBuild || options.reintroducePerceptionInProductTasks === true);
   vi.stubGlobal("__M3_WORKER_FRAME__", false);
   vi.stubGlobal("__REASONER_ENDPOINT__", REASONER_ENDPOINT);
   vi.stubGlobal("defineBackground", (main: () => void) => {
@@ -494,7 +514,11 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
     mediaDevices: {
       getUserMedia: async (constraints: { video?: { mandatory?: { chromeMediaSourceId?: string } } }) => {
         counters.getUserMedia += 1;
-        mediaSourceIds.push(constraints.video?.mandatory?.chromeMediaSourceId ?? "");
+        const streamId = constraints.video?.mandatory?.chromeMediaSourceId ?? "";
+        mediaSourceIds.push(streamId);
+        if (options.browserHonoursOnlyMintedStreamIds && !mintedStreamIds.has(streamId)) {
+          throw Object.assign(new Error("a stream id the browser did not mint"), { name: "NotAllowedError" });
+        }
         return {
           getVideoTracks: () => [
             {
@@ -605,16 +629,20 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
   }));
   // A product build's aliases (`wxt.config.ts`): the probes are absent. See the tests for the map itself.
   vi.doMock("#structural-probe", async () => import("../../probe/structural-absent"));
-  vi.doMock("#tr01-probe", async () => import("../../probe/tr01-absent"));
+  vi.doMock("#tr01-probe", async () => {
+    const absent = await import("../../probe/tr01-absent");
+    const sink = options.tr01ProbeContexts;
+    if (!sink) return absent;
+    // Still takes nothing, as the stub does. It only records what it was handed.
+    return {
+      ...absent,
+      serveTr01Probe: (_message: unknown, _sender: unknown, _sendResponse: unknown, context: unknown) => {
+        sink.push(context);
+        return false;
+      },
+    };
+  });
   vi.doMock("#egress-evidence-probe", async () => import("../../probe/egress-evidence-absent"));
-  if (options.reintroducePerceptionInProductTasks) {
-    vi.doMock("../../host-lib/task-perception", () => ({
-      taskPerception: <P>(_evidenceBuild: boolean, perceive: P) => ({ perceive }),
-      loadsUiHead: () => true,
-    }));
-  } else {
-    vi.doUnmock("../../host-lib/task-perception");
-  }
 
   // ── boot both realms, then open the page's port the way `connectPageTransport` does ────────────
   registering = "sw";
@@ -662,6 +690,9 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
     clickToolbar: () => {
       for (const listener of actionListeners) listener({ id: TAB_ID });
     },
+    navigate: () => {
+      for (const listener of updatedListeners) listener(TAB_ID, { status: "loading" });
+    },
     sendToOffscreen: (message, sender) => {
       messages.push(kindOf(message));
       return deliver(offscreenListeners, { target: "offscreen", ...message }, sender);
@@ -695,11 +726,13 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
       vi.doUnmock("#structural-probe");
       vi.doUnmock("#tr01-probe");
       vi.doUnmock("#egress-evidence-probe");
-      vi.doUnmock("../../host-lib/task-perception");
       vi.resetModules();
     },
   };
 }
+
+/** The drivers only an evidence build has, for tests that booted one. In a product build they are undefined. */
+export const driversOf = (rig: Rig): EvidenceDrivers => rig.host as unknown as EvidenceDrivers;
 
 /** A task request, with the postcondition the fixture's `#submit` satisfies. */
 export const taskRequest = (over: Record<string, unknown> = {}): object => ({
@@ -724,6 +757,7 @@ export const contextOf = (request: ModelRequest): Record<string, unknown> => {
 export const SENDERS = {
   worker: { id: EXTENSION_ID, url: `${EXTENSION_ROOT}background.js` } satisfies Sender,
   sidePanel: { id: EXTENSION_ID, url: `${EXTENSION_ROOT}sidepanel.html` } satisfies Sender,
+  offscreen: { id: EXTENSION_ID, url: `${EXTENSION_ROOT}offscreen.html` } satisfies Sender,
   contentScript: { id: EXTENSION_ID, url: `${PAGE_ORIGIN}/fixture.html`, tab: { id: TAB_ID }, frameId: FRAME_ID, documentId: "doc-1", origin: PAGE_ORIGIN } satisfies Sender,
   otherExtension: { id: "some-other-extension", url: "chrome-extension://some-other-extension/background.js" } satisfies Sender,
 };
