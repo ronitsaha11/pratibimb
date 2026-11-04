@@ -1,0 +1,51 @@
+{
+  "what": "sha256 of the product build's own text files, at the M23.7 build and at this milestone's source commit. No model or wasm file was opened for this comparison. Chunk names have their content hash removed.",
+  "before": {
+    "gitHead": "740a245"
+  },
+  "after": {
+    "gitHead": "712465e"
+  },
+  "files": {
+    "background.js": {
+      "before": "2d22c9d6a505b7e73693f3c8470558c52ceee0d78a2c26d229be8b7963f13043",
+      "after": "71ffaeef84972db79b14f120963413f6abf20e6f694fefe9877543ac2aff6059",
+      "identical": false
+    },
+    "chunks/_virtual_wxt-html-plugins.js": {
+      "before": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74",
+      "after": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74",
+      "identical": true
+    },
+    "chunks/offscreen.js": {
+      "before": "0875a72f49a44a14fe78f82600cc47135e97da6f9a4851ee5e69bc807a56d343",
+      "after": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8",
+      "identical": false
+    },
+    "chunks/sidepanel.js": {
+      "before": "9d6c2eb5d318586738c01dca52430e3abf6a71a8132b67195df936ed684a0e47",
+      "after": "9d6c2eb5d318586738c01dca52430e3abf6a71a8132b67195df936ed684a0e47",
+      "identical": true
+    },
+    "content-scripts/content.js": {
+      "before": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+      "after": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+      "identical": true
+    },
+    "manifest.json": {
+      "before": "0175cf3ec8651a826639b9e0590191729d10c13e67d7eb2e8856a7b3b78d96d3",
+      "after": "0175cf3ec8651a826639b9e0590191729d10c13e67d7eb2e8856a7b3b78d96d3",
+      "identical": true
+    },
+    "offscreen.html": {
+      "before": "f23a90671c43713003af1efe17e9a365ad041deecf569fbccff292e18ef9be40",
+      "after": "129797b5d694ca484c5db667e2f7340bb65fa81a3e0f535b9520839f067a6a81",
+      "identical": false
+    },
+    "sidepanel.html": {
+      "before": "f7650e17302e303035e0db908fc6a809b74352f045a4f324ae18e6013a7d490f",
+      "after": "f7650e17302e303035e0db908fc6a809b74352f045a4f324ae18e6013a7d490f",
+      "identical": true
+    }
+  }
+}

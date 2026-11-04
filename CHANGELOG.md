@@ -35,6 +35,13 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.9 — Diagnostic hooks removed from product builds (OD-S, Option B).** `PERCEIVE_ONCE`, `STREAM_CONSUME`, their
+  four worker drivers, the worker's `CAPTURE_FRAME` handler and the references that kept the capture path alive now sit
+  behind the existing evidence flag. A real product build names none of them and has no capture call; its manifest,
+  content script and side panel are byte-identical to before. An evidence build keeps the same behaviour under test
+  doubles; its runtime is unverified. Corrects M23.8: six evidence harnesses now refuse, because their byte-identity guard
+  on `background.js` cannot hold (OD-V, not changed). No browser ran; no permission, CSP, egress, authority, TR-01 or ADR
+  changed.
 - **M23.8 — DOM-only boundary assurance and regression hardening (tests and documentation only).** A rig runs the real
   worker, offscreen document, task run, gates and egress guard under a fake `chrome`, counting every capture, model and
   worker request: an ordinary task leaves them all at zero, and a regression double fails the checks. Audits

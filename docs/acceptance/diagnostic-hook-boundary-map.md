@@ -1,18 +1,19 @@
-# Diagnostic-hook reachability and boundary map (M23.8)
+# Diagnostic-hook reachability and boundary map (M23.8, updated M23.9)
 
-> **Status:** audit of `PERCEIVE_ONCE` and `STREAM_CONSUME` at `740a245` (M23.8, 2026-11-04).
+> **Status (M23.9, 2026-11-04): OD-S Option B is implemented. Both hooks exist only in an evidence build.** A real product build was inspected and contains neither (`artifacts/experiments/M23.9-diagnostic-hook-isolation/`). §1, §2, §6 and §8 are current. §3 to §5 are the M23.8 audit, and now describe an evidence build.
+> - **M23.8's audit:** of `PERCEIVE_ONCE` and `STREAM_CONSUME` at `740a245` (2026-11-04).
 > - **Method:** source reading, an inspection of the existing M23.7 product build, and tests that run the real handlers through the real listeners under a fake `chrome` (`apps/extension/test/diagnosticHooks.test.ts`).
 > - **Not a browser validation.** What Chrome itself would deliver or honour is not established here, and is marked UNKNOWN.
-> - **No hook was changed, disabled, moved or restricted.** The decision is OD-S (`od-s-diagnostic-hooks-comparison-PROPOSED.md`).
+> - **M23.8 changed no hook.** M23.9 implemented the owner's decision, OD-S (`od-s-diagnostic-hooks-comparison-PROPOSED.md`).
 > - **Labels:** FACT (source, or a test of this repository's code), INFERENCE, or UNKNOWN.
 
 ## 1. Summary
 
 - **Ordinary task execution reaches neither hook** (FACT: a whole task sends neither kind, and `runTask` names neither).
-- **Both hooks ship in the product bundle** (FACT: `logs/w1-m23-7-product-build-inspection.json`). Their source comments say "test only", but no build flag keeps them out.
-- **"DevTools-only" is true of `__host`, not of the handlers.** Each handler accepts a message from any context of this extension, including this extension's own content script (FACT, tested). No source sends one that way, and no page has a channel to one. This corrects M23.7's wording.
+- **A product build contains neither hook** (FACT, M23.9: a real build, `logs/w1-m23-9-product-build-inspection.json`). Not refused: absent. Their kinds are answered `UNKNOWN_KIND`, as a kind nobody defined is. At M23.8 both shipped in the product bundle.
+- **In an evidence build, "DevTools-only" is true of `__host`, not of the handlers.** Each handler accepts a message from any context of this extension, including this extension's own content script (FACT, tested). No source sends one that way, and no page has a channel to one. This corrects M23.7's wording. Preserved, not fixed, by M23.9.
 - **No hook returns a pixel to any caller** (FACT, tested: an exact field list, no image shape).
-- **A hook can still capture in a product build.** With a live gesture grant, `PERCEIVE_ONCE` captures and decodes a frame and starts TR-01. T1 stays out.
+- **An evidence build's hooks can capture.** With a live gesture grant, `PERCEIVE_ONCE` captures and decodes a frame, runs T1 and starts TR-01. No product build has this path.
 
 ## 2. Route classification
 
@@ -20,17 +21,20 @@
 |---|---|---|---|---|---|---|---|---|---|
 | `RUN_TASK` | `__host.runTask` | this extension; **tab senders refused** | no frame is ever asked for | **no** (product) | **no** | **no** | run record | all | **Normal product task path** (evidence builds add perception) |
 | `TASK_PREPARE`, `TASK_START`, `TASK_STATUS` | side panel | `isFromExtensionUi` | no frame is ever asked for | **no** (product) | **no** | **no** | form, status, run record | all | **Normal product task path** |
-| `PERCEIVE_ONCE` | `__host.perceiveOnce`; `__host.toOffscreen` | this extension; **tab senders accepted** | **yes**, through the capture authority | with a grant: **yes** | product: **refused, never fetched**. Evidence: loaded and run | with a frame: **yes** | codes, counts, timings, geometry | **all** | **Diagnostic product path** |
-| `STREAM_CONSUME` | `__host.consumeProbe`; `__host.toOffscreen` | this extension; **tab senders accepted** | **not checked by the handler.** It needs a stream id, which only the worker can mint under a grant | **yes**, one frame, then closed | no | no | width, height, settings, timings | **all** | **Diagnostic product path** |
-| `__host` members (`perceiveOnce`, `consumeProbe`, `mintStreamId`, `noteGrant`, `toOffscreen`, …) | a person or tool attached to the service worker through DevTools | a global on the worker; no message reaches it | as above | as above | as above | as above | as above | **all** | **Diagnostic product path** |
+| `PERCEIVE_ONCE` | `__host.perceiveOnce`; `__host.toOffscreen` | this extension; **tab senders accepted** | **yes**, through the capture authority | with a grant: **yes** | loaded and run | with a frame: **yes** | codes, counts, timings, geometry | **evidence only (M23.9)** | **Evidence-build-only path** |
+| `STREAM_CONSUME` | `__host.consumeProbe`; `__host.toOffscreen` | this extension; **tab senders accepted** | **not checked by the handler.** It needs a stream id, which only the worker can mint under a grant | **yes**, one frame, then closed | no | no | width, height, settings, timings | **evidence only (M23.9)** | **Evidence-build-only path** |
+| `__host.perceiveOnce`, `consumeProbe`, `ticketProbe`, `mintStreamId` | a person or tool attached to the service worker through DevTools | a global on the worker; no message reaches it | as above | as above | as above | as above | as above | **evidence only (M23.9)** | **Evidence-build-only path** |
+| Other `__host` members (`toOffscreen`, `captureState`, `noteGrant`, `runTask`, …) | as above | as above | none of them captures | **no** | no | no | status; run records | all | **Diagnostic product path** (no capture). `toOffscreen` forwards any message; a hook's kind finds no handler in a product build |
 | `ORT_SMOKE`, `REALM_PROBE` | `__host.toOffscreen` | this extension | n/a | no | product: not loaded | no | runtime status; API surface | all | **Diagnostic product path** (no capture) |
-| `CAPTURE_FRAME` | the perception realm | **offscreen document only** (`isFromOffscreenDocument`) | **yes** | issues a handle or a refusal | no | no | ticket | all | Internal to a perception pass; in a product build reached only through `PERCEIVE_ONCE` |
+| `CAPTURE_FRAME` | the perception realm | **offscreen document only** (`isFromOffscreenDocument`) | **yes** | issues a handle or a refusal | no | no | ticket | **evidence only (M23.9)** | **Evidence-build-only path (M23.9).** Internal to a perception pass. A product worker has no handler and answers nothing with a ticket |
 | `WORKER_FRAME` route (`captureVisibleTab`) | capture authority | compiled in only with `M3_WORKER_FRAME=1` | no | yes, in the worker | evidence | evidence | ticket with a data URL | evidence only | **Evidence-build-only path** |
 | `serveTr01Probe` (masked-frame reader, encoder, test-sink send) | `TR01_PROBE` messages | absent from a product build (`probe/tr01-absent.ts` answers `false`) | per probe | yes | evidence | evidence | per probe | evidence only | **Evidence-build-only path** |
 | `#structural-probe`, `#egress-evidence-probe`, `#e6-probe` | their harnesses | stubs in a product build | n/a | no | no | no | per probe | evidence only | **Evidence-build-only path** |
 | Harness drivers (`tests/browser/extension/*.mjs`) | a person or CI running them | outside the extension | as above | as above | as above | as above | evidence records | not shipped | **Test-only path** |
 
 ## 3. `PERCEIVE_ONCE`, from origin to end
+
+*M23.8's audit. Since M23.9 this path exists only in an evidence build; line references are as of `740a245`, and what it says of a product build was true then.*
 
 1. **Origin.** `__host.perceiveOnce(tabId, frameId)` (`host/background.ts:203`), or any `chrome.runtime.sendMessage` of this kind from a context of this extension. `__host.toOffscreen` (`:108`) forwards any message.
 2. **Handler.** `host/offscreen/main.ts:458`, after `msg.target === "offscreen"` and `isFromThisExtension(sender)` (`:382`). There is no tab refusal, no check of `tabId` or `frameId`, and no check for a task in progress.
@@ -46,6 +50,8 @@
 
 ## 4. `STREAM_CONSUME`, from origin to end
 
+*M23.8's audit; as for §3.*
+
 1. **Origin.** `__host.consumeProbe()` (`host/background.ts:186`), which asks the capture authority for a ticket first and answers `NO_GRANT` when no person has invoked the extension (tested). Or any message of this kind from a context of this extension.
 2. **Handler.** `host/offscreen/main.ts:484`, with the same two guards. **It checks no grant and does not validate `streamId`:** whatever id it is given goes to `getUserMedia` (tested).
 3. **The gate is the browser's.** A usable id comes only from `getMediaStreamId`, which only the worker calls; M3.1 measured Chrome refusing that call without an invocation (`host-lib/capture-authority.ts`). Whether Chrome would honour an id that was not minted for this extension is **UNKNOWN**.
@@ -53,6 +59,8 @@
 5. **Reply.** `ok, w, h, settings, ms`. No T1, no TR-01 (tested).
 
 ## 5. Who can issue them
+
+*In an evidence build, unchanged by M23.9. In a product build every row below ends at `UNKNOWN_KIND`, or at `SENDER_NOT_ACCEPTED` for another extension, and nothing starts (tested).*
 
 | Sender | What the handlers do | Sent in source? | Evidence |
 |---|---|---|---|
@@ -77,11 +85,35 @@
 | F-7 | `PERCEIVE_ONCE` brings ORT up (fetching and hashing the pinned WASM, in a real browser) even when it then refuses for want of a grant | FACT for the call; the cost is not measured |
 | F-8 | No handler checks whether a task is running. `perceiveTab` sets and clears `captureTabId`, which only a perception pass reads, so this cannot disturb a product task. In an evidence build, whose tasks do use it, a concurrent call could | FACT (source); the evidence-build effect is INFERENCE |
 
-**None of these gives a caller a pixel, and none is in the ordinary task path.** They are a question of what a DOM-only product should ship.
+**None of these gives a caller a pixel, and none is in the ordinary task path.** They were a question of what a DOM-only product should ship.
+
+**Where each stands after M23.9:**
+
+| # | In a product build | In an evidence build |
+|---|---|---|
+| F-1 | **closed:** absent from the bundle (real build) | present, by design |
+| F-2 | no longer applies | still applies; this corrects M23.7 |
+| F-3 | **closed:** no handler to reach | **preserved, not fixed,** and pinned by a test |
+| F-4 | **closed:** no handler | **preserved, not fixed.** An unminted id is refused only by the browser (a fake here), and the handler does not check it |
+| F-5 | **closed:** no path to a frame | still applies |
+| F-6 | **closed:** a driver that is gone cannot return an empty list. `run-detector-eval` now throws on a product build | does not apply: T1 runs, so an empty list means what it says |
+| F-7 | **closed for these hooks.** `ORT_SMOKE` still brings ORT up, as M13 requires | still applies |
+| F-8 | **closed:** `perceiveTab` is absent | still applies |
 
 ## 7. Still UNKNOWN
 
 - Chrome's delivery of a cross-extension or page message, on this build: not measured here.
 - Whether Chrome honours a `chromeMediaSourceId` it did not mint for this extension.
 - Any real-browser behaviour of either hook after M23.7. Neither has been run since then.
+- Whether an evidence build compiles and runs after M23.9. None was made, as instructed.
+- Real-browser behaviour of the M23.9 product build. It has been built and read, not run.
 - U-1 (M23.3): a complete proof that no message carries frame bytes. M23.8 adds evidence for the hooks' replies and for the task path. It is not a proof over every message.
+
+## 8. What a product build still has (M23.9)
+
+| Item | Why it stays | Reach |
+|---|---|---|
+| `__host.toOffscreen` | names no kind; M13's product phase (`ORT_SMOKE`) and the observation harnesses use it | can send any message, as any context of this extension can. A hook's kind gets `UNKNOWN_KIND` (tested). **So "no sender capable" holds for senders that name a hook, and cannot hold for generic messaging** |
+| The capture authority, with `getMediaStreamId` and `ticketFor` | changing it was forbidden; the toolbar's grant and the panel's status use it | `ticketFor` has no caller (source, tested; one occurrence in the built worker, its definition) |
+| `tabCapture`, `activeTab` | changing them was forbidden | nothing in a product build uses `tabCapture` now. A separate owner decision |
+| TR-01's model and worker | changing them was forbidden | packaged with its integrity check; the product bundle has no way to start it |

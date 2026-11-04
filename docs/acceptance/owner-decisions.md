@@ -1,11 +1,13 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.8, 2026-11-04):**
+> **Status (updated M23.9, 2026-11-04):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
 > - **Implemented in M23.7 (owner-authorised), product builds only:** OD-P and OD-R. M23.8 tested the boundary under a simulated extension. **Neither is browser-verified or accepted.**
-> - **Prepared in M23.8:** OD-S, OD-T and OD-U. None is decided.
+> - **Prepared in M23.8:** OD-S, OD-T and OD-U.
+> - **Selected and implemented in M23.9:** **OD-S: APPROVED — OPTION B** (2026-11-04), implemented in product builds. **Not browser-verified.**
+> - **Awaiting the owner:** OD-T, OD-U, and OD-V (added by M23.9).
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -378,7 +380,7 @@ Each sub-decision is separate.
 
 | ID | Decision | M23.8 input | Status |
 |---|---|---|---|
-| OD-S | **Diagnostic capture hooks** (`PERCEIVE_ONCE`, `STREAM_CONSUME`, the `__host` drivers): (A) retain in product builds, (B) move to evidence builds only, (C) remove | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `diagnostic-hook-boundary-map.md`. **PROPOSED — AWAITING OWNER APPROVAL: option B** | **AWAITING OWNER APPROVAL.** Any change needs its own authorisation |
+| OD-S | **Diagnostic capture hooks** (`PERCEIVE_ONCE`, `STREAM_CONSUME`, the `__host` drivers): (A) retain in product builds, (B) move to evidence builds only, (C) remove | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `diagnostic-hook-boundary-map.md` | *(M23.8 status, superseded by M23.9 below:)* awaiting the owner |
 | OD-T | **The product's visible capture wording:** the side panel's "Click the toolbar button to let PratiBimb look at this tab" and the toolbar title "perceive this tab", neither true of a product task | same comparison document | **AWAITING OWNER APPROVAL.** A product text change |
 | OD-U | **`run-gesture-capture.mjs` and `run-gesture-acts.mjs`:** re-scope to an evidence build, or retire the four checks a product build can no longer pass | `evidence-build-preservation-assessment.md` §3 | **AWAITING OWNER APPROVAL** |
 
@@ -391,3 +393,31 @@ Each sub-decision is separate.
 **Needs a separate authorisation, not a decision between options:** the human browser smoke run (`dom-only-browser-smoke-procedure-PROPOSED.md`), and any evidence-build run.
 
 **Not authorised:** detector evaluation, FR-01, Phase 2, frame egress.
+
+## M23.9 — status after OD-S
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-S | **APPROVED — OPTION B (owner, 2026-11-04):** `PERCEIVE_ONCE` and `STREAM_CONSUME` exist only in evidence builds; absent, not refused, in a product build | **M23.9: IMPLEMENTED IN PRODUCT BUILDS, after verification.** A real product build was inspected and contains neither hook, no driver, no capture ticket and no capture call. Evidence-build behaviour is preserved in source and under test doubles | **Not browser-verified. Evidence-build runtime UNVERIFIED: none was built.** It costs six evidence harnesses their ability to run (OD-V) |
+
+**New; awaiting the owner:**
+
+| ID | Decision | Input | Status |
+|---|---|---|---|
+| OD-V | **The byte-identity guard in six evidence harnesses** (`run-gesture-redaction`, `run-webp-loopback`, `run-artifact-verifier`, `run-capture-determinism`, `run-stream-j7`, `run-stream-re1`). They refuse unless both builds' `background.js` match, which OD-S makes impossible. How should the guard change, and what may those records claim? | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `evidence-build-preservation-assessment.md` §5. **PROPOSED — AWAITING OWNER APPROVAL: option A there** | **AWAITING OWNER APPROVAL.** Until then the six refuse, fail-closed |
+
+**Still awaiting the owner, unchanged by M23.9:**
+- **OD-T:** the product's visible capture wording.
+- **OD-U:** `run-gesture-capture.mjs` and `run-gesture-acts.mjs`. M23.9 adds a fact to it: `run-gesture-capture.mjs` now throws on a product build.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**Also the owner's, and raised only as a question:** a product build no longer uses `tabCapture`. M23.9 leaves it in place, as instructed.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 is unchanged.**

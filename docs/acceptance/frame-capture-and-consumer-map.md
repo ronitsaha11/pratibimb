@@ -3,7 +3,7 @@
 > **Status:** static source map at `a165c7a` (M23.5, 2026-11-03).
 > - **Nothing run or touched:** no frame was captured, no model was loaded, and no code was changed.
 > - **Labels:** FACT (source, cited), INFERENCE, or UNKNOWN.
-> - **Since then:** M23.7 took capture out of product tasks, so the chain below now describes evidence builds and the diagnostic path. M23.8 audited that path: `diagnostic-hook-boundary-map.md`.
+> - **Since then:** M23.7 took capture out of product tasks, so the chain below now describes evidence builds and the diagnostic path. M23.8 audited that path: `diagnostic-hook-boundary-map.md`. **M23.9 (OD-S) took that path out of product builds too,** so this chain now describes evidence builds alone.
 
 ## 1. The capture chain
 
@@ -34,7 +34,7 @@
 | TR-01 worker | a copy of the RGBA | scrubbed at run end |
 | `sanitizeFrame` / `sanitized` | the masked RGBA | until the next pass or `null`; **no product reader** |
 
-**Present in a product build, but reachable only through test or evidence entries (FACT):**
+**Present in a product build at the time, but reachable only through test or evidence entries (FACT at `a165c7a`; since M23.9, in evidence builds only):**
 
 | Entry | What it returns | Reachable from |
 |---|---|---|

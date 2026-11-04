@@ -4,7 +4,7 @@
 > - **It needs a separate authorisation.** It builds the product (the build's own hook reads and hashes TR-01), runs the real local language model (inference), and opens a real browser. M23.8 does none of these.
 > - **It claims nothing until it is run.** No product runtime validation exists for M23.7 yet.
 > - **Scope:** one operator, one machine, Chrome for Testing, the synthetic loopback fixture. It is evidence type C, unless the operator meets OD-C's definition. It says nothing about Firefox, a second machine, real sites or performance.
-> - **It must not call a diagnostic hook.** No `perceiveOnce`, `consumeProbe` or `mintStreamId`: they can capture.
+> - **A product build has no diagnostic hook to call (M23.9, OD-S).** Check D7 confirms that.
 
 ## 1. Before starting
 
@@ -74,7 +74,7 @@ This is the one that matters most: a grant must not start a capture.
 
 ### D. Looking for what must be absent
 
-Use `chrome://extensions` → Inspect views. **Read only; do not call a hook.**
+Use `chrome://extensions` → Inspect views. **Read only.**
 
 | # | Where | Do | Expect |
 |---|---|---|---|
@@ -84,6 +84,7 @@ Use `chrome://extensions` → Inspect views. **Read only; do not call a hook.**
 | D4 | service worker, Console | `__host.seen.filter((e) => e.message?.kind === "CAPTURE_FRAME" \|\| e.message?.kind === "CAPTURE_TICKET").length` | **0** |
 | D5 | service worker, Console | `/iVBORw0KGgo\|data:image/.test(JSON.stringify(__host.seen))` | **false** |
 | D6 | service worker, Console | `(await chrome.runtime.sendMessage({ target: "offscreen", kind: "TASK_STATUS" })).task.result` and read it | `ports.perception` is `[]`; `perceptionBoot` is `null`; in each turn's `handoff`, `capability` is `{ backend: "none", tiers_fired: ["T0","T2"] }`, every element's `source` is `"dom"`, and `elements` is non-empty |
+| D7 | service worker, Console | `["perceiveOnce", "consumeProbe", "ticketProbe", "mintStreamId"].filter((name) => name in __host)` | **`[]`** |
 
 ### E. Consent
 
