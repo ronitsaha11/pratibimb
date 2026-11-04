@@ -119,10 +119,10 @@ The six OD-V harnesses have **no diff.** `judgeBuildSeparation` is unchanged, al
 
 1. **Neither harness was run, and no evidence build exists.** **Evidence-build runtime validation is outstanding.**
 2. **The gate has only been shown to accept synthetic evidence builds.** On a real one it rests on the configuration and on names partly inferred (M23.10's limitation 3). A wrong inference refuses, safely.
-3. **Whether their checks pass today is UNKNOWN.** Each harness's only recorded real run in this repository passed on 2026-09-24, and much has changed since. Some may now fail on an evidence build for reasons nobody has looked at.
+3. **Whether their checks pass today is UNKNOWN.** Every recorded real run in this repository passed on 2026-09-24 (`run-gesture-capture` in M4; `run-gesture-acts` in M5 and M5.1), and much has changed since. Some may now fail on an evidence build for reasons nobody has looked at.
 4. **`theDetectorRanOnThePinnedArtifact` overstates:** T1's bytes are not integrity-checked in a build (OD-O). The name is kept, because assertions were not to change. It should not be read as a pin.
 5. **Unlike the six, these two cannot compare `content.js` or the manifest across builds:** they make no builds. Their manifest is held to the product policy by constant, and E6's markers are looked for. Any other change to `content.js` would not be caught here.
-6. **A real run would overwrite a historic record.** Both write to `w1-cft153-gesture-capture.json` and `w1-cft153-gesture-acts.json`, the tracked September records, and have no check against that, unlike the six. Recoverable from Git, but **worth resolving before authorising a run.** Not changed here.
+6. **A real run would overwrite a historic record.** Both write to `w1-cft153-gesture-capture.json` and `w1-cft153-gesture-acts.json` in the M4 and M5 logs, the tracked September records, and have no check against that, unlike the six. Recoverable from Git, but **worth resolving before authorising a run.** Not changed here.
 7. **F-3 and F-4 remain in evidence builds.**
 
 ## Conclusion

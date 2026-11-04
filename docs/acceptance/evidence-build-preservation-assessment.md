@@ -93,7 +93,7 @@ A separately authorised run: build with an evidence flag, then run an evidence h
 | Is a missing or unidentifiable build refused? | **Yes** | synthetic builds; a fake browser |
 | Would a real evidence build be accepted? | **UNVERIFIED.** Only synthetic ones have been. INFERENCE from the configuration and partly measured names. A wrong inference refuses | — |
 | Do the grant and stream checks hold under fakes? | **Yes,** those evaluated | simulated extension |
-| Do either harness's 41 checks pass today? | **UNKNOWN.** Each harness's only recorded real run passed on 2026-09-24 | — |
+| Do either harness's 41 checks pass today? | **UNKNOWN.** Every recorded real run (M4; M5 and M5.1) passed on 2026-09-24 | — |
 
 **Before authorising a real run:** both harnesses would overwrite their tracked September records.
 
