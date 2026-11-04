@@ -1,6 +1,6 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.11, 2026-11-04):**
+> **Status (updated M23.12, 2026-11-04):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
@@ -9,7 +9,7 @@
 > - **Selected and implemented in M23.9:** **OD-S: APPROVED — OPTION B** (2026-11-04), implemented in product builds. **Not browser-verified.**
 > - **Selected and implemented in M23.10:** **OD-V** (2026-11-04), in the six harness contracts. **No harness was run.**
 > - **Selected and implemented in M23.11:** **OD-U: OPTION B** (2026-11-04), in the two gesture harnesses. **Neither was run.**
-> - **Awaiting the owner:** OD-T.
+> - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. **Not rebuilt or seen in a browser.**
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -383,7 +383,7 @@ Each sub-decision is separate.
 | ID | Decision | M23.8 input | Status |
 |---|---|---|---|
 | OD-S | **Diagnostic capture hooks** (`PERCEIVE_ONCE`, `STREAM_CONSUME`, the `__host` drivers): (A) retain in product builds, (B) move to evidence builds only, (C) remove | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `diagnostic-hook-boundary-map.md` | *(M23.8 status, superseded by M23.9 below:)* awaiting the owner |
-| OD-T | **The product's visible capture wording:** the side panel's "Click the toolbar button to let PratiBimb look at this tab" and the toolbar title "perceive this tab", neither true of a product task | same comparison document | **AWAITING OWNER APPROVAL.** A product text change |
+| OD-T | **The product's visible capture wording:** the side panel's "Click the toolbar button to let PratiBimb look at this tab" and the toolbar title "perceive this tab", neither true of a product task | same comparison document | *(M23.8 status, superseded by M23.12 below:)* awaiting the owner |
 | OD-U | **`run-gesture-capture.mjs` and `run-gesture-acts.mjs`:** re-scope to an evidence build, or retire the four checks a product build can no longer pass | `evidence-build-preservation-assessment.md` §3 | *(M23.8 status, superseded by M23.11 below:)* awaiting the owner |
 
 **Still awaiting the owner, unchanged:**
@@ -457,13 +457,38 @@ Each sub-decision is separate.
 **Remains implemented:** OD-P, OD-R, OD-S and OD-V. Not browser-verified, not accepted.
 
 **Still awaiting the owner, unchanged by M23.11:**
-- **OD-T:** the product's visible capture wording. Nothing changed.
+- **OD-T:** *(M23.11 status, superseded by M23.12 below.)* the product's visible capture wording. Nothing changed.
 - OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
 - GOV-01, OD-E1, OD-K, OD-L, OD-M;
 - OD-A to OD-D, OD-G;
 - OD-H, OD-E2 to OD-E8.
 
 **For the owner's next review of the PROPOSED criteria, not changed here:** `BRW-04` and the scope's "Capture: gesture-authorised" still read as product capability. See the M23.11 decision record.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.12 — status after OD-T
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-T | **SELECTED (owner, 2026-11-04):** toolbar title `PratiBimb — Page Assistant`; side-panel description `PratiBimb uses page structure to identify elements and assist with browser tasks.`; privacy explanation `Normal tasks do not capture browser screenshots or send page images to the reasoning model.` | **M23.12: IMPLEMENTED, after verification.** The panel's two sentences appear in product builds only, because the privacy one is false in an evidence build. The Capture field is evidence-build-only, with its original words. The shortcut text reuses the approved title | **Not rebuilt and not seen in a browser.** It says nothing about visual PII, whose protection is not operational (`artifacts/experiments/M23.12-product-ui-language/`) |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-U and OD-V. Not browser-verified, not accepted.
+
+**Still awaiting the owner, unchanged:**
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**For the owner's attention, raised and not decided:**
+- In a product build the toolbar button now has no visible effect. It records a grant that nothing uses, and `tabCapture` has no product user.
+- `BRW-04` and the scope's "Capture: gesture-authorised" still read as product capability (M23.11).
 
 **Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
 

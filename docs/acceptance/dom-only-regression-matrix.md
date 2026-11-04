@@ -1,9 +1,10 @@
-# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11)
+# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11, M23.12)
 
 > **Status:** what M23.8's tests establish about M23.7's boundary (M23.8, 2026-11-04, at `740a245` plus tests).
 > - **What "behavioural" means here:** the real `background.ts`, `offscreen/main.ts`, task run, orchestrator, privacy boundary, execution gate and egress guard ran in Node under a fake `chrome`, with every capture, model and worker API counted (`apps/extension/test/support/simulatedExtension.ts`). **It is a model of a browser, not a browser.**
 > - **Evidence type:** in the terms of `core-product-acceptance-PROPOSED.md` §4, all of this is **type A** (unit and integration). None of it is type B to H. **No browser ran. No acceptance criterion is approved or re-rated by it.**
 > - **Nothing real was involved:** no frame, no model file, no worker, no model server.
+> - **M23.12:** §9 adds OD-T. Not rebuilt and not seen in a browser.
 > - **M23.11:** §8 adds OD-U. Tests and a mutation check; neither harness was run.
 > - **M23.10:** §7 adds OD-V. Tests and a mutation check; no harness was run.
 > - **M23.9:** §6 adds OD-S. It is the one row here with a real build behind it. That build was made and read, not run.
@@ -146,3 +147,19 @@ Commands, exit codes and counts: `artifacts/experiments/M23.10-evidence-harness-
 | The checks catch regressions | 47 deliberate mutations, 47 caught | **mutation** | PASS | — |
 
 Commands, exit codes and counts: `artifacts/experiments/M23.11-gesture-harness-isolation/decision.md`.
+
+## 9. OD-T: the product's wording (M23.12)
+
+| Requirement | Actual evidence | Kind | Result | Not established |
+|---|---|---|---|---|
+| Exact toolbar title | the real `wxt.config.ts`, per flag | **configuration executed** | PASS | a real build; Chrome's display |
+| Exact description and privacy explanation | the real panel code on a fake page; an in-memory product bundle | **behavioural** (fake DOM); **bundle from source** | PASS | real rendering |
+| No stale wording in the product UI | manifest, page and bundle; the updated inspection fails the real previous build on all seven points | **configuration executed**; **bundle from source**; **real build output** (negative) | PASS | a new real build |
+| Evidence wording scoped | five original messages kept in an evidence panel; none in a product bundle; the privacy sentence absent from an evidence panel | **behavioural** (fake DOM); **bundle from source** | PASS | an evidence build |
+| The privacy sentence is true of a normal task | all 14 counters at zero with a grant live; structure-only request; no image marker | **behavioural** (simulated) | PASS | a real browser |
+| It makes no visual-PII claim | the strings; a test | **unit** | PASS | — |
+| Toolbar action and task behaviour unchanged | no diff in the worker, offscreen document or content script; the panel asks for the same things; DOM-only tests pass | `git diff`; **behavioural** (simulated) | UNCHANGED | a real browser |
+| Permissions, CSP, packaging | per flag; the `<style>` hash against the last built manifest | **configuration executed** | UNCHANGED | — |
+| The checks catch regressions | 23 deliberate mutations, 23 caught | **mutation** | PASS | — |
+
+Commands, exit codes and counts: `artifacts/experiments/M23.12-product-ui-language/decision.md`.

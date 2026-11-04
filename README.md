@@ -136,6 +136,10 @@ do, press **Start task**, and answer the consent request. **Allow once** restore
 **Deny** restores nothing. The panel then shows each turn's outcome and its measured stage timings.
 Records go to `artifacts/experiments/M20-runnable-measured-product/logs/`, one new file per run.
 
+The toolbar button is titled **PratiBimb — Page Assistant**, and a normal task does not need it. Normal tasks do
+not capture browser screenshots or send page images to the reasoning model. Visual-only PII protection is not
+operational.
+
 **Outputs:**
 
 - **The side panel:** each turn's outcome, plus timings in ms. "Not measured" means the stage did

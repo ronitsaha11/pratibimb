@@ -5,6 +5,7 @@
 > - **It claims nothing until it is run.** No product runtime validation exists for M23.7 yet.
 > - **Scope:** one operator, one machine, Chrome for Testing, the synthetic loopback fixture. It is evidence type C, unless the operator meets OD-C's definition. It says nothing about Firefox, a second machine, real sites or performance.
 > - **A product build has no diagnostic hook to call (M23.9, OD-S).** Check D7 confirms that.
+> - **Updated M23.12 (OD-T):** a product panel has no Capture field, so A3, C1, C3 and C4 now use the approved wording and the worker's console.
 
 ## 1. Before starting
 
@@ -47,7 +48,8 @@ Each check is PASS or FAIL. **Any frame capture, model-file load or TR-01 worker
 |---|---|---|
 | A1 | Open `chrome://extensions` | the extension loads with no error |
 | A2 | Read its details | permissions and host access match `manifest.json`: `offscreen`, `sidePanel`, `activeTab`, `tabCapture`; `http://127.0.0.1/*` only |
-| A3 | Open Chrome's side panel and choose PratiBimb | the panel renders, styled. Note what its Capture field says (see C4) |
+| A3 | Open Chrome's side panel and choose PratiBimb | the panel renders, styled. It shows the approved description and privacy explanation, and **no Capture field** |
+| A4 | Hover over the extension's toolbar button | the title is **PratiBimb — Page Assistant** |
 
 ### B. A DOM-only task, with no toolbar click
 
@@ -67,10 +69,10 @@ This is the one that matters most: a grant must not start a capture.
 
 | # | Do | Expect |
 |---|---|---|
-| C1 | Start the harness again with `--scenarios allow`, for a fresh page and its own record. On the fixture page, click the extension's toolbar button | the panel's Capture field reads "Authorised. No frame taken yet." |
+| C1 | Start the harness again with `--scenarios allow`, for a fresh page and its own record. On the fixture page, click the extension's toolbar button | nothing visible changes in the panel. In the service worker's Console, `__host.captureState().grants` has one entry |
 | C2 | Run the task as in B | it completes as in B, with no tab-capture indicator |
-| C3 | Read the Capture field after the task | **still "Authorised. No frame taken yet."** "Authorised for the page currently open" would mean a capture ticket was issued: **FAIL** |
-| C4 | Note the panel's wording before and after | **known discrepancy (OD-T):** the panel asks for a toolbar click that a task does not need. Record what it said. Not a failure of this run |
+| C3 | In the service worker's Console, read `__host.captureState().grants` after the task | **still `boundTo: null`.** A bound grant would mean a capture ticket was issued: **FAIL** |
+| C4 | Read the panel's wording before and after | the approved sentences, unchanged. Nothing in the panel asks for a toolbar click. Any capture wording in the panel, other than the Status box's raw `captureStatus` key, is a **FAIL** |
 
 ### D. Looking for what must be absent
 

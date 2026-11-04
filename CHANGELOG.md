@@ -35,6 +35,11 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.12 — The product's UI says what a product task does (OD-T; UI copy, tests and documentation only).** Toolbar title
+  `PratiBimb — Page Assistant`, plus the approved side-panel description and privacy explanation. Those two sentences appear
+  in product builds only, because the privacy one is false in an evidence build, and the Capture field is now
+  evidence-build-only with its original words. No claim about visual PII, whose protection is not operational. No task,
+  permission, CSP, packaging or hook change. Not rebuilt or seen in a browser.
 - **M23.11 — Gesture harnesses are evidence-build-only (OD-U, Option B; harnesses, tests and documentation only).**
   `run-gesture-capture.mjs` and `run-gesture-acts.mjs` call one fail-closed gate first, which identifies a build from
   `connect-src`, the hooks' names and T1's presence by file name. A product, missing or unidentifiable build is refused before
