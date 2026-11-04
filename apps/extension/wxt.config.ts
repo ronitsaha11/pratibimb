@@ -19,6 +19,7 @@ import { readFileSync } from "node:fs";
 import { extensionPagesCsp } from "./host-lib/extension-csp";
 import { ORT_PIN } from "../../packages/security/src/generated/ortPin";
 import { TR01_PACKAGE } from "./host-lib/tr01-pin";
+import { TOOLBAR_TITLE } from "./host-lib/product-copy";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..", "..");
@@ -184,9 +185,9 @@ export default defineConfig({
     version: "0.0.0",
     minimum_chrome_version: "116",
     permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
-    action: { default_title: "PratiBimb: perceive this tab" },
+    action: { default_title: TOOLBAR_TITLE },
     commands: {
-      _execute_action: { suggested_key: { default: "Alt+Shift+P" }, description: "Perceive this tab" },
+      _execute_action: { suggested_key: { default: "Alt+Shift+P" }, description: TOOLBAR_TITLE },
     },
     host_permissions: HOST_PERMISSIONS,
     content_security_policy: {

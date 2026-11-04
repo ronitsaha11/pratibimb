@@ -137,7 +137,7 @@ try {
     const before = await worker.evaluate(() => globalThis.__host.captureState().grants.length);
     console.log(`\n  ┌─ ${act} ─────────────────────────────────────────────────────────────┐`);
     console.log("  │  Click the extension's toolbar button on the fixture tab.          │");
-    console.log("  │  (Puzzle-piece menu → \"PratiBimb: perceive this tab\" if unpinned.)  │");
+    console.log("  │  (Puzzle-piece menu → \"PratiBimb — Page Assistant\" if unpinned.)    │");
     console.log("  └────────────────────────────────────────────────────────────────────┘");
     const started = Date.now();
     while (Date.now() - started < WAIT_MS) {

@@ -25,7 +25,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { evidenceReferenceFlags } from "../../../tests/browser/support/build-separation.mjs";
 import { parseCsp, PRODUCT_CSP, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
-import { EXPECTED_PRODUCT_FILES } from "../../../tests/browser/support/product-build-inspection.mjs";
+import { APPROVED_UI_COPY, EXPECTED_PRODUCT_FILES, STALE_UI_WORDING } from "../../../tests/browser/support/product-build-inspection.mjs";
+import { PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, TOOLBAR_TITLE } from "../host-lib/product-copy";
 import { ORT_PIN } from "../../../packages/security/src/generated/ortPin";
 import { TR01_PACKAGE } from "../host-lib/tr01-pin";
 
@@ -171,6 +172,8 @@ interface GateRemoved {
   readonly file: string;
   readonly gate: string;
   readonly replacement: string;
+  /** A second gate in the same file, for a regression that takes two out together. */
+  readonly also?: readonly [string, string];
 }
 
 /** Which source files each entry point took, from the last bundle: its module graph, with the product's flags. */
@@ -216,7 +219,12 @@ async function productBundle(removed?: GateRemoved): Promise<Readonly<Record<str
             if (args.path.replace(/\\/g, "/") !== target) return undefined;
             const code = readSourceFile(args.path, "utf8").replace(/\r\n/g, "\n");
             if (!code.includes(removed.gate)) throw new Error(`the gate is not in ${removed.file}: ${removed.gate}`);
-            return { contents: code.replace(removed.gate, removed.replacement), loader: "ts" };
+            let contents = code.replace(removed.gate, removed.replacement);
+            if (removed.also) {
+              if (!contents.includes(removed.also[0])) throw new Error(`the gate is not in ${removed.file}: ${removed.also[0]}`);
+              contents = contents.replace(removed.also[0], removed.also[1]);
+            }
+            return { contents, loader: "ts" };
           });
         },
       },
@@ -335,6 +343,65 @@ describe("M23.10 (OD-V) — why two evidence builds' workers should match: the c
 
   // This establishes an expectation, not a fact: no evidence build was compared here. A harness's real run
   // makes the comparison, and refuses if the expectation is wrong.
+});
+
+describe("M23.12 (OD-T) — the product's wording, in the real manifest and in a product bundle of the panel", () => {
+  const PANEL = "host/sidepanel/main.js";
+  type Manifest = LoadedConfig["manifest"] & { readonly action: { readonly default_title: string }; readonly commands: { readonly _execute_action: { readonly description: string; readonly suggested_key: unknown } } };
+
+  it("the build-inspection tool expects exactly the approved module's wording", () => {
+    expect(APPROVED_UI_COPY).toEqual({ toolbarTitle: TOOLBAR_TITLE, sidePanelDescription: SIDE_PANEL_DESCRIPTION, privacyExplanation: PRIVACY_EXPLANATION });
+  });
+
+  it("the real manifest's toolbar title is the approved one, and the shortcut's text uses it too", async () => {
+    const manifest = (await loadConfig()).manifest as Manifest;
+    expect(manifest.action.default_title).toBe("PratiBimb — Page Assistant");
+    expect(manifest.commands._execute_action.description).toBe("PratiBimb — Page Assistant");
+    expect(manifest.commands._execute_action.suggested_key).toEqual({ default: "Alt+Shift+P" });
+    expect(productManifestProblems(manifest)).toEqual([]);
+  });
+
+  it("no build's manifest carries stale wording, and the wording does not vary by flag, since the manifests are compared", async () => {
+    const product = (await loadConfig()).manifest as Manifest;
+    for (const flag of FLAGS) {
+      const manifest = (await loadConfig([flag])).manifest as Manifest;
+      expect(manifest.action, flag).toEqual(product.action);
+      expect(manifest.commands, flag).toEqual(product.commands);
+      for (const phrase of STALE_UI_WORDING) expect(JSON.stringify(manifest).toLowerCase(), `${flag}: ${phrase}`).not.toContain(phrase.toLowerCase());
+    }
+  });
+
+  it("a product bundle of the panel says the two approved sentences, and no capture field or stale wording at all", async () => {
+    const panel = (await productBundle())[PANEL]!;
+    expect(panel).toContain(SIDE_PANEL_DESCRIPTION);
+    expect(panel).toContain(PRIVACY_EXPLANATION);
+    for (const phrase of [...STALE_UI_WORDING, "Authorised", "Capture", "capture-slot\")?.append", "evidenceCaptureField"]) {
+      expect(panel.includes(phrase), phrase).toBe(false);
+    }
+  }, 30_000);
+
+  describe("the negative controls: take a gate out, and the same search finds the wording", () => {
+    const FILE = "host/sidepanel/main.ts";
+    const FIELD_GATE = "__EVIDENCE_BUILD__ ? evidenceCaptureField() : null";
+    const TEXT_GATE = "const CAPTURE_TEXT: Record<string, string> = __EVIDENCE_BUILD__\n  ? {";
+    const USE_GATE = "if (__EVIDENCE_BUILD__ && captureEl) {";
+
+    it("without the field's gate, the Capture legend is back", async () => {
+      const panel = (await productBundle({ file: FILE, gate: FIELD_GATE, replacement: "evidenceCaptureField()" }))[PANEL]!;
+      expect(panel).toContain('"Capture"');
+    }, 30_000);
+
+    it("without the text's two gates, the old sentences are back", async () => {
+      const panel = (await productBundle({ file: FILE, gate: TEXT_GATE, replacement: "const CAPTURE_TEXT: Record<string, string> = true\n  ? {", also: [USE_GATE, "if (captureEl) {"] }))[PANEL]!;
+      expect(panel).toContain("look at this tab");
+      expect(panel).toContain("No frame taken");
+    }, 30_000);
+
+    it("with the product's branch removed, the approved sentences are gone", async () => {
+      const panel = (await productBundle({ file: FILE, gate: "if (!__EVIDENCE_BUILD__) {", replacement: "if (__EVIDENCE_BUILD__) {" }))[PANEL]!;
+      expect(panel).not.toContain(PRIVACY_EXPLANATION);
+    }, 30_000);
+  });
 });
 
 describe("TR-01's integrity check is unchanged, in every build", () => {

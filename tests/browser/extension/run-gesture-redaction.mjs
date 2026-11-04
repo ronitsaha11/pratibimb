@@ -246,7 +246,7 @@ try {
       } else {
         console.log(`\n>>> AWAITING_GESTURE window=${index + 1}/${DPRS.length} dpr=${dpr} url=${origin}/mask/`);
         console.log("    In the Chrome for Testing window that just opened, click the PratiBimb toolbar button once");
-        console.log('    (puzzle-piece Extensions menu → "PratiBimb: perceive this tab" if it is not pinned).');
+        console.log('    (puzzle-piece Extensions menu → "PratiBimb — Page Assistant" if it is not pinned).');
       }
       const t0 = Date.now();
       cell.steps.awaitingSince = new Date(t0).toISOString();

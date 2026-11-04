@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { DIAGNOSTIC_HOOK_MARKERS, inspectProductBuild } from "./product-build-inspection.mjs";
+import { APPROVED_UI_COPY, DIAGNOSTIC_HOOK_MARKERS, inspectProductBuild, STALE_UI_WORDING } from "./product-build-inspection.mjs";
 
 const EXPECTED = { ortFiles: ["ort.all.min.js", "ort-wasm-simd-threaded.jsep.wasm"], tr01File: "tr01-ppocrv4-mobile-det.onnx" };
 
@@ -29,7 +29,7 @@ afterEach(() => {
   dir = undefined;
 });
 
-function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx",p=typeof navigator.mediaDevices?.getUserMedia;', background = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;", sidepanel = 'const c="Click the toolbar button";' } = {}) {
+function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx",p=typeof navigator.mediaDevices?.getUserMedia;', background = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;", sidepanel = 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.";' } = {}) {
   dir = mkdtempSync(join(tmpdir(), "m238-build-"));
   mkdirSync(join(dir, "chunks"));
   mkdirSync(join(dir, "content-scripts"));
@@ -38,7 +38,7 @@ function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx
     JSON.stringify({
       permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
       host_permissions: ["http://127.0.0.1/*"],
-      action: { default_title: "PratiBimb: perceive this tab" },
+      action: { default_title: "PratiBimb — Page Assistant" },
       content_security_policy: { extension_pages: POLICY },
       content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],
       ...manifest,
@@ -64,7 +64,7 @@ describe("inspectProductBuild", () => {
     expect(report.files).toContain("tr01-ppocrv4-mobile-det.onnx");
   });
 
-  it("reports what ships as facts: no hook, a panel that still asks for the toolbar (OD-T), an authority that can still mint", () => {
+  it("reports what ships as facts: no hook, a panel that no longer asks for the toolbar (OD-T), an authority that can still mint", () => {
     const { problems, bundle } = inspectProductBuild(syntheticBuild(), EXPECTED);
     expect(problems).toEqual([]);
     expect(bundle).toMatchObject({
@@ -76,7 +76,7 @@ describe("inspectProductBuild", () => {
       callsGetUserMedia: false,
       contentScriptNamesEitherHook: false,
       sidePanelNamesEitherHook: false,
-      sidePanelStillAsksForTheToolbarGesture: true,
+      sidePanelStillAsksForTheToolbarGesture: false,
       workerMintsCaptureHandles: true,
     });
     expect(Object.values(bundle.namesEachHookMarker).every((named) => named === false)).toBe(true);
@@ -99,6 +99,31 @@ describe("inspectProductBuild", () => {
     expect(calling.bundle.callsGetUserMedia).toBe(true);
     rmSync(dir, { recursive: true, force: true });
     expect(inspectProductBuild(syntheticBuild(), EXPECTED).bundle.callsGetUserMedia).toBe(false);
+  });
+
+  it("M23.12 (OD-T): fails a product build without the approved toolbar title", () => {
+    const report = inspectProductBuild(syntheticBuild({ manifest: { action: { default_title: "Something else" } } }), EXPECTED);
+    expect(report.problems).toEqual(["TOOLBAR_TITLE_NOT_THE_APPROVED_WORDING"]);
+  });
+
+  it("M23.12 (OD-T): fails a product panel missing either approved sentence", () => {
+    const noPrivacy = inspectProductBuild(syntheticBuild({ sidepanel: `const a="${APPROVED_UI_COPY.sidePanelDescription}";` }), EXPECTED);
+    expect(noPrivacy.problems).toEqual(["PRIVACY_EXPLANATION_NOT_THE_APPROVED_WORDING"]);
+    rmSync(dir, { recursive: true, force: true });
+    const noDescription = inspectProductBuild(syntheticBuild({ sidepanel: `const p="${APPROVED_UI_COPY.privacyExplanation}";` }), EXPECTED);
+    expect(noDescription.problems).toEqual(["SIDE_PANEL_DESCRIPTION_NOT_THE_APPROVED_WORDING"]);
+  });
+
+  it("M23.12 (OD-T): fails stale capture wording in the panel or the manifest, in any case", () => {
+    const approved = `const a="${APPROVED_UI_COPY.sidePanelDescription}",p="${APPROVED_UI_COPY.privacyExplanation}";`;
+    for (const phrase of STALE_UI_WORDING) {
+      const inPanel = inspectProductBuild(syntheticBuild({ sidepanel: `${approved}const s="${phrase.toUpperCase()}";` }), EXPECTED);
+      expect(inPanel.problems, phrase).toEqual([`STALE_UI_WORDING:${phrase}`]);
+      rmSync(dir, { recursive: true, force: true });
+      const inManifest = inspectProductBuild(syntheticBuild({ manifest: { commands: { _execute_action: { description: phrase } } } }), EXPECTED);
+      expect(inManifest.problems, phrase).toEqual([`STALE_UI_WORDING:${phrase}`]);
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("does not hold ORT's own bundle to names it never chose", () => {

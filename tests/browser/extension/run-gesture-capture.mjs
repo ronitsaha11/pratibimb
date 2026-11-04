@@ -128,7 +128,7 @@ try {
   console.log("  │       one — it should already be in front;                               │");
   console.log("  │    2. click the extension's toolbar button.  If you do not see it, open  │");
   console.log("  │       the puzzle-piece (Extensions) menu and click                       │");
-  console.log('  │       "PratiBimb: perceive this tab".                                    │');
+  console.log('  │       "PratiBimb — Page Assistant".                                      │');
   console.log("  │                                                                          │");
   console.log("  │  That click is the whole experiment: it is the only thing Chrome accepts │");
   console.log("  │  as an activeTab grant, and nothing this process can do substitutes.     │");

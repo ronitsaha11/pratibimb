@@ -39,7 +39,7 @@ function build({ worker, offscreen, content = CONTENT, connectSrc, manifest = {}
     JSON.stringify({
       permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
       host_permissions: ["http://127.0.0.1/*"],
-      action: { default_title: "PratiBimb: perceive this tab" },
+      action: { default_title: "PratiBimb — Page Assistant" },
       content_security_policy: { extension_pages: csp ?? policy(connectSrc) },
       content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],
       ...manifest,
@@ -47,7 +47,7 @@ function build({ worker, offscreen, content = CONTENT, connectSrc, manifest = {}
   );
   writeFileSync(join(dir, "background.js"), worker);
   writeFileSync(join(dir, "chunks", "offscreen-abc.js"), offscreen);
-  writeFileSync(join(dir, "chunks", "sidepanel-abc.js"), 'const c="Click the toolbar button";');
+  writeFileSync(join(dir, "chunks", "sidepanel-abc.js"), 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.";');
   writeFileSync(join(dir, "content-scripts", "content.js"), content);
   writeFileSync(join(dir, "ort.all.min.js"), "");
   // Directories, deliberately. Reading one throws EISDIR.

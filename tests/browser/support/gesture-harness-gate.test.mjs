@@ -39,7 +39,7 @@ function write({ name = "m2311-build-", worker, offscreen, content = CONTENT, co
     "manifest.json": JSON.stringify({
       permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
       host_permissions: ["http://127.0.0.1/*"],
-      action: { default_title: "PratiBimb: perceive this tab" },
+      action: { default_title: "PratiBimb — Page Assistant" },
       content_security_policy: { extension_pages: csp ?? policy(connectSrc) },
       content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],
       ...manifest,
@@ -47,7 +47,7 @@ function write({ name = "m2311-build-", worker, offscreen, content = CONTENT, co
     "background.js": worker,
     "content-scripts/content.js": content,
     "chunks/offscreen-abc.js": offscreen,
-    "chunks/sidepanel-abc.js": 'const c="Click the toolbar button";',
+    "chunks/sidepanel-abc.js": 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.";',
   };
   for (const [path, text] of Object.entries(files)) if (!skip.includes(path)) writeFileSync(join(dir, path), text);
   // Directories, deliberately. Reading one throws EISDIR.

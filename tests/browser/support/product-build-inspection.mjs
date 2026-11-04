@@ -45,6 +45,19 @@ export const DIAGNOSTIC_HOOK_MARKERS = Object.freeze([
   "grabFrame",
 ]);
 
+/**
+ * M23.12 (OD-T): the owner's wording. Plain strings, because a browser-free tool cannot import TypeScript;
+ * `apps/extension/test/buildSeparation.test.ts` fails if these drift from `host-lib/product-copy.ts`.
+ */
+export const APPROVED_UI_COPY = Object.freeze({
+  toolbarTitle: "PratiBimb — Page Assistant",
+  sidePanelDescription: "PratiBimb uses page structure to identify elements and assist with browser tasks.",
+  privacyExplanation: "Normal tasks do not capture browser screenshots or send page images to the reasoning model.",
+});
+
+/** Wording a normal product must not carry: it describes a capture a product task does not make. */
+export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button"]);
+
 const walk = (root, relative = "", out = []) => {
   for (const name of readdirSync(join(root, relative)).sort()) {
     const path = relative === "" ? name : `${relative}/${name}`;
@@ -81,6 +94,11 @@ export function inspectProductBuild(directory, expected) {
     if (includes(everything, marker)) problems.push(`DIAGNOSTIC_HOOK_IN_BUNDLE:${marker}`);
   }
   if (/\.getUserMedia\s*\(/.test(everything)) problems.push("CAPTURE_CALL_IN_BUNDLE");
+  if (manifest.action?.default_title !== APPROVED_UI_COPY.toolbarTitle) problems.push("TOOLBAR_TITLE_NOT_THE_APPROVED_WORDING");
+  if (!includes(sidepanel, APPROVED_UI_COPY.sidePanelDescription)) problems.push("SIDE_PANEL_DESCRIPTION_NOT_THE_APPROVED_WORDING");
+  if (!includes(sidepanel, APPROVED_UI_COPY.privacyExplanation)) problems.push("PRIVACY_EXPLANATION_NOT_THE_APPROVED_WORDING");
+  const productUi = `${JSON.stringify(manifest)}\n${sidepanel}`.toLowerCase();
+  for (const phrase of STALE_UI_WORDING) if (productUi.includes(phrase.toLowerCase())) problems.push(`STALE_UI_WORDING:${phrase}`);
 
   return {
     problems,
