@@ -35,6 +35,11 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.17 — A product declares neither `tabCapture` nor `activeTab` (RD-5, RD-6; build configuration only).** A normal product's
+  permissions are now `offscreen` and `sidePanel`. Evidence builds keep all four: the real config's generated manifests are
+  byte-identical for all five flags. The build-separation contract allows exactly that difference and refuses any other. In the real
+  build only the manifest's `permissions` changed; all JavaScript is byte-identical.
+  - Not run in a browser. No evidence build or harness ran. Not product acceptance, and no authority for a smoke test.
 - **M23.15 — Product identity and acceptance reconciliation (OD-Y, OD-Z; wording only).** The extension and its panel are named
   **PratiBimb — Page Assistant (Development build)**, and the toolbar title is unchanged. `BRW-04` is now a DOM-only browser-task
   requirement, and the acceptance documents state that normal tasks capture no browser frame, need no gesture grant and run no T1

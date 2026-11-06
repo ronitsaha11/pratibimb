@@ -1,6 +1,6 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.15, 2026-11-06):**
+> **Status (updated M23.17, 2026-11-06):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
@@ -12,6 +12,7 @@
 > - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. Not seen in a browser. Its first real build was M23.13's.
 > - **Selected and implemented in M23.13:** **OD-W**, the product's toolbar opens the side panel. **Not tried in a browser.**
 > - **Selected and implemented in M23.14:** **OD-X**, a product's panel does not show `captureStatus`. **Not seen in a browser.**
+> - **Approved and implemented in M23.17:** **RD-5** and **RD-6**, from the M23.16 report: a normal product declares neither `tabCapture` nor `activeTab`; evidence builds keep both. **Not run in a browser.** No other M23.16 recommendation is adopted.
 > - **Implemented in M23.15, as far as existing approvals permit:** **OD-Y**, the product's identity, and **OD-Z**, the acceptance wording including `BRW-04`. **No classification is approved by this.**
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
@@ -570,6 +571,33 @@ Each sub-decision is separate.
 - **The Status box's place in a product,** which is a developer readout. OD-Y did not decide it.
 - Re-scoping `BRW-05` and the detector half of `REL-03`, if the owner wishes (`core-product-acceptance-PROPOSED.md` §5.14).
 - OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**QG-04-S and QG-04-F are not signed.**
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.17 — status after RD-5 and RD-6
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| RD-5 | **APPROVED (owner):** remove `tabCapture` from normal product builds only; evidence builds keep it | **M23.17: IMPLEMENTED IN PRODUCT BUILDS.** One manifest key changes in the real build; all JavaScript is byte-identical (`artifacts/experiments/M23.17-product-permission-isolation/`) | Not run in a browser. Evidence-build runtime stays UNVERIFIED |
+| RD-6 | **APPROVED (owner):** remove `activeTab` from normal product builds only; evidence builds keep it | **M23.17: IMPLEMENTED IN PRODUCT BUILDS,** in the same change | same |
+
+**This resolves the permission review** raised in M23.13. The build-separation contract now allows exactly that difference, and refuses any other.
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W, OD-X, OD-Y and OD-Z. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **From the M23.16 report, none adopted:** RD-1 (worker `justification`), RD-2 (Status box), RD-3 (BRW-05), RD-4 (REL-03), RD-7 (three document corrections), RD-8 (panel turn budget), RD-9 (order of work), RD-10 (Chrome smoke test).
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED; its permission list still names both, and needs updating before approval);
 - GOV-01, OD-E1, OD-K, OD-L, OD-M;
 - OD-A to OD-D, OD-G;
 - OD-H, OD-E2 to OD-E8.

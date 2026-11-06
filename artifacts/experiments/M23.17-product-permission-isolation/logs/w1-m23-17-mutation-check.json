@@ -1,0 +1,254 @@
+{
+  "milestone": "M23.17",
+  "what": "Each mutation breaks one permission, contract check, inspection check or harness wiring. Static and component tests only: no browser, no model, no frame, no evidence build.",
+  "tests": [
+    "tests/browser/support/csp-product-phase.test.mjs",
+    "tests/browser/support/build-separation.test.mjs",
+    "tests/browser/support/gesture-harness-gate.test.mjs",
+    "tests/browser/support/product-build-inspection.test.mjs",
+    "apps/extension/test/buildSeparation.test.ts",
+    "apps/extension/test/domOnlyPhase1.test.ts",
+    "apps/extension/test/visualBoundary.test.ts",
+    "apps/extension/test/permissionIsolation.test.ts"
+  ],
+  "total": 47,
+  "caught": 47,
+  "missed": [],
+  "results": [
+    {
+      "mutation": "the product regains tabCapture",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the product regains activeTab",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the product regains both: back to one shared list",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence loses tabCapture",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence loses activeTab",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence loses both: every build gets the product's list",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the gate is inverted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "an unrelated permission added to evidence",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "an unrelated permission added to both",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a shared permission dropped",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence's order changes",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "host permissions widened",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "optional permissions smuggled in",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the expected product list regains tabCapture",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the approved difference widens",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the approved difference narrows",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a product with a capture permission is not named",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "product permissions are not checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence permissions accept anything",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a duplicate passes as the approved list",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a missing approved difference passes",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "an unrelated difference in evidence passes",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "an unrelated difference in the product passes",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the cross-build route drops all permissions",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the cross-build route drops host permissions too",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the cross-build route ignores the whole CSP",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the cross-build route stops setting the pair aside",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the two-evidence comparison uses the loose route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the contract stops checking evidence's permissions",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence's permissions are not enforced in a dry run",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the contract stops checking the difference",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the contract compares the strict route across builds again",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the contract stops comparing the route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "host permissions stop being compared",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identifyBuild accepts any evidence permissions",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "identifyBuild holds evidence to the product's list: every real evidence build is refused",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the inspection stops looking for a ticket call",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the worker's capture handler loses its gate",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the worker reads the API at boot, so a product without it crashes",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-artifact-verifier goes back to the strict route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-capture-determinism goes back to the strict route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-gesture-redaction goes back to the strict route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-j7 goes back to the strict route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-stream-re1 goes back to the strict route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "run-webp-loopback goes back to the strict route",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a gesture harness loses its gate",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the other gesture harness loses its gate",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}
