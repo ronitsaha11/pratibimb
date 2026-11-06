@@ -434,6 +434,33 @@ describe("M23.13 (OD-W) — the toolbar route, in a product bundle of the worker
   });
 });
 
+describe("M23.14 (OD-X) — `captureStatus`, in a product bundle", () => {
+  it("the panel does not name it, or any of its values, and prints a named list", async () => {
+    const panel = (await productBundle())["host/sidepanel/main.js"]!;
+    for (const word of ["captureStatus", "NO_GRANT", "GRANTED", "STREAM_AVAILABLE", "DOCUMENT_CHANGED", "REVOKED", "lifecycle", "requiresReauth"]) {
+      expect(panel.includes(word), word).toBe(false);
+    }
+    expect(panel).toMatch(/PRODUCT_STATUS_FIELDS = \["bootId", "bootedAt", "offscreenContexts", "hellos"\]/);
+    expect(panel).toMatch(/JSON\.stringify\(s, PRODUCT_STATUS_FIELDS, 2\)/);
+  }, 30_000);
+
+  it("the worker still reports it: only the panel changed", async () => {
+    const worker = (await productBundle())["host/background.js"]!;
+    expect(worker).toMatch(/sendResponse\(\{ bootId, bootedAt, offscreenContexts: \w+, hellos: hellos\.length, captureStatus \}\)/);
+    expect(worker).toContain("capture.status(");
+  }, 30_000);
+
+  it("the negative control: without the panel's gate, the field and its values are back", async () => {
+    const panel = (await productBundle({ file: "host/sidepanel/main.ts", gate: "if (__EVIDENCE_BUILD__ && captureEl) {", replacement: "if (captureEl) {" }))["host/sidepanel/main.js"]!;
+    expect(panel).toContain("captureStatus");
+    expect(panel).toContain("NO_GRANT");
+  }, 30_000);
+
+  it("the two names the inspection now refuses in a product's UI are on its list", () => {
+    expect(STALE_UI_WORDING).toEqual(expect.arrayContaining(["captureStatus", "NO_GRANT"]));
+  });
+});
+
 describe("TR-01's integrity check is unchanged, in every build", () => {
   for (const flags of [[], ["TR01_PROBE"]] as readonly (readonly Flag[])[]) {
     const name = flags.length === 0 ? "product" : "evidence";

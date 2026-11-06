@@ -55,8 +55,8 @@ export const APPROVED_UI_COPY = Object.freeze({
   privacyExplanation: "Normal tasks do not capture browser screenshots or send page images to the reasoning model.",
 });
 
-/** Wording a normal product must not carry: it describes a capture a product task does not make. */
-export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button"]);
+/** Wording a normal product must not carry: it describes a capture a product task does not make. `captureStatus`: M23.14 (OD-X). */
+export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button", "captureStatus", "NO_GRANT"]);
 
 const walk = (root, relative = "", out = []) => {
   for (const name of readdirSync(join(root, relative)).sort()) {

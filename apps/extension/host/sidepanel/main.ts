@@ -74,12 +74,20 @@ const CAPTURE_TEXT: Record<string, string> = __EVIDENCE_BUILD__
     }
   : {};
 
+/**
+ * M23.14 (OD-X): WHAT A PRODUCT'S STATUS BOX SHOWS. `captureStatus` is a diagnostic: a product has no capture to report, so a
+ * person there would only ever read a meaningless `NO_GRANT`. A named list rather than a removal, so that a field the worker
+ * adds later stays out of a product's panel until someone decides to show it. The worker's reply is unchanged, and an evidence
+ * build's panel prints all of it, as it always has.
+ */
+const PRODUCT_STATUS_FIELDS = ["bootId", "bootedAt", "offscreenContexts", "hellos"];
+
 async function refresh() {
   try {
     const s = (await chrome.runtime.sendMessage({ kind: "HOST_STATUS" })) as {
       captureStatus?: { lifecycle: string; requiresReauth: boolean } | null;
     };
-    if (statusEl) statusEl.textContent = JSON.stringify(s, null, 2);
+    if (statusEl) statusEl.textContent = JSON.stringify(s, __EVIDENCE_BUILD__ ? null : PRODUCT_STATUS_FIELDS, 2);
     if (__EVIDENCE_BUILD__ && captureEl) {
       const lifecycle = s?.captureStatus?.lifecycle ?? "NO_GRANT";
       captureEl.textContent = CAPTURE_TEXT[lifecycle] ?? lifecycle;

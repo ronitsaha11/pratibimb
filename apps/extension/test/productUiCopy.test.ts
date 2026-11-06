@@ -14,78 +14,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { structuralRequestProblems } from "../../../tests/browser/support/dom-only-checks.mjs";
 import { PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, TOOLBAR_TITLE } from "../host-lib/product-copy";
+import { bootPanel, fieldsIn } from "./support/fakeSidePanel";
 import { bootSimulatedExtension, NO_VISUAL_ACTIVITY, taskRequest, type Rig } from "./support/simulatedExtension";
 
 const APP = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
 const read = (relative: string): string => readFileSync(join(APP, relative), "utf8").replace(/\r\n/g, "\n");
 const html = read("host/sidepanel/index.html");
-
-// ── a fake page: an element for every id in the real html, and only those ─────────────────────────
-class FakeElement {
-  id = "";
-  hidden = false;
-  textContent = "";
-  disabled = false;
-  value = "";
-  readonly dataset: Record<string, string> = {};
-  readonly children: FakeElement[] = [];
-  constructor(readonly tagName: string) {}
-  append(...nodes: FakeElement[]) {
-    this.children.push(...nodes);
-  }
-  replaceChildren() {
-    this.children.length = 0;
-  }
-  addEventListener() {
-    /* no interaction happens in these tests */
-  }
-  scrollIntoView() {
-    /* nothing to scroll */
-  }
-  querySelector() {
-    return null;
-  }
-}
-
-interface Panel {
-  readonly byId: ReadonlyMap<string, FakeElement>;
-  readonly sent: readonly string[];
-  readonly root: FakeElement;
-  readonly settle: () => Promise<void>;
-}
-
-async function bootPanel(evidenceBuild: boolean, lifecycle = "NO_GRANT"): Promise<Panel> {
-  vi.resetModules();
-  const byId = new Map<string, FakeElement>();
-  for (const match of html.matchAll(/<(\w+)[^>]*\bid="([^"]+)"([^>]*)>/g)) {
-    const element = new FakeElement(match[1]!);
-    element.id = match[2]!;
-    element.hidden = /\bhidden\b/.test(match[0]);
-    byId.set(element.id, element);
-  }
-  const root = new FakeElement("html");
-  const sent: string[] = [];
-  vi.stubGlobal("__EVIDENCE_BUILD__", evidenceBuild);
-  vi.stubGlobal("document", {
-    documentElement: root,
-    createElement: (tag: string) => new FakeElement(tag),
-    createTextNode: (text: string) => ({ text }),
-    getElementById: (id: string) => byId.get(id) ?? null,
-  });
-  vi.stubGlobal("chrome", {
-    runtime: {
-      sendMessage: async (message: { kind: string }) => {
-        sent.push(message.kind);
-        return message.kind === "HOST_STATUS" ? { bootId: "b", captureStatus: { lifecycle, requiresReauth: true } } : { pending: null };
-      },
-    },
-  });
-  vi.stubGlobal("setInterval", () => 0);
-  await import("../host/sidepanel/main");
-  return { byId, sent, root, settle: () => new Promise((resolve) => setTimeout(resolve, 0)) };
-}
-
-const fieldsIn = (element: FakeElement | undefined): FakeElement[] => (element ? element.children.flatMap((child) => [child, ...fieldsIn(child)]) : []);
 
 let rig: Rig | null = null;
 afterEach(() => {
@@ -125,7 +59,7 @@ describe("a product panel", () => {
     }
   });
 
-  it("still reports the host's status, and shows the worker's raw reply as it always did", async () => {
+  it("still reports the host's status, and shows the worker's reply, less what `captureStatusScope.test.ts` covers", async () => {
     const { byId, root, settle } = await bootPanel(false);
     await settle();
     expect(root.dataset.hostStatus).toBe("ok");
