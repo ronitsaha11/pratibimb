@@ -151,14 +151,14 @@ describe("stream and sender authority, as those two harnesses rely on it", () =>
 describe("why a product build is refused: the same sequence has nothing to run on", () => {
   it("run-gesture-capture's four drivers are gone, so its route cannot even be attempted", async () => {
     const r = await boot({ evidenceBuild: false });
-    r.clickToolbar();
+    r.holdGrant();
     for (const driver of ["ticketProbe", "mintStreamId", "consumeProbe", "perceiveOnce"] as const) expect(r.host[driver], driver).toBeUndefined();
     expect(r.visualActivity().mintedStreamIds).toBe(0);
   });
 
-  it("run-gesture-acts would run, with a click, and capture nothing: `everyCaptureUsedTheStreamRoute` cannot hold", async () => {
+  it("run-gesture-acts would run, even with a grant held, and capture nothing: `everyCaptureUsedTheStreamRoute` cannot hold", async () => {
     const r = await boot({ evidenceBuild: false, model: () => [{ op: "click", target: "#submit" }] });
-    r.clickToolbar();
+    r.holdGrant();
     const reply = await r.run(taskRequest(), { grant: true });
     const perception = (reply.result?.ports.perception ?? []) as unknown as readonly Loose[];
     const routesSeen = [...new Set(perception.map((p) => p.route).filter(Boolean))];
@@ -166,5 +166,13 @@ describe("why a product build is refused: the same sequence has nothing to run o
     expect((perception[0]?.detector?.detections ?? 0) > 0).toBe(false); // successPerceivedVisually
     expect(perception).toEqual([]);
     expect(r.visualActivity().getUserMedia).toBe(0);
+  });
+
+  it("and `waitForGesture` would never see a grant from a click: a product's toolbar opens the panel instead (OD-W)", async () => {
+    const r = await boot({ evidenceBuild: false });
+    const before = r.host.captureState().grants.length;
+    r.clickToolbar();
+    expect(r.host.captureState().grants.length > before).toBe(false);
+    expect(r.sidePanelOpens).toEqual([{ tabId: TAB_ID }]);
   });
 });

@@ -404,6 +404,36 @@ describe("M23.12 (OD-T) — the product's wording, in the real manifest and in a
   });
 });
 
+describe("M23.13 (OD-W) — the toolbar route, in a product bundle of the worker", () => {
+  const WORKER = "host/background.js";
+  const onClicked = (worker: string): string => {
+    const start = worker.indexOf("onClicked.addListener(");
+    expect(start, "the worker registers the toolbar's listener").toBeGreaterThan(0);
+    // Up to the listener's own close: esbuild joins the statements after it with commas.
+    return worker.slice(start, worker.indexOf("\n  })", start));
+  };
+
+  it("the listener opens the side panel, and has no grant in it at all", async () => {
+    const handler = onClicked((await productBundle())[WORKER]!);
+    expect(handler).toContain("chrome.sidePanel.open(target)");
+    expect(handler).not.toMatch(/capture\.|\.grant\(|__EVIDENCE_BUILD__/);
+  }, 30_000);
+
+  it("the negative control: without the flag, the grant is back in that listener", async () => {
+    const handler = onClicked((await productBundle({ file: "host/background.ts", gate: "if (__EVIDENCE_BUILD__) {\n      if (typeof tab.id", replacement: "if (true) {\n      if (typeof tab.id" }))[WORKER]!);
+    expect(handler).toContain("capture.grant(tab.id)");
+  }, 30_000);
+
+  it("permissions, hosts, the side panel's registration and CSP are as they were, per flag", async () => {
+    const { manifest } = await loadConfig();
+    expect(manifest.permissions).toEqual(["offscreen", "sidePanel", "activeTab", "tabCapture"]);
+    expect(manifest.host_permissions).toEqual(["http://127.0.0.1/*"]);
+    expect(manifest.side_panel).toEqual({ default_path: "sidepanel.html" });
+    expect(productManifestProblems(manifest)).toEqual([]);
+    for (const flag of FLAGS) expect((await loadConfig([flag])).manifest.permissions, flag).toEqual(manifest.permissions);
+  });
+});
+
 describe("TR-01's integrity check is unchanged, in every build", () => {
   for (const flags of [[], ["TR01_PROBE"]] as readonly (readonly Flag[])[]) {
     const name = flags.length === 0 ? "product" : "evidence";

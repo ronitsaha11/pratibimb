@@ -117,7 +117,7 @@ describe("a product build has neither hook: absent, not refused", () => {
 
   it("with a live grant, which is the case that used to capture, nothing happens at all", async () => {
     const r = await bootProduct();
-    r.clickToolbar();
+    r.holdGrant();
     expect(await r.sendToOffscreen(PERCEIVE_ONCE, SENDERS.worker)).toEqual({ refused: "UNKNOWN_KIND" });
     expect(await r.sendToOffscreen({ ...STREAM_CONSUME, streamId: "opaque-stream-handle-1" }, SENDERS.worker)).toEqual({ refused: "UNKNOWN_KIND" });
     expect(r.visualActivity()).toEqual(NO_VISUAL_ACTIVITY);
@@ -126,7 +126,7 @@ describe("a product build has neither hook: absent, not refused", () => {
 
   it("the one forwarder left names no kind, and what it forwards finds no handler", async () => {
     const r = await bootProduct();
-    r.clickToolbar();
+    r.holdGrant();
     // `toOffscreen` stays: the M13 harness's product phase and the observation harnesses drive through it.
     expect(await r.host.toOffscreen(PERCEIVE_ONCE)).toEqual({ refused: "UNKNOWN_KIND" });
     expect(await r.host.toOffscreen(STREAM_CONSUME)).toEqual({ refused: "UNKNOWN_KIND" });
@@ -136,7 +136,7 @@ describe("a product build has neither hook: absent, not refused", () => {
 
   it("the worker issues no capture ticket to anyone, the offscreen document included", async () => {
     const r = await bootProduct();
-    r.clickToolbar();
+    r.holdGrant();
     for (const sender of [SENDERS.offscreen, SENDERS.sidePanel, SENDERS.worker, SENDERS.otherExtension]) {
       expect(await r.sendToWorker({ kind: "CAPTURE_FRAME", tabId: TAB_ID }, sender)).toEqual({ refused: "SENDER_NOT_ACCEPTED" });
     }
@@ -152,9 +152,9 @@ describe("a product build has neither hook: absent, not refused", () => {
     expect(contexts).toEqual([]);
   });
 
-  it("the grant authority and what the panel reads from it are unchanged: the toolbar still records a grant", async () => {
+  it("the grant authority and what the panel reads from it are unchanged. Since OD-W only a test-only control fills it in a product", async () => {
     const r = await bootProduct();
-    r.clickToolbar();
+    r.holdGrant();
     expect(r.host.captureState().grants).toHaveLength(1);
     const status = (await r.sendToWorker({ kind: "HOST_STATUS" }, SENDERS.sidePanel)) as { captureStatus: { lifecycle: string; requiresReauth: boolean } };
     expect(status.captureStatus).toMatchObject({ lifecycle: "GRANTED", requiresReauth: false });
@@ -163,7 +163,7 @@ describe("a product build has neither hook: absent, not refused", () => {
 
   it("a whole task still sends neither kind and asks for no ticket, with a grant live", async () => {
     const r = await bootProduct({ model: () => [{ op: "click", target: "#submit" }] });
-    r.clickToolbar();
+    r.holdGrant();
     const reply = await r.run(taskRequest());
     expect(reply.ok).toBe(true);
     for (const kind of ["PERCEIVE_ONCE", "STREAM_CONSUME", "CAPTURE_FRAME"]) expect(r.messages).not.toContain(kind);
@@ -205,10 +205,10 @@ describe("in source: each thing a product bundle must not carry is behind the fl
     expect(rest).not.toMatch(/ticketFor|CAPTURE_FRAME|CAPTURE_TICKET/);
   });
 
-  it("the gesture authority itself is not gated: it is built and granted in every build", () => {
+  it("the gesture authority itself is not gated: it is built in every build. Since OD-W only an evidence toolbar grants", () => {
     expect(background).toMatch(/const capture = createCaptureAuthority\(\{/);
     expect(background).toMatch(/getMediaStreamId: \(o\) => chrome\.tabCapture\.getMediaStreamId\(o\),/);
-    expect(background).toMatch(/if \(typeof tab\.id === "number"\) capture\.grant\(tab\.id\);/);
+    expect(background).toMatch(/if \(__EVIDENCE_BUILD__\) \{\n\s+if \(typeof tab\.id === "number"\) capture\.grant\(tab\.id\);/);
     expect(read("host-lib/capture-authority.ts")).not.toMatch(/__EVIDENCE_BUILD__/);
   });
 

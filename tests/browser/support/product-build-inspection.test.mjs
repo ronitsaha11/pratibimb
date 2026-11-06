@@ -29,7 +29,7 @@ afterEach(() => {
   dir = undefined;
 });
 
-function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx",p=typeof navigator.mediaDevices?.getUserMedia;', background = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;", sidepanel = 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.";' } = {}) {
+function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx",p=typeof navigator.mediaDevices?.getUserMedia;', background = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});", sidepanel = 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.";' } = {}) {
   dir = mkdtempSync(join(tmpdir(), "m238-build-"));
   mkdirSync(join(dir, "chunks"));
   mkdirSync(join(dir, "content-scripts"));
@@ -126,6 +126,22 @@ describe("inspectProductBuild", () => {
     }
   });
 
+  it("M23.13 (OD-W): fails a toolbar that does not open the side panel, or that issues a grant, or has a popup", () => {
+    const none = inspectProductBuild(syntheticBuild({ background: "const h={};" }), EXPECTED);
+    expect(none.problems).toEqual(["TOOLBAR_DOES_NOT_OPEN_THE_SIDE_PANEL"]);
+    expect(none.bundle.toolbarOpensTheSidePanel).toBe(false);
+    rmSync(dir, { recursive: true, force: true });
+    const old = inspectProductBuild(syntheticBuild({ background: "chrome.action?.onClicked.addListener(t=>{typeof t.id==\"number\"&&a.grant(t.id)});" }), EXPECTED);
+    expect(old.problems).toEqual(["TOOLBAR_DOES_NOT_OPEN_THE_SIDE_PANEL", "TOOLBAR_ISSUES_A_CAPTURE_GRANT"]);
+    rmSync(dir, { recursive: true, force: true });
+    const both = inspectProductBuild(syntheticBuild({ background: "chrome.action?.onClicked.addListener(t=>{a.grant(t.id);chrome.sidePanel.open(t)});" }), EXPECTED);
+    expect(both.problems).toEqual(["TOOLBAR_ISSUES_A_CAPTURE_GRANT"]);
+    expect(both.bundle.toolbarIssuesACaptureGrant).toBe(true);
+    rmSync(dir, { recursive: true, force: true });
+    const popup = inspectProductBuild(syntheticBuild({ manifest: { action: { default_title: "PratiBimb — Page Assistant", default_popup: "p.html" } } }), EXPECTED);
+    expect(popup.problems).toEqual(["TOOLBAR_HAS_A_POPUP"]);
+  });
+
   it("does not hold ORT's own bundle to names it never chose", () => {
     const build = syntheticBuild();
     writeFileSync(join(build, "ort.all.min.js"), 'const unrelated="grabFrame";');
@@ -146,7 +162,7 @@ describe("inspectProductBuild", () => {
   });
 
   it("fails a bundle with the worker-frame route, or an unsubstituted flag", () => {
-    const worker = inspectProductBuild(syntheticBuild({ background: "chrome.tabs.captureVisibleTab();" }), EXPECTED);
+    const worker = inspectProductBuild(syntheticBuild({ background: "chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});chrome.tabs.captureVisibleTab();" }), EXPECTED);
     expect(worker.problems).toEqual(["WORKER_FRAME_ROUTE_IN_BUNDLE"]);
     rmSync(dir, { recursive: true, force: true });
     const flag = inspectProductBuild(syntheticBuild({ offscreen: "if(__EVIDENCE_BUILD__){}" }), EXPECTED);

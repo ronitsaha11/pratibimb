@@ -224,6 +224,8 @@ export interface RigOptions {
    * It models what M3.1 recorded of Chrome and establishes nothing about Chrome.
    */
   readonly browserHonoursOnlyMintedStreamIds?: boolean;
+  /** How the fake `chrome.sidePanel.open` behaves. It records the call in the first two cases. */
+  readonly sidePanel?: "OK" | "REJECTS" | "THROWS" | "ABSENT";
   /** Collects the context `host/offscreen/main.ts` hands the TR-01 probe, if it hands it any. */
   readonly tr01ProbeContexts?: unknown[];
 }
@@ -281,6 +283,7 @@ interface HostControlPlane {
   readonly grantDecide: (granted: boolean) => Promise<unknown>;
   readonly toOffscreen: (message: object) => Promise<unknown>;
   readonly captureState: () => { grants: readonly unknown[]; workerFrameEnabled: boolean };
+  readonly noteGrant: (tabId: number) => number;
 }
 
 /** What only an evidence build's control plane has (M23.9, OD-S). Read through `driversOf`. */
@@ -306,8 +309,15 @@ export interface Rig {
   readonly released: { readonly tracks: number; readonly bitmaps: number };
   readonly host: HostControlPlane & Partial<EvidenceDrivers>;
   visualActivity(): VisualActivity;
-  /** The toolbar click: a person invoking the extension on the tab. */
-  clickToolbar(): void;
+  /** Every `chrome.sidePanel.open` the worker made, with what it asked for. */
+  readonly sidePanelOpens: readonly unknown[];
+  /** The toolbar click, or `Alt+Shift+P`, which is the same event: a person invoking the extension on the tab. */
+  clickToolbar(tab?: { readonly id?: number; readonly windowId?: number }): void;
+  /**
+   * Put a grant in the capture authority directly, through the test-only `noteGrant`. Since OD-W a product's toolbar makes
+   * none, so a product test that needs a grant to exist, to show a task ignores it, uses this.
+   */
+  holdGrant(): void;
   /** The tab starting to load another document, which is what revokes a grant. */
   navigate(): void;
   /** Deliver a message to the offscreen listener with a sender the test chooses. */
@@ -376,7 +386,8 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
   const swListeners: Listener[] = [];
   const offscreenListeners: Listener[] = [];
   const connectListeners: ((port: unknown) => void)[] = [];
-  const actionListeners: ((tab: { id: number }) => void)[] = [];
+  const actionListeners: ((tab: { id?: number; windowId?: number }) => void)[] = [];
+  const sidePanelOpens: unknown[] = [];
   const updatedListeners: ((tabId: number, change: { status?: string }) => void)[] = [];
   const mintedStreamIds = new Set<string>();
   let registering: "sw" | "offscreen" = "sw";
@@ -468,7 +479,18 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
       },
     },
     offscreen: { Reason: { WORKERS: "WORKERS" }, createDocument: async () => undefined },
-    action: { onClicked: { addListener: (listener: (tab: { id: number }) => void) => actionListeners.push(listener) } },
+    action: { onClicked: { addListener: (listener: (tab: { id?: number; windowId?: number }) => void) => actionListeners.push(listener) } },
+    ...(options.sidePanel === "ABSENT"
+      ? {}
+      : {
+          sidePanel: {
+            open: (target: unknown) => {
+              sidePanelOpens.push(target);
+              if (options.sidePanel === "THROWS") throw new Error("synthetic: open threw");
+              return options.sidePanel === "REJECTS" ? Promise.reject(new Error("synthetic: open was rejected")) : Promise.resolve();
+            },
+          },
+        }),
     tabCapture: {
       // A fresh handle each time, as Chrome's are: the capture authority refuses one it has seen.
       getMediaStreamId: async () => {
@@ -687,8 +709,12 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
     released,
     host,
     visualActivity: () => ({ ...counters }),
-    clickToolbar: () => {
-      for (const listener of actionListeners) listener({ id: TAB_ID });
+    sidePanelOpens,
+    clickToolbar: (tab = { id: TAB_ID }) => {
+      for (const listener of actionListeners) listener(tab);
+    },
+    holdGrant: () => {
+      host.noteGrant(TAB_ID);
     },
     navigate: () => {
       for (const listener of updatedListeners) listener(TAB_ID, { status: "loading" });

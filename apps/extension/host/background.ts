@@ -9,6 +9,7 @@ import { createServiceWorkerRouter, relayRefused, TRANSPORT_CHANNEL, TRANSPORT_P
 
 import { createCaptureAuthority } from "../host-lib/capture-authority";
 import { identityOf, isFromContentScript, isFromExtensionPage, type SenderIdentity, type ToSw } from "../host-lib/messages";
+import { openSidePanelForToolbarClick } from "../host-lib/toolbar-action";
 import { adaptPort, isFromOffscreenDocument } from "../host-lib/transport-chrome";
 
 export default defineBackground(() => {
@@ -49,8 +50,18 @@ export default defineBackground(() => {
     },
     grantTtlMs: 5 * 60_000,
   });
+  /**
+   * M23.13 (OD-W): WHAT THE TOOLBAR BUTTON DOES DEPENDS ON THE BUILD. In an evidence build it is the gesture a capture
+   * needs, as above. In a product build nothing captures, so it opens the side panel and asks the authority for
+   * nothing. `Alt+Shift+P` is `_execute_action`, which fires this same event. `__EVIDENCE_BUILD__` is substituted at
+   * build time, so a product bundle has no grant on this route, rather than one that goes unused.
+   */
   chrome.action?.onClicked.addListener((tab) => {
-    if (typeof tab.id === "number") capture.grant(tab.id);
+    if (__EVIDENCE_BUILD__) {
+      if (typeof tab.id === "number") capture.grant(tab.id);
+      return;
+    }
+    openSidePanelForToolbarClick(tab, (target) => chrome.sidePanel.open(target), (problem) => console.warn(`PratiBimb: ${problem}`));
   });
   /**
    * A GRANT BELONGS TO A DOCUMENT, NOT TO A TAB NUMBER.
@@ -360,7 +371,7 @@ export default defineBackground(() => {
      *
      * M23.9 (OD-S): only an evidence build has this handler. A product build has no perception realm to
      * ask (`host/offscreen/main.ts`), so it issues no ticket to anyone. The grant authority itself is
-     * unchanged in both, because the toolbar and the panel's status use it.
+     * unchanged in both, because an evidence build's toolbar and every build's status report use it.
      */
     if (__EVIDENCE_BUILD__ && msg?.kind === "CAPTURE_FRAME") {
       if (!isFromOffscreenDocument(sender)) {

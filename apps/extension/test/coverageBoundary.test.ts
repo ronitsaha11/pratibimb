@@ -52,6 +52,7 @@ const EXERCISED_BY_TESTS = [
   "host-lib/page-privacy-boundary.ts",
   "host-lib/perception-realm.ts",
   "host-lib/product-copy.ts",
+  "host-lib/toolbar-action.ts",
   "host-lib/remote-privacy-boundary.ts",
   "host-lib/task-desk.ts",
   "host-lib/task-panel.ts",

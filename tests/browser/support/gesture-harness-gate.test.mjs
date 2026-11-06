@@ -19,7 +19,7 @@ const STYLE = "style-src 'sha256-ZYRp1TbYj9bPuYCw1S2y0R5L4r911NcNjTciEbHTsAo='";
 const policy = (connectSrc) => `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src ${connectSrc}; ${STYLE}; object-src 'none'; base-uri 'none'; form-action 'none'`;
 const PRODUCT_CONNECT = "'self' http://127.0.0.1:8995/v1/chat/completions";
 
-const PRODUCT_WORKER = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;";
+const PRODUCT_WORKER = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});";
 const EVIDENCE_WORKER = `${PRODUCT_WORKER}const d={perceiveOnce(){},consumeProbe(){},ticketProbe(){},mintStreamId(){}};const k=["PERCEIVE_ONCE","STREAM_CONSUME","CAPTURE_FRAME"];`;
 const PRODUCT_OFFSCREEN = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD";';
 const EVIDENCE_OFFSCREEN = `${PRODUCT_OFFSCREEN}const k=["PERCEIVE_ONCE","STREAM_CONSUME","CAPTURE_FRAME"];const c={chromeMediaSourceId:1};x.grabFrame();`;

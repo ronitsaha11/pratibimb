@@ -188,10 +188,9 @@ describe("nothing else about the panel changed", () => {
     }
   });
 
-  it("the toolbar's action is unchanged: it records a grant, and opens nothing", () => {
-    const worker = read("host/background.ts");
-    expect(worker).toContain('if (typeof tab.id === "number") capture.grant(tab.id);');
-    expect(`${worker}${read("wxt.config.ts")}`).not.toContain("setPanelBehavior");
+  it("the toolbar's action is OD-W's: tested in `toolbarInteraction.test.ts`, and it adds no panel wording", () => {
+    expect(read("host-lib/toolbar-action.ts")).not.toContain("textContent");
+    expect(`${read("host/background.ts")}${read("wxt.config.ts")}`).not.toContain("setPanelBehavior");
   });
 });
 
@@ -234,9 +233,9 @@ describe("no stale capture wording in a product's UI source", () => {
 describe("is the privacy explanation true? Checked against what a task does", () => {
   const click = () => [{ op: "click", target: "#submit" }];
 
-  it("a product task, with a toolbar grant live, captures nothing and runs neither T1 nor TR-01", async () => {
+  it("a product task, with a grant held by the authority, captures nothing and runs neither T1 nor TR-01", async () => {
     rig = await bootSimulatedExtension({ evidenceBuild: false, model: click });
-    rig.clickToolbar();
+    rig.holdGrant();
     const reply = await rig.run(taskRequest(), { grant: true });
     expect(reply.ok).toBe(true);
     expect(rig.visualActivity()).toEqual(NO_VISUAL_ACTIVITY);

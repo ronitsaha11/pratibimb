@@ -135,9 +135,9 @@ describe("A — an ordinary product task captures no frame", () => {
     expect(failedChecks(checksOf(r, result))).toEqual([]);
   });
 
-  it("does not depend on the absence of a grant: a person's toolbar click changes nothing", async () => {
+  it("does not depend on the absence of a grant: one held by the authority changes nothing", async () => {
     const r = await boot({ model: clickSubmit });
-    r.clickToolbar();
+    r.holdGrant();
     expect(r.host.captureState().grants).toHaveLength(1); // the authority would say yes, if it were asked
     const result = resultOf(await r.run(taskRequest()));
     expect(verificationOf(result.record)).toBe("CONFIRMED");
@@ -156,7 +156,7 @@ describe("A — an ordinary product task captures no frame", () => {
 
   it("holds on every turn of a multi-turn task", async () => {
     const r = await boot({ model: (_request, turn) => (turn === 1 ? [{ op: "click", target: "#submit" }] : [{ op: "done" }]) });
-    r.clickToolbar();
+    r.holdGrant();
     const result = resultOf(await r.run(taskRequest({ maxTurns: 3 })));
     expect(result.loop?.outcome).toBe("COMPLETED_AS_DECLARED");
     expect(result.loop?.turns).toHaveLength(2);
@@ -166,7 +166,7 @@ describe("A — an ordinary product task captures no frame", () => {
 
   it("holds for the route a person actually uses: a task started in the side panel", async () => {
     const r = await boot({ model: (_request, turn) => (turn === 1 ? [{ op: "click", target: "#submit" }] : [{ op: "done" }]) });
-    r.clickToolbar();
+    r.holdGrant();
     const { result } = await panelTask(r, { control: "Submit", maxTurns: 3 });
     expect(result?.loop?.outcome).toBe("COMPLETED_AS_DECLARED");
     expect(r.page.clicksOn("#submit")).toBe(1);
@@ -214,7 +214,7 @@ describe("B — T1 is not loaded, run or fused in an ordinary product task", () 
 describe("C — TR-01 is not invoked in an ordinary product task", () => {
   it("starts no worker, loads no weights, sends no frame, draws on no canvas", async () => {
     const r = await boot({ model: clickSubmit });
-    r.clickToolbar();
+    r.holdGrant();
     resultOf(await r.run(taskRequest()));
     const activity = r.visualActivity();
     expect(activity.tr01Workers).toBe(0);

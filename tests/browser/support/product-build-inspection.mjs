@@ -94,6 +94,12 @@ export function inspectProductBuild(directory, expected) {
     if (includes(everything, marker)) problems.push(`DIAGNOSTIC_HOOK_IN_BUNDLE:${marker}`);
   }
   if (/\.getUserMedia\s*\(/.test(everything)) problems.push("CAPTURE_CALL_IN_BUNDLE");
+  // M23.13 (OD-W): the toolbar opens the side panel and asks the capture authority for nothing.
+  const onClickedAt = background.indexOf("onClicked.addListener(");
+  const toolbarRoute = onClickedAt === -1 ? "" : background.slice(onClickedAt, onClickedAt + 300);
+  if (!includes(toolbarRoute, "sidePanel.open")) problems.push("TOOLBAR_DOES_NOT_OPEN_THE_SIDE_PANEL");
+  if (/\.grant\(/.test(toolbarRoute)) problems.push("TOOLBAR_ISSUES_A_CAPTURE_GRANT");
+  if (manifest.action?.default_popup !== undefined) problems.push("TOOLBAR_HAS_A_POPUP");
   if (manifest.action?.default_title !== APPROVED_UI_COPY.toolbarTitle) problems.push("TOOLBAR_TITLE_NOT_THE_APPROVED_WORDING");
   if (!includes(sidepanel, APPROVED_UI_COPY.sidePanelDescription)) problems.push("SIDE_PANEL_DESCRIPTION_NOT_THE_APPROVED_WORDING");
   if (!includes(sidepanel, APPROVED_UI_COPY.privacyExplanation)) problems.push("PRIVACY_EXPLANATION_NOT_THE_APPROVED_WORDING");
@@ -112,6 +118,8 @@ export function inspectProductBuild(directory, expected) {
     bundle: {
       namesEachHookMarker: Object.fromEntries(DIAGNOSTIC_HOOK_MARKERS.map((marker) => [marker, includes(everything, marker)])),
       callsGetUserMedia: /\.getUserMedia\s*\(/.test(everything),
+      toolbarOpensTheSidePanel: includes(toolbarRoute, "sidePanel.open"),
+      toolbarIssuesACaptureGrant: /\.grant\(/.test(toolbarRoute),
       offscreenCanStartTr01: includes(offscreen, "tr01-worker"),
       offscreenHandlesPerceiveOnce: includes(offscreen, "PERCEIVE_ONCE"),
       offscreenHandlesStreamConsume: includes(offscreen, "STREAM_CONSUME"),
