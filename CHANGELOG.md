@@ -35,6 +35,13 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.15 — Product identity and acceptance reconciliation (OD-Y, OD-Z; wording only).** The extension and its panel are named
+  **PratiBimb — Page Assistant (Development build)**, and the toolbar title is unchanged. `BRW-04` is now a DOM-only browser-task
+  requirement, and the acceptance documents state that normal tasks capture no browser frame, need no gesture grant and run no T1
+  or TR-01, with evidence-build diagnostics described separately. The brief's deliverables are mapped to what Phase 1 does and does
+  not fulfil. In the real build all JavaScript is byte-identical to the previous build, and the manifest changes in `name` alone.
+  - All 59 criteria keep their class and status. GOV-01 and the 51 proposed-mandatory classifications stay unapproved.
+  - Not seen in a browser. No evidence build or harness ran. Not release-ready.
 - **M23.14 — A product's panel does not show `captureStatus` (OD-X; presentation only).** Its Status box prints a named list of
   the worker's fields. An evidence panel prints the whole reply, as before. The worker still reports the status: in the real
   product build, the worker, offscreen chunk, content script and manifest are byte-identical to the build before. Not seen in a

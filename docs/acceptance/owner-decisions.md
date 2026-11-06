@@ -1,6 +1,6 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.14, 2026-11-06):**
+> **Status (updated M23.15, 2026-11-06):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
@@ -12,7 +12,7 @@
 > - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. Not seen in a browser. Its first real build was M23.13's.
 > - **Selected and implemented in M23.13:** **OD-W**, the product's toolbar opens the side panel. **Not tried in a browser.**
 > - **Selected and implemented in M23.14:** **OD-X**, a product's panel does not show `captureStatus`. **Not seen in a browser.**
-> - **Awaiting the owner, added in M23.13:** OD-Y and OD-Z.
+> - **Implemented in M23.15, as far as existing approvals permit:** **OD-Y**, the product's identity, and **OD-Z**, the acceptance wording including `BRW-04`. **No classification is approved by this.**
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -514,8 +514,8 @@ Each sub-decision is separate.
 | ID | Decision | Status |
 |---|---|---|
 | OD-X | The treatment of the visible `captureStatus` field in the side panel's Status box. In a product it now always reads `NO_GRANT` | *(M23.13 status, superseded by M23.14 below:)* awaiting the owner |
-| OD-Y | Branding terminology such as "PratiBimb minimal host" and "Development build" | **AWAITING OWNER APPROVAL** |
-| OD-Z | Remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description | **AWAITING OWNER APPROVAL** |
+| OD-Y | Branding terminology such as "PratiBimb minimal host" and "Development build" | **AWAITING OWNER APPROVAL** *(as of M23.13; see M23.15)* |
+| OD-Z | Remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description | **AWAITING OWNER APPROVAL** *(as of M23.13; see M23.15)* |
 
 **Still awaiting the owner, unchanged:**
 - OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
@@ -541,14 +541,41 @@ Each sub-decision is separate.
 **Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V and OD-W. Not browser-verified, not accepted.
 
 **Still awaiting the owner:**
-- **OD-Y:** branding terminology such as "PratiBimb minimal host" and "Development build". The Status box's place in a product overlaps this.
-- **OD-Z:** remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description.
+- **OD-Y:** branding terminology such as "PratiBimb minimal host" and "Development build". The Status box's place in a product overlaps this. *(As of M23.14; see M23.15.)*
+- **OD-Z:** remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description. *(As of M23.14; see M23.15.)*
 - **Permission review:** `activeTab` and `tabCapture`, which have no product user.
 - OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
 - GOV-01, OD-E1, OD-K, OD-L, OD-M;
 - OD-A to OD-D, OD-G;
 - OD-H, OD-E2 to OD-E8.
 - **All Phase 1 acceptance criteria.**
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.15 — status after OD-Y and OD-Z
+
+**Selected by the owner, and implemented as far as existing approvals permit:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-Y | **SELECTED (owner):** the product is **PratiBimb — Page Assistant**. Keep truthful environment qualifiers; a development build must not read as a release. Internal names, evidence-build wording and historical records stay | **M23.15: IMPLEMENTED.** The extension and its panel are named **PratiBimb — Page Assistant (Development build)**. The toolbar title stays the OD-T wording exactly. The "Development build" warning and synthetic-goal text stay | Wording only. Not seen in a browser. The worker's `justification` argument to Chrome keeps its old text, to keep the worker byte-identical (technical; the record classifies it) |
+| OD-Z | **SELECTED (owner):** `BRW-04` becomes a DOM-only browser-task requirement; Phase 1 capture wording says what a normal task does; evidence diagnostics are described separately; the brief's deliverables stay, with what Phase 1 does and does not fulfil | **M23.15: IMPLEMENTED** in the core proposal (`BRW-04`, §2, §5.14), the traceability matrix (§1.6), the Phase 1 scope and the release checklist | **No classification is approved by this.** All 59 criteria keep their class and status. No cross-browser claim is made |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W and OD-X. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **Permission review:** `activeTab` and `tabCapture`, which have no product user.
+- **The Status box's place in a product,** which is a developer readout. OD-Y did not decide it.
+- Re-scoping `BRW-05` and the detector half of `REL-03`, if the owner wishes (`core-product-acceptance-PROPOSED.md` §5.14).
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**QG-04-S and QG-04-F are not signed.**
 
 **Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
 

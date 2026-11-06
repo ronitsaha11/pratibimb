@@ -1,6 +1,7 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
+> - **M23.15:** **OD-Y and OD-Z are implemented, as far as existing approvals permit:** the product is named PratiBimb — Page Assistant (Development build), `BRW-04` is a DOM-only requirement, and evidence-build diagnostics are described separately. **No classification is approved.** Not seen in a browser. See `artifacts/experiments/M23.15-product-identity-acceptance-reconciliation/`.
 > - **M23.14:** **OD-X is implemented:** a product's panel does not show `captureStatus`, and an evidence panel still does. Real build compared; not seen in a browser. OD-Y and OD-Z await the owner. See `artifacts/experiments/M23.14-capture-status-scope/`.
 > - **M23.13:** **OD-W is implemented:** a product's toolbar button opens the side panel and issues no capture grant. Real build inspected; not tried in a browser. See `artifacts/experiments/M23.13-toolbar-interaction/`.
 > - **M23.12:** **OD-T is implemented:** the toolbar and side panel use the approved wording, in product builds. Not seen in a browser. See `artifacts/experiments/M23.12-product-ui-language/`.

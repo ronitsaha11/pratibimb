@@ -1,9 +1,10 @@
-# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11, M23.12, M23.13, M23.14)
+# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11, M23.12, M23.13, M23.14, M23.15)
 
 > **Status:** what M23.8's tests establish about M23.7's boundary (M23.8, 2026-11-04, at `740a245` plus tests).
 > - **What "behavioural" means here:** the real `background.ts`, `offscreen/main.ts`, task run, orchestrator, privacy boundary, execution gate and egress guard ran in Node under a fake `chrome`, with every capture, model and worker API counted (`apps/extension/test/support/simulatedExtension.ts`). **It is a model of a browser, not a browser.**
 > - **Evidence type:** in the terms of `core-product-acceptance-PROPOSED.md` §4, all of this is **type A** (unit and integration). None of it is type B to H. **No browser ran. No acceptance criterion is approved or re-rated by it.**
 > - **Nothing real was involved:** no frame, no model file, no worker, no model server.
+> - **M23.15:** §12 adds OD-Y and OD-Z. Real product build compared; not seen in a browser.
 > - **M23.14:** §11 adds OD-X. Real product build compared; not seen in a browser.
 > - **M23.13:** §10 adds OD-W. Real product build inspected; not tried in a browser. That build is also the OD-T wording's first.
 > - **M23.12:** §9 adds OD-T. Not rebuilt and not seen in a browser.
@@ -200,3 +201,20 @@ Commands, exit codes and counts: `artifacts/experiments/M23.13-toolbar-interacti
 | The checks catch regressions | 14 deliberate mutations, 14 caught | **mutation** | PASS | — |
 
 Commands, exit codes and counts: `artifacts/experiments/M23.14-capture-status-scope/decision.md`.
+
+## 12. OD-Y and OD-Z: identity and acceptance wording (M23.15)
+
+| Requirement | Actual evidence | Kind | Result | Not established |
+|---|---|---|---|---|
+| The approved name | the real manifest and pages carry it; the toolbar title is the OD-T wording | **static**; **real build output** | PASS | how Chrome displays it |
+| A development build stays one | the qualifier, the warning and the synthetic text are present; nothing says released | **static** | PASS | — |
+| No old identity in what a person reads | the real manifest and panel are free of it; the inspection refuses it | **real build output**; **behavioural** (fake DOM) | PASS | real rendering |
+| Evidence wording and internal names kept | the Capture field's wording; the package name; the worker's argument | **behavioural** (fake DOM); **static** | KEPT. **Runtime UNVERIFIED** | an evidence build |
+| No criterion lost | 59 IDs, classes and statuses pinned; 51, 7 and 1 | **document** | PASS | that any is met |
+| `BRW-04` is DOM-only | its wording; no gesture evidence counted; no cross-browser claim | **document** | PASS | **a browser run of the current build** |
+| No false capture or visual claim | the corrected rows; the false-claim scan; the deliverable mapping | **document** | PASS | rewordings the scan does not cover |
+| Nothing approved | PROPOSED kept; boxes unticked; GOV-01, FR-01 and B-07 as they were | **document** | PASS | — |
+| No behaviour changed | all JavaScript byte-identical; the manifest differs in `name` alone | **real build output** | UNCHANGED | a real browser |
+| The checks catch regressions | 40 deliberate mutations, 40 caught | **mutation** | PASS | — |
+
+Commands, exit codes and counts: `artifacts/experiments/M23.15-product-identity-acceptance-reconciliation/decision.md`.

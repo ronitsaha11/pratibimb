@@ -8,6 +8,9 @@
 >   - the matrix in §5 is now the proposed **Phase 1** acceptance scope;
 >   - the original vision-language and frame-based capabilities are listed in §5.13 as **Phase 2 future scope**.
 >   - **The proposal itself remains PROPOSED — AWAITING OWNER APPROVAL.** The phased direction approves none of its criteria or classifications.
+> - **Updated in M23.15 (2026-11-06)** to match the owner-approved DOM-only Phase 1 (OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W, OD-X):
+>   - `BRW-04` is reworded, and §2 is corrected. §5.14 records each affected criterion's Phase 1 interpretation, with its original wording.
+>   - **No criterion is removed and no classification changes. All of them stay PROPOSED — AWAITING OWNER APPROVAL.** This declares nothing accepted or release-ready.
 > - **It stands alone.** Its companions only add detail:
 >   - `traceability-matrix.md`;
 >   - `quality-gate-mapping-PROPOSED.md`;
@@ -22,7 +25,7 @@
 - **Owner-approved decisions changed that architecture:**
   - production frame egress is blocked, with a structure-only handoff (ADR-0012, partially approved);
   - the product is pinned to one loopback reasoner endpoint (ADR-0013, accepted);
-  - capture is gesture-authorised (ADR-0009) and the change signal is structural (ADR-0010, both approved);
+  - capture, where it happens, is gesture-authorised (ADR-0009), and the change signal is structural (ADR-0010, both approved). **Since OD-R and OD-W a normal product task captures nothing, so ADR-0009 now governs evidence builds alone;**
   - consent is given in the panel (ADR-0014, accepted).
 - **The consequence:** some gate items no longer apply as written, and a gate cannot be signed against an undefined target.
 
@@ -35,7 +38,7 @@
 **Perception scope (M23.6):** OD-P and **OD-R (APPROVED — OPTION A: DOM-ONLY PHASE 1)** are owner-selected. **Status: implemented in product builds (M23.7); boundary tested under a simulated extension (M23.8); not browser-verified, not accepted.**
 - **Excluded from normal Phase 1 task execution:** browser-frame capture, T1 inference, TR-01 invocation, and visual-only PII masking based on a captured frame.
 - **The brief is not fulfilled on these points:** the brief's visual requirements are **not** fulfilled by Phase 1; they are deferred to separate decisions (P2-08, OD-K2).
-- **The criteria are unchanged:** every criterion and classification below stays PROPOSED.
+- **The classifications are unchanged:** every criterion and classification below stays PROPOSED. M23.15 reworded `BRW-04` (§5.14).
 
 **What the direction does not do:** it amends no ADR or constitution text, approves no part of this proposal, signs no gate, authorises no frame egress, and lifts no blocker. Its conflicts with frozen documents are listed in that record's §4 (RC-01 to RC-10).
 
@@ -43,17 +46,19 @@
 
 | Element | As built | Source |
 |---|---|---|
-| Client | Chrome MV3 extension (WXT). A Firefox build script exists (`apps/extension/package.json` `build:firefox`); the product has not been run in Firefox | `apps/extension/`; M20 |
-| Local vision: TR-01 | **TR-01** (`PP-OCRv4_mobile_det`), hash-verified at build and run time, runs on a **copy of the full captured frame** in a dedicated worker. Its boxes become an `UNREAD_REGION` mask per visual region (`<canvas>`/`<img>`), **filled in place into the local frame only.** It does not change DOM values, text, references or the handoff. No product code reads the sanitized frame (M23.3). Visual-only PII protection **NOT VERIFIED** (M9) | `apps/extension/host-lib/perception-realm.ts`; `docs/acceptance/t1-tr01-status-reconciliation.md` §2 |
+| Client | Chrome MV3 extension (WXT), named **PratiBimb — Page Assistant (Development build)**: a development build, not a release. A Firefox build script exists (`apps/extension/package.json` `build:firefox`); the product has not been run in Firefox | `apps/extension/`; M20; M23.15 |
+| **Normal task perception** | **DOM-based observation only (OD-R).** No browser-frame capture, no gesture grant needed, no T1, no TR-01. The toolbar button and `Alt+Shift+P` open the side panel and issue no grant (OD-W). Tested under a simulated extension; a real product build has no capture call. **Not run in a browser since M23.7** | `task-perception.ts`; M23.7 to M23.14 |
+| TR-01 (`PP-OCRv4_mobile_det`) | **Not invoked in a normal task, and a product bundle has no way to start it (M23.7, M23.9).** It stays packaged, hash-verified at build time. **In an evidence build only,** it runs on a copy of the captured frame in a dedicated worker; its boxes become an `UNREAD_REGION` mask, filled into the local frame only. It does not change DOM values, text, references or the handoff. **No normal task produces or reads a masked frame.** Visual-only PII protection is **NOT VERIFIED** and is **not operational** in the product (M9, OD-F) | `apps/extension/host-lib/perception-realm.ts`; `docs/acceptance/t1-tr01-status-reconciliation.md` §2 |
 | UI detector: T1 | **UNADOPTED. Since M23.7 (OD-P), a product build neither packages, loads nor runs it, and a product task takes no perception pass** (tested under a simulated extension, M23.8; not browser-verified). **Evidence builds still load it and run it on every pass that captures a frame, as described here** (M23.2, M23.3, corrected M23.4; source):<br>• **Fused:** its output is fused with the DOM graph, and can relabel an existing DOM element's `source` (`dom` → `dom+vision`).<br>• **Manifest metadata:** it sets `capability` and `scale_to_css` in the handoff.<br>• **Cannot add elements:** it **cannot add a vision-only element** to the DOM-based handoff.<br>• **Not sent:** the reasoner request omits `source`, boxes and capability.<br>• **Not checked:** **its bytes are verified neither at build nor at run time.**<br>• **UNKNOWN:** further indirect influence.<br>Performance is FR-01 (deferred, not authorised) | `apps/extension/host/offscreen/main.ts`; `apps/extension/wxt.config.ts`; `t1-tr01-status-reconciliation.md` §1, §3, §4 |
 | Faces | a YuNet `FaceDetector` role is recorded as ACCEPT (wasm, webgpu) in `packages/perception/src/detector.ts`. FACT: it is referenced only there and in that file's test; no file under `apps/` references it. INFERENCE (from that FACT): **face detection is not in the product path** | `git grep` over `apps/` and `packages/` (M23.1) |
 | Reasoner | **local** llama.cpp `b10956` serving `Qwen2.5-0.5B-Instruct` Q4_K_M on `127.0.0.1`. A **text** LLM, not a VLM: it never sees a pixel or a value. Registry status **`PINNED`, not `ADOPTED`**; correctness **PROVISIONAL**; `MODEL_PATH = EXPERIMENTAL`, `FALLBACK_PATH = VERIFIED` (deterministic planner) | `agentos/registry/model-registry.md`; `artifacts/experiments/LOOP-2-local-reasoner-egress/`; M20 |
-| Handoff | the verified handoff holds DOM elements and typed references; **no frame**. The reasoner receives a **planning view** derived from it: goal, textbox `{id,name,empty}`, button `{id,name,enabled}`, references `{token,class,hint}`. Frames **are captured and processed locally**; only frame **egress** is impossible (three locks). The frame senders (`qg04.ts`, `frame.ts`) have no product caller | ADR-0012 §8, §16; `packages/reasoner/src/localModel.ts`; `phase-1-data-flow-and-components.md` §3 |
+| Handoff | the verified handoff holds DOM elements and typed references; **no frame**. The reasoner receives a **planning view** derived from it: goal, textbox `{id,name,empty}`, button `{id,name,enabled}`, references `{token,class,hint}`. A normal task captures no frame. **Evidence builds capture and process frames locally.** Frame **egress** is impossible in production (three locks). The frame senders (`qg04.ts`, `frame.ts`) have no product caller | ADR-0012 §8, §16; `packages/reasoner/src/localModel.ts`; `phase-1-data-flow-and-components.md` §3 |
 | Network | sent by `sendVerified` (`packages/egress/src/guard.ts`): verified handoff, loopback destination, declared tokens, value-aware residual scan, digest, record, then send. The target is the one endpoint `http://127.0.0.1:8995/v1/chat/completions` (CSP v2). The front refuses foreign origins and hosts, other paths and methods, non-JSON and value-shaped text. The model server needs a per-launch key, and `/slots` is off | ADR-0013 §3; `artifacts/experiments/M20-runnable-measured-product/` |
 | Loop | the constitution's 12 stages as implemented (see `traceability-matrix.md` §2), at most **5 turns** (`MAX_TASK_TURNS`) | CHANGELOG M14; `packages/orchestrator/src/loop.ts` |
 | Actions | **`click` is the only executable action** (`EXECUTABLE_ACTIONS = ["click"]`). `insert` is a trusted-client restoration of a vault value, after privacy and a human agree, not an agent action. `done` authorises nothing | `packages/plan/src/schema.ts`; ADR-0006 |
 | Consent | just-in-time, one-time panel consent with a masked local preview | ADR-0014; M19 |
-| Validated where | W1, Chrome for Testing, **synthetic loopback pages**, operated by the developer or owner | M15–M20 |
+| Validated where | W1, Chrome for Testing, **synthetic loopback pages**, operated by the developer or owner. **Those runs predate M23.7.** Nothing since has been run in a browser | M15–M20 |
+| Evidence-build diagnostics | **Separate from normal product behaviour.** Gesture-authorised capture (ADR-0009), T1, TR-01, `PERCEIVE_ONCE` and `STREAM_CONSUME` exist only in evidence builds (OD-S), and the harnesses that use them are evidence-build-only (OD-U, OD-V). Their runtime since these changes is **UNVERIFIED**, and they need a separate authorisation | `diagnostic-hook-boundary-map.md`; `evidence-build-preservation-assessment.md` |
 
 **Full source trace (M23.3):** `phase-1-data-flow-and-components.md`. The proposed architecture decision is **ADR-0015 (PROPOSED — AWAITING OWNER APPROVAL)**, and the reconciliation is in `reconciliation-matrix-RC-01-to-RC-12.md`.
 
@@ -126,7 +131,7 @@ Following the owner's phased direction (M23.2), §5.1 to §5.12 are the proposed
 | BRW-01 | Chrome MV3 product build runs the bounded task set | brief deliverable 1 | M | built | C: W1, CfT 153 | D, E, H for the product build | FUN-01 on each accepted machine | — | OD-B | PARTIAL |
 | BRW-02 | Firefox MV3 product build runs the bounded task set | brief deliverable 1; QG-06; release blockers | **OD** (OD-A) | build script only | none for the product. Firefox exists only for the coordinate-contract fixture (QG-02, hosted CI run `34485366327`), model runtime (QG-03a-B2, M8.2) and spikes (S-02, S-05) | build, run, human test | see OD-G | OD-A | OD-A, OD-G | NOT EVIDENCED |
 | BRW-03 | Firefox on Linux, with the backend indicator visible | release workflow, "Release blockers" | **OD** (OD-A) | — | spike-level only (S-02a, M8.2 WSL2) | product | see OD-G | OD-A | BRW-02 | NOT EVIDENCED |
-| BRW-04 | Gesture-authorised capture works in each accepted browser | ADR-0009 | M | implemented | B; C (M4 human-in-the-loop, M5) | other browsers per OD-A | part of FUN-01 | — | OD-A | PARTIAL |
+| BRW-04 | **The extension opens and operates in each browser accepted for Phase 1. A person completes supported browser tasks through DOM-based observation, with structural grounding and click safety working correctly. Browser-frame capture is not required for normal Phase 1 task execution** | ADR-0009 originally (§5.14); reworded for OD-R and OD-W (M23.15) | M | implemented in the Chrome product build (M23.7, M23.13) | A: `domOnlyTaskPath.test.ts`, under a simulated extension. C: M19, M20 in Chrome on W1, on DOM structure with no frame captured, **before M23.7**. M4 and M5 are gesture-capture evidence and **do not count here** | a browser run of the current DOM-only build; D; each other browser per OD-A. **No cross-browser claim is made** | part of FUN-01, on the current build, in each accepted browser | — | OD-A | PARTIAL |
 | BRW-05 | A WASM-only build, benchmarked, for the in-extension models (TR-01) | release workflow, "Release blockers" | M (as written) | ORT Web WASM in use | M8.2 TR-01 cells (feasibility) | a product WASM-only benchmark | product benchmark, WASM backend labelled | owner may re-scope (§6 of the gate mapping) | QG-03 | PARTIAL |
 
 ### 5.3 Privacy and sanitisation
@@ -246,6 +251,25 @@ These capabilities come from the brief and the constitution, and **their history
 - **Visual-only PII protection (PRV-03, OD-F):** a gap in the shipped product.
 - **Firefox (BRW-02, BRW-03, OD-A):** the brief names it for the client.
 - **Face-detection validation.**
+
+### 5.14 Phase 1 interpretation of the affected criteria (PROPOSED — AWAITING OWNER APPROVAL)
+
+**Added in M23.15.** No criterion is removed because Phase 1 excludes a capability, and no class in §5 changes. "Mandatory" and the rest are proposals. **This table approves nothing.**
+
+| ID | Original source and wording | Phase 1 interpretation | Classification (PROPOSED) | Evidence required |
+|---|---|---|---|---|
+| BRW-04 | ADR-0009: "Gesture-authorised capture works in each accepted browser" | the DOM-only wording in §5.2. Gesture capture is no longer a normal Phase 1 capability | **mandatory** | the current build, in each browser OD-A accepts: type C at least, per FUN-01 |
+| *(BRW-04's former content)* | ADR-0009: gesture-authorised capture | **not a Phase 1 criterion.** Kept as an evidence-build requirement: `run-gesture-capture.mjs`, `run-gesture-acts.mjs` (OD-U), whose 41 checks are unchanged | **deferred** to a separately authorised evidence run. It has no ID of its own | that run. **UNVERIFIED** since M23.7 |
+| BRW-05 | release workflow: "A WASM-only build, benchmarked, for the in-extension models (TR-01)" | no model runs in a normal task, so a product benchmark of TR-01 has nothing to measure. ORT and TR-01 stay packaged | **unresolved:** mandatory as written; the owner may re-scope it | per the owner's decision. No product measurement can answer it as written |
+| PRV-03 | brief: "blurring faces, blacking out passwords, masking PII"; M9 | **not operational in the product.** Frame-based masking is excluded from normal tasks (OD-R), and faces are not in the product path. The structure-only design keeps pixels from the reasoner, which is **not** the same as protecting visual-only PII | **unresolved** (OD-F) | per OD-F. Today none exists for the product |
+| PRV-04 | benchmark contract Rule 2: residual leakage, over-redaction, block rate | applies to textual and DOM redaction. Its server tripwire source does not exist (P2-06) | **mandatory** as written; **unresolved** evidence source (OD-F) | Rule 2 metrics from an owner-approved source |
+| SEC-04 | ADR-0012 §16: production frame egress disabled, three locks | applies unchanged | **mandatory** (frozen) | re-check on the release commit |
+| SEC-05 | INV-22, INV-23: a detector error or timeout counts as positive; the verifier blocks | a normal task has no detector, so the detector half applies to evidence builds. The verifier half applies to the product | **mandatory** | the verifier on the product build; the detector half on a separately authorised evidence build |
+| REL-03 | release workflow, sequence 3: an injected detector timeout masked; repeated verification failures shown | the detector half cannot occur in a normal task. The verification half applies | **unresolved:** mandatory as written; the owner may re-scope the detector half | a scripted failure-path run on the product build |
+| PRF-02 | benchmark contract Rule 2: peak heap, GPU, CPU share, weights on disk, tier firing | a normal task always fires T0 and T2, and uses no GPU for perception. The tier figure is then fixed, and is reported as such | **mandatory** (reporting) | an extended benchmark on the current build. M20's figures predate M23.7 |
+| GOV-05 | release workflow: sequences assuming a server VLM, frame egress and SmolVLM | must be redefined for the DOM-only product. A demonstration must not imply visual capability | **mandatory** | the redefinition; the owner's approval |
+
+**What Phase 1 does not claim:** that visual-only PII protection is operational; that its LLM is a VLM; that T1 is an adopted detector (it is UNADOPTED); that TR-01's masked frames are consumed in a normal task; or that it fulfils the brief's visual-reasoning requirements. The brief's requirements are unchanged, and the mapping is in `traceability-matrix.md` §1.6.
 
 ## 6. The gates
 

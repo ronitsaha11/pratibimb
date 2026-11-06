@@ -5,6 +5,7 @@
 > - **It claims nothing until it is run.** No product runtime validation exists for M23.7 yet.
 > - **Scope:** one operator, one machine, Chrome for Testing, the synthetic loopback fixture. It is evidence type C, unless the operator meets OD-C's definition. It says nothing about Firefox, a second machine, real sites or performance.
 > - **A product build has no diagnostic hook to call (M23.9, OD-S).** Check D7 confirms that.
+> - **Updated M23.15 (OD-Y):** the extension and the panel's heading read **PratiBimb — Page Assistant (Development build)**. A1 and A3 check that.
 > - **Updated M23.14 (OD-X):** a product's Status box shows `bootId`, `bootedAt`, `offscreenContexts` and `hellos`, and no `captureStatus`. A7 checks that.
 > - **Updated M23.13 (OD-W):** the toolbar button opens the side panel and issues no grant. A5, A6 and section C check that, and are the first real evidence of it.
 > - **Updated M23.12 (OD-T):** a product panel has no Capture field, so A3, C1, C3 and C4 now use the approved wording and the worker's console.
@@ -48,9 +49,9 @@ Each check is PASS or FAIL. **Any frame capture, model-file load or TR-01 worker
 
 | # | Do | Expect |
 |---|---|---|
-| A1 | Open `chrome://extensions` | the extension loads with no error |
+| A1 | Open `chrome://extensions` | the extension loads with no error, named **PratiBimb — Page Assistant (Development build)** |
 | A2 | Read its details | permissions and host access match `manifest.json`: `offscreen`, `sidePanel`, `activeTab`, `tabCapture`; `http://127.0.0.1/*` only |
-| A3 | Open Chrome's side panel and choose PratiBimb | the panel renders, styled. It shows the approved description and privacy explanation, and **no Capture field** |
+| A3 | Open Chrome's side panel and choose PratiBimb | the panel renders, styled, headed **PratiBimb — Page Assistant (Development build)**. It shows the approved description and privacy explanation, and **no Capture field** |
 | A4 | Hover over the extension's toolbar button | the title is **PratiBimb — Page Assistant** |
 | A5 | Close the panel, then click the toolbar button | **the side panel opens, on this tab** |
 | A6 | Close the panel, then press `Alt+Shift+P`. Then click the toolbar button several times | the panel opens from the shortcut, and repeated clicks start nothing and lose nothing |
