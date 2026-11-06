@@ -12,7 +12,7 @@
 | **Date** | 2026-11-06 (UTC) |
 | **Phase** | Product implementation. Milestones through M21 merged on `main` (last: #92, `077f139`). **M22, on a local branch: engineering scope CLOSED (M22.19, owner Option B); detector-performance research DEFERRED to FR-01, not authorised; no detector evaluation has run.** |
 | **Health** | 🟠 **AMBER.** The product runs end to end on W1 from a clean checkout, and its latency and resources are measured. The open decisions (J7/B5, D1–D4) and the unadopted visual detector are unchanged. |
-| **Next** | **M23.15: OD-Y and OD-Z are implemented, as far as existing approvals permit: the product is named PratiBimb — Page Assistant (Development build), `BRW-04` is a DOM-only requirement, and the acceptance documents separate normal tasks from evidence-build diagnostics. Real build compared; not seen in a browser. No classification is approved.** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W and OD-X remain completed. The owner decides the **permission review** (`activeTab`, `tabCapture`, which have no product user) and the Status box's place in a product. A person-run browser smoke, and any evidence-build or harness run, need a separate authorisation. Still open: OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED), GOV-01, OD-E1, OD-K, OD-L, OD-M, all Phase 1 acceptance criteria, and the browser, cross-machine, independent-human, real-site, performance and security decisions. QG-04-S and QG-04-F are not signed. Phase 2 is NOT AUTHORISED; FR-01 is deferred and not authorised; B-07 stays blocked. |
+| **Next** | **M23.16: a read-only review is complete. The owner decides RD-1 to RD-10** (`docs/acceptance/residual-product-surface-decision-report-PROPOSED.md`). No recommendation is adopted. **M23.15: OD-Y and OD-Z are implemented, as far as existing approvals permit: the product is named PratiBimb — Page Assistant (Development build), `BRW-04` is a DOM-only requirement, and the acceptance documents separate normal tasks from evidence-build diagnostics. Real build compared; not seen in a browser. No classification is approved.** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W and OD-X remain completed. The owner decides the **permission review** (`activeTab`, `tabCapture`, which have no product user) and the Status box's place in a product. A person-run browser smoke, and any evidence-build or harness run, need a separate authorisation. Still open: OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED), GOV-01, OD-E1, OD-K, OD-L, OD-M, all Phase 1 acceptance criteria, and the browser, cross-machine, independent-human, real-site, performance and security decisions. QG-04-S and QG-04-F are not signed. Phase 2 is NOT AUTHORISED; FR-01 is deferred and not authorised; B-07 stays blocked. |
 | **Product code written** | **Yes**: `packages/*` and `apps/extension`. See "Current state" below. |
 
 > **Correction forward.** Until M20 this snapshot still read 2026-09-07 and "Product code written:
@@ -21,6 +21,18 @@
 > wins**. The original wording is in this file's history.
 
 ---
+
+## Current state — M23.16 (2026-11-06 UTC, local branch, not merged)
+
+**A read-only review, completed. It changes no owner decision, and is neither product acceptance nor browser validation.** The owner's decisions are framed in `docs/acceptance/residual-product-surface-decision-report-PROPOSED.md`, RD-1 to RD-10, none adopted.
+
+| Claim | Label | Evidence |
+|---|---|---|
+| `NEEDS_USER: none` in the panel is a fixed string, unchanged during consent | FACT (source) | report §3 |
+| `HOST_STATUS` is the only normal creator of the offscreen document. Removing it, rather than hiding the box, would likely break tasks | FACT; consequence INFERENCE | report §3 |
+| No three-failure verification counter exists. The first failure blocks | FACT (source) | report §5 |
+| The panel's task budget is 3 turns; 5 is the enforced ceiling | FACT (source) | report §8, §10 |
+| `activeTab` and `tabCapture` have no reachable product path. The worker keeps an unreachable wrapper, so "no capture call" overstates it | FACT (source and the existing build's text) | report §6, §10 |
 
 ## Current state — M23.15 (2026-11-06 UTC, local branch, not merged)
 
@@ -468,3 +480,4 @@ identified, one written.
 | 2026-11-06 | M23.13 — toolbar interaction (OD-W) | **Owner-approved, narrow.** A product's toolbar click opens the side panel, synchronously inside the gesture, behind the existing flag, and issues no capture grant. Failures are reported with no fallback. An evidence build's click is unchanged. `Alt+Shift+P` is the same event. Real product build made and inspected, twice, its hook hashing TR-01 as the integrity check does. No evidence build, browser, model session, frame, inference, training, detector evaluation or dataset; no permission, CSP, egress, authority, packaging, hook or ADR change; OD-X, OD-Y and OD-Z pending; B-07 and FR-01 unchanged. |
 | 2026-11-06 | M23.14 — capture status UI scope (OD-X) | **Presentation only.** A product panel prints a named list of the worker's fields, so `captureStatus` is not shown. An evidence panel prints the whole reply, as before. In the real product build only the side panel's files changed: the worker, offscreen chunk, content script and manifest are byte-identical. No evidence build, browser, model session, frame, inference, training, detector evaluation or dataset; no worker, authority, permission, CSP, hook or ADR change; OD-Y and OD-Z pending; B-07 and FR-01 unchanged. |
 | 2026-11-06 | M23.15 — product identity and acceptance reconciliation (OD-Y, OD-Z) | **Wording only.** The product is named PratiBimb — Page Assistant (Development build). `BRW-04` is a DOM-only requirement, §5.14 records each affected criterion's interpretation, and §1.6 maps the brief's deliverables. All 59 criteria keep their class and status; nothing is approved. In the real build all JavaScript is byte-identical, and the manifest changes in `name` alone. Not seen in a browser. |
+| 2026-11-06 | M23.16 — residual product surface and acceptance gap review | **Read-only.** A decision report covers the worker `justification`, the Status box, BRW-05, REL-03, `activeTab`, `tabCapture`, the remaining governance items and a proposed Chrome smoke procedure. No product, criterion, permission or register change. No build, browser or model. Not acceptance or browser validation. |
