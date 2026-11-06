@@ -19,7 +19,7 @@ import { readFileSync } from "node:fs";
 import { extensionPagesCsp } from "./host-lib/extension-csp";
 import { ORT_PIN } from "../../packages/security/src/generated/ortPin";
 import { TR01_PACKAGE } from "./host-lib/tr01-pin";
-import { TOOLBAR_TITLE } from "./host-lib/product-copy";
+import { DEVELOPMENT_BUILD_NAME, TOOLBAR_TITLE } from "./host-lib/product-copy";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..", "..");
@@ -181,7 +181,7 @@ export default defineConfig({
     },
   }),
   manifest: {
-    name: "PratiBimb minimal MV3 host (experiment — not the product)",
+    name: DEVELOPMENT_BUILD_NAME,
     version: "0.0.0",
     minimum_chrome_version: "116",
     permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],

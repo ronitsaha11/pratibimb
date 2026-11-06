@@ -23,6 +23,11 @@ afterEach(() => {
   vi.resetModules();
 });
 
+/**
+ * Two tests boot the real worker and offscreen modules three times, on a fresh module graph each time. M23.15 found them
+ * under a second alone, and past the 5s default in a parallel full run. A longer limit, and no assertion changed.
+ */
+const THREE_REAL_BOOTS_MS = 30_000;
 const LIFECYCLES = ["NO_GRANT", "GRANTED", "STREAM_AVAILABLE", "DOCUMENT_CHANGED", "REVOKED"] as const;
 const replyFor = (lifecycle: string) => ({ bootId: "boot-1", bootedAt: 1234, offscreenContexts: 1, hellos: 2, captureStatus: { lifecycle, requiresReauth: lifecycle !== "GRANTED", revokedBecause: null } });
 
@@ -131,7 +136,7 @@ describe("an evidence panel keeps its diagnostic exactly", () => {
       r.navigate();
     });
     expect(JSON.parse(await statusText(true, revoked))).toMatchObject({ captureStatus: { lifecycle: "REVOKED" } });
-  });
+  }, THREE_REAL_BOOTS_MS);
 
   it("(3, 5) the Capture field still reads the same lifecycle and sets the same data attributes", async () => {
     const { byId, settle } = await bootPanel(true, "GRANTED", { hostStatus: replyFor("GRANTED") });
@@ -154,7 +159,7 @@ describe("(6) the underlying status is untouched: only a product's panel stopped
         r.navigate();
       })
     ).toMatchObject({ captureStatus: { lifecycle: "REVOKED" } });
-  });
+  }, THREE_REAL_BOOTS_MS);
 
   it("the source of it is where it was, and the control plane still answers", () => {
     const worker = read("host/background.ts");

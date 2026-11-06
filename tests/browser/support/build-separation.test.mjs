@@ -39,6 +39,7 @@ function build({ worker, offscreen, content = CONTENT, connectSrc, manifest = {}
     JSON.stringify({
       permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
       host_permissions: ["http://127.0.0.1/*"],
+      name: "PratiBimb — Page Assistant (Development build)",
       action: { default_title: "PratiBimb — Page Assistant" },
       content_security_policy: { extension_pages: csp ?? policy(connectSrc) },
       content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],

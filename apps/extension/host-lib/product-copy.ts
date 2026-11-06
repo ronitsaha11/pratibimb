@@ -10,5 +10,10 @@
  * redacted, and nothing should be added here that does: that protection is not operational (OD-F, OD-K2).
  */
 export const TOOLBAR_TITLE = "PratiBimb — Page Assistant";
+/**
+ * M23.15 (OD-Y): the extension's name. The same product, with what it truly is: a development build, not a release. It
+ * changes only by an owner's decision to release. `sidepanel/index.html` and `offscreen/index.html` carry it in their markup.
+ */
+export const DEVELOPMENT_BUILD_NAME = `${TOOLBAR_TITLE} (Development build)`;
 export const SIDE_PANEL_DESCRIPTION = "PratiBimb uses page structure to identify elements and assist with browser tasks.";
 export const PRIVACY_EXPLANATION = "Normal tasks do not capture browser screenshots or send page images to the reasoning model.";

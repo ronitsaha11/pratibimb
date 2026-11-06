@@ -38,6 +38,7 @@ function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx
     JSON.stringify({
       permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
       host_permissions: ["http://127.0.0.1/*"],
+      name: "PratiBimb — Page Assistant (Development build)",
       action: { default_title: "PratiBimb — Page Assistant" },
       content_security_policy: { extension_pages: POLICY },
       content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],
@@ -140,6 +141,14 @@ describe("inspectProductBuild", () => {
     rmSync(dir, { recursive: true, force: true });
     const popup = inspectProductBuild(syntheticBuild({ manifest: { action: { default_title: "PratiBimb — Page Assistant", default_popup: "p.html" } } }), EXPECTED);
     expect(popup.problems).toEqual(["TOOLBAR_HAS_A_POPUP"]);
+  });
+
+  it("M23.15 (OD-Y): fails a product build with another name, or with no development qualifier", () => {
+    for (const name of ["PratiBimb minimal MV3 host (experiment — not the product)", "PratiBimb — Page Assistant", "PratiBimb"]) {
+      const report = inspectProductBuild(syntheticBuild({ manifest: { name } }), EXPECTED);
+      expect(report.problems, name).toContain("EXTENSION_NAME_NOT_THE_APPROVED_FORM");
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("does not hold ORT's own bundle to names it never chose", () => {

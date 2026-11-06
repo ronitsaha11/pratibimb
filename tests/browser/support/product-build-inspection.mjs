@@ -51,12 +51,13 @@ export const DIAGNOSTIC_HOOK_MARKERS = Object.freeze([
  */
 export const APPROVED_UI_COPY = Object.freeze({
   toolbarTitle: "PratiBimb — Page Assistant",
+  extensionName: "PratiBimb — Page Assistant (Development build)",
   sidePanelDescription: "PratiBimb uses page structure to identify elements and assist with browser tasks.",
   privacyExplanation: "Normal tasks do not capture browser screenshots or send page images to the reasoning model.",
 });
 
 /** Wording a normal product must not carry: it describes a capture a product task does not make. `captureStatus`: M23.14 (OD-X). */
-export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button", "captureStatus", "NO_GRANT"]);
+export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button", "captureStatus", "NO_GRANT", "minimal host", "minimal MV3", "not the product", "(experiment"]);
 
 const walk = (root, relative = "", out = []) => {
   for (const name of readdirSync(join(root, relative)).sort()) {
@@ -101,6 +102,7 @@ export function inspectProductBuild(directory, expected) {
   if (/\.grant\(/.test(toolbarRoute)) problems.push("TOOLBAR_ISSUES_A_CAPTURE_GRANT");
   if (manifest.action?.default_popup !== undefined) problems.push("TOOLBAR_HAS_A_POPUP");
   if (manifest.action?.default_title !== APPROVED_UI_COPY.toolbarTitle) problems.push("TOOLBAR_TITLE_NOT_THE_APPROVED_WORDING");
+  if (manifest.name !== APPROVED_UI_COPY.extensionName) problems.push("EXTENSION_NAME_NOT_THE_APPROVED_FORM");
   if (!includes(sidepanel, APPROVED_UI_COPY.sidePanelDescription)) problems.push("SIDE_PANEL_DESCRIPTION_NOT_THE_APPROVED_WORDING");
   if (!includes(sidepanel, APPROVED_UI_COPY.privacyExplanation)) problems.push("PRIVACY_EXPLANATION_NOT_THE_APPROVED_WORDING");
   const productUi = `${JSON.stringify(manifest)}\n${sidepanel}`.toLowerCase();

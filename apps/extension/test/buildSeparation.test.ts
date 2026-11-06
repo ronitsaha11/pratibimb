@@ -26,7 +26,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { evidenceReferenceFlags } from "../../../tests/browser/support/build-separation.mjs";
 import { parseCsp, PRODUCT_CSP, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
 import { APPROVED_UI_COPY, EXPECTED_PRODUCT_FILES, STALE_UI_WORDING } from "../../../tests/browser/support/product-build-inspection.mjs";
-import { PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, TOOLBAR_TITLE } from "../host-lib/product-copy";
+import { DEVELOPMENT_BUILD_NAME, PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, TOOLBAR_TITLE } from "../host-lib/product-copy";
 import { ORT_PIN } from "../../../packages/security/src/generated/ortPin";
 import { TR01_PACKAGE } from "../host-lib/tr01-pin";
 
@@ -350,7 +350,7 @@ describe("M23.12 (OD-T) — the product's wording, in the real manifest and in a
   type Manifest = LoadedConfig["manifest"] & { readonly action: { readonly default_title: string }; readonly commands: { readonly _execute_action: { readonly description: string; readonly suggested_key: unknown } } };
 
   it("the build-inspection tool expects exactly the approved module's wording", () => {
-    expect(APPROVED_UI_COPY).toEqual({ toolbarTitle: TOOLBAR_TITLE, sidePanelDescription: SIDE_PANEL_DESCRIPTION, privacyExplanation: PRIVACY_EXPLANATION });
+    expect(APPROVED_UI_COPY).toEqual({ toolbarTitle: TOOLBAR_TITLE, extensionName: DEVELOPMENT_BUILD_NAME, sidePanelDescription: SIDE_PANEL_DESCRIPTION, privacyExplanation: PRIVACY_EXPLANATION });
   });
 
   it("the real manifest's toolbar title is the approved one, and the shortcut's text uses it too", async () => {
@@ -458,6 +458,23 @@ describe("M23.14 (OD-X) — `captureStatus`, in a product bundle", () => {
 
   it("the two names the inspection now refuses in a product's UI are on its list", () => {
     expect(STALE_UI_WORDING).toEqual(expect.arrayContaining(["captureStatus", "NO_GRANT"]));
+  });
+});
+
+describe("M23.15 (OD-Y) — the extension's name, in the real manifest", () => {
+  it("is the approved form, for every flag: the two builds' manifests are compared, so it cannot vary", async () => {
+    expect((await loadConfig()).manifest.name).toBe("PratiBimb — Page Assistant (Development build)");
+    for (const flag of FLAGS) expect((await loadConfig([flag])).manifest.name, flag).toBe("PratiBimb — Page Assistant (Development build)");
+  });
+
+  it("is within Chrome's limit for a name, and the toolbar's title stays the owner's exact wording", async () => {
+    const { manifest } = await loadConfig();
+    expect(String(manifest.name).length).toBeLessThanOrEqual(75);
+    expect((manifest as unknown as { action: { default_title: string } }).action.default_title).toBe("PratiBimb — Page Assistant");
+  });
+
+  it("the build inspection refuses the old identity, by name", () => {
+    expect(STALE_UI_WORDING).toEqual(expect.arrayContaining(["minimal host", "minimal MV3", "not the product", "(experiment"]));
   });
 });
 
