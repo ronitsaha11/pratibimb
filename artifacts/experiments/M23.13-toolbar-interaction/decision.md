@@ -47,7 +47,7 @@ A later pass does not cancel these. **The typecheck passed first time.**
 | 2 | My first attempt at that one-line fix | an assertion failed in my script, so the fix did not apply, and the focused tests failed again the same way | a shell heredoc mangled the backslashes in it | done from a script file |
 | 3 | Console output of the toolbar title | showed `�` in place of the em dash | checked the bytes, because a corrupted title would have been a defect: **the manifest holds exactly the approved string, UTF-8 `E2 80 94`.** Only the console could not display it | no change needed |
 
-**No check was weakened to reach a pass.** 11 product tests were changed to hold a grant directly, since a click no longer makes one: they keep their claim and would otherwise have silently lost it. Two pins of the old toolbar behaviour were changed deliberately.
+**No check was weakened to reach a pass.** 12 product tests were changed to hold a grant directly, since a click no longer makes one: they keep their claim and would otherwise have silently lost it. Two pins of the old toolbar behaviour were changed deliberately.
 
 ## What did not happen
 

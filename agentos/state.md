@@ -30,7 +30,7 @@
 | **`Alt+Shift+P` is the same route:** `_execute_action`, with no command listener in source. No unused grant remains. Whether Chrome treats it as a gesture is unknown | FACT (source); UNKNOWN (Chrome) | `artifacts/experiments/M23.13-toolbar-interaction/README.md` §2 |
 | **An evidence build's click is what it was:** a grant, revoked by navigation, and no panel. Runtime **UNVERIFIED** | FACT (fakes) | `toolbarInteraction.test.ts` |
 | **Permissions, hosts and CSP are identical** to the previous real build; `wxt.config.ts` has no diff. No T1 packaged; hooks absent; TR-01's integrity check ran and passed. That build is also the OD-T wording's first, and it passes | FACT | `logs/w1-m23-13-manifest-comparison.json` |
-| **3595 tests pass; 24 of 24 deliberate regressions caught.** 11 product tests that relied on a toolbar grant now hold one directly, so they keep their claim | FACT | `decision.md` |
+| **3595 tests pass; 24 of 24 deliberate regressions caught.** 12 product tests that relied on a toolbar grant now hold one directly, so they keep their claim | FACT | `decision.md` |
 
 ## Current state — M23.12 (2026-11-04 UTC, local branch, not merged)
 

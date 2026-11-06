@@ -97,7 +97,7 @@ Compared against the previous real build (`logs/w1-m23-13-manifest-comparison.js
 
 **Mutation check (`logs/w1-m23-13-mutation-check.json`): 24 of 24 caught,** all files restored (checksums). These include a failure falling back to a grant, a click starting offscreen work, the handler awaiting before `open`, and evidence opening the panel.
 
-**Tests that assumed a product toolbar grant.** 11 product tests clicked the toolbar to get "a live grant". They would have kept passing while no longer testing that, so they now put a grant in the authority directly, through the test-only `noteGrant`. Their claim, that a task ignores a grant, is kept. Evidence tests still click.
+**Tests that assumed a product toolbar grant.** 12 product tests clicked the toolbar to get "a live grant". They would have kept passing while no longer testing that, so they now put a grant in the authority directly, through the test-only `noteGrant`. Their claim, that a task ignores a grant, is kept. Evidence tests still click.
 
 **`captureAuthority.test.ts` has no diff,** and its expiry and revocation tests pass. The authority module reads no build flag.
 
