@@ -27,7 +27,7 @@
 | Claim | Label | Evidence |
 |---|---|---|
 | **A normal product build declares `offscreen` and `sidePanel`. Neither `tabCapture` nor `activeTab`** | FACT (the real manifest). **Not run in a browser** | `artifacts/experiments/M23.17-product-permission-isolation/logs/w1-m23-17-product-build-inspection.json` |
-| **Wording aside, only one thing changed:** in the real build all JavaScript and both pages are byte-identical, and the manifest differs in `permissions` alone | FACT | `logs/w1-m23-17-product-build-comparison.json` |
+| **Only one thing changed:** in the real build all JavaScript and both pages are byte-identical, and the manifest differs in `permissions` alone | FACT | `logs/w1-m23-17-product-build-comparison.json` |
 | **Evidence builds keep all four,** in the same order: the real config's generated manifests are byte-identical for all five flags. Runtime **UNVERIFIED** | FACT (config). No evidence build was made | same |
 | **The contract allows exactly that difference and refuses any other.** Three places assumed equal permissions, and all three changed | FACT (tests) | `tests/browser/support/build-separation.mjs` |
 | **3717 tests pass; 47 of 47 deliberate regressions caught** | FACT | `decision.md` |
