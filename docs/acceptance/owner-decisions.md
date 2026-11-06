@@ -1,6 +1,6 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.12, 2026-11-04):**
+> **Status (updated M23.13, 2026-11-06):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
@@ -9,7 +9,9 @@
 > - **Selected and implemented in M23.9:** **OD-S: APPROVED — OPTION B** (2026-11-04), implemented in product builds. **Not browser-verified.**
 > - **Selected and implemented in M23.10:** **OD-V** (2026-11-04), in the six harness contracts. **No harness was run.**
 > - **Selected and implemented in M23.11:** **OD-U: OPTION B** (2026-11-04), in the two gesture harnesses. **Neither was run.**
-> - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. **Not rebuilt or seen in a browser.**
+> - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. Not seen in a browser. Its first real build was M23.13's.
+> - **Selected and implemented in M23.13:** **OD-W**, the product's toolbar opens the side panel. **Not tried in a browser.**
+> - **Awaiting the owner, added in M23.13:** OD-X, OD-Y and OD-Z.
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -487,8 +489,41 @@ Each sub-decision is separate.
 - **All Phase 1 acceptance criteria.**
 
 **For the owner's attention, raised and not decided:**
-- In a product build the toolbar button now has no visible effect. It records a grant that nothing uses, and `tabCapture` has no product user.
+- *(Toolbar: resolved by OD-W, M23.13.)* In a product build the toolbar button now has no visible effect. It records a grant that nothing uses, and `tabCapture` has no product user.
 - `BRW-04` and the scope's "Capture: gesture-authorised" still read as product capability (M23.11).
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.13 — status after OD-W
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-W | **SELECTED (owner):** in a normal Phase 1 product, clicking the toolbar button opens or focuses the side panel, and issues no capture grant. Evidence builds keep their toolbar gesture-capture behaviour unchanged | **M23.13: IMPLEMENTED IN PRODUCT BUILDS, after the tests and the product build passed.** One handler, behind the existing flag. The real product build's listener opens the panel and has no grant in it. Permissions, hosts and CSP are identical to the previous real build. 24 of 24 deliberate regressions caught | **Not tried in a browser.** Evidence-build runtime UNVERIFIED (`artifacts/experiments/M23.13-toolbar-interaction/`) |
+
+**The keyboard shortcut needs no further decision.** `Alt+Shift+P` is `_execute_action`, with no command listener in the source, so it is the same event as the click and issues no unused grant. Whether Chrome treats it as a user gesture is unknown until a browser run.
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U and OD-V. Not browser-verified, not accepted.
+
+**New; awaiting the owner:**
+
+| ID | Decision | Status |
+|---|---|---|
+| OD-X | The treatment of the visible `captureStatus` field in the side panel's Status box. In a product it now always reads `NO_GRANT` | **AWAITING OWNER APPROVAL** |
+| OD-Y | Branding terminology such as "PratiBimb minimal host" and "Development build" | **AWAITING OWNER APPROVAL** |
+| OD-Z | Remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description | **AWAITING OWNER APPROVAL** |
+
+**Still awaiting the owner, unchanged:**
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**Raised, not decided:** `tabCapture` and `activeTab` have no product user now, and the capture authority is idle in a product. Both stay, as instructed. While `activeTab` stays, Chrome itself gives the extension temporary tab access on a click, which nothing in a product build uses.
 
 **Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
 

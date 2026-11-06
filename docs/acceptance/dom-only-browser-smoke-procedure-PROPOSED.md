@@ -5,6 +5,7 @@
 > - **It claims nothing until it is run.** No product runtime validation exists for M23.7 yet.
 > - **Scope:** one operator, one machine, Chrome for Testing, the synthetic loopback fixture. It is evidence type C, unless the operator meets OD-C's definition. It says nothing about Firefox, a second machine, real sites or performance.
 > - **A product build has no diagnostic hook to call (M23.9, OD-S).** Check D7 confirms that.
+> - **Updated M23.13 (OD-W):** the toolbar button opens the side panel and issues no grant. A5, A6 and section C check that, and are the first real evidence of it.
 > - **Updated M23.12 (OD-T):** a product panel has no Capture field, so A3, C1, C3 and C4 now use the approved wording and the worker's console.
 
 ## 1. Before starting
@@ -50,6 +51,8 @@ Each check is PASS or FAIL. **Any frame capture, model-file load or TR-01 worker
 | A2 | Read its details | permissions and host access match `manifest.json`: `offscreen`, `sidePanel`, `activeTab`, `tabCapture`; `http://127.0.0.1/*` only |
 | A3 | Open Chrome's side panel and choose PratiBimb | the panel renders, styled. It shows the approved description and privacy explanation, and **no Capture field** |
 | A4 | Hover over the extension's toolbar button | the title is **PratiBimb — Page Assistant** |
+| A5 | Close the panel, then click the toolbar button | **the side panel opens, on this tab** |
+| A6 | Close the panel, then press `Alt+Shift+P`. Then click the toolbar button several times | the panel opens from the shortcut, and repeated clicks start nothing and lose nothing |
 
 ### B. A DOM-only task, with no toolbar click
 
@@ -65,13 +68,13 @@ Do **not** click the extension's toolbar button.
 
 ### C. The same task with a toolbar click first
 
-This is the one that matters most: a grant must not start a capture.
+This is the one that matters most: the click must issue no grant, and must start no capture.
 
 | # | Do | Expect |
 |---|---|---|
-| C1 | Start the harness again with `--scenarios allow`, for a fresh page and its own record. On the fixture page, click the extension's toolbar button | nothing visible changes in the panel. In the service worker's Console, `__host.captureState().grants` has one entry |
+| C1 | Start the harness again with `--scenarios allow`, for a fresh page and its own record. On the fixture page, click the extension's toolbar button | the panel opens. In the service worker's Console, `__host.captureState().grants` is **`[]`** |
 | C2 | Run the task as in B | it completes as in B, with no tab-capture indicator |
-| C3 | In the service worker's Console, read `__host.captureState().grants` after the task | **still `boundTo: null`.** A bound grant would mean a capture ticket was issued: **FAIL** |
+| C3 | In the service worker's Console, read `__host.captureState().grants` after the task | **still `[]`.** Any grant means the toolbar or a task asked for one: **FAIL** |
 | C4 | Read the panel's wording before and after | the approved sentences, unchanged. Nothing in the panel asks for a toolbar click. Any capture wording in the panel, other than the Status box's raw `captureStatus` key, is a **FAIL** |
 
 ### D. Looking for what must be absent
@@ -82,7 +85,7 @@ Use `chrome://extensions` → Inspect views. **Read only.**
 |---|---|---|---|
 | D1 | offscreen document, Console | `performance.getEntriesByType("resource").map((e) => e.name)` | `ort.all.min.js` and the extension's own chunks. **No `t1-ui-head.onnx`, no `tr01-ppocrv4-mobile-det.onnx`, no `.wasm`** |
 | D2 | offscreen document, Sources → Threads | look at the list | **no `tr01-worker.js`** |
-| D3 | service worker, Console | `__host.captureState().grants` | one entry per toolbar click, each with **`boundTo: null`** |
+| D3 | service worker, Console | `__host.captureState().grants` | **`[]`**, however many times the toolbar was clicked |
 | D4 | service worker, Console | `__host.seen.filter((e) => e.message?.kind === "CAPTURE_FRAME" \|\| e.message?.kind === "CAPTURE_TICKET").length` | **0** |
 | D5 | service worker, Console | `/iVBORw0KGgo\|data:image/.test(JSON.stringify(__host.seen))` | **false** |
 | D6 | service worker, Console | `(await chrome.runtime.sendMessage({ target: "offscreen", kind: "TASK_STATUS" })).task.result` and read it | `ports.perception` is `[]`; `perceptionBoot` is `null`; in each turn's `handoff`, `capability` is `{ backend: "none", tiers_fired: ["T0","T2"] }`, every element's `source` is `"dom"`, and `elements` is non-empty |

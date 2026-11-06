@@ -1,7 +1,8 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
-> - **M23.12:** **OD-T is implemented:** the toolbar and side panel use the approved wording, in product builds. Not rebuilt or seen in a browser. See `artifacts/experiments/M23.12-product-ui-language/`.
+> - **M23.13:** **OD-W is implemented:** a product's toolbar button opens the side panel and issues no capture grant. Real build inspected; not tried in a browser. OD-X, OD-Y and OD-Z await the owner. See `artifacts/experiments/M23.13-toolbar-interaction/`.
+> - **M23.12:** **OD-T is implemented:** the toolbar and side panel use the approved wording, in product builds. Not seen in a browser. See `artifacts/experiments/M23.12-product-ui-language/`.
 > - **M23.11:** **OD-U is implemented:** the two gesture harnesses are evidence-build-only, and refuse a product build before Chrome can start. Neither was run, and evidence-build runtime validation is outstanding. See `artifacts/experiments/M23.11-gesture-harness-isolation/`.
 > - **M23.10:** **OD-V is implemented:** six evidence harnesses judge a build-separation contract instead of requiring equal workers. None was run. See `artifacts/experiments/M23.10-evidence-harness-reconciliation/`.
 > - **M23.9:** **OD-S (Option B) is implemented in product builds:** a real product build contains neither diagnostic hook. Not browser-verified. See `artifacts/experiments/M23.9-diagnostic-hook-isolation/`.

@@ -35,6 +35,10 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.13 — A product's toolbar button opens the side panel (OD-W).** It issues no capture grant, ticket or frame, and sends no
+  message. A failure or a missing tab is reported, with no fallback to capture. An evidence build's click is unchanged, and
+  `Alt+Shift+P` is the same event. Permissions, hosts and CSP are identical to the previous real build, which this build
+  replaces. Not tried in a browser. OD-X, OD-Y and OD-Z await the owner.
 - **M23.12 — The product's UI says what a product task does (OD-T; UI copy, tests and documentation only).** Toolbar title
   `PratiBimb — Page Assistant`, plus the approved side-panel description and privacy explanation. Those two sentences appear
   in product builds only, because the privacy one is false in an evidence build, and the Capture field is now

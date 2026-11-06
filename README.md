@@ -130,13 +130,13 @@ writes a value-free record of what happened.
 CHROME_PATH="$LOCALAPPDATA/ms-playwright/chromium-1243/chrome-win64/chrome.exe" node tests/browser/extension/run-product-smoke.mjs
 ```
 
-In the browser, open Chrome's side panel (the side-panel button at the right of the toolbar) and
-choose **PratiBimb**. Type the goal, press **Read this page**, declare what the Submit button should
+In the browser, click the **PratiBimb — Page Assistant** toolbar button to open the side panel. (Chrome's
+own side-panel button at the right of the toolbar also works: choose **PratiBimb**.) Type the goal, press **Read this page**, declare what the Submit button should
 do, press **Start task**, and answer the consent request. **Allow once** restores the value once;
 **Deny** restores nothing. The panel then shows each turn's outcome and its measured stage timings.
 Records go to `artifacts/experiments/M20-runnable-measured-product/logs/`, one new file per run.
 
-The toolbar button is titled **PratiBimb — Page Assistant**, and a normal task does not need it. Normal tasks do
+The toolbar button only opens the panel: `Alt+Shift+P` does the same. Normal tasks do
 not capture browser screenshots or send page images to the reasoning model. Visual-only PII protection is not
 operational.
 

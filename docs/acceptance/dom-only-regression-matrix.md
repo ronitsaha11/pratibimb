@@ -1,9 +1,10 @@
-# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11, M23.12)
+# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11, M23.12, M23.13)
 
 > **Status:** what M23.8's tests establish about M23.7's boundary (M23.8, 2026-11-04, at `740a245` plus tests).
 > - **What "behavioural" means here:** the real `background.ts`, `offscreen/main.ts`, task run, orchestrator, privacy boundary, execution gate and egress guard ran in Node under a fake `chrome`, with every capture, model and worker API counted (`apps/extension/test/support/simulatedExtension.ts`). **It is a model of a browser, not a browser.**
 > - **Evidence type:** in the terms of `core-product-acceptance-PROPOSED.md` §4, all of this is **type A** (unit and integration). None of it is type B to H. **No browser ran. No acceptance criterion is approved or re-rated by it.**
 > - **Nothing real was involved:** no frame, no model file, no worker, no model server.
+> - **M23.13:** §10 adds OD-W. Real product build inspected; not tried in a browser. That build is also the OD-T wording's first.
 > - **M23.12:** §9 adds OD-T. Not rebuilt and not seen in a browser.
 > - **M23.11:** §8 adds OD-U. Tests and a mutation check; neither harness was run.
 > - **M23.10:** §7 adds OD-V. Tests and a mutation check; no harness was run.
@@ -28,7 +29,7 @@
 | Control | What it does | What it shows |
 |---|---|---|
 | A regression double, no grant | the build's gates stop gating (since M23.9 the double flips the flag, as the gate sits in `main.ts`; M23.8's mocked `task-perception.ts`) | capture requested, T1 fetched, session created. `noPerceptionPassRan` and `noPerceptionRealmWasBuilt` fail, **while the task still reports CONFIRMED**, which is why only these checks catch it |
-| The same double, with a grant | as above, plus a toolbar grant | frames, T1 inference and TR-01 frames are counted; the handoff claims `wasm` and tier T1; the floor checks fail |
+| The same double, with a grant | as above, plus a toolbar grant (the double flips the flag, so its toolbar still grants) | frames, T1 inference and TR-01 frames are counted; the handoff claims `wasm` and tier T1; the floor checks fail |
 | The evidence flag, with the real policy | `__EVIDENCE_BUILD__` true | the wiring evidence builds depend on is intact, and the same product checks do not hold |
 
 No product source was changed or mutated for this in M23.8. M23.7's mutation check against the old source stands on its own record.
@@ -163,3 +164,22 @@ Commands, exit codes and counts: `artifacts/experiments/M23.11-gesture-harness-i
 | The checks catch regressions | 23 deliberate mutations, 23 caught | **mutation** | PASS | — |
 
 Commands, exit codes and counts: `artifacts/experiments/M23.12-product-ui-language/decision.md`.
+
+## 10. OD-W: the product's toolbar (M23.13)
+
+| Requirement | Actual evidence | Kind | Result | Not established |
+|---|---|---|---|---|
+| Click opens the side panel | `sidePanel.open({ tabId })`, once; in the real minified listener | **behavioural** (simulated); **real build output** | PASS | **that Chrome opens it** |
+| No grant | authority still has none, and reports `NO_GRANT`; no `.grant(` in the real listener | **behavioural** (simulated); **real build output** | PASS | — |
+| No ticket, frame, T1, TR-01, offscreen work | all 14 counters at zero; no message sent | **behavioural** (simulated) | PASS | a real browser |
+| Repeated clicks | five clicks start no task, session or run; a click during a task disturbs nothing | **behavioural** (simulated) | PASS | Chrome's own handling of a repeat |
+| Missing tab | window used if there is one; otherwise reported, and nothing else | **behavioural** (simulated) | PASS | — |
+| Panel API failure, with no capture fallback | rejected, thrown and absent API: reported; no grant, message or capture; a later click retries | **behavioural** (simulated) | PASS | a real failure |
+| Within the user gesture | `open` called before the listener returns; nothing awaited first | **unit**; **static** | PASS | Chrome's gesture rule |
+| Evidence toolbar | still grants, per tab; navigation still revokes; opens nothing | **behavioural** (doubles) | PRESERVED. **Runtime UNVERIFIED** | an evidence build |
+| Keyboard shortcut | no command listener in source; `_execute_action` only | **static** | same route | whether Chrome treats it as a gesture |
+| Expiry and revocation | `captureAuthority.test.ts` no diff and passing | **unit** | UNCHANGED | — |
+| Permissions, hosts, CSP | identical to the previous real build; per flag in the config | **real build output**; **configuration executed** | UNCHANGED | — |
+| The checks catch regressions | 24 deliberate mutations, 24 caught | **mutation** | PASS | — |
+
+Commands, exit codes and counts: `artifacts/experiments/M23.13-toolbar-interaction/decision.md`.

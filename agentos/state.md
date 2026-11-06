@@ -9,10 +9,10 @@
 
 | Field | Value |
 |---|---|
-| **Date** | 2026-11-04 (UTC) |
+| **Date** | 2026-11-06 (UTC) |
 | **Phase** | Product implementation. Milestones through M21 merged on `main` (last: #92, `077f139`). **M22, on a local branch: engineering scope CLOSED (M22.19, owner Option B); detector-performance research DEFERRED to FR-01, not authorised; no detector evaluation has run.** |
 | **Health** | 🟠 **AMBER.** The product runs end to end on W1 from a clean checkout, and its latency and resources are measured. The open decisions (J7/B5, D1–D4) and the unadopted visual detector are unchanged. |
-| **Next** | **M23.12: OD-T is implemented: the toolbar and a product panel use the owner's wording. Not rebuilt or seen in a browser.** OD-P, OD-R, OD-S, OD-U and OD-V remain completed. A rebuild and a person-run browser smoke need a separate authorisation, as does any evidence-build or harness run. For the owner's attention: a product's toolbar button now has no visible effect and `tabCapture` has no product user. Still open: OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED), GOV-01, OD-E1, OD-K, OD-L, OD-M, all Phase 1 acceptance criteria, and the browser, cross-machine, independent-human, real-site, performance and security decisions. Phase 2 is NOT AUTHORISED; FR-01 is deferred and not authorised; B-07 stays blocked. |
+| **Next** | **M23.13: OD-W is implemented: a product's toolbar button opens the side panel and issues no capture grant. Real build inspected; not tried in a browser.** OD-P, OD-R, OD-S, OD-T, OD-U and OD-V remain completed. The owner decides **OD-X** (the visible `captureStatus` field), **OD-Y** ("minimal host", "Development build") and **OD-Z** (acceptance wording, including `BRW-04`). A person-run browser smoke, and any evidence-build or harness run, need a separate authorisation. Raised: `tabCapture` and `activeTab` have no product user now. Still open: OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED), GOV-01, OD-E1, OD-K, OD-L, OD-M, all Phase 1 acceptance criteria, and the browser, cross-machine, independent-human, real-site, performance and security decisions. Phase 2 is NOT AUTHORISED; FR-01 is deferred and not authorised; B-07 stays blocked. |
 | **Product code written** | **Yes**: `packages/*` and `apps/extension`. See "Current state" below. |
 
 > **Correction forward.** Until M20 this snapshot still read 2026-09-07 and "Product code written:
@@ -21,6 +21,16 @@
 > wins**. The original wording is in this file's history.
 
 ---
+
+## Current state — M23.13 (2026-11-06 UTC, local branch, not merged)
+
+| Claim | Label | Evidence |
+|---|---|---|
+| **OD-W is implemented:** a product's toolbar click opens the side panel for its tab, and issues no grant, ticket or capture and sends no message. A failure or a missing tab is reported and goes no further: nothing falls back to capture | FACT (real worker under fakes; a real build's listener). **Not tried in a browser** | `apps/extension/test/toolbarInteraction.test.ts`; `artifacts/experiments/M23.13-toolbar-interaction/logs/w1-m23-13-product-build-inspection.json` |
+| **`Alt+Shift+P` is the same route:** `_execute_action`, with no command listener in source. No unused grant remains. Whether Chrome treats it as a gesture is unknown | FACT (source); UNKNOWN (Chrome) | `artifacts/experiments/M23.13-toolbar-interaction/README.md` §2 |
+| **An evidence build's click is what it was:** a grant, revoked by navigation, and no panel. Runtime **UNVERIFIED** | FACT (fakes) | `toolbarInteraction.test.ts` |
+| **Permissions, hosts and CSP are identical** to the previous real build; `wxt.config.ts` has no diff. No T1 packaged; hooks absent; TR-01's integrity check ran and passed. That build is also the OD-T wording's first, and it passes | FACT | `logs/w1-m23-13-manifest-comparison.json` |
+| **3595 tests pass; 24 of 24 deliberate regressions caught.** 11 product tests that relied on a toolbar grant now hold one directly, so they keep their claim | FACT | `decision.md` |
 
 ## Current state — M23.12 (2026-11-04 UTC, local branch, not merged)
 
@@ -436,3 +446,4 @@ identified, one written.
 | 2026-11-04 | M23.10 — evidence harness reconciliation (OD-V) | **Harnesses, tests and documentation only.** Six evidence harnesses no longer require product and evidence workers to be byte-identical, which OD-S made impossible. One tested contract replaces that comparison, and their `content.js`, manifest, permission and CSP comparisons and their own checks are retained. 73 new contract tests and 3 configuration tests; 58 of 58 mutations caught. The first mutation run crashed on a failed restore, leaving one harness mutated until the tests caught it. Nothing was committed in that state. No harness, build, browser, model session, frame, inference, training, detector evaluation or dataset; no product source, permission, CSP or ADR change; OD-U and OD-T untouched; B-07 and FR-01 unchanged. |
 | 2026-11-04 | M23.11 — gesture harness isolation (OD-U, Option B) | **Harnesses, tests and documentation only.** `run-gesture-capture.mjs` and `run-gesture-acts.mjs` are evidence-build-only behind one fail-closed gate in `build-separation.mjs`, using `connect-src`, the hooks' names and T1's presence by file name: no new marker and no second definition. The real product build is refused. All 41 checks are byte-identical to before. 70 new tests; 47 of 47 mutations caught. No harness, build, browser, model, frame, inference, training, detector evaluation or dataset; no product source, permission, CSP or ADR change; OD-T untouched; B-07 and FR-01 unchanged. |
 | 2026-11-04 | M23.12 — product UI language (OD-T) | **UI copy, tests and documentation only.** The toolbar title, side-panel description and privacy explanation use the owner's exact wording. The two panel sentences appear in product builds only, because the privacy one is false in an evidence build, and the Capture field is evidence-build-only with its original words. The shortcut text reuses the approved title. Three evidence harness prompts name the new title. No build, browser, model, frame, inference, training, detector evaluation or dataset; no task, permission, CSP, packaging, hook or ADR change; B-07 and FR-01 unchanged. |
+| 2026-11-06 | M23.13 — toolbar interaction (OD-W) | **Owner-approved, narrow.** A product's toolbar click opens the side panel, synchronously inside the gesture, behind the existing flag, and issues no capture grant. Failures are reported with no fallback. An evidence build's click is unchanged. `Alt+Shift+P` is the same event. Real product build made and inspected, twice, its hook hashing TR-01 as the integrity check does. No evidence build, browser, model session, frame, inference, training, detector evaluation or dataset; no permission, CSP, egress, authority, packaging, hook or ADR change; OD-X, OD-Y and OD-Z pending; B-07 and FR-01 unchanged. |

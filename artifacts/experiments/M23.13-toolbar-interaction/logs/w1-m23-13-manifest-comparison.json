@@ -1,0 +1,46 @@
+{
+  "what": "the manifest of the product build from before this milestone (712465e) against the one built from 59f4282. Nothing but manifest.json was read for this.",
+  "identical": {
+    "action": false,
+    "background": true,
+    "commands": false,
+    "content_scripts": true,
+    "content_security_policy": true,
+    "host_permissions": true,
+    "manifest_version": true,
+    "minimum_chrome_version": true,
+    "name": true,
+    "permissions": true,
+    "side_panel": true,
+    "version": true
+  },
+  "differ": {
+    "action": {
+      "before": {
+        "default_title": "PratiBimb: perceive this tab"
+      },
+      "after": {
+        "default_title": "PratiBimb — Page Assistant"
+      }
+    },
+    "commands": {
+      "before": {
+        "_execute_action": {
+          "suggested_key": {
+            "default": "Alt+Shift+P"
+          },
+          "description": "Perceive this tab"
+        }
+      },
+      "after": {
+        "_execute_action": {
+          "suggested_key": {
+            "default": "Alt+Shift+P"
+          },
+          "description": "PratiBimb — Page Assistant"
+        }
+      }
+    }
+  },
+  "note": "the two differences are M23.12's approved wording, built for the first time here. M23.13 changed no manifest entry."
+}
