@@ -226,6 +226,8 @@ export interface RigOptions {
   readonly browserHonoursOnlyMintedStreamIds?: boolean;
   /** How the fake `chrome.sidePanel.open` behaves. It records the call in the first two cases. */
   readonly sidePanel?: "OK" | "REJECTS" | "THROWS" | "ABSENT";
+  /** M23.17: the API surface of a manifest with neither capture permission: `chrome.tabCapture` is not there at all. */
+  readonly withoutTabCaptureApi?: boolean;
   /** Collects the context `host/offscreen/main.ts` hands the TR-01 probe, if it hands it any. */
   readonly tr01ProbeContexts?: unknown[];
 }
@@ -491,15 +493,19 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
             },
           },
         }),
-    tabCapture: {
-      // A fresh handle each time, as Chrome's are: the capture authority refuses one it has seen.
-      getMediaStreamId: async () => {
-        counters.mintedStreamIds += 1;
-        const handle = `opaque-stream-handle-${counters.mintedStreamIds}`;
-        mintedStreamIds.add(handle);
-        return handle;
-      },
-    },
+    ...(options.withoutTabCaptureApi
+      ? {}
+      : {
+          tabCapture: {
+            // A fresh handle each time, as Chrome's are: the capture authority refuses one it has seen.
+            getMediaStreamId: async () => {
+              counters.mintedStreamIds += 1;
+              const handle = `opaque-stream-handle-${counters.mintedStreamIds}`;
+              mintedStreamIds.add(handle);
+              return handle;
+            },
+          },
+        }),
     tabs: {
       onUpdated: { addListener: (listener: (tabId: number, change: { status?: string }) => void) => updatedListeners.push(listener) },
       onRemoved: { addListener: () => undefined },

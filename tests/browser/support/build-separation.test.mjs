@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { connectSrcOf, manifestRouteSha } from "./build-route.mjs";
+import { connectSrcOf, crossBuildManifestRouteSha, manifestRouteSha } from "./build-route.mjs";
 import { evidenceReferenceFlags, EVIDENCE_CONNECT_SRC, EVIDENCE_REQUIRED_NAMES, judgeBuildSeparation, snapshotEvidenceBuild, snapshotProductBuild } from "./build-separation.mjs";
 import { DIAGNOSTIC_HOOK_MARKERS } from "./product-build-inspection.mjs";
 
@@ -57,7 +57,7 @@ function build({ worker, offscreen, content = CONTENT, connectSrc, manifest = {}
   return dir;
 }
 
-const productBuild = (over = {}) => snapshotProductBuild(build({ worker: PRODUCT_WORKER, offscreen: PRODUCT_OFFSCREEN, connectSrc: PRODUCT_CONNECT, ...over }), EXPECTED);
+const productBuild = (over = {}) => snapshotProductBuild(build({ worker: PRODUCT_WORKER, offscreen: PRODUCT_OFFSCREEN, connectSrc: PRODUCT_CONNECT, ...over, manifest: { permissions: ["offscreen", "sidePanel"], ...over.manifest } }), EXPECTED);
 const evidenceBuild = (over = {}) => snapshotEvidenceBuild(build({ worker: EVIDENCE_WORKER, offscreen: EVIDENCE_OFFSCREEN, connectSrc: EVIDENCE_CONNECT_SRC, models: ["t1-ui-head.onnx"], ...over }));
 const good = () => ({ product: productBuild(), reference: evidenceBuild(), evidence: evidenceBuild() });
 
@@ -178,11 +178,17 @@ describe("the retained comparisons: still the same bar across the two builds", (
     expect(problems).toEqual(expect.arrayContaining(["MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT", "HOST_PERMISSIONS_DIFFER_FROM_PRODUCT"]));
   });
 
-  it("(11) a permission added, or tabCapture removed, fails", () => {
-    for (const permissions of [["offscreen", "sidePanel", "activeTab", "tabCapture", "tabs"], ["offscreen", "sidePanel", "activeTab"]]) {
+  it("(11) a permission added to an evidence build fails, three ways", () => {
+    const changed = { manifest: { permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture", "tabs"] } };
+    const { problems } = judgeBuildSeparation({ ...good(), evidence: evidenceBuild(changed), reference: evidenceBuild(changed) });
+    expect(problems.sort()).toEqual(["EVIDENCE_UNAPPROVED_PERMISSION:tabs", "MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT", "UNAPPROVED_PERMISSION_DIFFERENCE:tabs"]);
+  });
+
+  it("(11) tabCapture or activeTab removed from an evidence build fails, and names it", () => {
+    for (const [permissions, lost] of [[["offscreen", "sidePanel", "activeTab"], "tabCapture"], [["offscreen", "sidePanel", "tabCapture"], "activeTab"]]) {
       const changed = { manifest: { permissions } };
       const { problems } = judgeBuildSeparation({ ...good(), evidence: evidenceBuild(changed), reference: evidenceBuild(changed) });
-      expect(problems, JSON.stringify(permissions)).toEqual(expect.arrayContaining(["MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT", "PERMISSIONS_DIFFER_FROM_PRODUCT"]));
+      expect(problems.sort(), lost).toEqual([`APPROVED_PERMISSION_DIFFERENCE_MISSING:${lost}`, `EVIDENCE_LACKS_PERMISSION:${lost}`]);
     }
   });
 
@@ -199,11 +205,105 @@ describe("the retained comparisons: still the same bar across the two builds", (
     expect(judgeBuildSeparation({ ...good(), product }).problems).toEqual(expect.arrayContaining(["CONNECT_SRC_NOT_THE_APPROVED_DIFFERENCE"]));
   });
 
+  it("manifestRouteSha normalises connect-src alone, and still sees the two permissions (M13's helper, unchanged)", () => {
+    const four = build({ worker: "", offscreen: "", connectSrc: PRODUCT_CONNECT });
+    const two = build({ worker: "", offscreen: "", connectSrc: PRODUCT_CONNECT, manifest: { permissions: ["offscreen", "sidePanel"] } });
+    expect(manifestRouteSha(four)).not.toBe(manifestRouteSha(two));
+  });
+
   it("the manifest comparison normalises connect-src alone (M13's helper, unchanged)", () => {
     const a = build({ worker: "", offscreen: "", connectSrc: PRODUCT_CONNECT });
     const b = build({ worker: "", offscreen: "", connectSrc: EVIDENCE_CONNECT_SRC });
     expect(manifestRouteSha(a)).toBe(manifestRouteSha(b));
     expect(connectSrcOf(a)).not.toBe(connectSrcOf(b));
+  });
+});
+
+describe("M23.17 (RD-5, RD-6): the approved permission difference, and nothing else", { timeout: 30_000 }, () => {
+  it("(1, 2, 3) a product with neither permission and an evidence build with both pass", () => {
+    const builds = good();
+    expect(builds.product.permissions).toEqual(["offscreen", "sidePanel"]);
+    expect(builds.evidence.permissions).toEqual(["offscreen", "sidePanel", "activeTab", "tabCapture"]);
+    expect(judgeBuildSeparation(builds).problems).toEqual([]);
+  });
+
+  it("(1, 2) a product that declares either one is refused, and named", () => {
+    for (const permission of ["tabCapture", "activeTab"]) {
+      const product = productBuild({ manifest: { permissions: ["offscreen", "sidePanel", permission] } });
+      const { problems, status } = judgeBuildSeparation({ ...good(), product });
+      expect(problems, permission).toContain(`PRODUCT:EVIDENCE_ONLY_PERMISSION_IN_PRODUCT:${permission}`);
+      expect(problems, permission).toContain(`APPROVED_PERMISSION_DIFFERENCE_MISSING:${permission}`);
+      expect(status, permission).toBe("REFUSED");
+    }
+  });
+
+  it("(4) an evidence build lacking either one is refused, in every mode, including a dry run", () => {
+    for (const [permissions, lost] of [[["offscreen", "sidePanel", "activeTab"], "tabCapture"], [["offscreen", "sidePanel", "tabCapture"], "activeTab"]]) {
+      const changed = { manifest: { permissions } };
+      const { problems, status } = judgeBuildSeparation({ ...good(), evidence: evidenceBuild(changed), reference: evidenceBuild(changed), dryRun: true });
+      expect(problems, lost).toEqual([`EVIDENCE_LACKS_PERMISSION:${lost}`]);
+      expect(status, lost).toBe("REFUSED");
+    }
+  });
+
+  it("(4) an evidence build with the product's list is refused, and it does not read as the approved difference", () => {
+    const changed = { manifest: { permissions: ["offscreen", "sidePanel"] } };
+    const { problems } = judgeBuildSeparation({ ...good(), evidence: evidenceBuild(changed), reference: evidenceBuild(changed) });
+    expect(problems).toEqual(expect.arrayContaining(["EVIDENCE_LACKS_PERMISSION:activeTab", "EVIDENCE_LACKS_PERMISSION:tabCapture", "APPROVED_PERMISSION_DIFFERENCE_MISSING:activeTab", "APPROVED_PERMISSION_DIFFERENCE_MISSING:tabCapture"]));
+  });
+
+  it("(5) an unexpected product permission is refused, whatever it is", () => {
+    for (const permission of ["tabs", "scripting", "storage", "<all_urls>", "webRequest", "debugger"]) {
+      const product = productBuild({ manifest: { permissions: ["offscreen", "sidePanel", permission] } });
+      const { problems } = judgeBuildSeparation({ ...good(), product });
+      expect(problems, permission).toContain("PRODUCT:PERMISSIONS_CHANGED");
+      expect(problems, permission).toContain(`UNAPPROVED_PERMISSION_DIFFERENCE:${permission}`);
+    }
+  });
+
+  it("(6) a shared permission lost from either build is refused", () => {
+    const product = productBuild({ manifest: { permissions: ["offscreen"] } });
+    expect(judgeBuildSeparation({ ...good(), product }).problems).toEqual(expect.arrayContaining(["PRODUCT:PERMISSIONS_CHANGED", "UNAPPROVED_PERMISSION_DIFFERENCE:sidePanel", "MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT"]));
+    const changed = { manifest: { permissions: ["offscreen", "activeTab", "tabCapture"] } };
+    expect(judgeBuildSeparation({ ...good(), evidence: evidenceBuild(changed), reference: evidenceBuild(changed) }).problems).toEqual(expect.arrayContaining(["EVIDENCE_LACKS_PERMISSION:sidePanel", "UNAPPROVED_PERMISSION_DIFFERENCE:sidePanel", "MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT"]));
+  });
+
+  it("(6) the shared permissions in another order are a different manifest", () => {
+    const changed = { manifest: { permissions: ["sidePanel", "offscreen", "activeTab", "tabCapture"] } };
+    expect(judgeBuildSeparation({ ...good(), evidence: evidenceBuild(changed), reference: evidenceBuild(changed) }).problems).toEqual(["MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT"]);
+  });
+
+  it("(7) a host permission differing still fails, on either side", () => {
+    const wider = { manifest: { host_permissions: ["http://127.0.0.1/*", "https://example.com/*"] } };
+    expect(judgeBuildSeparation({ ...good(), evidence: evidenceBuild(wider), reference: evidenceBuild(wider) }).problems).toEqual(expect.arrayContaining(["MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT", "HOST_PERMISSIONS_DIFFER_FROM_PRODUCT"]));
+    expect(judgeBuildSeparation({ ...good(), product: productBuild(wider) }).problems).toEqual(expect.arrayContaining(["PRODUCT:HOST_PERMISSIONS_CHANGED", "MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT", "HOST_PERMISSIONS_DIFFER_FROM_PRODUCT"]));
+  });
+
+  it("(8) every other CSP directive still fails, one at a time", () => {
+    for (const [from, to] of [["default-src 'none'", "default-src 'self'"], ["worker-src 'self'", "worker-src 'self' blob:"], ["object-src 'none'", "object-src 'self'"], ["base-uri 'none'", "base-uri 'self'"], ["form-action 'none'", "form-action 'self'"]]) {
+      const changed = { csp: policy(EVIDENCE_CONNECT_SRC).replace(from, to) };
+      expect(judgeBuildSeparation({ ...good(), evidence: evidenceBuild(changed), reference: evidenceBuild(changed) }).problems, from).toEqual(["MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT"]);
+    }
+  });
+
+  it("(9) connect-src stays exactly ADR-0013's difference", () => {
+    const wider = { connectSrc: "'self' http://127.0.0.1:8995 http://127.0.0.1:8977" };
+    expect(judgeBuildSeparation({ ...good(), evidence: evidenceBuild(wider), reference: evidenceBuild(wider) }).problems).toEqual(["CONNECT_SRC_NOT_THE_APPROVED_DIFFERENCE"]);
+  });
+
+  it("two evidence builds must still agree on the permissions themselves: their comparison sets nothing aside", () => {
+    const reference = evidenceBuild({ manifest: { permissions: ["offscreen", "sidePanel", "tabCapture", "activeTab"] } });
+    expect(judgeBuildSeparation({ ...good(), reference }).problems).toEqual(["EVIDENCE_MANIFESTS_DISAGREE"]);
+  });
+
+  it("the cross-build route sets aside those two names and no others, and leaves everything else in the hash", () => {
+    const base = { worker: "", offscreen: "", connectSrc: PRODUCT_CONNECT };
+    const route = (manifest) => crossBuildManifestRouteSha(build({ ...base, manifest }));
+    const product = route({ permissions: ["offscreen", "sidePanel"] });
+    expect(route({ permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"] })).toBe(product);
+    for (const other of [{ permissions: ["offscreen", "sidePanel", "tabs"] }, { permissions: ["offscreen"] }, { permissions: ["sidePanel", "offscreen"] }, { permissions: ["offscreen", "sidePanel"], host_permissions: ["http://127.0.0.1/*", "<all_urls>"] }, { permissions: ["offscreen", "sidePanel"], name: "other" }, { permissions: ["offscreen", "sidePanel"], optional_permissions: ["tabCapture"] }]) {
+      expect(route(other), JSON.stringify(other)).not.toBe(product);
+    }
   });
 });
 
@@ -287,7 +387,8 @@ describe("the six harnesses, read as text", () => {
         expect(code).toContain("sharedRouteIdenticalToProduct: JSON.stringify({ ...productRoute, background: null, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, background: null, connectSrc: null }),");
         expect(code).toMatch(/!buildFacts\.sharedRouteIdenticalToProduct\) refuse\(/);
         expect(code).toMatch(/content: (sha|shaFile)\(join\(EXT, "content-scripts", "content\.js"\)\)/);
-        expect(code).toContain("manifest: manifestRouteSha(EXT)");
+        expect(code).toContain("manifest: crossBuildManifestRouteSha(EXT)");
+        expect(code).not.toMatch(/\bmanifestRouteSha\(/);
       });
 
       it("refuses on any contract problem, in every mode", () => {
@@ -317,6 +418,15 @@ describe("the six harnesses, read as text", () => {
       });
     });
   }
+
+  it("M23.17 (10): no harness compares permissions outside the revised contract, or sets anything else aside", () => {
+    for (const name of Object.keys(SIX)) {
+      const code = harness(name);
+      expect(code, name).not.toMatch(/PERMISSIONS_DIFFER_FROM_PRODUCT/);
+      expect(code, name).not.toMatch(/productManifest\.permissions\s*[!=]==|manifest\.permissions\s*[!=]==|\.permissions\)\s*[!=]==/);
+      expect(code, name).not.toMatch(/\.filter\(\(?\w*\)?\s*=>[^)]*(activeTab|tabCapture)/);
+    }
+  });
 
   it("no other harness had this guard, and none has a new blanket worker comparison", () => {
     for (const name of ["run-csp-negative", "run-tr01-worker", "run-visual-mask", "run-re1-product", "run-structural-stale", "run-text-region-eval", "run-extension-loop", "run-qg04-interception"]) {

@@ -57,7 +57,7 @@ function write({ name = "m2311-build-", worker, offscreen, content = CONTENT, co
   return dir;
 }
 
-const productDir = (over = {}) => write({ worker: PRODUCT_WORKER, offscreen: PRODUCT_OFFSCREEN, connectSrc: PRODUCT_CONNECT, models: [EXPECTED.tr01File], ...over });
+const productDir = (over = {}) => write({ worker: PRODUCT_WORKER, offscreen: PRODUCT_OFFSCREEN, connectSrc: PRODUCT_CONNECT, models: [EXPECTED.tr01File], ...over, manifest: { permissions: ["offscreen", "sidePanel"], ...over.manifest } });
 const evidenceDir = (over = {}) => write({ worker: EVIDENCE_WORKER, offscreen: EVIDENCE_OFFSCREEN, connectSrc: EVIDENCE_CONNECT_SRC, models: [EXPECTED.tr01File, "t1-ui-head.onnx"], ...over });
 const identify = (dir) => identifyBuild(dir, EXPECTED);
 const select = (dir) => selectGestureEvidenceBuild(dir, EXPECTED);
@@ -102,6 +102,9 @@ describe("identifyBuild: which build is this, from what it contains", () => {
       ["a wider script-src", { csp: policy(EVIDENCE_CONNECT_SRC).replace("'wasm-unsafe-eval'", "'unsafe-eval'") }, "MANIFEST:CSP_DIRECTIVE:script-src"],
       ["a permission added", { manifest: { permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture", "tabs"] } }, "MANIFEST:PERMISSIONS_CHANGED"],
       ["tabCapture removed", { manifest: { permissions: ["offscreen", "sidePanel", "activeTab"] } }, "MANIFEST:PERMISSIONS_CHANGED"],
+      ["activeTab removed", { manifest: { permissions: ["offscreen", "sidePanel", "tabCapture"] } }, "EVIDENCE_LACKS_PERMISSION:activeTab"],
+      ["both removed: the product's list, with an evidence build's hooks", { manifest: { permissions: ["offscreen", "sidePanel"] } }, "EVIDENCE_LACKS_PERMISSION:tabCapture"],
+      ["a shared permission removed", { manifest: { permissions: ["offscreen", "activeTab", "tabCapture"] } }, "EVIDENCE_LACKS_PERMISSION:sidePanel"],
       ["another host", { manifest: { host_permissions: ["http://127.0.0.1/*", "https://example.com/*"] } }, "MANIFEST:HOST_PERMISSIONS_CHANGED"],
       ["externally_connectable", { manifest: { externally_connectable: { matches: ["http://127.0.0.1/*"] } } }, "MANIFEST:EXTERNALLY_CONNECTABLE_PRESENT"],
       ["the flag left unsubstituted", { offscreen: `${EVIDENCE_OFFSCREEN}if(__EVIDENCE_BUILD__){}` }, "EVIDENCE_FLAG_NOT_SUBSTITUTED"],
@@ -128,6 +131,22 @@ describe("identifyBuild: which build is this, from what it contains", () => {
         expect(found.identity, name).toBe("UNKNOWN");
         expect(found.reasons, name).toContain(`OFFSCREEN_LACKS:${name}`);
       }
+    });
+
+    it("M23.17: a build with no hooks and the capture permissions is not a product build, and not an evidence build either", () => {
+      for (const permissions of [["offscreen", "sidePanel", "activeTab", "tabCapture"], ["offscreen", "sidePanel", "tabCapture"], ["offscreen", "sidePanel", "activeTab"]]) {
+        const found = identify(productDir({ manifest: { permissions } }));
+        expect(found.identity, JSON.stringify(permissions)).toBe("UNKNOWN");
+        expect(found.productProblems, JSON.stringify(permissions)).toContain("PERMISSIONS_CHANGED");
+      }
+    });
+
+    it("M23.17: a gesture harness refuses each of those, and an evidence build with either permission missing", () => {
+      expect(select(productDir({ manifest: { permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"] } })).accepted).toBe(false);
+      for (const permissions of [["offscreen", "sidePanel"], ["offscreen", "sidePanel", "activeTab"], ["offscreen", "sidePanel", "tabCapture"]]) {
+        expect(select(evidenceDir({ manifest: { permissions } })).accepted, JSON.stringify(permissions)).toBe(false);
+      }
+      expect(select(evidenceDir()).accepted).toBe(true);
     });
 
     it("a product build with one hook left in is not a product build, and not an evidence build either", () => {

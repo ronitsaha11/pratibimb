@@ -95,6 +95,8 @@ export function inspectProductBuild(directory, expected) {
     if (includes(everything, marker)) problems.push(`DIAGNOSTIC_HOOK_IN_BUNDLE:${marker}`);
   }
   if (/\.getUserMedia\s*\(/.test(everything)) problems.push("CAPTURE_CALL_IN_BUNDLE");
+  // M23.17: the worker keeps the authority's minting wrapper, and nothing may reach it. A ticket is the only way in.
+  if (/\.ticketFor\s*\(/.test(background)) problems.push("CAPTURE_TICKET_CALL_IN_BUNDLE");
   // M23.13 (OD-W): the toolbar opens the side panel and asks the capture authority for nothing.
   const onClickedAt = background.indexOf("onClicked.addListener(");
   const toolbarRoute = onClickedAt === -1 ? "" : background.slice(onClickedAt, onClickedAt + 300);
@@ -131,6 +133,7 @@ export function inspectProductBuild(directory, expected) {
       workerControlPlaneHasConsumeProbe: includes(background, "consumeProbe"),
       workerControlPlaneHasMintStreamId: includes(background, "mintStreamId"),
       workerMintsCaptureHandles: includes(background, "getMediaStreamId"),
+      workerCallsForACaptureTicket: /\.ticketFor\s*\(/.test(background),
       contentScriptNamesEitherHook: includes(content, "PERCEIVE_ONCE") || includes(content, "STREAM_CONSUME"),
       sidePanelNamesEitherHook: includes(sidepanel, "PERCEIVE_ONCE") || includes(sidepanel, "STREAM_CONSUME"),
       sidePanelStillAsksForTheToolbarGesture: includes(sidepanel, "Click the toolbar button"),

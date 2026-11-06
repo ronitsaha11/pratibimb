@@ -16,8 +16,8 @@
  *   3. the EVIDENCE build (TR01_PROBE=1), the build under test. The run REFUSES unless its content.js and
  *      manifest route are byte-identical to the product build's, its worker matches the reference's and
  *      differs from the product's, and it has every hook. `tests/browser/support/build-separation.mjs` is
- *      the contract. The permissions and the page side are the product's. The capture route is the evidence
- *      build's: a product build has none (OD-R, OD-S). No `<all_urls>`, no captureVisibleTab.
+ *      the contract. The page side is the product's. The capture route and its two permissions are the evidence
+ *      build's: a product build has neither (OD-R, OD-S, M23.17). No `<all_urls>`, no captureVisibleTab.
  *   4. After the run, the product build is restored in `.output`.
  *
  * PER WINDOW (one per device scale; Chrome is launched with --force-device-scale-factor):
@@ -55,7 +55,7 @@ import { cpus, release as osRelease, tmpdir } from "node:os";
 import { redactionMask } from "../../../packages/privacy/src/redactionGeometry.ts";
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { scoreImage } from "../support/redaction-metrics.mjs";
-import { connectSrcOf, manifestRouteSha } from "../support/build-route.mjs";
+import { connectSrcOf, crossBuildManifestRouteSha } from "../support/build-route.mjs";
 import { evidenceReferenceFlags, judgeBuildSeparation, snapshotEvidenceBuild, snapshotProductBuild } from "../support/build-separation.mjs";
 import { fixturesDir, loadBaseline } from "../support/m82-baseline.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
@@ -120,7 +120,7 @@ const sha = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
 const routeFiles = () => ({
   background: sha(join(EXT, "background.js")),
   content: sha(join(EXT, "content-scripts", "content.js")),
-  manifest: manifestRouteSha(EXT), connectSrc: connectSrcOf(EXT),
+  manifest: crossBuildManifestRouteSha(EXT), connectSrc: connectSrcOf(EXT),
 });
 const build = (env) => execSync("npm run build", { cwd: APP, env: { ...process.env, TR01_PROBE: "", M3_WORKER_FRAME: "", STRUCTURAL_PROBE: "", E6_PROBE: "", ...env }, stdio: "pipe" });
 console.log("building the PRODUCT extension…");
@@ -141,7 +141,8 @@ const offscreenChunks = readdirSync(join(EXT, "chunks")).filter((f) => f.startsW
 const buildFacts = {
   productRoute,
   evidenceRoute,
-  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical. The worker does not: since
+  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical, with M23.17's two permissions
+  // set aside by name and judged exactly in `separation`. The worker does not: since
   // OD-S it must differ, and `separation` requires that, along with everything that replaced the comparison.
   sharedRouteIdenticalToProduct: JSON.stringify({ ...productRoute, background: null, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, background: null, connectSrc: null }),
   separation,

@@ -6,12 +6,12 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-import { ortSmokeCheck, parseCsp, productManifestProblems, productPackageProblems } from "./csp-product-phase.mjs";
+import { evidencePermissionProblems, EVIDENCE_ONLY_PERMISSIONS, EVIDENCE_PERMISSIONS, ortSmokeCheck, parseCsp, permissionDeltaProblems, PRODUCT_PERMISSIONS, productManifestProblems, productPackageProblems } from "./csp-product-phase.mjs";
 
 const PRODUCT_POLICY =
   "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' http://127.0.0.1:8995/v1/chat/completions; style-src 'sha256-ZYRp1TbYj9bPuYCw1S2y0R5L4r911NcNjTciEbHTsAo='; object-src 'none'; base-uri 'none'; form-action 'none'";
 const manifest = (over = {}) => ({
-  permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
+  permissions: ["offscreen", "sidePanel"],
   host_permissions: ["http://127.0.0.1/*"],
   content_security_policy: { extension_pages: PRODUCT_POLICY },
   content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],
@@ -58,9 +58,17 @@ describe("productManifestProblems", () => {
     expect(productManifestProblems(undefined)).toEqual(["NO_MANIFEST"]);
   });
 
-  it("refuses a widened or a narrowed permission set: tabCapture stays, and nothing is added", () => {
-    expect(productManifestProblems(manifest({ permissions: ["offscreen", "sidePanel", "activeTab"] }))).toEqual(["PERMISSIONS_CHANGED"]);
-    expect(productManifestProblems(manifest({ permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture", "tabs"] }))).toEqual(["PERMISSIONS_CHANGED"]);
+  it("M23.17: refuses a product with either capture permission, and names it", () => {
+    expect(productManifestProblems(manifest({ permissions: ["offscreen", "sidePanel", "tabCapture"] }))).toEqual(["PERMISSIONS_CHANGED", "EVIDENCE_ONLY_PERMISSION_IN_PRODUCT:tabCapture"]);
+    expect(productManifestProblems(manifest({ permissions: ["offscreen", "sidePanel", "activeTab"] }))).toEqual(["PERMISSIONS_CHANGED", "EVIDENCE_ONLY_PERMISSION_IN_PRODUCT:activeTab"]);
+    expect(productManifestProblems(manifest({ permissions: [...EVIDENCE_PERMISSIONS] }))).toEqual(["PERMISSIONS_CHANGED", "EVIDENCE_ONLY_PERMISSION_IN_PRODUCT:activeTab", "EVIDENCE_ONLY_PERMISSION_IN_PRODUCT:tabCapture"]);
+  });
+
+  it("refuses a widened or a narrowed permission set: nothing is added, and neither of the two is lost", () => {
+    expect(productManifestProblems(manifest({ permissions: ["offscreen", "sidePanel", "tabs"] }))).toEqual(["PERMISSIONS_CHANGED"]);
+    expect(productManifestProblems(manifest({ permissions: ["offscreen"] }))).toEqual(["PERMISSIONS_CHANGED"]);
+    expect(productManifestProblems(manifest({ permissions: ["sidePanel"] }))).toEqual(["PERMISSIONS_CHANGED"]);
+    expect(productManifestProblems(manifest({ permissions: undefined }))).toEqual(["PERMISSIONS_CHANGED"]);
   });
 
   it("refuses any host beyond loopback", () => {
@@ -135,5 +143,49 @@ describe("the M13 harness", () => {
     ]) {
       expect(harness, check).toContain(`${check}:`);
     }
+  });
+});
+
+describe("M23.17 (RD-5, RD-6): the approved permission difference", () => {
+  it("is these two names exactly, and an evidence build's list is the product's and then those", () => {
+    expect(PRODUCT_PERMISSIONS).toEqual(["offscreen", "sidePanel"]);
+    expect(EVIDENCE_ONLY_PERMISSIONS).toEqual(["activeTab", "tabCapture"]);
+    expect(EVIDENCE_PERMISSIONS).toEqual(["offscreen", "sidePanel", "activeTab", "tabCapture"]);
+  });
+
+  it("evidencePermissionProblems: the exact list passes, and anything else names what is wrong", () => {
+    expect(evidencePermissionProblems([...EVIDENCE_PERMISSIONS])).toEqual([]);
+    expect(evidencePermissionProblems(["offscreen", "sidePanel", "activeTab"])).toEqual(["EVIDENCE_LACKS_PERMISSION:tabCapture"]);
+    expect(evidencePermissionProblems(["offscreen", "sidePanel", "tabCapture"])).toEqual(["EVIDENCE_LACKS_PERMISSION:activeTab"]);
+    expect(evidencePermissionProblems([...EVIDENCE_PERMISSIONS, "tabs"])).toEqual(["EVIDENCE_UNAPPROVED_PERMISSION:tabs"]);
+    expect(evidencePermissionProblems(["offscreen", "sidePanel", "activeTab", "tabCapture", "tabCapture"])).toEqual(["EVIDENCE_PERMISSIONS_CHANGED"]);
+  });
+
+  it("evidencePermissionProblems fails closed on what is not a list", () => {
+    for (const nothing of [undefined, null, "tabCapture", {}]) expect(evidencePermissionProblems(nothing)).toHaveLength(EVIDENCE_PERMISSIONS.length);
+  });
+
+  it("permissionDeltaProblems: the approved difference passes, and only in that direction", () => {
+    expect(permissionDeltaProblems([...PRODUCT_PERMISSIONS], [...EVIDENCE_PERMISSIONS])).toEqual([]);
+    expect(permissionDeltaProblems([...EVIDENCE_PERMISSIONS], [...PRODUCT_PERMISSIONS])).toEqual([
+      "APPROVED_PERMISSION_DIFFERENCE_MISSING:activeTab",
+      "APPROVED_PERMISSION_DIFFERENCE_MISSING:tabCapture",
+      "UNAPPROVED_PERMISSION_DIFFERENCE:activeTab",
+      "UNAPPROVED_PERMISSION_DIFFERENCE:tabCapture",
+    ]);
+  });
+
+  it("permissionDeltaProblems: no difference at all is not the approved difference", () => {
+    expect(permissionDeltaProblems([...EVIDENCE_PERMISSIONS], [...EVIDENCE_PERMISSIONS])).toEqual(["APPROVED_PERMISSION_DIFFERENCE_MISSING:activeTab", "APPROVED_PERMISSION_DIFFERENCE_MISSING:tabCapture"]);
+  });
+
+  it("permissionDeltaProblems: any other name differing, either way, is named", () => {
+    expect(permissionDeltaProblems(["offscreen", "sidePanel"], [...EVIDENCE_PERMISSIONS, "tabs"])).toEqual(["UNAPPROVED_PERMISSION_DIFFERENCE:tabs"]);
+    expect(permissionDeltaProblems(["offscreen", "sidePanel", "tabs"], [...EVIDENCE_PERMISSIONS])).toEqual(["UNAPPROVED_PERMISSION_DIFFERENCE:tabs"]);
+    expect(permissionDeltaProblems(["offscreen"], [...EVIDENCE_PERMISSIONS])).toEqual(["UNAPPROVED_PERMISSION_DIFFERENCE:sidePanel"]);
+  });
+
+  it("permissionDeltaProblems fails closed on what is not a list", () => {
+    expect(permissionDeltaProblems(undefined, undefined)).toEqual(["APPROVED_PERMISSION_DIFFERENCE_MISSING:activeTab", "APPROVED_PERMISSION_DIFFERENCE_MISSING:tabCapture"]);
   });
 });

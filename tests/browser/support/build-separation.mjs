@@ -14,9 +14,12 @@
  *      still catches an unintended change to the worker, now that the product's cannot be the reference.
  *   D. THE PRODUCT'S AND THE EVIDENCE BUILD'S WORKERS DIFFER, as expected. Identical ones would mean a gate was lost.
  *
- * STILL COMPARED ACROSS THE TWO BUILDS, as before: `content.js` byte for byte, and the manifest with one source
- * of `connect-src` normalised, so permissions, host permissions and every other CSP directive. `connect-src`
- * itself must be exactly ADR-0013's difference.
+ * STILL COMPARED ACROSS THE TWO BUILDS: `content.js` byte for byte, and the manifest with one source of `connect-src`
+ * normalised and two named permissions set aside, so every other permission, host permissions and every other CSP
+ * directive. `connect-src` itself must be exactly ADR-0013's difference.
+ *
+ * M23.17 (RD-5, RD-6): A PRODUCT DECLARES NEITHER `tabCapture` NOR `activeTab`, AND AN EVIDENCE BUILD DECLARES BOTH. Each
+ * build's list is held exactly, and so is the difference between them. Anything else that differs is refused.
  *
  * WHAT A PASS DOES NOT MEAN. This reads built files. It does not establish that either build runs, or that a
  * hook works. It also cannot pass on builds it was not given: a missing one is a problem, never a skip, so no
@@ -29,8 +32,8 @@ import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { connectSrcOf, manifestRouteSha } from "./build-route.mjs";
-import { PRODUCT_CSP, productManifestProblems } from "./csp-product-phase.mjs";
+import { connectSrcOf, crossBuildManifestRouteSha, manifestRouteSha } from "./build-route.mjs";
+import { evidencePermissionProblems, permissionDeltaProblems, PRODUCT_CSP, PRODUCT_PERMISSIONS, productManifestProblems } from "./csp-product-phase.mjs";
 import { EXPECTED_PRODUCT_FILES, inspectProductBuild } from "./product-build-inspection.mjs";
 
 /** The one permitted `connect-src` for an evidence build (ADR-0013). */
@@ -69,6 +72,7 @@ function snapshot(directory) {
     worker: sha256(worker),
     content: sha256(readFileSync(join(directory, "content-scripts", "content.js"))),
     manifestRoute: manifestRouteSha(directory),
+    crossBuildRoute: crossBuildManifestRouteSha(directory),
     connectSrc: connectSrcOf(directory),
     permissions: manifest.permissions ?? [],
     hostPermissions: manifest.host_permissions ?? [],
@@ -112,6 +116,8 @@ export function judgeBuildSeparation({ product = null, reference = null, evidenc
   if (evidence !== null) {
     for (const name of EVIDENCE_REQUIRED_NAMES.worker) if (!evidence.workerNames.includes(name)) problems.push(`EVIDENCE_WORKER_LACKS:${name}`);
     for (const name of EVIDENCE_REQUIRED_NAMES.offscreen) if (!evidence.offscreenNames.includes(name)) problems.push(`EVIDENCE_OFFSCREEN_LACKS:${name}`);
+    // M23.17: and its permissions, in every mode: the gesture route cannot work without them.
+    problems.push(...evidencePermissionProblems(evidence.permissions));
   }
 
   // C. Two evidence builds agree on everything shared.
@@ -127,8 +133,8 @@ export function judgeBuildSeparation({ product = null, reference = null, evidenc
 
     // Retained: everything else is still compared across the two builds.
     if (evidence.content !== product.content) acrossBuilds.push("CONTENT_DIFFERS_FROM_PRODUCT");
-    if (evidence.manifestRoute !== product.manifestRoute) acrossBuilds.push("MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT");
-    if (!same(evidence.permissions, product.permissions)) acrossBuilds.push("PERMISSIONS_DIFFER_FROM_PRODUCT");
+    if (evidence.crossBuildRoute !== product.crossBuildRoute) acrossBuilds.push("MANIFEST_ROUTE_DIFFERS_FROM_PRODUCT");
+    acrossBuilds.push(...permissionDeltaProblems(product.permissions, evidence.permissions));
     if (!same(evidence.hostPermissions, product.hostPermissions)) acrossBuilds.push("HOST_PERMISSIONS_DIFFER_FROM_PRODUCT");
     if (product.connectSrc !== PRODUCT_CSP["connect-src"] || evidence.connectSrc !== EVIDENCE_CONNECT_SRC) acrossBuilds.push("CONNECT_SRC_NOT_THE_APPROVED_DIFFERENCE");
   }
@@ -205,6 +211,10 @@ export function identifyBuild(directory, expected = EXPECTED_PRODUCT_FILES) {
   const csp = asProduct.content_security_policy?.extension_pages;
   if (typeof csp === "string") asProduct.content_security_policy.extension_pages = csp.replace(/connect-src [^;]*/, `connect-src ${PRODUCT_CSP["connect-src"]}`);
   if (allUrls && workerFrame) asProduct.host_permissions = seen.hostPermissions.filter((host) => host !== "<all_urls>");
+  // M23.17: an evidence build is held to its own list, and everything else in its manifest to the product's.
+  const permissionProblems = evidencePermissionProblems(manifest.permissions);
+  if (permissionProblems.length > 0) reasons.push("MANIFEST:PERMISSIONS_CHANGED", ...permissionProblems);
+  asProduct.permissions = [...PRODUCT_PERMISSIONS];
   for (const problem of productManifestProblems(asProduct)) reasons.push(`MANIFEST:${problem}`);
 
   return reasons.length === 0

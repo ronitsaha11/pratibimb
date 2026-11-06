@@ -24,7 +24,7 @@ import { build as bundle } from "esbuild";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { evidenceReferenceFlags } from "../../../tests/browser/support/build-separation.mjs";
-import { parseCsp, PRODUCT_CSP, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
+import { evidencePermissionProblems, EVIDENCE_ONLY_PERMISSIONS, EVIDENCE_PERMISSIONS, parseCsp, permissionDeltaProblems, PRODUCT_CSP, PRODUCT_HOST_PERMISSIONS, PRODUCT_PERMISSIONS, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
 import { APPROVED_UI_COPY, EXPECTED_PRODUCT_FILES, STALE_UI_WORDING } from "../../../tests/browser/support/product-build-inspection.mjs";
 import { DEVELOPMENT_BUILD_NAME, PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, TOOLBAR_TITLE } from "../host-lib/product-copy";
 import { ORT_PIN } from "../../../packages/security/src/generated/ortPin";
@@ -156,10 +156,11 @@ describe("a product build", () => {
     });
   });
 
-  it("has exactly ADR-0013's policy, the same permissions including tabCapture, and loopback hosts only", async () => {
+  it("has exactly ADR-0013's policy, neither capture permission (M23.17), and loopback hosts only", async () => {
     const { manifest } = await loadConfig();
     expect(productManifestProblems(manifest)).toEqual([]);
-    expect(manifest.permissions).toContain("tabCapture");
+    expect(manifest.permissions).not.toContain("tabCapture");
+    expect(manifest.permissions).not.toContain("activeTab");
     expect(parseCsp(manifest.content_security_policy.extension_pages)?.["connect-src"]).toBe(PRODUCT_CSP["connect-src"]);
   });
 });
@@ -426,11 +427,11 @@ describe("M23.13 (OD-W) — the toolbar route, in a product bundle of the worker
 
   it("permissions, hosts, the side panel's registration and CSP are as they were, per flag", async () => {
     const { manifest } = await loadConfig();
-    expect(manifest.permissions).toEqual(["offscreen", "sidePanel", "activeTab", "tabCapture"]);
+    expect(manifest.permissions).toEqual(["offscreen", "sidePanel"]);
     expect(manifest.host_permissions).toEqual(["http://127.0.0.1/*"]);
     expect(manifest.side_panel).toEqual({ default_path: "sidepanel.html" });
     expect(productManifestProblems(manifest)).toEqual([]);
-    for (const flag of FLAGS) expect((await loadConfig([flag])).manifest.permissions, flag).toEqual(manifest.permissions);
+    for (const flag of FLAGS) expect((await loadConfig([flag])).manifest.permissions, flag).toEqual(["offscreen", "sidePanel", "activeTab", "tabCapture"]);
   });
 });
 
@@ -476,6 +477,65 @@ describe("M23.15 (OD-Y) — the extension's name, in the real manifest", () => {
   it("the build inspection refuses the old identity, by name", () => {
     expect(STALE_UI_WORDING).toEqual(expect.arrayContaining(["minimal host", "minimal MV3", "not the product", "(experiment"]));
   });
+});
+
+describe("M23.17 (RD-5, RD-6) — permissions, in the real config, per flag", { timeout: 30_000 }, () => {
+  it("(1, 2) a product build declares neither capture permission, and exactly the two it uses", async () => {
+    const { manifest } = await loadConfig();
+    expect(manifest.permissions).toEqual(["offscreen", "sidePanel"]);
+    expect(manifest.permissions).not.toContain("tabCapture");
+    expect(manifest.permissions).not.toContain("activeTab");
+  });
+
+  it("(3) every evidence flag keeps both, with the order and list it has always declared", async () => {
+    for (const flag of FLAGS) {
+      const { manifest } = await loadConfig([flag]);
+      expect(manifest.permissions, flag).toEqual(["offscreen", "sidePanel", "activeTab", "tabCapture"]);
+      expect(evidencePermissionProblems(manifest.permissions), flag).toEqual([]);
+    }
+  });
+
+  it("the expected lists the browser-free tools hold are the config's own, so they cannot drift apart", async () => {
+    expect((await loadConfig()).manifest.permissions).toEqual(PRODUCT_PERMISSIONS);
+    expect((await loadConfig(["TR01_PROBE"])).manifest.permissions).toEqual(EVIDENCE_PERMISSIONS);
+    expect(EVIDENCE_ONLY_PERMISSIONS).toEqual(["activeTab", "tabCapture"]);
+  });
+
+  it("(6) the real config's difference is exactly the approved one, for every flag", async () => {
+    const product = (await loadConfig()).manifest.permissions;
+    for (const flag of FLAGS) expect(permissionDeltaProblems(product, (await loadConfig([flag])).manifest.permissions), flag).toEqual([]);
+  });
+
+  it("(7) host permissions do not change, except the degraded route's existing `<all_urls>`", async () => {
+    expect((await loadConfig()).manifest.host_permissions).toEqual(PRODUCT_HOST_PERMISSIONS);
+    for (const flag of FLAGS) {
+      const expected = flag === "M3_WORKER_FRAME" ? [...PRODUCT_HOST_PERMISSIONS, "<all_urls>"] : PRODUCT_HOST_PERMISSIONS;
+      expect((await loadConfig([flag])).manifest.host_permissions, flag).toEqual(expected);
+    }
+  });
+
+  it("(8, 9) CSP differs between builds only in connect-src, and that by ADR-0013's one source", async () => {
+    const product = parseCsp((await loadConfig()).manifest.content_security_policy.extension_pages)!;
+    expect(product).toMatchObject(PRODUCT_CSP);
+    for (const flag of FLAGS) {
+      const evidence = parseCsp((await loadConfig([flag])).manifest.content_security_policy.extension_pages)!;
+      expect({ ...evidence, "connect-src": null }, flag).toEqual({ ...product, "connect-src": null });
+      expect(evidence["connect-src"], flag).toBe("'self' http://127.0.0.1:8995");
+    }
+  });
+
+  it("(11) a product worker cannot reach the wrapper it keeps: nothing asks for a ticket, and no realm calls `getUserMedia`", async () => {
+    const bundle = await productBundle();
+    const worker = bundle["host/background.js"]!;
+    expect(worker).toMatch(/chrome\.tabCapture\.getMediaStreamId/);
+    expect(worker).not.toMatch(/\.ticketFor\s*\(/);
+    for (const [file, text] of Object.entries(bundle)) expect(text, file).not.toMatch(/\.getUserMedia\s*\(/);
+  }, 30_000);
+
+  it("the negative control: put the ticket call back, and the same search finds it", async () => {
+    const worker = (await productBundle({ file: "host/background.ts", gate: "if (__EVIDENCE_BUILD__ && msg?.kind === \"CAPTURE_FRAME\") {", replacement: "if (msg?.kind === \"CAPTURE_FRAME\") {" }))["host/background.js"]!;
+    expect(worker).toMatch(/\.ticketFor\s*\(/);
+  }, 30_000);
 });
 
 describe("TR-01's integrity check is unchanged, in every build", () => {
@@ -544,7 +604,7 @@ describe("an evidence build: what the configuration selects, for each flag", () 
     }
   });
 
-  it("differs from a product build's CSP in connect-src alone, and keeps the same permissions", async () => {
+  it("differs from a product build's CSP in connect-src alone, and its permissions by the approved two alone (M23.17)", async () => {
     const product = await loadConfig();
     const productCsp = parseCsp(product.manifest.content_security_policy.extension_pages)!;
     for (const flag of FLAGS) {
@@ -552,7 +612,7 @@ describe("an evidence build: what the configuration selects, for each flag", () 
       const evidenceCsp = parseCsp(evidence.manifest.content_security_policy.extension_pages)!;
       expect(evidenceCsp["connect-src"], flag).toBe("'self' http://127.0.0.1:8995");
       expect({ ...evidenceCsp, "connect-src": null }, flag).toEqual({ ...productCsp, "connect-src": null });
-      expect(evidence.manifest.permissions, flag).toEqual(product.manifest.permissions);
+      expect(evidence.manifest.permissions, flag).toEqual([...product.manifest.permissions, "activeTab", "tabCapture"]);
     }
   });
 });

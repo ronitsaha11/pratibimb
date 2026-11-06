@@ -157,8 +157,10 @@ describe("D — evidence-build functionality and permissions are unchanged", () 
     expect(main).toMatch(/kind === "STREAM_CONSUME"/);
   });
 
-  it("the permissions, including tabCapture, are exactly as before", () => {
-    expect(config).toContain('permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],');
+  it("M23.17: a product's permissions are the two it uses, an evidence build adds the two its capture route needs, and hosts are as before", () => {
+    expect(config).toContain('const PRODUCT_PERMISSIONS = ["offscreen", "sidePanel"];');
+    expect(config).toContain('const EVIDENCE_ONLY_PERMISSIONS = ["activeTab", "tabCapture"];');
+    expect(config).toContain("permissions: EVIDENCE_BUILD ? [...PRODUCT_PERMISSIONS, ...EVIDENCE_ONLY_PERMISSIONS] : PRODUCT_PERMISSIONS,");
     expect(config).toContain('const HOST_PERMISSIONS = WORKER_FRAME ? ["http://127.0.0.1/*", "<all_urls>"] : ["http://127.0.0.1/*"];');
   });
 });

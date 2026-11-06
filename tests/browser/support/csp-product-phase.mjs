@@ -20,7 +20,13 @@ export const PRODUCT_CSP = Object.freeze({
   "base-uri": "'none'",
   "form-action": "'none'",
 });
-export const PRODUCT_PERMISSIONS = Object.freeze(["offscreen", "sidePanel", "activeTab", "tabCapture"]);
+/**
+ * M23.17 (RD-5, RD-6): the one approved difference between a product's permissions and an evidence build's. These two
+ * names, named here, and not a rule about capture permissions in general: anything else that differs is refused.
+ */
+export const PRODUCT_PERMISSIONS = Object.freeze(["offscreen", "sidePanel"]);
+export const EVIDENCE_ONLY_PERMISSIONS = Object.freeze(["activeTab", "tabCapture"]);
+export const EVIDENCE_PERMISSIONS = Object.freeze([...PRODUCT_PERMISSIONS, ...EVIDENCE_ONLY_PERMISSIONS]);
 export const PRODUCT_HOST_PERMISSIONS = Object.freeze(["http://127.0.0.1/*"]);
 
 const STYLE_SRC = /^'sha256-[A-Za-z0-9+/]+=*'$/;
@@ -64,6 +70,9 @@ export function productManifestProblems(manifest) {
   if (typeof manifest !== "object" || manifest === null) return ["NO_MANIFEST"];
   const problems = [];
   if (!sameSet(manifest.permissions, PRODUCT_PERMISSIONS)) problems.push("PERMISSIONS_CHANGED");
+  for (const permission of EVIDENCE_ONLY_PERMISSIONS) {
+    if (Array.isArray(manifest.permissions) && manifest.permissions.includes(permission)) problems.push(`EVIDENCE_ONLY_PERMISSION_IN_PRODUCT:${permission}`);
+  }
   if (!sameSet(manifest.host_permissions, PRODUCT_HOST_PERMISSIONS)) problems.push("HOST_PERMISSIONS_CHANGED");
   if ("externally_connectable" in manifest) problems.push("EXTERNALLY_CONNECTABLE_PRESENT");
   if ("web_accessible_resources" in manifest) problems.push("WEB_ACCESSIBLE_RESOURCES_PRESENT");
@@ -80,6 +89,31 @@ export function productManifestProblems(manifest) {
     if (!(directive in PRODUCT_CSP) && directive !== "style-src") problems.push(`CSP_UNEXPECTED_DIRECTIVE:${directive}`);
   }
   return problems;
+}
+
+/** M23.17: what differs from the permissions an evidence build must declare, as codes. Empty is the only pass. */
+export function evidencePermissionProblems(permissions) {
+  if (sameSet(permissions, EVIDENCE_PERMISSIONS)) return [];
+  const declared = Array.isArray(permissions) ? permissions : [];
+  const problems = [
+    ...EVIDENCE_PERMISSIONS.filter((permission) => !declared.includes(permission)).map((permission) => `EVIDENCE_LACKS_PERMISSION:${permission}`),
+    ...declared.filter((permission) => !EVIDENCE_PERMISSIONS.includes(permission)).map((permission) => `EVIDENCE_UNAPPROVED_PERMISSION:${permission}`),
+  ];
+  // Every name right and the count wrong: a duplicate. Still not the approved list.
+  return problems.length > 0 ? problems : ["EVIDENCE_PERMISSIONS_CHANGED"];
+}
+
+/** M23.17: the two builds' permissions may differ by exactly `EVIDENCE_ONLY_PERMISSIONS`, in that direction. Empty is the only pass. */
+export function permissionDeltaProblems(productPermissions, evidencePermissions) {
+  const product = Array.isArray(productPermissions) ? productPermissions : [];
+  const evidence = Array.isArray(evidencePermissions) ? evidencePermissions : [];
+  const onlyInEvidence = evidence.filter((permission) => !product.includes(permission));
+  const onlyInProduct = product.filter((permission) => !evidence.includes(permission));
+  return [
+    ...EVIDENCE_ONLY_PERMISSIONS.filter((permission) => !onlyInEvidence.includes(permission)).map((permission) => `APPROVED_PERMISSION_DIFFERENCE_MISSING:${permission}`),
+    ...onlyInEvidence.filter((permission) => !EVIDENCE_ONLY_PERMISSIONS.includes(permission)).map((permission) => `UNAPPROVED_PERMISSION_DIFFERENCE:${permission}`),
+    ...onlyInProduct.map((permission) => `UNAPPROVED_PERMISSION_DIFFERENCE:${permission}`),
+  ];
 }
 
 /**

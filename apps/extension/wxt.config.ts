@@ -68,8 +68,8 @@ const STRUCTURAL_PROBE = process.env.STRUCTURAL_PROBE === "1";
  * off a doc page: with only `http://127.0.0.1/*` the call refuses with
  * "Either the '<all_urls>' or 'activeTab' permission is required."
  *
- * `activeTab` is the right product permission and the one the default build declares: an agent acts
- * on the tab a person invoked it on, and the grant arrives with that invocation. But `activeTab` is
+ * `activeTab` is the right permission for the gesture route, and M3's default build declared it: an agent
+ * acts on the tab a person invoked it on, and the grant arrives with that invocation. But `activeTab` is
  * granted by a USER GESTURE — a toolbar click, a context menu, a command — and a Playwright harness
  * cannot produce one. So the evidence harness builds with `M3_CAPTURE_WITHOUT_GESTURE=1`, which
  * substitutes `<all_urls>` for the gesture and changes nothing else: the same capture call, the same
@@ -82,7 +82,7 @@ const STRUCTURAL_PROBE = process.env.STRUCTURAL_PROBE === "1";
 /**
  * THE DEGRADED CAPTURE PATH, off unless a build asks for it by name.
  *
- * The product path is `getMediaStreamId` under an `activeTab` grant a person produced: the worker
+ * The gesture path is `getMediaStreamId` under an `activeTab` grant a person produced: the worker
  * mints an opaque handle and the offscreen document redeems it for pixels itself. No automated
  * harness can produce that invocation -- measured on W1, `<all_urls>` does not substitute for it,
  * a click inside an extension page does not, and a CDP keyboard command does not reach Chrome's
@@ -127,7 +127,7 @@ const EVIDENCE_BUILD = E6_PROBE || STRUCTURAL_PROBE || TR01_PROBE || EGRESS_EVID
  * A product build runs DOM-only tasks: no frame capture, no UI head (T1), no TR-01 in a task run
  * (`host-lib/task-perception.ts`), and the UI head is not packaged. An evidence build is unchanged:
  * its tasks keep the perception pass and the UI head is packaged as before. TR-01's packaging and its
- * hash check below are unchanged in both, and so are the permissions.
+ * hash check below are unchanged in both.
  */
 /**
  * The side panel's one inline <style>, admitted by its SHA-256 rather than by 'unsafe-inline'. Line
@@ -138,6 +138,15 @@ const SIDEPANEL_STYLE = /<style>([\s\S]*?)<\/style>/.exec(readFileSync(join(HERE
 if (SIDEPANEL_STYLE === undefined) throw new Error("host/sidepanel/index.html: no <style> to hash");
 const STYLE_HASHES = [`'sha256-${createHash("sha256").update(SIDEPANEL_STYLE, "utf8").digest("base64")}'`];
 const HOST_PERMISSIONS = WORKER_FRAME ? ["http://127.0.0.1/*", "<all_urls>"] : ["http://127.0.0.1/*"];
+/**
+ * M23.17 (RD-5, RD-6) — A PRODUCT DECLARES NEITHER CAPTURE PERMISSION.
+ *
+ * A DOM-only product has no reachable capture path, so it asks for neither `tabCapture` nor `activeTab`. An evidence
+ * build's gesture route needs both, so it keeps them, in the order it has always declared them. The difference is these
+ * two names and nothing else: `tests/browser/support/build-separation.mjs` refuses any other.
+ */
+const PRODUCT_PERMISSIONS = ["offscreen", "sidePanel"];
+const EVIDENCE_ONLY_PERMISSIONS = ["activeTab", "tabCapture"];
 
 const ORT_DIST = join(ROOT, "node_modules", "onnxruntime-web", "dist");
 const MODEL = join(ROOT, "artifacts", "models", "t1-ui-head", "t1-ui-head.onnx");
@@ -184,7 +193,7 @@ export default defineConfig({
     name: DEVELOPMENT_BUILD_NAME,
     version: "0.0.0",
     minimum_chrome_version: "116",
-    permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
+    permissions: EVIDENCE_BUILD ? [...PRODUCT_PERMISSIONS, ...EVIDENCE_ONLY_PERMISSIONS] : PRODUCT_PERMISSIONS,
     action: { default_title: TOOLBAR_TITLE },
     commands: {
       _execute_action: { suggested_key: { default: "Alt+Shift+P" }, description: TOOLBAR_TITLE },

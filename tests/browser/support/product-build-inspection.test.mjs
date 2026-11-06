@@ -36,7 +36,7 @@ function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx
   writeFileSync(
     join(dir, "manifest.json"),
     JSON.stringify({
-      permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
+      permissions: ["offscreen", "sidePanel"],
       host_permissions: ["http://127.0.0.1/*"],
       name: "PratiBimb — Page Assistant (Development build)",
       action: { default_title: "PratiBimb — Page Assistant" },
@@ -60,7 +60,7 @@ describe("inspectProductBuild", () => {
   it("passes a product build, and reports what ships without opening a model", () => {
     const report = inspectProductBuild(syntheticBuild(), EXPECTED);
     expect(report.problems).toEqual([]);
-    expect(report.manifest.permissions).toContain("tabCapture");
+    expect(report.manifest.permissions).toEqual(["offscreen", "sidePanel"]);
     expect(report.manifest.connectSrc).toBe("'self' http://127.0.0.1:8995/v1/chat/completions");
     expect(report.files).toContain("tr01-ppocrv4-mobile-det.onnx");
   });
@@ -141,6 +141,24 @@ describe("inspectProductBuild", () => {
     rmSync(dir, { recursive: true, force: true });
     const popup = inspectProductBuild(syntheticBuild({ manifest: { action: { default_title: "PratiBimb — Page Assistant", default_popup: "p.html" } } }), EXPECTED);
     expect(popup.problems).toEqual(["TOOLBAR_HAS_A_POPUP"]);
+  });
+
+  it("M23.17: fails a product build that declares either capture permission", () => {
+    for (const permission of ["tabCapture", "activeTab"]) {
+      const report = inspectProductBuild(syntheticBuild({ manifest: { permissions: ["offscreen", "sidePanel", permission] } }), EXPECTED);
+      expect(report.problems, permission).toEqual(["PERMISSIONS_CHANGED", `EVIDENCE_ONLY_PERMISSION_IN_PRODUCT:${permission}`]);
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("M23.17: fails a product worker that asks the capture authority for a ticket, the only way to reach its wrapper", () => {
+    const report = inspectProductBuild(syntheticBuild({ background: 'const h={};chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});u.ticketFor(1);' }), EXPECTED);
+    expect(report.problems).toEqual(["CAPTURE_TICKET_CALL_IN_BUNDLE"]);
+    expect(report.bundle.workerCallsForACaptureTicket).toBe(true);
+    rmSync(dir, { recursive: true, force: true });
+    const clean = inspectProductBuild(syntheticBuild({ background: 'const a={async ticketFor(o){}};chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});' }), EXPECTED);
+    expect(clean.problems).toEqual([]);
+    expect(clean.bundle.workerCallsForACaptureTicket).toBe(false);
   });
 
   it("M23.15 (OD-Y): fails a product build with another name, or with no development qualifier", () => {

@@ -51,7 +51,7 @@ import { cpus, release as osRelease, tmpdir } from "node:os";
 import { isDeepStrictEqual } from "node:util";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
-import { connectSrcOf, manifestRouteSha } from "../support/build-route.mjs";
+import { connectSrcOf, crossBuildManifestRouteSha } from "../support/build-route.mjs";
 import { evidenceReferenceFlags, judgeBuildSeparation, snapshotEvidenceBuild, snapshotProductBuild } from "../support/build-separation.mjs";
 import { decodePng } from "../support/png-decode.mjs";
 import { fixturesDir } from "../support/m82-baseline.mjs";
@@ -92,7 +92,7 @@ const TARGET = assertOwnEvidencePath(join(OUT, evidenceFileName(WS, RUN > 1 ? `c
 if (existsSync(TARGET)) refuse(`${TARGET} already exists; this run does not overwrite an earlier record`);
 
 const shaFile = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
-const routeFiles = () => ({ background: shaFile(join(EXT, "background.js")), content: shaFile(join(EXT, "content-scripts", "content.js")), manifest: manifestRouteSha(EXT), connectSrc: connectSrcOf(EXT) });
+const routeFiles = () => ({ background: shaFile(join(EXT, "background.js")), content: shaFile(join(EXT, "content-scripts", "content.js")), manifest: crossBuildManifestRouteSha(EXT), connectSrc: connectSrcOf(EXT) });
 const build = (env) => execSync("npm run build", { cwd: APP, env: { ...process.env, TR01_PROBE: "", M3_WORKER_FRAME: "", STRUCTURAL_PROBE: "", E6_PROBE: "", EGRESS_EVIDENCE_PROBE: "", ...env }, stdio: "pipe" });
 console.log("building the PRODUCT extension…");
 build({});
@@ -109,7 +109,8 @@ const separation = judgeBuildSeparation({ product: productBuild, reference: refe
 const buildFacts = {
   productRoute,
   evidenceRoute,
-  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical. The worker does not: since
+  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical, with M23.17's two permissions
+  // set aside by name and judged exactly in `separation`. The worker does not: since
   // OD-S it must differ, and `separation` requires that, along with everything that replaced the comparison.
   sharedRouteIdenticalToProduct: JSON.stringify({ ...productRoute, background: null, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, background: null, connectSrc: null }),
   separation,
