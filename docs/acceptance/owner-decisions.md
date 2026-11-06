@@ -1,6 +1,6 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.13, 2026-11-06):**
+> **Status (updated M23.14, 2026-11-06):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
@@ -11,7 +11,8 @@
 > - **Selected and implemented in M23.11:** **OD-U: OPTION B** (2026-11-04), in the two gesture harnesses. **Neither was run.**
 > - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. Not seen in a browser. Its first real build was M23.13's.
 > - **Selected and implemented in M23.13:** **OD-W**, the product's toolbar opens the side panel. **Not tried in a browser.**
-> - **Awaiting the owner, added in M23.13:** OD-X, OD-Y and OD-Z.
+> - **Selected and implemented in M23.14:** **OD-X**, a product's panel does not show `captureStatus`. **Not seen in a browser.**
+> - **Awaiting the owner, added in M23.13:** OD-Y and OD-Z.
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -512,7 +513,7 @@ Each sub-decision is separate.
 
 | ID | Decision | Status |
 |---|---|---|
-| OD-X | The treatment of the visible `captureStatus` field in the side panel's Status box. In a product it now always reads `NO_GRANT` | **AWAITING OWNER APPROVAL** |
+| OD-X | The treatment of the visible `captureStatus` field in the side panel's Status box. In a product it now always reads `NO_GRANT` | *(M23.13 status, superseded by M23.14 below:)* awaiting the owner |
 | OD-Y | Branding terminology such as "PratiBimb minimal host" and "Development build" | **AWAITING OWNER APPROVAL** |
 | OD-Z | Remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description | **AWAITING OWNER APPROVAL** |
 
@@ -524,6 +525,30 @@ Each sub-decision is separate.
 - **All Phase 1 acceptance criteria.**
 
 **Raised, not decided:** `tabCapture` and `activeTab` have no product user now, and the capture authority is idle in a product. Both stay, as instructed. While `activeTab` stays, Chrome itself gives the extension temporary tab access on a click, which nothing in a product build uses.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.14 — status after OD-X
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-X | **SELECTED (owner):** in a product build `captureStatus` does not appear in the side panel. In an evidence build it stays exactly, as a diagnostic. Presentation only | **M23.14: IMPLEMENTED IN PRODUCT BUILDS, after verification.** A product panel prints a named list of the worker's fields. An evidence panel prints the whole reply, as before. In the real build the worker, offscreen chunk, content script and manifest are byte-identical to the previous build. 14 of 14 deliberate regressions caught | **Not seen in a browser.** Evidence-build runtime UNVERIFIED. The worker still sends the field to the panel, which does not display it (`artifacts/experiments/M23.14-capture-status-scope/`) |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V and OD-W. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **OD-Y:** branding terminology such as "PratiBimb minimal host" and "Development build". The Status box's place in a product overlaps this.
+- **OD-Z:** remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description.
+- **Permission review:** `activeTab` and `tabCapture`, which have no product user.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
 
 **Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
 

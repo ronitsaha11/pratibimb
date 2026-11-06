@@ -1,9 +1,10 @@
-# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11, M23.12, M23.13)
+# DOM-only Phase 1 — regression and evidence matrix (M23.8, updated M23.9, M23.10, M23.11, M23.12, M23.13, M23.14)
 
 > **Status:** what M23.8's tests establish about M23.7's boundary (M23.8, 2026-11-04, at `740a245` plus tests).
 > - **What "behavioural" means here:** the real `background.ts`, `offscreen/main.ts`, task run, orchestrator, privacy boundary, execution gate and egress guard ran in Node under a fake `chrome`, with every capture, model and worker API counted (`apps/extension/test/support/simulatedExtension.ts`). **It is a model of a browser, not a browser.**
 > - **Evidence type:** in the terms of `core-product-acceptance-PROPOSED.md` §4, all of this is **type A** (unit and integration). None of it is type B to H. **No browser ran. No acceptance criterion is approved or re-rated by it.**
 > - **Nothing real was involved:** no frame, no model file, no worker, no model server.
+> - **M23.14:** §11 adds OD-X. Real product build compared; not seen in a browser.
 > - **M23.13:** §10 adds OD-W. Real product build inspected; not tried in a browser. That build is also the OD-T wording's first.
 > - **M23.12:** §9 adds OD-T. Not rebuilt and not seen in a browser.
 > - **M23.11:** §8 adds OD-U. Tests and a mutation check; neither harness was run.
@@ -183,3 +184,19 @@ Commands, exit codes and counts: `artifacts/experiments/M23.12-product-ui-langua
 | The checks catch regressions | 24 deliberate mutations, 24 caught | **mutation** | PASS | — |
 
 Commands, exit codes and counts: `artifacts/experiments/M23.13-toolbar-interaction/decision.md`.
+
+## 11. OD-X: `captureStatus` in the panel (M23.14)
+
+| Requirement | Actual evidence | Kind | Result | Not established |
+|---|---|---|---|---|
+| Product does not render it | given the real worker's reply, the Status box has no such key. The real panel chunk does not name it | **behavioural** (fake DOM); **real build output** | PASS | real rendering |
+| Product does not render `NO_GRANT`, or any status value or placeholder | all five values, each absent | **behavioural** (fake DOM); **real build output** | PASS | — |
+| Evidence renders it | exactly `JSON.stringify(reply, null, 2)` | **behavioural** (doubles) | PRESERVED. **Runtime UNVERIFIED** | an evidence build |
+| Evidence values and updates | all five; follows the worker on each panel load | **behavioural** (doubles) | PRESERVED | an evidence build |
+| Underlying status unchanged | the real worker is byte-identical to the previous build; `HOST_STATUS` still reports it | **real build output**; **behavioural** (simulated) | UNCHANGED | — |
+| Other Status information | the same four fields; valid JSON; no gap; failure message kept | **behavioural** (fake DOM) | PASS | real rendering |
+| OD-T wording | unchanged | **behavioural** (fake DOM) | PASS | — |
+| Tasks and security | worker, offscreen chunk, content script and manifest byte-identical | **real build output** | UNCHANGED | a real browser |
+| The checks catch regressions | 14 deliberate mutations, 14 caught | **mutation** | PASS | — |
+
+Commands, exit codes and counts: `artifacts/experiments/M23.14-capture-status-scope/decision.md`.

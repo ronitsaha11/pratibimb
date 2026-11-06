@@ -5,6 +5,7 @@
 > - **It claims nothing until it is run.** No product runtime validation exists for M23.7 yet.
 > - **Scope:** one operator, one machine, Chrome for Testing, the synthetic loopback fixture. It is evidence type C, unless the operator meets OD-C's definition. It says nothing about Firefox, a second machine, real sites or performance.
 > - **A product build has no diagnostic hook to call (M23.9, OD-S).** Check D7 confirms that.
+> - **Updated M23.14 (OD-X):** a product's Status box shows `bootId`, `bootedAt`, `offscreenContexts` and `hellos`, and no `captureStatus`. A7 checks that.
 > - **Updated M23.13 (OD-W):** the toolbar button opens the side panel and issues no grant. A5, A6 and section C check that, and are the first real evidence of it.
 > - **Updated M23.12 (OD-T):** a product panel has no Capture field, so A3, C1, C3 and C4 now use the approved wording and the worker's console.
 
@@ -53,6 +54,7 @@ Each check is PASS or FAIL. **Any frame capture, model-file load or TR-01 worker
 | A4 | Hover over the extension's toolbar button | the title is **PratiBimb — Page Assistant** |
 | A5 | Close the panel, then click the toolbar button | **the side panel opens, on this tab** |
 | A6 | Close the panel, then press `Alt+Shift+P`. Then click the toolbar button several times | the panel opens from the shortcut, and repeated clicks start nothing and lose nothing |
+| A7 | Read the panel's Status box | it shows those four fields. **No `captureStatus`, no `NO_GRANT`** |
 
 ### B. A DOM-only task, with no toolbar click
 
@@ -75,7 +77,7 @@ This is the one that matters most: the click must issue no grant, and must start
 | C1 | Start the harness again with `--scenarios allow`, for a fresh page and its own record. On the fixture page, click the extension's toolbar button | the panel opens. In the service worker's Console, `__host.captureState().grants` is **`[]`** |
 | C2 | Run the task as in B | it completes as in B, with no tab-capture indicator |
 | C3 | In the service worker's Console, read `__host.captureState().grants` after the task | **still `[]`.** Any grant means the toolbar or a task asked for one: **FAIL** |
-| C4 | Read the panel's wording before and after | the approved sentences, unchanged. Nothing in the panel asks for a toolbar click. Any capture wording in the panel, other than the Status box's raw `captureStatus` key, is a **FAIL** |
+| C4 | Read the panel's wording before and after | the approved sentences, unchanged. Nothing in the panel asks for a toolbar click. **Any capture wording anywhere in the panel is a FAIL** |
 
 ### D. Looking for what must be absent
 

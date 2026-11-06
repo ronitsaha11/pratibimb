@@ -116,7 +116,7 @@
 | Item | Why it stays | Reach |
 |---|---|---|
 | `__host.toOffscreen` | names no kind; M13's product phase (`ORT_SMOKE`) and the observation harnesses use it | can send any message, as any context of this extension can. A hook's kind gets `UNKNOWN_KIND` (tested). **So "no sender capable" holds for senders that name a hook, and cannot hold for generic messaging** |
-| The capture authority, with `getMediaStreamId` and `ticketFor` | changing it was forbidden; an evidence build's toolbar and the status report use it. Since M23.13 a product's toolbar does not (OD-W), so it is idle in a product | `ticketFor` has no caller (source, tested; one occurrence in the built worker, its definition) |
+| The capture authority, with `getMediaStreamId` and `ticketFor` | changing it was forbidden; an evidence build's toolbar and the status report use it. Since M23.13 a product's toolbar does not (OD-W), so it is idle in a product. **Since M23.14 (OD-X) a product's panel does not show its status either;** the worker still reports it, and an evidence panel still shows it | `ticketFor` has no caller (source, tested; one occurrence in the built worker, its definition) |
 | `tabCapture`, `activeTab` | changing them was forbidden | nothing in a product build uses `tabCapture` now. A separate owner decision |
 | TR-01's model and worker | changing them was forbidden | packaged with its integrity check; the product bundle has no way to start it |
 

@@ -35,6 +35,10 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.14 — A product's panel does not show `captureStatus` (OD-X; presentation only).** Its Status box prints a named list of
+  the worker's fields. An evidence panel prints the whole reply, as before. The worker still reports the status: in the real
+  product build, the worker, offscreen chunk, content script and manifest are byte-identical to the build before. Not seen in a
+  browser. OD-Y and OD-Z await the owner.
 - **M23.13 — A product's toolbar button opens the side panel (OD-W).** It issues no capture grant, ticket or frame, and sends no
   message. A failure or a missing tab is reported, with no fallback to capture. An evidence build's click is unchanged, and
   `Alt+Shift+P` is the same event. Permissions, hosts and CSP are identical to the previous real build, which this build

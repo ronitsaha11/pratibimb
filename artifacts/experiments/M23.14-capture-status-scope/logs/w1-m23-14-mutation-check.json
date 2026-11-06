@@ -1,0 +1,80 @@
+{
+  "what": "each mutation was applied to one working-tree file, three test files were run, and the file was restored. A non-zero exit means the mutation was caught. No build, browser or model was involved.",
+  "tests": [
+    "apps/extension/test/captureStatusScope.test.ts",
+    "apps/extension/test/buildSeparation.test.ts",
+    "tests/browser/support/product-build-inspection.test.mjs"
+  ],
+  "results": [
+    {
+      "mutation": "the product shows the whole reply again",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the evidence panel is filtered too",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the gate is inverted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the product's list includes captureStatus",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the product's list loses hellos",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the product's list loses bootId",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a product prints a placeholder",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the Capture field shows in a product",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the status failure is silent",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the worker stops reporting it",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the worker's reply is filtered in a product",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the control plane's member removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: captureStatus not refused",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: NO_GRANT not refused",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}
