@@ -29,7 +29,7 @@ afterEach(() => {
   dir = undefined;
 });
 
-function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx",p=typeof navigator.mediaDevices?.getUserMedia;', background = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});", sidepanel = 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.";' } = {}) {
+function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx"], offscreen = 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD",t="t1-ui-head.onnx",p=typeof navigator.mediaDevices?.getUserMedia;', background = "const h={toOffscreen(){},captureState(){}};chrome.tabCapture.getMediaStreamId;chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});", sidepanel = 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.",f="PratiBimb could not start. Close this panel and open it again.";' } = {}) {
   dir = mkdtempSync(join(tmpdir(), "m238-build-"));
   mkdirSync(join(dir, "chunks"));
   mkdirSync(join(dir, "content-scripts"));
@@ -108,15 +108,15 @@ describe("inspectProductBuild", () => {
   });
 
   it("M23.12 (OD-T): fails a product panel missing either approved sentence", () => {
-    const noPrivacy = inspectProductBuild(syntheticBuild({ sidepanel: `const a="${APPROVED_UI_COPY.sidePanelDescription}";` }), EXPECTED);
+    const noPrivacy = inspectProductBuild(syntheticBuild({ sidepanel: `const a="${APPROVED_UI_COPY.sidePanelDescription}",f="${APPROVED_UI_COPY.statusUnavailable}";` }), EXPECTED);
     expect(noPrivacy.problems).toEqual(["PRIVACY_EXPLANATION_NOT_THE_APPROVED_WORDING"]);
     rmSync(dir, { recursive: true, force: true });
-    const noDescription = inspectProductBuild(syntheticBuild({ sidepanel: `const p="${APPROVED_UI_COPY.privacyExplanation}";` }), EXPECTED);
+    const noDescription = inspectProductBuild(syntheticBuild({ sidepanel: `const p="${APPROVED_UI_COPY.privacyExplanation}",f="${APPROVED_UI_COPY.statusUnavailable}";` }), EXPECTED);
     expect(noDescription.problems).toEqual(["SIDE_PANEL_DESCRIPTION_NOT_THE_APPROVED_WORDING"]);
   });
 
   it("M23.12 (OD-T): fails stale capture wording in the panel or the manifest, in any case", () => {
-    const approved = `const a="${APPROVED_UI_COPY.sidePanelDescription}",p="${APPROVED_UI_COPY.privacyExplanation}";`;
+    const approved = `const a="${APPROVED_UI_COPY.sidePanelDescription}",p="${APPROVED_UI_COPY.privacyExplanation}",f="${APPROVED_UI_COPY.statusUnavailable}";`;
     for (const phrase of STALE_UI_WORDING) {
       const inPanel = inspectProductBuild(syntheticBuild({ sidepanel: `${approved}const s="${phrase.toUpperCase()}";` }), EXPECTED);
       expect(inPanel.problems, phrase).toEqual([`STALE_UI_WORDING:${phrase}`]);
@@ -141,6 +141,23 @@ describe("inspectProductBuild", () => {
     rmSync(dir, { recursive: true, force: true });
     const popup = inspectProductBuild(syntheticBuild({ manifest: { action: { default_title: "PratiBimb — Page Assistant", default_popup: "p.html" } } }), EXPECTED);
     expect(popup.problems).toEqual(["TOOLBAR_HAS_A_POPUP"]);
+  });
+
+  it("M23.18 (RD-2): fails a product panel without the approved failure sentence, or with the evidence build's status lines", () => {
+    const without = inspectProductBuild(syntheticBuild({ sidepanel: `const a="${APPROVED_UI_COPY.sidePanelDescription}",p="${APPROVED_UI_COPY.privacyExplanation}";` }), EXPECTED);
+    expect(without.problems).toEqual(["STATUS_FAILURE_NOT_THE_APPROVED_WORDING"]);
+    rmSync(dir, { recursive: true, force: true });
+    for (const stale of ["NEEDS_USER: none", "status unavailable: x"]) {
+      const report = inspectProductBuild(syntheticBuild({ sidepanel: `const a="${APPROVED_UI_COPY.sidePanelDescription}",p="${APPROVED_UI_COPY.privacyExplanation}",f="${APPROVED_UI_COPY.statusUnavailable}",s="${stale}";` }), EXPECTED);
+      expect(report.problems.length, stale).toBe(1);
+      expect(report.problems[0], stale).toMatch(/^STALE_UI_WORDING:/);
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("M23.18 (RD-1): reports the worker's justification as a fact", () => {
+    const report = inspectProductBuild(syntheticBuild({ background: 'chrome.offscreen.createDocument({url:"offscreen.html",reasons:[1],justification:"Run it."});chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});' }), EXPECTED);
+    expect(report.bundle.offscreenJustification).toBe("Run it.");
   });
 
   it("M23.17: fails a product build that declares either capture permission", () => {

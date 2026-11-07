@@ -106,9 +106,9 @@ describe("what stays, on purpose", () => {
     expect(nodes[2]?.textContent).toBe("Not authorised. Click the toolbar button to let PratiBimb look at this tab.");
   });
 
-  it("internal names are not touched: the package, the worker's argument to Chrome, and source comments", () => {
+  it("internal names are not touched: the package and source comments. The worker's argument to Chrome changed by decision (RD-1, M23.18)", () => {
     expect(JSON.parse(readFileSync(join(APP, "package.json"), "utf8")).name).toBe("@pratibimb/extension");
-    expect(read("host/background.ts")).toContain('justification: "PratiBimb minimal host: ORT inference and the synthetic vault stub",');
+    expect(read("host/background.ts")).toContain(`justification: "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",`);
     expect(read("wxt.config.ts")).toContain("MINIMAL MV3 HOST");
   });
 

@@ -17,3 +17,8 @@ export const TOOLBAR_TITLE = "PratiBimb — Page Assistant";
 export const DEVELOPMENT_BUILD_NAME = `${TOOLBAR_TITLE} (Development build)`;
 export const SIDE_PANEL_DESCRIPTION = "PratiBimb uses page structure to identify elements and assist with browser tasks.";
 export const PRIVACY_EXPLANATION = "Normal tasks do not capture browser screenshots or send page images to the reasoning model.";
+/**
+ * M23.18 (RD-2, option S-C): the one thing a product's Status box says, and only when the panel could not reach the rest of
+ * PratiBimb. Reopening the panel sends the same request again, so the advice is what actually retries.
+ */
+export const STATUS_UNAVAILABLE_MESSAGE = "PratiBimb could not start. Close this panel and open it again.";

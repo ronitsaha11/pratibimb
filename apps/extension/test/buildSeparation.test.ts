@@ -25,8 +25,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { evidenceReferenceFlags } from "../../../tests/browser/support/build-separation.mjs";
 import { evidencePermissionProblems, EVIDENCE_ONLY_PERMISSIONS, EVIDENCE_PERMISSIONS, parseCsp, permissionDeltaProblems, PRODUCT_CSP, PRODUCT_HOST_PERMISSIONS, PRODUCT_PERMISSIONS, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
-import { APPROVED_UI_COPY, EXPECTED_PRODUCT_FILES, STALE_UI_WORDING } from "../../../tests/browser/support/product-build-inspection.mjs";
-import { DEVELOPMENT_BUILD_NAME, PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, TOOLBAR_TITLE } from "../host-lib/product-copy";
+import { APPROVED_UI_COPY, EXPECTED_PRODUCT_FILES, OFFSCREEN_JUSTIFICATION, STALE_UI_WORDING } from "../../../tests/browser/support/product-build-inspection.mjs";
+import { DEVELOPMENT_BUILD_NAME, PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, STATUS_UNAVAILABLE_MESSAGE, TOOLBAR_TITLE } from "../host-lib/product-copy";
 import { ORT_PIN } from "../../../packages/security/src/generated/ortPin";
 import { TR01_PACKAGE } from "../host-lib/tr01-pin";
 
@@ -351,7 +351,7 @@ describe("M23.12 (OD-T) — the product's wording, in the real manifest and in a
   type Manifest = LoadedConfig["manifest"] & { readonly action: { readonly default_title: string }; readonly commands: { readonly _execute_action: { readonly description: string; readonly suggested_key: unknown } } };
 
   it("the build-inspection tool expects exactly the approved module's wording", () => {
-    expect(APPROVED_UI_COPY).toEqual({ toolbarTitle: TOOLBAR_TITLE, extensionName: DEVELOPMENT_BUILD_NAME, sidePanelDescription: SIDE_PANEL_DESCRIPTION, privacyExplanation: PRIVACY_EXPLANATION });
+    expect(APPROVED_UI_COPY).toEqual({ toolbarTitle: TOOLBAR_TITLE, extensionName: DEVELOPMENT_BUILD_NAME, sidePanelDescription: SIDE_PANEL_DESCRIPTION, privacyExplanation: PRIVACY_EXPLANATION, statusUnavailable: STATUS_UNAVAILABLE_MESSAGE });
   });
 
   it("the real manifest's toolbar title is the approved one, and the shortcut's text uses it too", async () => {
@@ -441,8 +441,10 @@ describe("M23.14 (OD-X) — `captureStatus`, in a product bundle", () => {
     for (const word of ["captureStatus", "NO_GRANT", "GRANTED", "STREAM_AVAILABLE", "DOCUMENT_CHANGED", "REVOKED", "lifecycle", "requiresReauth"]) {
       expect(panel.includes(word), word).toBe(false);
     }
-    expect(panel).toMatch(/PRODUCT_STATUS_FIELDS = \["bootId", "bootedAt", "offscreenContexts", "hellos"\]/);
-    expect(panel).toMatch(/JSON\.stringify\(s, PRODUCT_STATUS_FIELDS, 2\)/);
+    // M23.18 (RD-2): a product prints none of the worker's reply, so the panel names none of its fields.
+    for (const word of ["PRODUCT_STATUS_FIELDS", "bootId", "bootedAt", "offscreenContexts", "hellos", "NEEDS_USER", "status unavailable"]) expect(panel.includes(word), word).toBe(false);
+    expect(panel).toContain('kind: "HOST_STATUS"');
+    expect(panel).toContain(STATUS_UNAVAILABLE_MESSAGE);
   }, 30_000);
 
   it("the worker still reports it: only the panel changed", async () => {
@@ -536,6 +538,21 @@ describe("M23.17 (RD-5, RD-6) — permissions, in the real config, per flag", { 
     const worker = (await productBundle({ file: "host/background.ts", gate: "if (__EVIDENCE_BUILD__ && msg?.kind === \"CAPTURE_FRAME\") {", replacement: "if (msg?.kind === \"CAPTURE_FRAME\") {" }))["host/background.js"]!;
     expect(worker).toMatch(/\.ticketFor\s*\(/);
   }, 30_000);
+});
+
+describe("M23.18 (RD-1) — the worker's justification, in a product bundle", () => {
+  it("is the approved description, and the inspection's copy of it is the source's", async () => {
+    const worker = (await productBundle())["host/background.js"]!;
+    expect(worker).toContain(OFFSCREEN_JUSTIFICATION);
+    expect(worker).not.toMatch(/ORT inference|minimal host|synthetic vault stub/);
+    const source = readSourceFile(join(APP, "host/background.ts"), "utf8");
+    expect(source).toContain(`justification: "${OFFSCREEN_JUSTIFICATION}",`);
+  }, 30_000);
+
+  it("claims no visual inference, T1, TR-01 or model", () => {
+    expect(OFFSCREEN_JUSTIFICATION).toBe("Run PratiBimb's offscreen runtime for DOM-based browser assistance.");
+    expect(OFFSCREEN_JUSTIFICATION).not.toMatch(/ORT|infer|model|detector|T1|TR-01|vision|visual|capture|frame|screenshot/i);
+  });
 });
 
 describe("TR-01's integrity check is unchanged, in every build", () => {

@@ -60,7 +60,8 @@
   </fieldset>
   <!-- M23.12 (OD-T): an evidence build's capture field goes here. A product build has none. See main.ts. -->
   <div id="capture-slot"></div>
-  <fieldset><legend>Status</legend><pre id="status">…</pre><div id="needs-user">NEEDS_USER: none</div></fieldset>
+  <!-- M23.18 (RD-2): a product hides this unless something failed. An evidence build adds its fixed status line. See main.ts. -->
+  <fieldset id="status-box"><legend>Status</legend><pre id="status">…</pre></fieldset>
   <script type="module" src="./main.ts"></script>
 </body>
 </html>

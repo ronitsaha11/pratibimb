@@ -48,7 +48,7 @@ function build({ worker, offscreen, content = CONTENT, connectSrc, manifest = {}
   );
   writeFileSync(join(dir, "background.js"), worker);
   writeFileSync(join(dir, "chunks", "offscreen-abc.js"), offscreen);
-  writeFileSync(join(dir, "chunks", "sidepanel-abc.js"), 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.";');
+  writeFileSync(join(dir, "chunks", "sidepanel-abc.js"), 'const a="PratiBimb uses page structure to identify elements and assist with browser tasks.",p="Normal tasks do not capture browser screenshots or send page images to the reasoning model.",f="PratiBimb could not start. Close this panel and open it again.";');
   writeFileSync(join(dir, "content-scripts", "content.js"), content);
   writeFileSync(join(dir, "ort.all.min.js"), "");
   // Directories, deliberately. Reading one throws EISDIR.

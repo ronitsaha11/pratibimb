@@ -54,10 +54,14 @@ export const APPROVED_UI_COPY = Object.freeze({
   extensionName: "PratiBimb — Page Assistant (Development build)",
   sidePanelDescription: "PratiBimb uses page structure to identify elements and assist with browser tasks.",
   privacyExplanation: "Normal tasks do not capture browser screenshots or send page images to the reasoning model.",
+  statusUnavailable: "PratiBimb could not start. Close this panel and open it again.",
 });
 
+/** M23.18 (RD-1): the worker's argument to `chrome.offscreen.createDocument`. Reported as a fact; `buildSeparation.test.ts` pins it. */
+export const OFFSCREEN_JUSTIFICATION = "Run PratiBimb's offscreen runtime for DOM-based browser assistance.";
+
 /** Wording a normal product must not carry: it describes a capture a product task does not make. `captureStatus`: M23.14 (OD-X). */
-export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button", "captureStatus", "NO_GRANT", "minimal host", "minimal MV3", "not the product", "(experiment"]);
+export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button", "captureStatus", "NO_GRANT", "minimal host", "minimal MV3", "not the product", "(experiment", "NEEDS_USER", "status unavailable"]);
 
 const walk = (root, relative = "", out = []) => {
   for (const name of readdirSync(join(root, relative)).sort()) {
@@ -107,6 +111,7 @@ export function inspectProductBuild(directory, expected) {
   if (manifest.name !== APPROVED_UI_COPY.extensionName) problems.push("EXTENSION_NAME_NOT_THE_APPROVED_FORM");
   if (!includes(sidepanel, APPROVED_UI_COPY.sidePanelDescription)) problems.push("SIDE_PANEL_DESCRIPTION_NOT_THE_APPROVED_WORDING");
   if (!includes(sidepanel, APPROVED_UI_COPY.privacyExplanation)) problems.push("PRIVACY_EXPLANATION_NOT_THE_APPROVED_WORDING");
+  if (!includes(sidepanel, APPROVED_UI_COPY.statusUnavailable)) problems.push("STATUS_FAILURE_NOT_THE_APPROVED_WORDING");
   const productUi = `${JSON.stringify(manifest)}\n${sidepanel}`.toLowerCase();
   for (const phrase of STALE_UI_WORDING) if (productUi.includes(phrase.toLowerCase())) problems.push(`STALE_UI_WORDING:${phrase}`);
 
@@ -134,6 +139,7 @@ export function inspectProductBuild(directory, expected) {
       workerControlPlaneHasMintStreamId: includes(background, "mintStreamId"),
       workerMintsCaptureHandles: includes(background, "getMediaStreamId"),
       workerCallsForACaptureTicket: /\.ticketFor\s*\(/.test(background),
+      offscreenJustification: /justification:\s*"([^"]*)"/.exec(background)?.[1] ?? null,
       contentScriptNamesEitherHook: includes(content, "PERCEIVE_ONCE") || includes(content, "STREAM_CONSUME"),
       sidePanelNamesEitherHook: includes(sidepanel, "PERCEIVE_ONCE") || includes(sidepanel, "STREAM_CONSUME"),
       sidePanelStillAsksForTheToolbarGesture: includes(sidepanel, "Click the toolbar button"),

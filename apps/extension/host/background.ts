@@ -103,7 +103,8 @@ export default defineBackground(() => {
       await chrome.offscreen.createDocument({
         url: "offscreen.html",
         reasons: [chrome.offscreen.Reason.WORKERS],
-        justification: "PratiBimb minimal host: ORT inference and the synthetic vault stub",
+        // M23.18 (RD-1): what the document is for in a normal task. Chrome may show this to a person; whether it does is unverified.
+        justification: "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",
       });
     }
     return (await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT] })).length;

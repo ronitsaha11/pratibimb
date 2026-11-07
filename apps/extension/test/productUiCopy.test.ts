@@ -59,11 +59,11 @@ describe("a product panel", () => {
     }
   });
 
-  it("still reports the host's status, and shows the worker's reply, less what `captureStatusScope.test.ts` covers", async () => {
+  it("still reports the host's status. Since M23.18 (RD-2) a product shows none of the reply: `captureStatusScope.test.ts`", async () => {
     const { byId, root, settle } = await bootPanel(false);
     await settle();
     expect(root.dataset.hostStatus).toBe("ok");
-    expect(byId.get("status")?.textContent).toContain('"bootId": "b"');
+    expect(byId.get("status")?.textContent).toBe("");
   });
 });
 
@@ -117,7 +117,7 @@ describe("nothing else about the panel changed", () => {
   });
 
   it("every other control on the page is still there", () => {
-    for (const id of ["consent", "consent-allow", "consent-deny", "clarify", "clarify-use", "clarify-decline", "goal", "task-read", "task-start", "task-status", "task-timings", "status", "needs-user"]) {
+    for (const id of ["consent", "consent-allow", "consent-deny", "clarify", "clarify-use", "clarify-decline", "goal", "task-read", "task-start", "task-status", "task-timings", "status", "status-box"]) {
       expect(html, id).toContain(`id="${id}"`);
     }
   });

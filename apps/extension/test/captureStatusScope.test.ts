@@ -8,7 +8,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION } from "../host-lib/product-copy";
+import { PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, STATUS_UNAVAILABLE_MESSAGE } from "../host-lib/product-copy";
 import { bootPanel, fieldsIn, sidePanelHtml } from "./support/fakeSidePanel";
 import { bootSimulatedExtension, NO_VISUAL_ACTIVITY, SENDERS, taskRequest, type Rig } from "./support/simulatedExtension";
 
@@ -61,36 +61,43 @@ describe("a product panel's Status box", () => {
     expect(text).not.toMatch(/capture|grant|frame|perception|visual|null/i);
   });
 
-  it("(7, 8) still shows everything else, as valid JSON with no gap where the field was", async () => {
-    const text = await statusText(false, replyFor("NO_GRANT"));
-    expect(JSON.parse(text)).toEqual({ bootId: "boot-1", bootedAt: 1234, offscreenContexts: 1, hellos: 2 });
-    expect(text).toBe(JSON.stringify({ bootId: "boot-1", bootedAt: 1234, offscreenContexts: 1, hellos: 2 }, null, 2));
-    expect(text).not.toMatch(/\n\s*\n/);
+  it("(7, 8) M23.18 (RD-2): shows none of the worker's fields at all, and the box is hidden while the panel works", async () => {
+    const { byId, settle } = await bootPanel(false, "NO_GRANT", { hostStatus: replyFor("NO_GRANT") });
+    await settle();
+    expect(byId.get("status")?.textContent).toBe("");
+    expect(byId.get("status-box")?.hidden).toBe(true);
   });
 
-  it("(7) the other fields are the real worker's, all of them", async () => {
+  it("(7) the real worker still sends every field; a product simply prints none of them", async () => {
     const reply = await realWorkerReply(false);
     expect(Object.keys(reply).sort()).toEqual(["bootId", "bootedAt", "captureStatus", "hellos", "offscreenContexts"]);
-    expect(Object.keys(JSON.parse(await statusText(false, reply))).sort()).toEqual(["bootId", "bootedAt", "hellos", "offscreenContexts"]);
+    const text = await statusText(false, reply);
+    for (const key of Object.keys(reply)) expect(text, key).not.toContain(key);
   });
 
-  it("a field the worker adds later stays out until someone lists it", async () => {
-    const parsed = JSON.parse(await statusText(false, { ...replyFor("GRANTED"), somethingNew: "value" })) as Record<string, unknown>;
-    expect(parsed).not.toHaveProperty("somethingNew");
+  it("a field the worker adds later is not shown either", async () => {
+    expect(await statusText(false, { ...replyFor("GRANTED"), somethingNew: "value" })).not.toContain("somethingNew");
   });
 
-  it("when the worker cannot be reached it says so, as it did", async () => {
+  it("M23.18 (RD-2): when the worker cannot be reached it says so plainly, shows the box, and keeps the raw error for the console", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const { byId, root, settle } = await bootPanel(false, "NO_GRANT", { hostStatusFails: true });
     await settle();
-    expect(byId.get("status")?.textContent).toBe("status unavailable: synthetic: no worker");
+    expect(byId.get("status")?.textContent).toBe(STATUS_UNAVAILABLE_MESSAGE);
+    expect(byId.get("status-box")?.hidden).toBe(false);
+    expect(byId.get("status")?.textContent).not.toContain("synthetic: no worker");
     expect(root.dataset.hostStatus).toBe("error");
+    expect(warn).toHaveBeenCalledWith("PratiBimb: the side panel could not reach the service worker: synthetic: no worker");
+    warn.mockRestore();
   });
 
-  it("(7) the panel still marks the host as running, and the NEEDS_USER line is still on the page", async () => {
-    const { root, settle } = await bootPanel(false, "NO_GRANT", { hostStatus: replyFor("NO_GRANT") });
+  it("(7) M23.18 (RD-2): the panel still marks the host as running, and a product has no NEEDS_USER line", async () => {
+    const { byId, root, settle } = await bootPanel(false, "NO_GRANT", { hostStatus: replyFor("NO_GRANT") });
     await settle();
     expect(root.dataset.hostStatus).toBe("ok");
-    expect(sidePanelHtml()).toContain('<fieldset><legend>Status</legend><pre id="status">…</pre><div id="needs-user">NEEDS_USER: none</div></fieldset>');
+    expect(sidePanelHtml()).toContain('<fieldset id="status-box"><legend>Status</legend><pre id="status">…</pre></fieldset>');
+    expect(sidePanelHtml()).not.toContain("NEEDS_USER");
+    expect(fieldsIn(byId.get("status-box"))).toEqual([]);
   });
 
   it("(8) has no capture field either, and its slot stays empty", async () => {
@@ -172,7 +179,10 @@ describe("(6) the underlying status is untouched: only a product's panel stopped
     const product = await bootPanel(false);
     await product.settle();
     expect(product.sent).toContain("HOST_STATUS");
-    expect(read("host/sidepanel/main.ts")).toMatch(/JSON\.stringify\(s, __EVIDENCE_BUILD__ \? null : PRODUCT_STATUS_FIELDS, 2\)/);
+    const panel = read("host/sidepanel/main.ts");
+    expect(panel).toContain('const s = (await chrome.runtime.sendMessage({ kind: "HOST_STATUS" })) as {');
+    expect(panel).toContain('if (statusEl) statusEl.textContent = __EVIDENCE_BUILD__ ? JSON.stringify(s, null, 2) : "";');
+    expect(panel).not.toContain("PRODUCT_STATUS_FIELDS");
   });
 });
 

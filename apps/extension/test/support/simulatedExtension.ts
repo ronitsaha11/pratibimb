@@ -228,6 +228,8 @@ export interface RigOptions {
   readonly sidePanel?: "OK" | "REJECTS" | "THROWS" | "ABSENT";
   /** M23.17: the API surface of a manifest with neither capture permission: `chrome.tabCapture` is not there at all. */
   readonly withoutTabCaptureApi?: boolean;
+  /** M23.18: no offscreen document exists until the worker creates one, as on a fresh browser start. Off by default. */
+  readonly offscreenStartsClosed?: boolean;
   /** Collects the context `host/offscreen/main.ts` hands the TR-01 probe, if it hands it any. */
   readonly tr01ProbeContexts?: unknown[];
 }
@@ -313,6 +315,8 @@ export interface Rig {
   visualActivity(): VisualActivity;
   /** Every `chrome.sidePanel.open` the worker made, with what it asked for. */
   readonly sidePanelOpens: readonly unknown[];
+  /** M23.18: every `chrome.offscreen.createDocument` the worker made, with its arguments. */
+  readonly offscreenCreations: readonly unknown[];
   /** The toolbar click, or `Alt+Shift+P`, which is the same event: a person invoking the extension on the tab. */
   clickToolbar(tab?: { readonly id?: number; readonly windowId?: number }): void;
   /**
@@ -380,6 +384,8 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
   vi.resetModules();
 
   const counters = { ...NO_VISUAL_ACTIVITY } as { -readonly [K in keyof VisualActivity]: number };
+  const offscreenCreations: unknown[] = [];
+  let offscreenOpen = options.offscreenStartsClosed !== true;
   const messages: string[] = [];
   const modelRequests: ModelRequest[] = [];
   const fetched: string[] = [];
@@ -462,7 +468,7 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
       lastError: undefined,
       ContextType: { OFFSCREEN_DOCUMENT: "OFFSCREEN_DOCUMENT" },
       getURL: (path: string) => `${EXTENSION_ROOT}${path}`,
-      getContexts: async () => [{}],
+      getContexts: async () => (offscreenOpen ? [{}] : []),
       onMessage: {
         addListener: (listener: Listener) => {
           (registering === "sw" ? swListeners : offscreenListeners).push(listener);
@@ -480,7 +486,13 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
         return addressed ? deliver(offscreenListeners, message, workerSender) : deliver(swListeners, message, offscreenSender);
       },
     },
-    offscreen: { Reason: { WORKERS: "WORKERS" }, createDocument: async () => undefined },
+    offscreen: {
+      Reason: { WORKERS: "WORKERS" },
+      createDocument: async (parameters: unknown) => {
+        offscreenCreations.push(parameters);
+        offscreenOpen = true;
+      },
+    },
     action: { onClicked: { addListener: (listener: (tab: { id?: number; windowId?: number }) => void) => actionListeners.push(listener) } },
     ...(options.sidePanel === "ABSENT"
       ? {}
@@ -716,6 +728,7 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
     host,
     visualActivity: () => ({ ...counters }),
     sidePanelOpens,
+    offscreenCreations,
     clickToolbar: (tab = { id: TAB_ID }) => {
       for (const listener of actionListeners) listener(tab);
     },

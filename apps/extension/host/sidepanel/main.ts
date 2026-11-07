@@ -20,6 +20,7 @@ import {
   type Expectation,
   type PanelForm,
 } from "../../host-lib/task-panel";
+import { STATUS_UNAVAILABLE_MESSAGE } from "../../host-lib/product-copy";
 
 // NOT `status`: `window.status` is a DOM global of type `string`, so a module-scope `const status`
 // collides with it. The build never noticed because nothing type-checked this file.
@@ -75,19 +76,33 @@ const CAPTURE_TEXT: Record<string, string> = __EVIDENCE_BUILD__
   : {};
 
 /**
- * M23.14 (OD-X): WHAT A PRODUCT'S STATUS BOX SHOWS. `captureStatus` is a diagnostic: a product has no capture to report, so a
- * person there would only ever read a meaningless `NO_GRANT`. A named list rather than a removal, so that a field the worker
- * adds later stays out of a product's panel until someone decides to show it. The worker's reply is unchanged, and an evidence
- * build's panel prints all of it, as it always has.
+ * M23.18 (RD-2, option S-C): A PRODUCT'S STATUS BOX SAYS NOTHING WHILE THE PANEL WORKS, AND ONE PLAIN SENTENCE IF IT DOES NOT.
+ *
+ * THE REQUEST IS NOT PRESENTATION. `HOST_STATUS` is what creates the offscreen document every task needs (M23.16 §3), so it is
+ * sent in every build, exactly as before, and the worker's reply is unchanged. Only what a product prints changes: no worker
+ * identifiers, counters or timestamps, and on failure no raw error. The error goes to the console, for a developer.
+ *
+ * An evidence build prints the worker's whole reply, its Capture field and its NEEDS_USER line, as it always has. That line is
+ * a fixed string, so a product no longer carries it: it said "none" while a request for consent was on screen.
  */
-const PRODUCT_STATUS_FIELDS = ["bootId", "bootedAt", "offscreenContexts", "hellos"];
+const statusBox = document.getElementById("status-box");
+if (statusBox) {
+  if (__EVIDENCE_BUILD__) {
+    const needsUser = document.createElement("div");
+    needsUser.id = "needs-user";
+    needsUser.textContent = "NEEDS_USER: none";
+    statusBox.append(needsUser);
+  } else {
+    statusBox.hidden = true;
+  }
+}
 
 async function refresh() {
   try {
     const s = (await chrome.runtime.sendMessage({ kind: "HOST_STATUS" })) as {
       captureStatus?: { lifecycle: string; requiresReauth: boolean } | null;
     };
-    if (statusEl) statusEl.textContent = JSON.stringify(s, __EVIDENCE_BUILD__ ? null : PRODUCT_STATUS_FIELDS, 2);
+    if (statusEl) statusEl.textContent = __EVIDENCE_BUILD__ ? JSON.stringify(s, null, 2) : "";
     if (__EVIDENCE_BUILD__ && captureEl) {
       const lifecycle = s?.captureStatus?.lifecycle ?? "NO_GRANT";
       captureEl.textContent = CAPTURE_TEXT[lifecycle] ?? lifecycle;
@@ -96,7 +111,14 @@ async function refresh() {
     }
     document.documentElement.dataset.hostStatus = "ok";
   } catch (e) {
-    if (statusEl) statusEl.textContent = `status unavailable: ${e instanceof Error ? e.message : String(e)}`;
+    const detail = e instanceof Error ? e.message : String(e);
+    if (__EVIDENCE_BUILD__) {
+      if (statusEl) statusEl.textContent = `status unavailable: ${detail}`;
+    } else {
+      if (statusEl) statusEl.textContent = STATUS_UNAVAILABLE_MESSAGE;
+      if (statusBox) statusBox.hidden = false;
+      console.warn(`PratiBimb: the side panel could not reach the service worker: ${detail}`);
+    }
     document.documentElement.dataset.hostStatus = "error";
   }
 }
