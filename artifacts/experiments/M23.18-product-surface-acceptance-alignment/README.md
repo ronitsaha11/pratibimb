@@ -24,6 +24,15 @@ Each approved decision can be made with no change to what a task does, with the 
 - **Tooling:** Node with the workspace's install; Vitest 3.2.4; WXT 0.21.4.
 - **Builds made:** the product build only, with every evidence flag cleared. **No evidence build was made.**
 
+## Expected result
+
+- **The worker:** carries the new justification, and nothing else about the offscreen call changes.
+- **The product panel:** shows no Status fields and no `NEEDS_USER` line, and one plain sentence on failure. It still sends `HOST_STATUS`.
+- **The evidence panel:** prints what it printed.
+- **In a real build:** the manifest and the offscreen runtime are byte-identical, and only the worker and the side panel change.
+- **The criteria:** all 59 keep their identifier, class and status, and the originals of BRW-05 and REL-03 stay quoted.
+- **ADR-0015:** stays PROPOSED.
+
 ## Actual result
 
 ### RD-1: the worker's justification

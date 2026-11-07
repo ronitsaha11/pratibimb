@@ -47,7 +47,8 @@ Each command's execution path was read first. No evidence flag was set.
 | **Mutation check, first run** | **38 of 39** | writing "EVIDENCED." into BRW-05's decision cell passed: only the status column was pinned | **a test was added:** neither re-scoped row may claim a result outside its status cell |
 | **Mutation check, second run** | **38 of 39, the same miss** | **the new test was broken:** a shell heredoc turned its `\b` into backspace characters, so its pattern could never match. A repeat of an earlier pitfall | fixed with a direct edit, after a scan found no other control character in any changed file. The mutation was then shown caught by hand. The second run's log was not kept |
 | **Mutation check, third run** | **39 of 39** | — | the run recorded in `logs/w1-m23-18-mutation-check.json` |
-| Full suite, product build, inspection, pin check, `verify-repo.py` | **passed first time** | — | — |
+| `verify-repo.py` | **exit 0, with 1 warning:** this record's README had no "Expected result" section. The documents had already been committed as `81a60dd` when it ran | the section was added in a follow-up commit, and `verify-repo.py` rerun: 0 failures, 0 warnings |
+| Full suite, product build, inspection, pin check | **passed first time** | — | — |
 
 **No check was weakened.** The tests that pinned four Status fields and the old string now pin the approved behaviour. Every other change only adds assertions.
 
