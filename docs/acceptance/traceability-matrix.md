@@ -5,6 +5,7 @@
 > - **What it does not do:** approve anything, or reclassify any historical record.
 > - **Criterion IDs** (FUN-, BRW-, PRV-, SEC-, RSN-, ACT-, REL-, PRF-, XM-, HUM-, CI-, GOV-) refer to `core-product-acceptance-PROPOSED.md` §5.
 > - **Evidence types** A–H are defined there, in §4.
+> - **Updated in M23.18 (2026-11-08):** every turn limit below states the 3-turn panel budget and the 5-turn ceiling separately (RD-8). No criterion or deliverable changes.
 > - **Updated in M23.15 (2026-11-06)** for the DOM-only Phase 1 as implemented: the rows below say what a normal task does, and evidence builds are named separately. §1.6 maps each deliverable. **The brief's requirements are quoted unchanged, and nothing here is approved.**
 > - **Updated in M23.3** with the source trace: stage rows 1–5 follow `phase-1-data-flow-and-components.md`. The proposed architecture decision is ADR-0015 (PROPOSED — AWAITING OWNER APPROVAL).
 > - **Updated in M23.2** for the owner's **phased architecture** direction (2026-11-03). Each deliverable now states what is **Phase 1** (the current structure-only product) and what is **Phase 2** (future, not authorised). §1.5 summarises. The original requirements are quoted unchanged.
@@ -52,7 +53,7 @@ The four deliverables are quoted from `docs/architecture/vision.md` ("Deliverabl
 
 | Aspect | As built (FACT) | Evidence | Gap | Criteria | Owner decision |
 |---|---|---|---|---|---|
-| **Synthetic runs** | bounded tasks on synthetic loopback pages, at most 5 turns | B: M15 (two-step task). C: M20, a person-run smoke test (17 of 17; then 18 of 18 after the keyed-server fix) and a benchmark (6 tasks, 15 steps). All W1, Chrome | repeated runs; D; E | FUN-01, FUN-02, REL-01 | OD-B, OD-C |
+| **Synthetic runs** | bounded tasks on synthetic loopback pages: a 3-turn budget from the panel, under the enforced 5-turn ceiling | B: M15 (two-step task). C: M20, a person-run smoke test (17 of 17; then 18 of 18 after the keyed-server fix) and a benchmark (6 tasks, 15 steps). All W1, Chrome | repeated runs; D; E | FUN-01, FUN-02, REL-01 | OD-B, OD-C |
 | **Real-site runs** | **none.** The validated scope is synthetic loopback pages | — | an approved real-site scope; legal and ToS review (AUDIT-0004 D5) | FUN-01, PRV-02 | **OD-D** |
 | **"Visibly"** | real side panel, masked preview, per-stage timings (M19, M20) | C | an independent observer | HUM-01 | OD-C |
 
@@ -65,7 +66,7 @@ The four deliverables are quoted from `docs/architecture/vision.md` ("Deliverabl
 | 1. Extension, Chrome and Firefox, local vision model | Chrome MV3; DOM-based observation. No vision model in a normal task | a VLM or frame-based local visual reasoning (P2-01, P2-03, P2-08) | Firefox (OD-A, OD-G); whether Phase 1 without a local vision model is acceptable (OD-K2) |
 | 2. Privacy filter, demonstrated | textual and DOM PII to references; consent; masked preview; no frame leaves | the server tripwire (P2-06) | visual-only PII and faces (OD-F); the Rule 2 metrics (PRV-02, PRV-04) |
 | 3. Server with an open-weight LLM or VLM | a loopback-hosted open-weight **text** LLM, structure-only | a VLM; frame-based context; server infrastructure (P2-01, P2-02, P2-04) | the ADR record (RC-01, RC-02); reasoner adoption (RSN-06); whether Phase 1 meets Deliverable 3 (OD-K2) |
-| 4. End-to-end task, visibly assisting | bounded synthetic tasks, at most 5 turns, click only | visual-context scoring (P2-05) | repeated runs, cross-machine, independent operator, real sites (OD-B, OD-C, OD-D) |
+| 4. End-to-end task, visibly assisting | bounded synthetic tasks (a 3-turn panel budget; a 5-turn ceiling), click only | visual-context scoring (P2-05) | repeated runs, cross-machine, independent operator, real sites (OD-B, OD-C, OD-D) |
 
 **OD-R (M23.6): APPROVED — OPTION A: DOM-ONLY PHASE 1.** Status: implemented in product builds (M23.7); boundary tested under a simulated extension (M23.8); **not browser-verified, not accepted**.
 - **Excluded from normal Phase 1 tasks:** browser-frame capture, T1 inference, TR-01 invocation, and frame-based visual-only PII masking.
@@ -80,7 +81,7 @@ The four deliverables are quoted from `docs/architecture/vision.md` ("Deliverabl
 | **1.** Client extension in Chrome and Firefox, with a vision model executing locally | a Chrome MV3 extension; DOM-based observation; toolbar opens the side panel | **no vision model runs in a normal task.** Firefox is not built or run for the product | a VLM, or frame-based local perception (P2-01, P2-03, P2-08) | the current DOM-only build in a real browser; any Firefox run | OD-A, OD-G, OD-K2 |
 | **2.** A privacy filter, demonstrated clearly | textual and DOM PII to references before the handoff; a memory-only vault; one-time consent with a masked preview; normal tasks send no page image to the reasoning model | **visual-only PII protection is not operational.** No frame masking runs in a normal task, and faces are not in the product path. The Rule 2 metrics are not produced | frame-based masking in tasks (P2-08); a server tripwire (P2-06) | per-class metrics; a demonstration to an independent observer | OD-F, OD-D, GOV-05 |
 | **3.** A server hosting an open-weight LLM or VLM, returning a UI action | a loopback-hosted open-weight **text** LLM; structure-only input; a plan validated on the client | **it is not a VLM, and does no visual reasoning.** It is not a remote server, and no accepted ADR records the substitution | a VLM, frame context, and server infrastructure (P2-01, P2-02, P2-04) | cross-machine runs; the model is `PINNED`, not `ADOPTED` | OD-K, OD-N (ADR-0015), RSN-06 |
-| **4.** One end-to-end task that visibly assists a user | bounded synthetic tasks, at most 5 turns, click only, with consent, grounding and postconditions | real sites and an independent operator: neither has happened | visual-context scoring (P2-05) | **the current build in a real browser;** repeated runs | OD-B, OD-C, OD-D |
+| **4.** One end-to-end task that visibly assists a user | bounded synthetic tasks (a 3-turn panel budget; a 5-turn ceiling), click only, with consent, grounding and postconditions | real sites and an independent operator: neither has happened | visual-context scoring (P2-05) | **the current build in a real browser;** repeated runs | OD-B, OD-C, OD-D |
 
 **Also not claimed:** T1 is UNADOPTED. TR-01's masked frames are not consumed in a normal task. FR-01 is deferred and unauthorised, and B-07 is blocked.
 
@@ -92,7 +93,7 @@ The four deliverables are quoted from `docs/architecture/vision.md` ("Deliverabl
 
 `OBSERVE → SANITIZE → VERIFY PAYLOAD → SEND → VALIDATE PLAN → REFRESH → HUMAN GRANT → REHYDRATE → ACT → VERIFY RESULT`
 
-It runs at most **5 turns** (`MAX_TASK_TURNS`, `packages/orchestrator/src/loop.ts`).
+A panel-started task has a budget of **3 turns** (the default in `apps/extension/host/offscreen/main.ts`; the panel asks for none). The enforced ceiling is **5** (`MAX_TASK_TURNS`, `packages/orchestrator/src/loop.ts`), refused above and never clamped.
 
 | # | Stage | Implementation (FACT: module exists) | As-built note | Evidence | Gap | Criteria |
 |---|---|---|---|---|---|---|
@@ -108,7 +109,7 @@ It runs at most **5 turns** (`MAX_TASK_TURNS`, `packages/orchestrator/src/loop.t
 | 9 | RE-HYDRATE | `packages/privacy/src/vault.ts`, `vaultView.ts`, `fill.ts`, `bind.ts` | trusted-client `insert` into a target approved by privacy and a human | A; B (M16) | C/D/E | FUN-03 |
 | 10 | ACT | `packages/agent/src/act.ts`, `guardedAct.ts` | click only | A; B | off-screen scroll (QG-02 criterion 7) | ACT-01, ACT-06 |
 | 11 | VERIFY RESULT | `packages/agent/src/verifyResult.ts`; `packages/orchestrator/src/postconditions.ts` | postconditions (M18; E8 on W2) | A; B | ADR-0007 tolerance | ACT-03 |
-| 12 | Repeat, or stop and ask | `packages/orchestrator/src/loop.ts`, `clarification.ts`, `declaration.ts` | at most 5 turns; clarification (M17); declared outcome (M18) | A; B (M15) | C/D coverage of the stop paths | FUN-02, FUN-04 |
+| 12 | Repeat, or stop and ask | `packages/orchestrator/src/loop.ts`, `clarification.ts`, `declaration.ts` | a 3-turn panel budget under a 5-turn ceiling; clarification (M17); declared outcome (M18) | A; B (M15) | C/D coverage of the stop paths | FUN-02, FUN-04 |
 
 **Observation (INFERENCE, from the rows above).** The implemented loop covers every frozen stage, and none is removed or reordered. Two stages are realised differently from the constitution's wording. Under the owner's phased direction, both differences are the **intended Phase 1** design; the formal reconciliation is M23.2 RC-01 and RC-02:
 - **stage 4** carries structure instead of a frame;

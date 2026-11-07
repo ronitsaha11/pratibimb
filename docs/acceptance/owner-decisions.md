@@ -1,6 +1,6 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.17, 2026-11-06):**
+> **Status (updated M23.18, 2026-11-08):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
 > - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
@@ -12,6 +12,7 @@
 > - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. Not seen in a browser. Its first real build was M23.13's.
 > - **Selected and implemented in M23.13:** **OD-W**, the product's toolbar opens the side panel. **Not tried in a browser.**
 > - **Selected and implemented in M23.14:** **OD-X**, a product's panel does not show `captureStatus`. **Not seen in a browser.**
+> - **Approved and implemented in M23.18:** **RD-1, RD-2, RD-3, RD-4, RD-7 and RD-8**, from the M23.16 report. ADR-0015's permission description is reconciled with M23.17, and ADR-0015 stays PROPOSED. **Nothing is accepted.**
 > - **Approved and implemented in M23.17:** **RD-5** and **RD-6**, from the M23.16 report: a normal product declares neither `tabCapture` nor `activeTab`; evidence builds keep both. **Not run in a browser.** No other M23.16 recommendation is adopted.
 > - **Implemented in M23.15, as far as existing approvals permit:** **OD-Y**, the product's identity, and **OD-Z**, the acceptance wording including `BRW-04`. **No classification is approved by this.**
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
@@ -406,7 +407,7 @@ Each sub-decision is separate.
 
 | ID | Decision | Implementation | Limits |
 |---|---|---|---|
-| OD-S | **APPROVED — OPTION B (owner, 2026-11-04):** `PERCEIVE_ONCE` and `STREAM_CONSUME` exist only in evidence builds; absent, not refused, in a product build | **M23.9: IMPLEMENTED IN PRODUCT BUILDS, after verification.** A real product build was inspected and contains neither hook, no driver, no capture ticket and no capture call. Evidence-build behaviour is preserved in source and under test doubles | **Not browser-verified. Evidence-build runtime UNVERIFIED: none was built.** It costs six evidence harnesses their ability to run (OD-V) |
+| OD-S | **APPROVED — OPTION B (owner, 2026-11-04):** `PERCEIVE_ONCE` and `STREAM_CONSUME` exist only in evidence builds; absent, not refused, in a product build | **M23.9: IMPLEMENTED IN PRODUCT BUILDS, after verification.** A real product build was inspected and contains neither hook, no driver, no capture ticket and no capture call *(corrected M23.18: no **reachable** capture call. An unreachable minting wrapper remained in the worker, and M23.17 later removed the permission)*. Evidence-build behaviour is preserved in source and under test doubles | **Not browser-verified. Evidence-build runtime UNVERIFIED: none was built.** It costs six evidence harnesses their ability to run (OD-V) |
 
 **New; awaiting the owner:**
 
@@ -602,6 +603,40 @@ Each sub-decision is separate.
 - OD-A to OD-D, OD-G;
 - OD-H, OD-E2 to OD-E8.
 - **All Phase 1 acceptance criteria.**
+
+**QG-04-S and QG-04-F are not signed.**
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.18 — status after RD-1 to RD-4, RD-7 and RD-8
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| RD-1 | **APPROVED (owner):** a truthful justification for the offscreen document | **M23.18: IMPLEMENTED.** `"Run PratiBimb's offscreen runtime for DOM-based browser assistance."` Only the value changed | **Whether Chrome shows it to a person is UNVERIFIED** until an authorised browser run |
+| RD-2 | **APPROVED (owner), option S-C:** no running fields in a product panel; one plain sentence on failure; `HOST_STATUS` kept | **M23.18: IMPLEMENTED IN PRODUCT BUILDS.** The fixed `NEEDS_USER: none` line is gone from a product. `HOST_STATUS`, the worker's reply and the offscreen lifecycle are unchanged. An evidence panel is as it was | Not seen in a browser |
+| RD-3 | **APPROVED (owner):** re-scope `BRW-05` for Phase 1, preserving the original | **M23.18: IMPLEMENTED** in the core proposal (§5, §5.14) and the release checklist | Class and status unchanged. **QG-06's WASM-only item is a separate decision, still unresolved** |
+| RD-4 | **APPROVED (owner):** re-scope `REL-03` around the actual fail-closed behaviour; defer its detector half | **M23.18: IMPLEMENTED** in the same places | Class and status unchanged. No counter added. FR-01 DEFERRED — NOT AUTHORISED; B-07 BLOCKED |
+| RD-7 | **APPROVED (owner):** three corrections | **M23.18: IMPLEMENTED,** each marked *(corrected M23.18)*. Historical records are left as written, and listed in `artifacts/experiments/M23.18-product-surface-acceptance-alignment/` | — |
+| RD-8 | **APPROVED (owner):** keep the 3-turn panel budget, and state the 5-turn ceiling separately | **M23.18: IMPLEMENTED** in the core proposal, the traceability matrix and the Phase 1 scope. No code changes | — |
+| ADR-0015 permissions | the description, reconciled with M23.17 | **M23.18: CORRECTED** in §3.1, with dated notes in §3.6 and §5 | **ADR-0015 stays PROPOSED — AWAITING OWNER APPROVAL (OD-N).** A corrected description is not an approval |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W, OD-X, OD-Y, OD-Z, RD-5 and RD-6. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **RD-9** (the order of work) and **RD-10** (the Chrome smoke test). **No smoke test is authorised.**
+- **QG-06's "A separate WASM-only build, benchmarked" item:** unresolved. RD-3 did not decide it.
+- SEC-05's detector half, if the owner wishes to re-scope it.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.** GOV-01 and the 51 proposed-mandatory classifications are not approved.
+
+**Unchanged:** F-M13-1, J7/B5 and B-02 stay open.
 
 **QG-04-S and QG-04-F are not signed.**
 

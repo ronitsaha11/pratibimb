@@ -1,0 +1,62 @@
+{
+  "what": "static inspection of an existing product build: manifest, file names and JavaScript text. No model file was opened, nothing was built, and no browser was started",
+  "workstation": "W1",
+  "gitHead": "8d3ce5f595551d1e80526e00b063792c82635f99",
+  "buildManifestWrittenAt": "2026-11-07T19:52:33.607Z",
+  "recordedAt": "2026-11-07T19:52:34.792Z",
+  "problems": [],
+  "files": [
+    "background.js",
+    "content-scripts/content.js",
+    "manifest.json",
+    "offscreen.html",
+    "ort-wasm-simd-threaded.jsep.mjs",
+    "ort-wasm-simd-threaded.jsep.wasm",
+    "ort.all.min.js",
+    "sidepanel.html",
+    "tr01-ppocrv4-mobile-det.onnx",
+    "tr01-worker.js"
+  ],
+  "manifest": {
+    "permissions": [
+      "offscreen",
+      "sidePanel"
+    ],
+    "host_permissions": [
+      "http://127.0.0.1/*"
+    ],
+    "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+    "actionTitle": "PratiBimb — Page Assistant"
+  },
+  "bundle": {
+    "namesEachHookMarker": {
+      "PERCEIVE_ONCE": false,
+      "STREAM_CONSUME": false,
+      "perceiveOnce": false,
+      "consumeProbe": false,
+      "mintStreamId": false,
+      "ticketProbe": false,
+      "CAPTURE_FRAME": false,
+      "CAPTURE_TICKET": false,
+      "chromeMediaSourceId": false,
+      "grabFrame": false
+    },
+    "callsGetUserMedia": false,
+    "toolbarOpensTheSidePanel": true,
+    "toolbarIssuesACaptureGrant": false,
+    "offscreenCanStartTr01": false,
+    "offscreenHandlesPerceiveOnce": false,
+    "offscreenHandlesStreamConsume": false,
+    "offscreenHasTheProductRefusal": true,
+    "offscreenStillNamesT1": true,
+    "workerControlPlaneHasPerceiveOnce": false,
+    "workerControlPlaneHasConsumeProbe": false,
+    "workerControlPlaneHasMintStreamId": false,
+    "workerMintsCaptureHandles": true,
+    "workerCallsForACaptureTicket": false,
+    "offscreenJustification": "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",
+    "contentScriptNamesEitherHook": false,
+    "sidePanelNamesEitherHook": false,
+    "sidePanelStillAsksForTheToolbarGesture": false
+  }
+}

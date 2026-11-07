@@ -35,6 +35,15 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.18 — Product surface and acceptance alignment (RD-1 to RD-4, RD-7, RD-8).** The worker's offscreen justification now says
+  "Run PratiBimb's offscreen runtime for DOM-based browser assistance." A product's Status box is hidden while the panel works and
+  shows one plain sentence if it cannot reach the worker; the fixed `NEEDS_USER: none` line is gone from a product. `HOST_STATUS`,
+  which creates the offscreen document, is unchanged, and so is an evidence panel. BRW-05 and REL-03 are re-scoped for Phase 1 with
+  their original wording kept; QG-06's WASM-only item stays unresolved. ADR-0015's permission description matches M23.17, and it stays
+  PROPOSED. In the real build the manifest and the offscreen runtime are byte-identical.
+  - **Correction, dated M23.18:** the M23.9 entry below says a real product build "has no capture call". It had no **reachable**
+    capture call; an unreachable minting wrapper remained in the worker. The entry is left as written.
+  - Not run in a browser. No evidence build or harness ran. Not product acceptance, and no authority for a smoke test.
 - **M23.17 — A product declares neither `tabCapture` nor `activeTab` (RD-5, RD-6; build configuration only).** A normal product's
   permissions are now `offscreen` and `sidePanel`. Evidence builds keep all four: the real config's generated manifests are
   byte-identical for all five flags. The build-separation contract allows exactly that difference and refuses any other. In the real

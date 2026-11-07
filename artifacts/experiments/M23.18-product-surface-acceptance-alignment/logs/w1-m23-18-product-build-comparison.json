@@ -1,0 +1,95 @@
+{
+  "milestone": "M23.18",
+  "sourceCommit": "8d3ce5f",
+  "comparedWith": "the product build of M23.17 (b48c069)",
+  "what": "SHA-256 of each file a browser would run, before and after, and facts read from the built text. The product build's own hook reads and hashes TR-01 for its integrity check. No model was loaded or run. No evidence build was made.",
+  "filesCompared": 10,
+  "filesChanged": [
+    "background.js",
+    "chunks/sidepanel-Cale8Bwh.js",
+    "chunks/sidepanel-CtGBYmtZ.js",
+    "sidepanel.html"
+  ],
+  "filesIdentical": 6,
+  "manifestKeysThatChanged": {},
+  "facts": {
+    "justification": "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",
+    "oldJustificationPresent": false,
+    "sidepanelHtmlHasNeedsUser": false,
+    "sidepanelChunkHasNeedsUser": false,
+    "sidepanelChunkHasStatusFieldNames": false,
+    "sidepanelChunkHasFailureSentence": true,
+    "sidepanelChunkSendsHostStatus": true,
+    "workerHostStatusEnsuresOffscreen": true,
+    "styleHashInCsp": true,
+    "permissions": [
+      "offscreen",
+      "sidePanel"
+    ],
+    "hostPermissions": [
+      "http://127.0.0.1/*"
+    ]
+  },
+  "rows": [
+    {
+      "file": "background.js",
+      "same": false,
+      "before": "c566d9b2e02532e5a9f1fcfc279f6d596bdebaff6fbff33f40518c6f9d5c666d",
+      "after": "6ba961f934365534c7839b2f57f1f272c79e1e980c504f274a29a6ebcd4f3b1b"
+    },
+    {
+      "file": "chunks/_virtual_wxt-html-plugins-DPbbfBKe.js",
+      "same": true,
+      "before": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74",
+      "after": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74"
+    },
+    {
+      "file": "chunks/offscreen-DajYm2zT.js",
+      "same": true,
+      "before": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8",
+      "after": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8"
+    },
+    {
+      "file": "chunks/sidepanel-Cale8Bwh.js",
+      "same": false,
+      "before": "218f4f90af1d41d57787a4aa3aded20e0788d620bad2fe86cbea24d38e937255",
+      "after": null
+    },
+    {
+      "file": "chunks/sidepanel-CtGBYmtZ.js",
+      "same": false,
+      "before": null,
+      "after": "a4147ac942dda28e8dc0cbb3fcfc96dd9a17a327171120b9abc69d59f1bbabc8"
+    },
+    {
+      "file": "content-scripts/content.js",
+      "same": true,
+      "before": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+      "after": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2"
+    },
+    {
+      "file": "manifest.json",
+      "same": true,
+      "before": "b07965cef1357c4769c1bb9be517a7aa2f8f2304312da1e9cf8c92fe971af3db",
+      "after": "b07965cef1357c4769c1bb9be517a7aa2f8f2304312da1e9cf8c92fe971af3db"
+    },
+    {
+      "file": "offscreen.html",
+      "same": true,
+      "before": "5e46eda30cfc8da9cb3ebd44b7b1ea4a8f6bbed15c333f2f5a0528d1badfffac",
+      "after": "5e46eda30cfc8da9cb3ebd44b7b1ea4a8f6bbed15c333f2f5a0528d1badfffac"
+    },
+    {
+      "file": "sidepanel.html",
+      "same": false,
+      "before": "6a7595d9b14f57151ef8ca565d0d7ae799c71cd53d26e4f530fcfb760b0f190a",
+      "after": "e73a6ab1192b7501efbf78aa4a76b1e8307644fc25a211edb5c384416f978ef1"
+    },
+    {
+      "file": "tr01-worker.js",
+      "same": true,
+      "before": "e1f77fe9d65dceb89eab5f396e4cbc21a6ab8336f394a3ab338989da3ce47464",
+      "after": "e1f77fe9d65dceb89eab5f396e4cbc21a6ab8336f394a3ab338989da3ce47464"
+    }
+  ]
+}

@@ -2,11 +2,11 @@
 id: ADR-0015
 title: "Phase 1 architecture: local perception, structure-only handoff, local loopback reasoner; vision-language reasoning deferred to Phase 2"
 version: 1.1
-status: PROPOSED — AWAITING OWNER APPROVAL (M23.3, 2026-11-03). Not approved, not adopted. Records the owner's phased direction (M23.2) and the source-traced Phase 1 architecture; it authorises no implementation, no Phase 2 work and no frame egress. Updated M23.6 (2026-11-03): records the owner-selected OD-P (T1 out of active Phase 1 execution) and OD-R (Option A, DOM-only Phase 1). Implementation NOT authorised; runtime unchanged
+status: PROPOSED — AWAITING OWNER APPROVAL (M23.3, 2026-11-03). Not approved, not adopted. Records the owner's phased direction (M23.2) and the source-traced Phase 1 architecture; it authorises no implementation, no Phase 2 work and no frame egress. Updated M23.6 (2026-11-03): records the owner-selected OD-P (T1 out of active Phase 1 execution) and OD-R (Option A, DOM-only Phase 1). Implementation NOT authorised; runtime unchanged. Updated M23.18 (2026-11-08): §3.1's permission description now matches M23.17, product and evidence builds stated separately. A factual correction, not an approval
 owner: pratibimb-architect
 proposed_by: pratibimb-architect (M23.3 documentation milestone)
 created: 2026-11-03
-modified: 2026-11-03
+modified: 2026-11-08
 amends: none. ADR-0001 to ADR-0014 are unchanged and keep their own status. The constitution, the dossier and the frozen specifications are not edited; proposed wording is in docs/acceptance/proposed-amendment-language-PROPOSED.md
 related_adr: ["ADR-0003", "ADR-0006", "ADR-0009", "ADR-0010", "ADR-0012", "ADR-0013", "ADR-0014"]
 related_invariants: ["INV-01..INV-25 (unchanged)", "INV-11", "INV-12", "INV-21", "INV-22", "INV-23"]
@@ -22,6 +22,7 @@ evidence: artifacts/experiments/M23.3-phase-1-architecture-reconciliation/; docs
 >   - the owner's phased direction (M23.2, 2026-11-03);
 >   - the Phase 1 architecture, as the source implements it at `3e6a2e6`;
 >   - **(M23.6)** the owner-selected Phase 1 perception scope: OD-P and OD-R (Option A), §3.6. **Selected, not implemented.**
+>   - **(M23.18)** the permissions as M23.17 implemented them (RD-5, RD-6): §3.1. **This corrects a description. It is not approval of this ADR, which stays PROPOSED — AWAITING OWNER APPROVAL.**
 > - **What it does not do:**
 >   - it is not approved, and it adopts no model;
 >   - it supersedes no ADR, and amends no constitution text;
@@ -74,7 +75,7 @@ It must do this without silently rewriting frozen text, and without upgrading an
 
 | Component | Implementation | Status |
 |---|---|---|
-| Client | Chrome MV3 extension (WXT). Permissions: `offscreen`, `sidePanel`, `activeTab`, `tabCapture`. Host permission `http://127.0.0.1/*` | **Firefox is not run** (OD-A, OD-G) |
+| Client | Chrome MV3 extension (WXT). **Permissions, by build (M23.17, RD-5, RD-6):** a normal product build declares `offscreen` and `sidePanel`. An evidence build declares those and `activeTab` and `tabCapture`, which ADR-0009's gesture route needs. Host permission `http://127.0.0.1/*` in both; an evidence build with `M3_WORKER_FRAME` also has `<all_urls>`. Evidence: `artifacts/experiments/M23.17-product-permission-isolation/`. *(Corrected M23.18: this row listed all four as the client's permissions.)* | **Firefox is not run** (OD-A, OD-G) |
 | Capture | gesture-authorised tab capture into the offscreen document (ADR-0009) | approved ADR. **Intended: no capture during normal Phase 1 task execution (OD-R; §3.6)** |
 | T1 UI head | loaded (ORT WASM) on the first perception call; inference on every pass that **captures a frame** (gesture grant); its output fused with the DOM graph *(corrected M23.4)*. **Intended: excluded from active Phase 1 execution (OD-P; §3.6)** | **UNADOPTED. Bytes not integrity-checked** (§3.4). Performance is FR-01, deferred and not authorised |
 | TR-01 | text-region detector on a copy of the full frame in a dedicated worker. `UNREAD_REGION` masks filled in place into the **local** frame | hash-verified at build and run time; **visual-only PII protection NOT VERIFIED** (M9). **Intended: not invoked in normal Phase 1 task execution; retained as a separate component (OD-R; §3.6)** |
@@ -159,7 +160,7 @@ T1's bytes are checked neither at build time nor at runtime. TR-01's are checked
 **Unchanged by OD-P and OD-R:**
 - production frame egress (impossible);
 - the structure-only JSON handoff and `sendVerified`;
-- the loopback endpoint, CSP and permissions;
+- the loopback endpoint, CSP and permissions *(M23.18: OD-P and OD-R did not change them. RD-5 and RD-6 later removed `activeTab` and `tabCapture` from product builds only, M23.17; see §3.1)*;
 - the QG-04-S and QG-04-F definitions;
 - fail-closed behaviour, the five-turn cap and click-only execution;
 - consent and human approval;
@@ -189,7 +190,7 @@ This is a statement of applicability, **not a weakening**.
 
 **Fail-closed behaviour holds** (INV-22, INV-23).
 
-**Unchanged:** the five-turn cap, click-only execution, consent, grounding, the postcondition checks, CSP and permissions.
+**Unchanged:** the five-turn cap, click-only execution, consent, grounding, the postcondition checks, CSP and permissions. *(M23.18: as of this ADR. Product permissions narrowed in M23.17; see §3.1.)*
 
 ## 6. Alternatives considered
 

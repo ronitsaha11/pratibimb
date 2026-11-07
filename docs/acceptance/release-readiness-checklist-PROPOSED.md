@@ -25,7 +25,7 @@
 - [ ] **SEC-06:** B-02 decided by ADR (OD-E3).
 - [ ] **SEC-04:** production frame egress still impossible (three locks), re-checked on the candidate.
 - [ ] **SEC-01, SEC-08:** CSP v2, one endpoint, no new permission, origin or action type; diffed against the baseline.
-- [ ] **SEC-05, REL-03:** fail-closed and the failure path demonstrated on the product build. A normal task has no detector, so their detector halves are for the owner to re-scope (`core-product-acceptance-PROPOSED.md` §5.14).
+- [ ] **SEC-05, REL-03:** fail-closed and the failure path demonstrated on the product build. REL-03 is re-scoped (RD-4, M23.18): a verification failure blocks on the first failure, with no outbound request. Its detector half is deferred. SEC-05's detector half is still for the owner to re-scope (`core-product-acceptance-PROPOSED.md` §5.14).
 - [ ] **SEC-07:** adversarial-page case: observed, not obeyed.
 
 ### Privacy
@@ -56,7 +56,8 @@
 - [ ] **PRF-01, PRF-02:** latency and resources reported, labelled with machine, backend and browser. **Reporting, not a target** unless OD-H says otherwise.
 - [ ] **BRW-01:** the Chrome product build runs the bounded task set.
 - [ ] **BRW-04:** the extension opens and operates in each browser accepted for Phase 1, and supported tasks complete through DOM-based observation, with structural grounding and click safety. **No browser-frame capture is required.**
-- [ ] **BRW-05:** a benchmarked WASM path for TR-01, as written. No model runs in a normal task, so the owner may re-scope it (§5.14).
+- [ ] **BRW-05:** re-scoped (RD-3, M23.18): a normal task performs no in-extension model inference, shown in a real browser. The original benchmark is deferred (§5.14).
+- [ ] **QG-06, "A separate WASM-only build, benchmarked":** **unresolved, and a separate owner decision.** RD-3 re-scoped BRW-05 and did not decide this item.
 - [ ] **CI-01:** hosted CI green on the candidate, every job.
 - [ ] **CI-02:** pins and a reproducibility manifest recorded.
 - [ ] **CI-03:** line endings (B-06) resolved.

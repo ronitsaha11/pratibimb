@@ -15,6 +15,9 @@ const TRACE = "traceability-matrix.md";
 const SCOPE = "phase-1-architecture-scope.md";
 const CHECKLIST = "release-readiness-checklist-PROPOSED.md";
 const REGISTER = "owner-decisions.md";
+const SMOKE = "dom-only-browser-smoke-procedure-PROPOSED.md";
+const fileAt = (...parts: string[]): string => readFileSync(join(ROOT, ...parts), "utf8").replace(/\r\n/g, "\n");
+const ADR = (): string => fileAt("docs", "adr", "ADR-0015-phase-1-local-structure-only-architecture.md");
 
 const DISCLAIMER = "**What Phase 1 does not claim:**";
 
@@ -239,5 +242,149 @@ describe("nothing is approved or declared", () => {
     expect(latest).toContain("**B-07 remains blocked.**");
     for (const pending of ["GOV-01", "OD-N", "OD-E1"]) expect(latest, pending).toContain(pending);
     expect(latest).toContain("**QG-04-S and QG-04-F are not signed.**");
+  });
+});
+
+const section514 = (): string => {
+  const core = doc(CORE);
+  return core.slice(core.indexOf("### 5.14"), core.indexOf("## 6. The gates"));
+};
+
+describe("M23.18 (RD-3): BRW-05, re-scoped and still traceable", () => {
+  it("states what a DOM-only Phase 1 can show, and keeps its ID, source, class, status and evidence history", () => {
+    const row = rowOf("BRW-05");
+    expect(row).toContain("a normal task performs no in-extension model inference");
+    expect(row).toContain('release workflow, "Release blockers"');
+    expect(row).toContain("M8.2 TR-01 cells: feasibility, before M23.7");
+    expect(criteria()["BRW-05"]).toEqual(["M (as written)", "PARTIAL"]);
+  });
+
+  it("keeps the original wording, and says what is outside Phase 1", () => {
+    const section = section514();
+    expect(section).toContain('"A WASM-only build, benchmarked, for the in-extension models (TR-01)"');
+    expect(section).toMatch(/^\| \*\(BRW-05's original requirement\)\* \|[^\n]*\*\*outside Phase 1:\*\*[^\n]*\*\*deferred\*\*/m);
+    expect(section).toContain("**None has been run**");
+  });
+
+  it("does not resolve QG-06's WASM-only item: it stays a separate, unresolved decision everywhere it is named", () => {
+    expect(rowOf("BRW-05")).toContain("is a separate decision, still unresolved");
+    expect(doc(CHECKLIST)).toContain('- [ ] **QG-06, "A separate WASM-only build, benchmarked":** **unresolved, and a separate owner decision.**');
+    const latest = doc(REGISTER).slice(doc(REGISTER).indexOf("## M23.18"));
+    expect(latest).toContain("**QG-06's \"A separate WASM-only build, benchmarked\" item:** unresolved.");
+  });
+
+  it("claims no browser coverage", () => {
+    expect(rowOf("BRW-05")).toContain("D1 and D2 on the current build, in a real browser");
+    expect(rowOf("BRW-05")).not.toMatch(/browser[- ]verified|shown in Chrome|tested in Chrome/i);
+  });
+});
+
+describe("M23.18 (RD-3, RD-4): re-scoping accepts nothing", () => {
+  it("neither re-scoped row claims a result anywhere but its status cell, which is still PARTIAL", () => {
+    for (const id of ["BRW-05", "REL-03"]) {
+      const cells = rowOf(id).split("|").map((c) => c.trim()).slice(1, -1);
+      expect(cells.at(-1), id).toBe("PARTIAL");
+      for (const cell of cells.slice(0, -1)) expect(cell, id).not.toMatch(/\b(EVIDENCED|ACCEPTED|APPROVED|VERIFIED|PASS(ED)?)\b/);
+    }
+  });
+});
+
+describe("M23.18 (RD-4): REL-03, re-scoped around what exists", () => {
+  it("states the first-failure block, and that no counter exists", () => {
+    const row = rowOf("REL-03");
+    expect(row).toContain("blocked on the first failure, with no outbound request");
+    expect(row).toContain("**No three-failure counter exists.**");
+    expect(criteria()["REL-03"]).toEqual(["M", "PARTIAL"]);
+  });
+
+  it("keeps the original wording, and defers the detector half without implying adoption or evaluation", () => {
+    const section = section514();
+    expect(section).toContain('"an injected detector timeout masked; repeated verification failures block and are shown"');
+    const detector = section.split("\n").find((l) => l.startsWith("| *(REL-03's detector half)* |"));
+    expect(detector).toContain("**deferred**");
+    expect(detector).toContain("**No detector is adopted, benchmarked or evaluated.**");
+    expect(detector).toContain("FR-01 stays DEFERRED — NOT AUTHORISED, and B-07 stays BLOCKED");
+  });
+
+  it("points the other safeguards at the criteria that own them", () => {
+    expect(section514()).toContain("Postconditions, grounding, freshness and the execution safeguards are ACT-02 to ACT-04");
+  });
+});
+
+describe("M23.18 (RD-7): the three corrections, and the records that keep what they said", () => {
+  it("(a) the core proposal no longer says a product build has no capture call, and says what is true", () => {
+    const core = doc(CORE);
+    expect(core).toContain("A real product build has **no reachable capture path**, and since M23.17 **no capture permission**; an unreachable minting wrapper remains in the worker *(corrected M23.18");
+    expect(core.replace(/\*\(corrected M23\.18: M23\.15 wrote "a real product build has no capture call"\)\*/, "")).not.toContain("has no capture call");
+  });
+
+  it("(b) BRW-05 no longer cites a gate-mapping section that does not exist", () => {
+    expect(rowOf("BRW-05").replace(/\*\(corrected M23\.18: this cell cited "§6 of the gate mapping", which does not exist\)\*/, "")).not.toContain("§6 of the gate mapping");
+  });
+
+  it("(c) REL-03 no longer calls the whole requirement implemented", () => {
+    const cells = rowOf("REL-03").split("|").map((c) => c.trim());
+    expect(cells[5]).toMatch(/^\*\*the first-failure block is implemented\*\*/);
+    expect(cells[5]).toContain('*(corrected M23.18: this cell said "implemented")*');
+  });
+
+  it("each correction is dated where it was made", () => {
+    expect(doc(CORE).match(/\*\(corrected M23\.18:/g)).toHaveLength(3);
+    expect(doc(REGISTER)).toContain("no capture ticket and no capture call *(corrected M23.18: no **reachable** capture call.");
+  });
+
+  it("historical records still say what they said", () => {
+    expect(fileAt("CHANGELOG.md")).toContain("A real product build names none of them and has no capture call;");
+    expect(fileAt("artifacts", "experiments", "M23.12-product-ui-language", "README.md")).toContain("M23.9's real product build has no capture call.");
+    expect(doc("residual-product-surface-decision-report-PROPOSED.md")).toContain('(a) "**A real product build has no capture call**"');
+    expect(fileAt("artifacts", "experiments", "M23.17-product-permission-isolation", "README.md")).toContain("M23.16's report named only the first, and said the gesture harnesses appeared unaffected.");
+  });
+});
+
+describe("M23.18 (RD-8): the 3-turn panel budget and the 5-turn ceiling are never one number", () => {
+  it("the living documents state both wherever they describe the loop", () => {
+    expect(doc(CORE)).toContain("a panel-started task has a **3-turn budget** (the default: the panel asks for none); **5 is the enforced ceiling** (`MAX_TASK_TURNS`), refused above and never clamped");
+    expect(doc(SCOPE)).toContain("a panel-started task has a **3-turn budget**");
+    expect(doc(TRACE)).toContain("A panel-started task has a budget of **3 turns**");
+  });
+
+  it("no living document says a task runs \"at most 5 turns\" unqualified, except FUN-02's criterion, which is the ceiling", () => {
+    for (const name of [CORE, TRACE, SCOPE, CHECKLIST, SMOKE]) {
+      const lines = doc(name).split("\n").filter((l) => /at most (\*\*)?5 turns|at most five turns/i.test(l) && !l.startsWith("| FUN-02 |"));
+      expect(lines, name).toEqual([]);
+    }
+  });
+
+  it("nothing claims the panel lets a person choose, or run five", () => {
+    for (const name of [CORE, TRACE, SCOPE, CHECKLIST, SMOKE]) {
+      expect(doc(name), name).not.toMatch(/default (of )?(5|five) turns|five-turn default|panel (allows|offers|runs) (5|five)|choose (the )?(number of )?turns/i);
+    }
+  });
+});
+
+describe("M23.18: ADR-0015's permission description matches M23.17, and the ADR is still only proposed", () => {
+  it("separates the product's permissions from an evidence build's, in the same lists the build contract holds", () => {
+    const client = ADR().split("\n").find((l) => l.startsWith("| Client |"))!;
+    expect(client).toContain("a normal product build declares `offscreen` and `sidePanel`");
+    expect(client).toContain("An evidence build declares those and `activeTab` and `tabCapture`");
+    expect(client).toContain("artifacts/experiments/M23.17-product-permission-isolation/");
+    expect(client).not.toContain("Permissions: `offscreen`, `sidePanel`, `activeTab`, `tabCapture`.");
+  });
+
+  it("stays PROPOSED — AWAITING OWNER APPROVAL, and says the correction is not an approval", () => {
+    const adr = ADR();
+    expect(adr).toMatch(/^status: PROPOSED — AWAITING OWNER APPROVAL/m);
+    expect(adr).toContain("> **STATUS: PROPOSED — AWAITING OWNER APPROVAL.**");
+    expect(adr).toContain("A factual correction, not an approval");
+    expect(adr).not.toMatch(/^status: (APPROVED|ACCEPTED)/m);
+    expect(fileAt("docs", "adr", "README.md")).toMatch(/\| \[ADR-0015\][^\n]*\*\*PROPOSED — AWAITING OWNER APPROVAL/);
+  });
+});
+
+describe("M23.18: the smoke procedure checks the Status box as it now is", () => {
+  it("A7 expects no Status box and no NEEDS_USER, and nothing authorises running it", () => {
+    const smoke = doc(SMOKE);
+    expect(smoke.split("\n").find((l) => l.startsWith("| A7 |"))).toContain("**no Status box is shown**");
+    expect(smoke).toContain("**Status: PROPOSED — AWAITING OWNER APPROVAL (M23.8, 2026-11-04). NOT RUN.**");
   });
 });

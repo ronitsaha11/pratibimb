@@ -5,6 +5,7 @@
 > - **It claims nothing until it is run.** No product runtime validation exists for M23.7 yet.
 > - **Scope:** one operator, one machine, Chrome for Testing, the synthetic loopback fixture. It is evidence type C, unless the operator meets OD-C's definition. It says nothing about Firefox, a second machine, real sites or performance.
 > - **A product build has no diagnostic hook to call (M23.9, OD-S).** Check D7 confirms that.
+> - **Updated M23.18 (RD-2):** a product's Status box is hidden while the panel works, and shows one sentence if it cannot reach the worker. It has no `NEEDS_USER` line. A7 checks that.
 > - **Updated M23.17 (RD-5, RD-6):** a product declares neither `tabCapture` nor `activeTab`. A2 checks that.
 > - **Updated M23.15 (OD-Y):** the extension and the panel's heading read **PratiBimb — Page Assistant (Development build)**. A1 and A3 check that.
 > - **Updated M23.14 (OD-X):** a product's Status box shows `bootId`, `bootedAt`, `offscreenContexts` and `hellos`, and no `captureStatus`. A7 checks that.
@@ -56,7 +57,7 @@ Each check is PASS or FAIL. **Any frame capture, model-file load or TR-01 worker
 | A4 | Hover over the extension's toolbar button | the title is **PratiBimb — Page Assistant** |
 | A5 | Close the panel, then click the toolbar button | **the side panel opens, on this tab** |
 | A6 | Close the panel, then press `Alt+Shift+P`. Then click the toolbar button several times | the panel opens from the shortcut, and repeated clicks start nothing and lose nothing |
-| A7 | Read the panel's Status box | it shows those four fields. **No `captureStatus`, no `NO_GRANT`** |
+| A7 | Read the panel | **no Status box is shown**, and nothing anywhere says `NEEDS_USER`, `captureStatus` or `NO_GRANT`. A task still starts (section B), so the panel reached the worker |
 
 ### B. A DOM-only task, with no toolbar click
 

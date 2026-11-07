@@ -3,6 +3,7 @@
 > **Status:** the **direction** is owner-selected (M23.2, 2026-11-03). The **acceptance criteria** are **PROPOSED — AWAITING OWNER APPROVAL**.
 > - **Not an ADR:** this is not an ADR or a constitution amendment. The proposed architecture ADR is **ADR-0015 (PROPOSED — AWAITING OWNER APPROVAL, M23.3)**. The conflicts it creates are listed in `artifacts/experiments/M23.2-phased-architecture-decision/decision.md` §4 (RC-01 to RC-10).
 > - **Not a claim of acceptance:** it does not say that any Phase 1 capability has passed acceptance.
+> - **Updated in M23.18 (2026-11-08):** the loop's two limits are stated separately (RD-8). Since M23.17 a product declares neither `tabCapture` nor `activeTab`.
 > - **Updated in M23.15 (2026-11-06):** §2 now describes the product as it is, with evidence-build diagnostics separate.
 
 ## 1. Owner-selected direction
@@ -44,7 +45,7 @@ Vision-language and frame-based reasoning are Phase 2 (`phase-2-future-capabilit
 | Reasoner | launcher (`npm run reasoner`) with pin verification; a front on `127.0.0.1:8995` that refuses foreign origins, hosts, paths, methods, non-JSON and value-shaped text; a keyed llama.cpp `b10956` model server on `127.0.0.1:8977`; `Qwen2.5-0.5B-Instruct` Q4_K_M. Registry **`PINNED`, not `ADOPTED`**; correctness PROVISIONAL; deterministic planner fallback | `scripts/reasoner/`; `packages/reasoner`; M20; model registry |
 | Network | CSP v2: one endpoint, `http://127.0.0.1:8995/v1/chat/completions`, reached only through `sendVerified` | ADR-0013 |
 | Plan and action | allowlist VALIDATE, REFRESH, human grant, single-use permit, RE-HYDRATE, **click only**, VERIFY RESULT | `packages/plan`, `packages/agent`; ADR-0005 to ADR-0008 (PROPOSED) |
-| Loop | at most 5 turns; clarification; declared outcome | `packages/orchestrator/src/loop.ts`; M14, M17, M18 |
+| Loop | a panel-started task has a **3-turn budget** (the default: the panel asks for none); **5 is the enforced ceiling** (`MAX_TASK_TURNS`), refused above and never clamped; clarification; declared outcome | `packages/orchestrator/src/loop.ts`; `apps/extension/host/offscreen/main.ts`; M14, M17, M18 |
 | Product identity | **PratiBimb — Page Assistant.** The build is named **PratiBimb — Page Assistant (Development build)**, and is not a release | OD-T, OD-Y |
 
 **Evidence-build diagnostics, which are not normal product behaviour.** These exist only in evidence builds, need a separate authorisation, and are **UNVERIFIED** at run time since M23.7:

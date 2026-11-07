@@ -1,6 +1,7 @@
 # Core-product acceptance — PROPOSED — AWAITING OWNER APPROVAL
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03; updated M23.2).**
+> - **M23.18:** owner-approved **RD-1 to RD-4, RD-7 and RD-8** are implemented: the worker's justification, a product's Status box, `BRW-05` and `REL-03` re-scoped, three corrections and the turn wording. ADR-0015's permission description matches M23.17, and it stays PROPOSED. **Nothing is accepted.** See `artifacts/experiments/M23.18-product-surface-acceptance-alignment/`.
 > - **M23.15:** **OD-Y and OD-Z are implemented, as far as existing approvals permit:** the product is named PratiBimb — Page Assistant (Development build), `BRW-04` is a DOM-only requirement, and evidence-build diagnostics are described separately. **No classification is approved.** Not seen in a browser. See `artifacts/experiments/M23.15-product-identity-acceptance-reconciliation/`.
 > - **M23.14:** **OD-X is implemented:** a product's panel does not show `captureStatus`, and an evidence panel still does. Real build compared; not seen in a browser. OD-Y and OD-Z await the owner. See `artifacts/experiments/M23.14-capture-status-scope/`.
 > - **M23.13:** **OD-W is implemented:** a product's toolbar button opens the side panel and issues no capture grant. Real build inspected; not tried in a browser. See `artifacts/experiments/M23.13-toolbar-interaction/`.

@@ -1,0 +1,254 @@
+{
+  "milestone": "M23.18",
+  "what": "Each mutation breaks one approved decision in source or in a document. Static and component tests only: no browser, no model, no frame, no evidence build.",
+  "sourceTests": [
+    "apps/extension/test/productSurface.test.ts",
+    "apps/extension/test/captureStatusScope.test.ts",
+    "apps/extension/test/productUiCopy.test.ts",
+    "apps/extension/test/productIdentity.test.ts",
+    "apps/extension/test/buildSeparation.test.ts",
+    "tests/browser/support/product-build-inspection.test.mjs"
+  ],
+  "documentTests": [
+    "apps/extension/test/acceptanceDocuments.test.ts"
+  ],
+  "total": 39,
+  "caught": 39,
+  "missed": [],
+  "results": [
+    {
+      "mutation": "RD-1: the old justification comes back",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-1: the justification claims inference",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-1: the document's reason changes",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: a product prints the worker's reply again",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: a product's box is not hidden",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: the fixed NEEDS_USER line is back in the page",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: an evidence panel loses its NEEDS_USER line",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: a product shows the raw error",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: a product's failure is silent in the console",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: a product's failure stays hidden",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: the HOST_STATUS request is removed",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: HOST_STATUS stops creating the offscreen document",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: the failure sentence is reworded with internals",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: an evidence panel's failure text changes",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: the inspection stops requiring the failure sentence",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-2: the inspection stops refusing NEEDS_USER",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-8: the panel asks for five turns",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-8: the default becomes five",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-8: the ceiling is raised",
+      "tests": "source",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-3: BRW-05's original wording is dropped",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-3: BRW-05 is reclassified",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-3: BRW-05 is declared evidenced",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-3: QG-06's item is marked resolved",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-3: the register resolves QG-06",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-3: BRW-05 claims browser coverage",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-4: REL-03 says implemented again",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-4: REL-03 claims a counter",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-4: the detector half claims adoption",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-4: the detector half is made mandatory",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-7 (a): the overstatement is restored",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-7 (b): the dangling reference returns",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-7: a historical changelog entry is rewritten",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-7: the M23.16 report is rewritten",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-8: the scope's loop row conflates them again",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "RD-8: the traceability matrix says the default is five",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "ADR-0015 is marked approved",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "ADR-0015 lists all four permissions again",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "ADR-0015 drops 'not an approval'",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the smoke check A7 goes back to four fields",
+      "tests": "documents",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}
