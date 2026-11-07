@@ -1,6 +1,7 @@
 # M23.19B — final Chrome smoke-test authorisation record — FOR THE OWNER
 
 > **Status: PREPARED, NOT APPROVED (M23.19B, 2026-11-08). Every approval field below is PENDING.**
+> - **Updated M23.19C (2026-11-08):** the owner's scenario decisions are recorded: **G1 and G3 EXCLUDED, outside the approved fixture; G4 NOT RUN.** No page or fixture is substituted for them. Everything else keeps its proposed scope and PENDING status. **Agreeing these exclusions authorises nothing:** F1 to F5 stay PENDING.
 > - **Built on:** `README.md`, `smoke-test-procedure-PROPOSED.md` and `authorisation-checklist-PROPOSED.md` in this directory (M23.19A).
 > - **This record is not permission to execute.** Nothing in it may be done until the owner has changed each field they approve from PENDING to APPROVED, and signed §8.
 > - **During preparation,** Chrome was not launched, the extension was not loaded, the reasoner was not started, and no scenario was run.
@@ -15,7 +16,7 @@ These close M23.19A's checklist items 1, 2, 3, 6, 7 and 8 as **choices**. They b
 | Mode | **manual Chrome testing,** following `smoke-test-procedure-PROPOSED.md`. The M20 harness is not used | 8 |
 | Product build | **built from `8d3ce5f`,** in `apps/extension/.output/chrome-mv3`. It must pass the 9-file hash check in `logs/expected-product-build.sha256` immediately before the test | 1 |
 | Browser | **Chrome for Testing 153.0.8010.12** (`%LOCALAPPDATA%/ms-playwright/chromium-1243/chrome-win64/chrome.exe`), in a new, empty, temporary profile | 2 |
-| Fixture | **`http://127.0.0.1:8975/fixture/`,** served by `node tests/browser/demo/server.mjs` | 4, in part (see §4) |
+| Fixture | **`http://127.0.0.1:8975/fixture/` only,** served by `node tests/browser/demo/server.mjs`. No other page or fixture is used | 4, in part: G1 and G3 excluded (§4) |
 | Evidence directory | **`artifacts/experiments/M23.19-chrome-smoke-test/`** | 6 |
 | Screenshots | **of the side panel only, showing synthetic data only** | 7 |
 
@@ -47,7 +48,7 @@ These hold for every scenario, whatever is approved.
 **Needs:**
 - **F4:** the browser alone, without the reasoner.
 - **F1–F3:** a running reasoner and inference.
-- **Outside:** uses a page other than the approved `/fixture/`, so it needs its own approval. Without one, it is recorded NOT RUN.
+- **EXCLUDED / NOT RUN:** decided by the owner in M23.19C. These are not executed, and are recorded with that state and reason.
 
 | ID | Scenario | Needs | Expected outcome | Status |
 |---|---|---|---|---|
@@ -84,10 +85,10 @@ These hold for every scenario, whatever is approved.
 | F1s | Turn setting | F4 | none offered; no number of turns claimed | **PENDING** |
 | F2s | Turn count | F4, F1–F3 | **at most 3** per task. 5 is the enforced ceiling, unreachable from the panel | **PENDING** |
 | F3s | Budget manipulation | — | **not done:** prohibited | **PENDING** (confirmation) |
-| G1 | **Invalid target** on `about:blank` | F4, **Outside** | "Could not read the page (…)", and nothing else | **PENDING — OUTSIDE THE APPROVED FIXTURE** |
+| G1 | **Invalid target** on `about:blank` | — | not executed | **EXCLUDED — OUTSIDE THE APPROVED FIXTURE** (owner, M23.19C) |
 | G2 | **Stale target** | F4, F1–F3 | as D4 | **PENDING** |
-| G3 | **Failed postcondition** on `/declared/` | F4, F1–F3, **Outside** | never `CONFIRMED`; `STOPPED_UNVERIFIED` after at most one click, or a refusal before any. **A completed result is a FAIL** | **PENDING — OUTSIDE THE APPROVED FIXTURE** |
-| G4 | **Unsupported operation** | — | **expected NOT RUN:** it cannot be induced without manipulation. If it happens on its own, it must be refused and nothing done | **PENDING** (observe only) |
+| G3 | **Failed postcondition** on `/declared/` | — | not executed | **EXCLUDED — OUTSIDE THE APPROVED FIXTURE** (owner, M23.19C) |
+| G4 | **Unsupported operation** | — | not executed: it cannot be induced without manipulation, which is prohibited. If the model proposes one by itself during another scenario, the result must show it refused with nothing done, and that is recorded as an observation under that scenario | **NOT RUN — REQUIRES PROHIBITED MANIPULATION** (owner, M23.19C) |
 | G5 | **Reasoner unavailable,** run last | F4, F1–F3 | after stopping the reasoner: **one turn labelled `DETERMINISTIC_FALLBACK`, ending `STOPPED_SINGLE_TURN_PLANNER`,** with consent still asked before any restoration; or a refusal with nothing done. **An unconsented action or an unlabelled completion is a FAIL.** The reasoner is not restarted | **PENDING** |
 | H1 | Offscreen Network panel | F4, F1–F3 | requests only to the extension's files and `127.0.0.1:8995/v1/chat/completions` with its preflight | **PENDING** |
 | H2 | A reasoner request's headers and size | F4, F1–F3 | `application/json`; no image or multipart. **Its body is never copied** | **PENDING** |
@@ -95,16 +96,17 @@ These hold for every scenario, whatever is approved.
 | H4 | Reasoner terminal | F1–F3 | requests only during tasks, only to `/v1/chat/completions`; no `422` tripwire lines | **PENDING** |
 | H5 | The record, before saving | F5 | no value, preview, page text, prompt, model output, token or local path | **PENDING** |
 
-**If G1 and G3 are not approved separately,** the test still has its invalid-target and failed-postcondition behaviour only from tests under fakes. They are recorded NOT RUN, with that reason.
+**Because G1 and G3 are excluded,** this test does not observe invalid-target or failed-postcondition behaviour in a browser. That behaviour stays established only by tests under fakes. The record lists G1 and G3 as EXCLUDED and G4 as NOT RUN, each with its reason, and **no other page or fixture is substituted** for them.
 
 ## 5. Order of execution
 
 1. Setup: procedure §1, steps 1 to 9.
 2. A, B, C, D, E, F, G2.
 3. H, observed during C.
-4. G1 and G3, only if approved.
-5. G5, last.
-6. Shutdown: procedure §5.
+4. G5, last.
+5. Shutdown: procedure §5.
+
+G1, G3 and G4 are not executed.
 
 ## 6. Stop conditions
 
@@ -148,7 +150,7 @@ These hold for every scenario, whatever is approved.
 | F3: Local model inference for the approved synthetic task | **PENDING** |
 | F4: Execute the scenarios marked in §4 | **PENDING** |
 | F5: Create the evidence directory and write results | **PENDING** |
-| G1 (`about:blank`) and G3 (`/declared/`), outside the approved fixture | **PENDING** |
+| Scenario scope | **Decided (owner, M23.19C):** G1 and G3 EXCLUDED, G4 NOT RUN. **This is a scope decision, not an execution approval** |
 | Boundaries (§3), stop conditions (§6) and evidence rules (§7) accepted | **PENDING** |
 | Approved by | **PENDING** |
 | Date and time | **PENDING** |
