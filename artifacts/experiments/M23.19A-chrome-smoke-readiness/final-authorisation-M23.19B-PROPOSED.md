@@ -157,3 +157,27 @@ G1, G3 and G4 are not executed.
 | Session window | **PENDING** |
 
 **EXECUTION STATUS: NOT AUTHORISED — AWAITING FINAL OWNER APPROVAL.**
+
+---
+
+## 9. Addendum — owner approval given in chat (appended in M23.19, 2026-11-08)
+
+> **Append-only.** §1 to §8 above, and the status line before this section, are unchanged from `3e0c40c`. They record the state before approval. This section records the approval that followed, and where it was given.
+
+| Field | Value |
+|---|---|
+| F1: Start the local reasoner | **APPROVED** (in chat) |
+| F2: Read and hash the model weights at startup | **APPROVED** (in chat) |
+| F3: Local model inference for the approved synthetic task | **APPROVED** (in chat) |
+| F4: Execute the scenarios marked in §4 | **APPROVED** (in chat), as "the approved manual Chrome scenarios" |
+| F5: Create the evidence directory and write results | **APPROVED** (in chat) |
+| Scenario scope | unchanged and restated in the approval: G1 and G3 EXCLUDED, G4 NOT RUN, no substitute page, no other fixture or external destination |
+| Boundaries (§3), stop conditions (§6) and evidence rules (§7) | **not marked "accepted" in those words.** The approval gave its own stop conditions, consent and action discipline, and evidence rules, and directed that the scope not be expanded |
+| Approved configuration | operator: the project owner; manual Chrome, not the M20 harness; build `apps/extension/.output/chrome-mv3` from `8d3ce5f`; Chrome for Testing 153.0.8010.12; `http://127.0.0.1:8975/fixture/` only; reasoner `http://127.0.0.1:8995/v1/chat/completions`; evidence `artifacts/experiments/M23.19-chrome-smoke-test/`; screenshots side panel only, synthetic data only |
+| Approved by | the project owner |
+| Date and time | 2026-11-08 02:13:56 IST (2026-11-07T20:43:56.859Z), the session transcript's timestamp for the approval message |
+| Session window | not stated in the approval |
+| Not authorised by it | QG-04, ADR-0015, GOV-01, FR-01; push, PR or merge |
+| Execution record | `artifacts/experiments/M23.19-chrome-smoke-test/` |
+
+**EXECUTION STATUS (from this addendum): AUTHORISED IN CHAT BY THE OWNER, 2026-11-08 02:13:56 IST, WITHIN THE SCOPE ABOVE.**
