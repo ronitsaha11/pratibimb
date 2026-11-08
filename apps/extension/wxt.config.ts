@@ -195,8 +195,14 @@ export default defineConfig({
     minimum_chrome_version: "116",
     permissions: EVIDENCE_BUILD ? [...PRODUCT_PERMISSIONS, ...EVIDENCE_ONLY_PERMISSIONS] : PRODUCT_PERMISSIONS,
     action: { default_title: TOOLBAR_TITLE },
+    /**
+     * M23.21 (DEF-M23.19-01): `Ctrl+Shift+Y`, not `Alt+Shift+P`. Chrome assigns a suggested key only if it is not one
+     * of its own accelerators, and on Windows and Linux `Alt+Shift+P` is Chrome's "create new tab group"
+     * (`kTabGroupAcceleratorMap`, Chromium 153.0.8010.12), so the old key was never assigned and the press went to
+     * Chrome. The command is still `_execute_action`: the same click event as the toolbar button, and nothing else.
+     */
     commands: {
-      _execute_action: { suggested_key: { default: "Alt+Shift+P" }, description: TOOLBAR_TITLE },
+      _execute_action: { suggested_key: { default: "Ctrl+Shift+Y" }, description: TOOLBAR_TITLE },
     },
     host_permissions: HOST_PERMISSIONS,
     content_security_policy: {

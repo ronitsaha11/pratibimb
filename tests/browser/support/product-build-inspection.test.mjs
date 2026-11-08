@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { APPROVED_UI_COPY, DIAGNOSTIC_HOOK_MARKERS, inspectProductBuild, STALE_UI_WORDING } from "./product-build-inspection.mjs";
+import { APPROVED_TOOLBAR_SHORTCUT, APPROVED_UI_COPY, DIAGNOSTIC_HOOK_MARKERS, inspectProductBuild, STALE_UI_WORDING } from "./product-build-inspection.mjs";
 
 const EXPECTED = { ortFiles: ["ort.all.min.js", "ort-wasm-simd-threaded.jsep.wasm"], tr01File: "tr01-ppocrv4-mobile-det.onnx" };
 
@@ -40,6 +40,7 @@ function syntheticBuild({ manifest = {}, models = ["tr01-ppocrv4-mobile-det.onnx
       host_permissions: ["http://127.0.0.1/*"],
       name: "PratiBimb — Page Assistant (Development build)",
       action: { default_title: "PratiBimb — Page Assistant" },
+      commands: { _execute_action: { suggested_key: { default: "Ctrl+Shift+Y" }, description: "PratiBimb — Page Assistant" } },
       content_security_policy: { extension_pages: POLICY },
       content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],
       ...manifest,
@@ -121,7 +122,7 @@ describe("inspectProductBuild", () => {
       const inPanel = inspectProductBuild(syntheticBuild({ sidepanel: `${approved}const s="${phrase.toUpperCase()}";` }), EXPECTED);
       expect(inPanel.problems, phrase).toEqual([`STALE_UI_WORDING:${phrase}`]);
       rmSync(dir, { recursive: true, force: true });
-      const inManifest = inspectProductBuild(syntheticBuild({ manifest: { commands: { _execute_action: { description: phrase } } } }), EXPECTED);
+      const inManifest = inspectProductBuild(syntheticBuild({ manifest: { commands: { _execute_action: { suggested_key: { default: APPROVED_TOOLBAR_SHORTCUT }, description: phrase } } } }), EXPECTED);
       expect(inManifest.problems, phrase).toEqual([`STALE_UI_WORDING:${phrase}`]);
       rmSync(dir, { recursive: true, force: true });
     }
@@ -153,6 +154,35 @@ describe("inspectProductBuild", () => {
       expect(report.problems[0], stale).toMatch(/^STALE_UI_WORDING:/);
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  it("M23.21 (DEF-M23.19-01): passes the approved shortcut and reports it, with the only command", () => {
+    const report = inspectProductBuild(syntheticBuild(), EXPECTED);
+    expect(report.problems).toEqual([]);
+    expect(report.manifest.toolbarShortcut).toEqual({ default: APPROVED_TOOLBAR_SHORTCUT });
+    expect(report.manifest.commandNames).toEqual(["_execute_action"]);
+  });
+
+  it("M23.21 (DEF-M23.19-01): fails the old key twice over: not the approved key, and Chrome 153 would not assign it", () => {
+    const report = inspectProductBuild(syntheticBuild({ manifest: { commands: { _execute_action: { suggested_key: { default: "Alt+Shift+P" } } } } }), EXPECTED);
+    expect(report.problems).toEqual(["TOOLBAR_SHORTCUT_NOT_THE_APPROVED_KEY", "TOOLBAR_SHORTCUT_NOT_ASSIGNABLE:CHROME_ACCELERATOR:IDC_CREATE_NEW_TAB_GROUP"]);
+  });
+
+  it("M23.21: fails a second command, and a missing one", () => {
+    const extra = inspectProductBuild(syntheticBuild({ manifest: { commands: { _execute_action: { suggested_key: { default: "Ctrl+Shift+Y" } }, other: { suggested_key: { default: "Alt+Shift+Y" } } } } }), EXPECTED);
+    expect(extra.problems).toEqual(["COMMANDS_NOT_ONLY_EXECUTE_ACTION"]);
+    rmSync(dir, { recursive: true, force: true });
+    const none = inspectProductBuild(syntheticBuild({ manifest: { commands: {} } }), EXPECTED);
+    expect(none.problems).toEqual(["COMMANDS_NOT_ONLY_EXECUTE_ACTION", "TOOLBAR_SHORTCUT_NOT_THE_APPROVED_KEY"]);
+  });
+
+  it("M23.21 (A6): reports how the offscreen document is created, and whether the product's document starts a worker", () => {
+    const background = 'chrome.offscreen.createDocument({url:"offscreen.html",reasons:[chrome.offscreen.Reason.WORKERS],justification:"Run it."});chrome.action?.onClicked.addListener(t=>{o(t,e=>chrome.sidePanel.open(e))});';
+    const quiet = inspectProductBuild(syntheticBuild({ background }), EXPECTED);
+    expect(quiet.bundle).toMatchObject({ offscreenCreateCalls: 1, offscreenUrl: "offscreen.html", offscreenReasons: ["WORKERS"], offscreenConstructsAWorker: false });
+    rmSync(dir, { recursive: true, force: true });
+    const working = inspectProductBuild(syntheticBuild({ background, offscreen: 'const r="UI_HEAD_NOT_IN_PRODUCT_BUILD";new Worker(u);' }), EXPECTED);
+    expect(working.bundle.offscreenConstructsAWorker).toBe(true);
   });
 
   it("M23.18 (RD-1): reports the worker's justification as a fact", () => {

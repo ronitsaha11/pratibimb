@@ -1,0 +1,160 @@
+{
+  "what": "M23.21 mutations: each changes one file, runs the targeted tests, and restores the file; the restored file is re-hashed",
+  "recorded": "2026-11-08",
+  "workstation": "W1",
+  "results": [
+    {
+      "mutation": "M1 the old key back",
+      "file": "apps/extension/wxt.config.ts",
+      "exit": 1,
+      "tests": "Tests  7 failed | 102 passed (109)",
+      "killed": true,
+      "firstFailures": [
+        "M23.12 (OD-T) — the product's wording, in the real manifest and in a product bundle of the panel > M23.21 (DEF-M23.19-01): the real manifest's shortcut is the inspection tool's, and Chrome 153 would assign it",
+        "M23.12 (OD-T) — the product's wording, in the real manifest and in a product bundle of the panel > the real manifest's toolbar title is the approved one, and the shortcut's text uses it too",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > in an evidence build it is the evidence build's click, unchanged: a grant, and no panel",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > pressed repeatedly, and mixed with clicks, it only asks for the panel again"
+      ]
+    },
+    {
+      "mutation": "M2 a key Chrome claims (Ctrl+Shift+P, basic print)",
+      "file": "apps/extension/wxt.config.ts",
+      "exit": 1,
+      "tests": "Tests  7 failed | 102 passed (109)",
+      "killed": true,
+      "firstFailures": [
+        "M23.12 (OD-T) — the product's wording, in the real manifest and in a product bundle of the panel > M23.21 (DEF-M23.19-01): the real manifest's shortcut is the inspection tool's, and Chrome 153 would assign it",
+        "M23.12 (OD-T) — the product's wording, in the real manifest and in a product bundle of the panel > the real manifest's toolbar title is the approved one, and the shortcut's text uses it too",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > in an evidence build it is the evidence build's click, unchanged: a grant, and no panel",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > pressed repeatedly, and mixed with clicks, it only asks for the panel again"
+      ]
+    },
+    {
+      "mutation": "M3 a second command",
+      "file": "apps/extension/wxt.config.ts",
+      "exit": 1,
+      "tests": "Tests  2 failed | 107 passed (109)",
+      "killed": true,
+      "firstFailures": [
+        "M23.12 (OD-T) — the product's wording, in the real manifest and in a product bundle of the panel > M23.21 (DEF-M23.19-01): the real manifest's shortcut is the inspection tool's, and Chrome 153 would assign it",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > is still the only command, and still `_execute_action`: no second command, no listener, no other action"
+      ]
+    },
+    {
+      "mutation": "M4 a command listener in the worker",
+      "file": "apps/extension/host/background.ts",
+      "exit": 1,
+      "tests": "Tests  2 failed | 36 passed (38)",
+      "killed": true,
+      "firstFailures": [
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > is still the only command, and still `_execute_action`: no second command, no listener, no other action",
+        "the keyboard shortcut is the same event, not a second route > there is no command listener anywhere in what ships: `_execute_action` is the only command"
+      ]
+    },
+    {
+      "mutation": "M5 a keydown listener in the content script",
+      "file": "apps/extension/host/content.ts",
+      "exit": 1,
+      "tests": "Tests  1 failed | 37 passed (38)",
+      "killed": true,
+      "firstFailures": [
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > is still the only command, and still `_execute_action`: no second command, no listener, no other action"
+      ]
+    },
+    {
+      "mutation": "M6 the product toolbar also issues a grant",
+      "file": "apps/extension/host/background.ts",
+      "exit": 1,
+      "tests": "Tests  12 failed | 26 passed (38)",
+      "killed": true,
+      "firstFailures": [
+        "(8, 12) when the side panel API fails > ABSENT: the failure is reported, nothing escapes, and nothing falls back to capture",
+        "(8, 12) when the side panel API fails > REJECTS: the failure is reported, nothing escapes, and nothing falls back to capture",
+        "(8, 12) when the side panel API fails > THROWS: the failure is reported, nothing escapes, and nothing falls back to capture",
+        "(8, 12) when the side panel API fails > a later click tries again: one failure leaves nothing stuck"
+      ]
+    },
+    {
+      "mutation": "M7 the justification emptied",
+      "file": "apps/extension/host/background.ts",
+      "exit": 1,
+      "tests": "Tests  2 failed | 5 passed (7)",
+      "killed": true,
+      "firstFailures": [
+        "A6: the call > it supplies a URL that the build ships, one reason, and a non-empty justification",
+        "A6: when it is made > by the panel's HOST_STATUS, once, with exactly the arguments above"
+      ]
+    },
+    {
+      "mutation": "M8 the justification claims capture",
+      "file": "apps/extension/host/background.ts",
+      "exit": 1,
+      "tests": "Tests  2 failed | 5 passed (7)",
+      "killed": true,
+      "firstFailures": [
+        "A6: the call > it supplies a URL that the build ships, one reason, and a non-empty justification",
+        "A6: when it is made > by the panel's HOST_STATUS, once, with exactly the arguments above"
+      ]
+    },
+    {
+      "mutation": "M9 the offscreen document created at worker start",
+      "file": "apps/extension/host/background.ts",
+      "exit": 1,
+      "tests": "Tests  3 failed | 4 passed (7)",
+      "killed": true,
+      "firstFailures": [
+        "A6: when it is made > not by the toolbar button, and not by the keyboard shortcut",
+        "A6: when it is made > not from a page or another extension: HOST_STATUS from either is refused and creates nothing",
+        "A6: when it is made > not when the worker starts"
+      ]
+    },
+    {
+      "mutation": "M10 the toolbar creates the offscreen document",
+      "file": "apps/extension/host/background.ts",
+      "exit": 1,
+      "tests": "Tests  2 failed | 43 passed (45)",
+      "killed": true,
+      "firstFailures": [
+        "A6: when it is made > not by the toolbar button, and not by the keyboard shortcut",
+        "the handler itself > the worker's listener awaits nothing before it, and its source has no route to capture in the product branch"
+      ]
+    },
+    {
+      "mutation": "M11 the model assigns every key",
+      "file": "tests/browser/support/chrome-commands.mjs",
+      "exit": 1,
+      "tests": "Tests  4 failed | 67 passed (71)",
+      "killed": true,
+      "firstFailures": [
+        "CanAutoAssign, for a command that is not global > refuses a key Chrome claims, whichever modifier spelling the table uses",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > the old key, pressed, reaches Chrome and not the extension: no panel opens, which is what M23.19's B6 saw",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > the root cause, as Chrome 153's source states it: `Alt+Shift+P` is Chrome's 'create new tab group' on Windows, so it is never assigned",
+        "inspectProductBuild > M23.21 (DEF-M23.19-01): fails the old key twice over: not the approved key, and Chrome 153 would not assign it"
+      ]
+    },
+    {
+      "mutation": "M12 the fixture loses the tab-group P entry",
+      "file": "tests/browser/support/chrome-153-accelerators.json",
+      "exit": 1,
+      "tests": "Tests  4 failed | 45 passed (49)",
+      "killed": true,
+      "firstFailures": [
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > the old key, pressed, reaches Chrome and not the extension: no panel opens, which is what M23.19's B6 saw",
+        "M23.21 (DEF-M23.19-01) — the keyboard shortcut > the root cause, as Chrome 153's source states it: `Alt+Shift+P` is Chrome's 'create new tab group' on Windows, so it is never assigned",
+        "routing a key press > gives a claimed key to Chrome, and an unclaimed one to nothing",
+        "the fixture > holds the tab-group shortcuts, present on Windows: `Alt+Shift+P` is 'create new tab group'"
+      ]
+    },
+    {
+      "mutation": "M13 the inspection tool stops checking the key",
+      "file": "tests/browser/support/product-build-inspection.mjs",
+      "exit": 1,
+      "tests": "Tests  2 failed | 20 passed (22)",
+      "killed": true,
+      "firstFailures": [
+        "inspectProductBuild > M23.21 (DEF-M23.19-01): fails the old key twice over: not the approved key, and Chrome 153 would not assign it",
+        "inspectProductBuild > M23.21: fails a second command, and a missing one"
+      ]
+    }
+  ]
+}

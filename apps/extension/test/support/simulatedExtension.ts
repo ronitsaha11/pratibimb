@@ -30,6 +30,7 @@ import { createPageAgent, parseAttachedNotice, TRANSPORT_PORT_NAME, type PagePoi
 
 import { createPagePrivacyBoundary, type PagePrivacyBoundary } from "../../host-lib/page-privacy-boundary";
 import { type BoundaryReply, type BoundaryRequest, type CapabilityPayload } from "../../host-lib/boundary-protocol";
+import { routeKeyPress, type Registration } from "../../../../tests/browser/support/chrome-commands.mjs";
 
 export const EXTENSION_ID = "pratibimb-simulated-extension";
 export const EXTENSION_ROOT = `chrome-extension://${EXTENSION_ID}/`;
@@ -317,8 +318,14 @@ export interface Rig {
   readonly sidePanelOpens: readonly unknown[];
   /** M23.18: every `chrome.offscreen.createDocument` the worker made, with its arguments. */
   readonly offscreenCreations: readonly unknown[];
-  /** The toolbar click, or `Alt+Shift+P`, which is the same event: a person invoking the extension on the tab. */
+  /** The toolbar click, or the keyboard shortcut, which is the same event: a person invoking the extension on the tab. */
   clickToolbar(tab?: { readonly id?: number; readonly windowId?: number }): void;
+  /**
+   * M23.21: a key press, routed by `tests/browser/support/chrome-commands.mjs`'s model of Chrome 153. If the registration
+   * gives the key to `_execute_action`, the action's click listeners fire, exactly as `clickToolbar` fires them; if Chrome
+   * claims it, the extension sees nothing. A model of Chrome's routing, not a browser.
+   */
+  pressKeys(pressed: string, registration: readonly Registration[], tab?: { readonly id?: number; readonly windowId?: number }): ReturnType<typeof routeKeyPress>;
   /**
    * Put a grant in the capture authority directly, through the test-only `noteGrant`. Since OD-W a product's toolbar makes
    * none, so a product test that needs a grant to exist, to show a task ignores it, uses this.
@@ -731,6 +738,11 @@ export async function bootSimulatedExtension(options: RigOptions): Promise<Rig> 
     offscreenCreations,
     clickToolbar: (tab = { id: TAB_ID }) => {
       for (const listener of actionListeners) listener(tab);
+    },
+    pressKeys: (pressed, registration, tab = { id: TAB_ID }) => {
+      const route = routeKeyPress(registration, pressed);
+      if (route.to === "EXECUTE_ACTION") for (const listener of actionListeners) listener(tab);
+      return route;
     },
     holdGrant: () => {
       host.noteGrant(TAB_ID);

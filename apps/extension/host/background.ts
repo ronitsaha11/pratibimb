@@ -53,7 +53,7 @@ export default defineBackground(() => {
   /**
    * M23.13 (OD-W): WHAT THE TOOLBAR BUTTON DOES DEPENDS ON THE BUILD. In an evidence build it is the gesture a capture
    * needs, as above. In a product build nothing captures, so it opens the side panel and asks the authority for
-   * nothing. `Alt+Shift+P` is `_execute_action`, which fires this same event. `__EVIDENCE_BUILD__` is substituted at
+   * nothing. The keyboard shortcut (`Ctrl+Shift+Y` since M23.21) is `_execute_action`, which fires this same event. `__EVIDENCE_BUILD__` is substituted at
    * build time, so a product bundle has no grant on this route, rather than one that goes unused.
    */
   chrome.action?.onClicked.addListener((tab) => {

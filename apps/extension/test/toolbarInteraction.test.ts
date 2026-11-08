@@ -3,12 +3,13 @@
  *
  * The real `host/background.ts` and `host/offscreen/main.ts` run under a fake `chrome`, with every capture and model API
  * counted (`support/simulatedExtension.ts`). No browser starts and no frame is captured. Whether Chrome honours
- * `sidePanel.open` from this click, or from `Alt+Shift+P`, is NOT established here: only a real browser can say.
+ * `sidePanel.open` from this click, or from the keyboard shortcut, is NOT established here: only a real browser can say.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { chromeAcceleratorsMatching, registerCommands } from "../../../tests/browser/support/chrome-commands.mjs";
 import { openSidePanelForToolbarClick } from "../host-lib/toolbar-action";
 import { bootSimulatedExtension, NO_VISUAL_ACTIVITY, SENDERS, TAB_ID, taskRequest, type Rig, type RigOptions } from "./support/simulatedExtension";
 
@@ -251,11 +252,90 @@ describe("the keyboard shortcut is the same event, not a second route", () => {
     for (const file of ["host/background.ts", "host/offscreen/main.ts", "host/sidepanel/main.ts", "host/content.ts"]) {
       expect(read(file), file).not.toMatch(/chrome\.commands|onCommand/);
     }
-    expect(read("wxt.config.ts")).toMatch(/commands: \{\s+_execute_action: \{ suggested_key: \{ default: "Alt\+Shift\+P" \}/);
+    expect(read("wxt.config.ts")).toMatch(/commands: \{\s+_execute_action: \{ suggested_key: \{ default: "Ctrl\+Shift\+Y" \}/);
   });
 
   it("so what the fake fires for a click is what Chrome is documented to fire for it: one listener, in both builds", () => {
     expect(read("host/background.ts").match(/onClicked\.addListener/g)).toHaveLength(1);
+  });
+});
+
+/**
+ * M23.21 (DEF-M23.19-01): the shortcut, routed by `tests/browser/support/chrome-commands.mjs`, Chrome 153's own rule for
+ * assigning a suggested key, over Chrome 153's own accelerator table. What a browser does is for the operator to see.
+ */
+describe("M23.21 (DEF-M23.19-01) — the keyboard shortcut", () => {
+  const SHORTCUT = "Ctrl+Shift+Y";
+  const declared = (): string => /_execute_action: \{ suggested_key: \{ default: "([^"]+)" \}/.exec(read("wxt.config.ts"))?.[1] ?? "";
+  const registration = (key = declared()) => registerCommands({ _execute_action: { suggested_key: { default: key }, description: "PratiBimb — Page Assistant" } });
+
+  it("the root cause, as Chrome 153's source states it: `Alt+Shift+P` is Chrome's 'create new tab group' on Windows, so it is never assigned", () => {
+    expect(chromeAcceleratorsMatching("Alt+Shift+P").map((e) => [e.command, e.array, e.onWindows])).toEqual([["IDC_CREATE_NEW_TAB_GROUP", "kTabGroupAcceleratorMap", "yes"]]);
+    expect(registration("Alt+Shift+P")).toEqual([{ name: "_execute_action", description: "PratiBimb — Page Assistant", shortcut: "", refusedBecause: "CHROME_ACCELERATOR:IDC_CREATE_NEW_TAB_GROUP" }]);
+  });
+
+  it("the old key, pressed, reaches Chrome and not the extension: no panel opens, which is what M23.19's B6 saw", async () => {
+    const r = await boot();
+    expect(r.pressKeys("Alt+Shift+P", registration("Alt+Shift+P"))).toEqual({ to: "CHROME", command: "IDC_CREATE_NEW_TAB_GROUP" });
+    expect(r.sidePanelOpens).toEqual([]);
+  });
+
+  it("the product declares the new key, and Chrome 153 claims it for nothing, so it is assigned", () => {
+    expect(declared()).toBe(SHORTCUT);
+    expect(chromeAcceleratorsMatching(SHORTCUT)).toEqual([]);
+    expect(registration()).toEqual([{ name: "_execute_action", description: "PratiBimb — Page Assistant", shortcut: SHORTCUT, refusedBecause: null }]);
+  });
+
+  it("is still the only command, and still `_execute_action`: no second command, no listener, no other action", () => {
+    expect(read("wxt.config.ts").match(/suggested_key/g)).toHaveLength(1);
+    for (const file of ["host/background.ts", "host/offscreen/main.ts", "host/sidepanel/main.ts", "host/content.ts", "host-lib/toolbar-action.ts"]) {
+      expect(read(file), file).not.toMatch(/chrome\.commands|onCommand|addEventListener\(\s*["']key(down|up|press)/);
+    }
+  });
+
+  it("pressed, it opens the side panel exactly as a click does: same call, same target", async () => {
+    const pressed = await boot();
+    expect(pressed.pressKeys(SHORTCUT, registration())).toEqual({ to: "EXECUTE_ACTION" });
+    rig?.dispose();
+    const clicked = await boot();
+    clicked.clickToolbar();
+    expect(pressed.sidePanelOpens).toEqual([{ tabId: TAB_ID }]);
+    expect(pressed.sidePanelOpens).toEqual(clicked.sidePanelOpens);
+  });
+
+  it("pressed, it starts no task, sends no message and creates no capture grant", async () => {
+    const r = await boot();
+    r.pressKeys(SHORTCUT, registration());
+    await settle();
+    expect(r.messages).toEqual([]);
+    expect(await r.sendToOffscreen({ kind: "TASK_STATUS" }, SENDERS.sidePanel)).toEqual({ ok: true, task: null });
+    expectNoCaptureActivity(r);
+    expect((await status(r)).captureStatus.lifecycle).toBe("NO_GRANT");
+  });
+
+  it("pressed repeatedly, and mixed with clicks, it only asks for the panel again", async () => {
+    const r = await boot();
+    r.pressKeys(SHORTCUT, registration());
+    r.clickToolbar();
+    r.pressKeys(SHORTCUT, registration());
+    await settle();
+    expect(r.sidePanelOpens).toEqual([{ tabId: TAB_ID }, { tabId: TAB_ID }, { tabId: TAB_ID }]);
+    expect(r.messages).toEqual([]);
+    expectNoCaptureActivity(r);
+  });
+
+  it("in an evidence build it is the evidence build's click, unchanged: a grant, and no panel", async () => {
+    const r = await boot({ evidenceBuild: true });
+    r.pressKeys(SHORTCUT, registration());
+    expect(r.host.captureState().grants).toEqual([expect.objectContaining({ tabId: TAB_ID })]);
+    expect(r.sidePanelOpens).toEqual([]);
+  });
+
+  it("a key nothing holds does nothing", async () => {
+    const r = await boot();
+    expect(r.pressKeys("Alt+Shift+Y", registration())).toEqual({ to: "NOTHING" });
+    expect(r.sidePanelOpens).toEqual([]);
+    expectNoCaptureActivity(r);
   });
 });
 

@@ -15,6 +15,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
 
+import { registerCommands } from "./chrome-commands.mjs";
 import { productManifestProblems, productPackageProblems } from "./csp-product-phase.mjs";
 
 const TEXT_EXTENSIONS = new Set([".js", ".html"]);
@@ -59,6 +60,12 @@ export const APPROVED_UI_COPY = Object.freeze({
 
 /** M23.18 (RD-1): the worker's argument to `chrome.offscreen.createDocument`. Reported as a fact; `buildSeparation.test.ts` pins it. */
 export const OFFSCREEN_JUSTIFICATION = "Run PratiBimb's offscreen runtime for DOM-based browser assistance.";
+
+/**
+ * M23.21 (DEF-M23.19-01): the toolbar's keyboard shortcut. `Alt+Shift+P` was Chrome's own "create new tab group" on Windows,
+ * so Chrome never assigned it. `buildSeparation.test.ts` fails if this drifts from `wxt.config.ts`.
+ */
+export const APPROVED_TOOLBAR_SHORTCUT = "Ctrl+Shift+Y";
 
 /** Wording a normal product must not carry: it describes a capture a product task does not make. `captureStatus`: M23.14 (OD-X). */
 export const STALE_UI_WORDING = Object.freeze(["perceive this tab", "look at this tab", "capture this page", "see this tab", "No frame taken", "Click the toolbar button", "captureStatus", "NO_GRANT", "minimal host", "minimal MV3", "not the product", "(experiment", "NEEDS_USER", "status unavailable"]);
@@ -114,6 +121,13 @@ export function inspectProductBuild(directory, expected) {
   if (!includes(sidepanel, APPROVED_UI_COPY.statusUnavailable)) problems.push("STATUS_FAILURE_NOT_THE_APPROVED_WORDING");
   const productUi = `${JSON.stringify(manifest)}\n${sidepanel}`.toLowerCase();
   for (const phrase of STALE_UI_WORDING) if (productUi.includes(phrase.toLowerCase())) problems.push(`STALE_UI_WORDING:${phrase}`);
+  // M23.21 (DEF-M23.19-01): one command, the toolbar's, on the approved key, and a key Chrome 153 would actually assign.
+  const commandNames = Object.keys(manifest.commands ?? {});
+  if (commandNames.length !== 1 || commandNames[0] !== "_execute_action") problems.push("COMMANDS_NOT_ONLY_EXECUTE_ACTION");
+  const shortcut = manifest.commands?._execute_action?.suggested_key ?? null;
+  if (JSON.stringify(shortcut) !== JSON.stringify({ default: APPROVED_TOOLBAR_SHORTCUT })) problems.push("TOOLBAR_SHORTCUT_NOT_THE_APPROVED_KEY");
+  const registration = registerCommands(manifest.commands).find((command) => command.name === "_execute_action");
+  if (registration !== undefined && registration.shortcut === "") problems.push(`TOOLBAR_SHORTCUT_NOT_ASSIGNABLE:${registration.refusedBecause}`);
 
   return {
     problems,
@@ -123,6 +137,8 @@ export function inspectProductBuild(directory, expected) {
       host_permissions: manifest.host_permissions ?? null,
       connectSrc: /connect-src ([^;]*)/.exec(manifest.content_security_policy?.extension_pages ?? "")?.[1] ?? null,
       actionTitle: manifest.action?.default_title ?? null,
+      toolbarShortcut: shortcut,
+      commandNames,
     },
     bundle: {
       namesEachHookMarker: Object.fromEntries(DIAGNOSTIC_HOOK_MARKERS.map((marker) => [marker, includes(everything, marker)])),
@@ -140,6 +156,11 @@ export function inspectProductBuild(directory, expected) {
       workerMintsCaptureHandles: includes(background, "getMediaStreamId"),
       workerCallsForACaptureTicket: /\.ticketFor\s*\(/.test(background),
       offscreenJustification: /justification:\s*"([^"]*)"/.exec(background)?.[1] ?? null,
+      // M23.21 (A6): how the document is created, and whether the product's document does what its declared reason says.
+      offscreenCreateCalls: (background.match(/offscreen\.createDocument\(/g) ?? []).length,
+      offscreenUrl: /createDocument\(\{\s*url:\s*"([^"]*)"/.exec(background)?.[1] ?? null,
+      offscreenReasons: /reasons:\s*\[([^\]]*)\]/.exec(background)?.[1]?.split(",").map((r) => r.trim().replace(/^.*\.Reason\./, "")) ?? null,
+      offscreenConstructsAWorker: /new (Shared)?Worker\s*\(/.test(offscreen),
       contentScriptNamesEitherHook: includes(content, "PERCEIVE_ONCE") || includes(content, "STREAM_CONSUME"),
       sidePanelNamesEitherHook: includes(sidepanel, "PERCEIVE_ONCE") || includes(sidepanel, "STREAM_CONSUME"),
       sidePanelStillAsksForTheToolbarGesture: includes(sidepanel, "Click the toolbar button"),

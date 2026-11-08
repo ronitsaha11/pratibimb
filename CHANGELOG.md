@@ -6,6 +6,16 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 
 ## [Unreleased]
 
+### Fixed
+- **M23.21 — DEF-M23.19-01: the toolbar's keyboard shortcut is `Ctrl+Shift+Y`.** `Alt+Shift+P` is
+  Chrome's own "create new tab group" on Windows and Linux (`kTabGroupAcceleratorMap`, Chromium
+  153.0.8010.12). Chrome does not auto-assign a suggested key that matches one of its accelerators
+  (`CommandService::CanAutoAssign`), so the old key was never the extension's, and pressing it opened
+  Chrome's tab-group editor. The command is still `_execute_action`: the toolbar's own click event. No
+  permission, host, CSP, listener or lifecycle change; the built JavaScript is byte-identical, and only
+  `manifest.json` differs. Verified by the operator on W1 in Chrome for Testing 153.0.8010.12: `Ctrl+Shift+Y` and
+  the toolbar button both open the side panel (`artifacts/experiments/M23.21-product-reliability/`).
+
 ### Found
 - **M22.1 — the T1 dataset recipe cannot teach the icon class.** Regenerating its TRAIN and DEV
   splits (the pinned manifest also holds TEST and was not opened): every icon label is fully

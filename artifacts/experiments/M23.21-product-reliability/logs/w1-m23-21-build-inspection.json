@@ -1,0 +1,74 @@
+{
+  "what": "static inspection of an existing product build: manifest, file names and JavaScript text. No model file was opened, nothing was built, and no browser was started",
+  "workstation": "W1",
+  "gitHead": "cbced35f18fa9f85edb7f2522eb586741d026ab4",
+  "buildManifestWrittenAt": "2026-11-08T10:41:28.473Z",
+  "recordedAt": "2026-11-08T10:41:38.784Z",
+  "problems": [],
+  "files": [
+    "background.js",
+    "content-scripts/content.js",
+    "manifest.json",
+    "offscreen.html",
+    "ort-wasm-simd-threaded.jsep.mjs",
+    "ort-wasm-simd-threaded.jsep.wasm",
+    "ort.all.min.js",
+    "sidepanel.html",
+    "tr01-ppocrv4-mobile-det.onnx",
+    "tr01-worker.js"
+  ],
+  "manifest": {
+    "permissions": [
+      "offscreen",
+      "sidePanel"
+    ],
+    "host_permissions": [
+      "http://127.0.0.1/*"
+    ],
+    "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+    "actionTitle": "PratiBimb — Page Assistant",
+    "toolbarShortcut": {
+      "default": "Ctrl+Shift+Y"
+    },
+    "commandNames": [
+      "_execute_action"
+    ]
+  },
+  "bundle": {
+    "namesEachHookMarker": {
+      "PERCEIVE_ONCE": false,
+      "STREAM_CONSUME": false,
+      "perceiveOnce": false,
+      "consumeProbe": false,
+      "mintStreamId": false,
+      "ticketProbe": false,
+      "CAPTURE_FRAME": false,
+      "CAPTURE_TICKET": false,
+      "chromeMediaSourceId": false,
+      "grabFrame": false
+    },
+    "callsGetUserMedia": false,
+    "toolbarOpensTheSidePanel": true,
+    "toolbarIssuesACaptureGrant": false,
+    "offscreenCanStartTr01": false,
+    "offscreenHandlesPerceiveOnce": false,
+    "offscreenHandlesStreamConsume": false,
+    "offscreenHasTheProductRefusal": true,
+    "offscreenStillNamesT1": true,
+    "workerControlPlaneHasPerceiveOnce": false,
+    "workerControlPlaneHasConsumeProbe": false,
+    "workerControlPlaneHasMintStreamId": false,
+    "workerMintsCaptureHandles": true,
+    "workerCallsForACaptureTicket": false,
+    "offscreenJustification": "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",
+    "offscreenCreateCalls": 1,
+    "offscreenUrl": "offscreen.html",
+    "offscreenReasons": [
+      "WORKERS"
+    ],
+    "offscreenConstructsAWorker": false,
+    "contentScriptNamesEitherHook": false,
+    "sidePanelNamesEitherHook": false,
+    "sidePanelStillAsksForTheToolbarGesture": false
+  }
+}

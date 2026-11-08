@@ -8,8 +8,8 @@
  * before it. This calls `open` before it returns.
  *
  * A FAILURE IS REPORTED AND GOES NO FURTHER. There is no fallback here, and in particular none to capture: if the panel
- * cannot open, the person simply does not get the panel. `Alt+Shift+P` is Chrome's `_execute_action`, which fires the
- * same click event, so it takes this path too.
+ * cannot open, the person simply does not get the panel. The keyboard shortcut (`Ctrl+Shift+Y` since M23.21) is Chrome's
+ * `_execute_action`, which fires the same click event, so it takes this path too.
  */
 export type SidePanelTarget = { readonly tabId: number } | { readonly windowId: number };
 
