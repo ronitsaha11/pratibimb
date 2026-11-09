@@ -1,0 +1,48 @@
+{
+  "what": "SHA-256 of candidate 1 files before and after M22.6 (frames as one hash over the sorted name:hash list)",
+  "before": {
+    "BUILD-STATUS.json": "542673cd68cfa1eb8cbbf305b6b4f797bdc485f9c8f2cb84310fbcda1f16b2ae",
+    "build-record.json": "404f4154efb73f5cdf3937553c838b39cce21ef632cfc13606dd1a19a262ba93",
+    "manifest-train.json": "0ded4c8fd31d916694d7e91cd81fe2991553468b894ac20364a3011c0af7dd66",
+    "manifest-dev.json": "72038dca8d4c92c05d52a8c5a257a170c8be4f9e7ce1a942e74fdf004ff44502",
+    "frames-train": {
+      "files": 600,
+      "listSha256": "dfde47fcf7866be03bc1095b02d9dc6705f582aaf6c554b8e5dcf2dd3ac384cf"
+    },
+    "frames-dev": {
+      "files": 160,
+      "listSha256": "05e74176b9689f8b1e3c539bfb2d6c4f7d910f5c3e541f1f938720063c33f597"
+    },
+    "topLevel": [
+      "BUILD-STATUS.json",
+      "build-record.json",
+      "frames-dev",
+      "frames-train",
+      "manifest-dev.json",
+      "manifest-train.json"
+    ]
+  },
+  "after": {
+    "BUILD-STATUS.json": "542673cd68cfa1eb8cbbf305b6b4f797bdc485f9c8f2cb84310fbcda1f16b2ae",
+    "build-record.json": "404f4154efb73f5cdf3937553c838b39cce21ef632cfc13606dd1a19a262ba93",
+    "manifest-train.json": "0ded4c8fd31d916694d7e91cd81fe2991553468b894ac20364a3011c0af7dd66",
+    "manifest-dev.json": "72038dca8d4c92c05d52a8c5a257a170c8be4f9e7ce1a942e74fdf004ff44502",
+    "frames-train": {
+      "files": 600,
+      "listSha256": "dfde47fcf7866be03bc1095b02d9dc6705f582aaf6c554b8e5dcf2dd3ac384cf"
+    },
+    "frames-dev": {
+      "files": 160,
+      "listSha256": "05e74176b9689f8b1e3c539bfb2d6c4f7d910f5c3e541f1f938720063c33f597"
+    },
+    "topLevel": [
+      "BUILD-STATUS.json",
+      "build-record.json",
+      "frames-dev",
+      "frames-train",
+      "manifest-dev.json",
+      "manifest-train.json"
+    ]
+  },
+  "unchanged": true
+}

@@ -1,0 +1,32 @@
+{
+ "samplesWithPartialCase": {
+  "train": {
+   "samples": 340,
+   "of": 600,
+   "keptPositivesInThem": 2860,
+   "keptPositives": 5280
+  },
+  "dev": {
+   "samples": 87,
+   "of": 160,
+   "keptPositivesInThem": 751,
+   "keptPositives": 1408
+  }
+ },
+ "cosineClosedForm": {
+  "what": "lr applied at 0-based optimizer step t = 0.5*lr0*(1+cos(pi*t/T)), lr0 3e-3, T 6000 (CosineAnnealingLR closed form, eta_min 0)",
+  "firstStepOfEpoch": {
+   "1": 0.003,
+   "6": 0.00288581929876693,
+   "11": 0.002560660171779821,
+   "16": 0.002074025148547635,
+   "21": 0.0015,
+   "26": 0.0009259748514523654,
+   "31": 0.0004393398282201788,
+   "36": 0.0001141807012330699,
+   "40": 4.6239994003080545e-06
+  },
+  "lastStep5999": 2.056167536235165e-10,
+  "sumOverRun": 9.0015
+ }
+}

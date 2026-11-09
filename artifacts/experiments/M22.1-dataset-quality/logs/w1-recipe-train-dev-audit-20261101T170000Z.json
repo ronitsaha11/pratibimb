@@ -1,0 +1,809 @@
+{
+  "experiment": "M22.1 — T1 dataset recipe, TRAIN and DEV regenerated: label quality (no detector)",
+  "classification": "DATA QUALITY AUDIT of a recipe regeneration. Not a read of the pinned files; no TEST plan constructed; no detector; hit tests are not pixel visibility.",
+  "runId": "20261101T170000Z",
+  "source": {
+    "recipe": "tools/dataset/build-dataset.mjs (seed, split offsets, counts, viewport, DPR, __measure labels, geometric visibility)",
+    "reproduced": {
+      "seed": 20260910,
+      "offsets": {
+        "train": 0,
+        "dev": 1000000
+      },
+      "counts": {
+        "train": 120,
+        "dev": 40
+      },
+      "dpr": 1
+    },
+    "splits": [
+      "train",
+      "dev"
+    ],
+    "pinnedDataset": "artifacts/datasets/t1-ui-v1 NOT opened: its one manifest holds TEST annotations",
+    "identityWithPinned": "not verified (inference only, from a deterministic recipe)"
+  },
+  "gateOptions": {
+    "classes": [
+      "button",
+      "link",
+      "textbox",
+      "checkbox",
+      "radio",
+      "select",
+      "tab",
+      "icon"
+    ],
+    "minPerClassBucket": 1,
+    "nearDuplicateIou": 0.9,
+    "repetitionShare": 0.5
+  },
+  "environment": {
+    "browser": "Chromium 153.0.8010.12 (headless; renders and hit-tests only)",
+    "node": "v24.22.1",
+    "generator": "@pratibimb/evaluation 1.0.0"
+  },
+  "samples": {
+    "train": 120,
+    "dev": 40
+  },
+  "gate": {
+    "checks": [
+      {
+        "id": "G1_NON_DEGENERATE",
+        "status": "PASS",
+        "failing": 0
+      },
+      {
+        "id": "G2_VISIBILITY_MATCHES_GEOMETRY",
+        "status": "PASS",
+        "failing": 0
+      },
+      {
+        "id": "G3_LABEL_OBSERVABLE",
+        "status": "FAIL",
+        "visibleNotHitTestable": 198,
+        "visibleFullyOccluded": 162,
+        "byValidity": {
+          "HIT_TESTABLE": 2565,
+          "FULLY_OCCLUDED": 162,
+          "PARTIALLY_CLIPPED": 223,
+          "OFFSCREEN": 395,
+          "PARTIALLY_OCCLUDED": 29,
+          "SAMPLING_SENSITIVE": 7
+        }
+      },
+      {
+        "id": "G4_CLASS_SIZE_COVERAGE",
+        "status": "FAIL",
+        "minPerClassBucket": 1,
+        "gaps": 37,
+        "coverage": {
+          "train": {
+            "button": {
+              "very-small": 0,
+              "small": 74,
+              "medium": 379,
+              "large": 0
+            },
+            "link": {
+              "very-small": 0,
+              "small": 403,
+              "medium": 3,
+              "large": 0
+            },
+            "textbox": {
+              "very-small": 0,
+              "small": 69,
+              "medium": 335,
+              "large": 0
+            },
+            "checkbox": {
+              "very-small": 20,
+              "small": 95,
+              "medium": 0,
+              "large": 0
+            },
+            "radio": {
+              "very-small": 20,
+              "small": 95,
+              "medium": 0,
+              "large": 0
+            },
+            "select": {
+              "very-small": 0,
+              "small": 41,
+              "medium": 75,
+              "large": 0
+            },
+            "tab": {
+              "very-small": 0,
+              "small": 99,
+              "medium": 211,
+              "large": 0
+            }
+          },
+          "dev": {
+            "button": {
+              "very-small": 0,
+              "small": 25,
+              "medium": 127,
+              "large": 0
+            },
+            "link": {
+              "very-small": 0,
+              "small": 140,
+              "medium": 0,
+              "large": 0
+            },
+            "textbox": {
+              "very-small": 0,
+              "small": 17,
+              "medium": 108,
+              "large": 0
+            },
+            "checkbox": {
+              "very-small": 2,
+              "small": 38,
+              "medium": 0,
+              "large": 0
+            },
+            "radio": {
+              "very-small": 2,
+              "small": 38,
+              "medium": 0,
+              "large": 0
+            },
+            "select": {
+              "very-small": 0,
+              "small": 9,
+              "medium": 31,
+              "large": 0
+            },
+            "tab": {
+              "very-small": 0,
+              "small": 30,
+              "medium": 79,
+              "large": 0
+            }
+          }
+        }
+      },
+      {
+        "id": "G5_DUPLICATES",
+        "status": "PASS",
+        "exactPairs": 0,
+        "nearPairs": 0,
+        "nearDuplicateIou": 0.9
+      },
+      {
+        "id": "G6_SUSPICIOUS_REPETITION",
+        "status": "FAIL",
+        "repetitionShare": 0.5,
+        "repeated": [
+          {
+            "split": "train",
+            "cls": "icon",
+            "share": 1,
+            "samples": 120
+          },
+          {
+            "split": "dev",
+            "cls": "icon",
+            "share": 1,
+            "samples": 40
+          }
+        ]
+      },
+      {
+        "id": "G7_SPLIT_INTEGRITY",
+        "status": "PASS",
+        "duplicateIds": 0,
+        "seedsAcrossSplits": 0,
+        "layoutsAcrossSplits": 0,
+        "splits": {
+          "train": 120,
+          "dev": 40
+        }
+      }
+    ],
+    "pass": false
+  },
+  "validityBySplitClass": {
+    "train": {
+      "button": {
+        "HIT_TESTABLE": 453,
+        "PARTIALLY_CLIPPED": 128,
+        "OFFSCREEN": 183,
+        "PARTIALLY_OCCLUDED": 11,
+        "SAMPLING_SENSITIVE": 2
+      },
+      "link": {
+        "HIT_TESTABLE": 406,
+        "OFFSCREEN": 109,
+        "PARTIALLY_CLIPPED": 15,
+        "PARTIALLY_OCCLUDED": 5,
+        "SAMPLING_SENSITIVE": 2
+      },
+      "textbox": {
+        "HIT_TESTABLE": 404
+      },
+      "checkbox": {
+        "HIT_TESTABLE": 115,
+        "FULLY_OCCLUDED": 1,
+        "PARTIALLY_CLIPPED": 2,
+        "PARTIALLY_OCCLUDED": 1,
+        "SAMPLING_SENSITIVE": 1
+      },
+      "radio": {
+        "HIT_TESTABLE": 115,
+        "FULLY_OCCLUDED": 1,
+        "PARTIALLY_CLIPPED": 2,
+        "PARTIALLY_OCCLUDED": 1,
+        "SAMPLING_SENSITIVE": 1
+      },
+      "select": {
+        "HIT_TESTABLE": 116,
+        "PARTIALLY_CLIPPED": 4
+      },
+      "tab": {
+        "HIT_TESTABLE": 310,
+        "OFFSCREEN": 24,
+        "PARTIALLY_OCCLUDED": 5,
+        "PARTIALLY_CLIPPED": 21
+      },
+      "icon": {
+        "FULLY_OCCLUDED": 120
+      }
+    },
+    "dev": {
+      "button": {
+        "HIT_TESTABLE": 152,
+        "PARTIALLY_CLIPPED": 40,
+        "OFFSCREEN": 55,
+        "PARTIALLY_OCCLUDED": 1,
+        "SAMPLING_SENSITIVE": 1
+      },
+      "link": {
+        "HIT_TESTABLE": 140,
+        "OFFSCREEN": 21,
+        "PARTIALLY_CLIPPED": 5,
+        "PARTIALLY_OCCLUDED": 3
+      },
+      "textbox": {
+        "HIT_TESTABLE": 125
+      },
+      "checkbox": {
+        "HIT_TESTABLE": 40
+      },
+      "radio": {
+        "HIT_TESTABLE": 40
+      },
+      "select": {
+        "HIT_TESTABLE": 40
+      },
+      "tab": {
+        "HIT_TESTABLE": 109,
+        "PARTIALLY_OCCLUDED": 2,
+        "PARTIALLY_CLIPPED": 6,
+        "OFFSCREEN": 3
+      },
+      "icon": {
+        "FULLY_OCCLUDED": 40
+      }
+    }
+  },
+  "ignoredPositioningBySplitClass": {
+    "train/icon": 120,
+    "dev/icon": 40
+  },
+  "description": {
+    "train": {
+      "button": {
+        "all": 777,
+        "byVisibility": {
+          "VISIBLE": 466,
+          "CLIPPED": 128,
+          "OFFSCREEN": 183
+        },
+        "w": {
+          "n": 594,
+          "min": 84,
+          "p50": 118,
+          "max": 230
+        },
+        "h": {
+          "n": 594,
+          "min": 26,
+          "p50": 33,
+          "max": 46
+        },
+        "aspect": {
+          "n": 594,
+          "min": 2.58,
+          "p50": 3.74,
+          "max": 6.65
+        },
+        "shorterSideModelPx": {
+          "n": 594,
+          "min": 13,
+          "p50": 19.33,
+          "max": 30.67
+        }
+      },
+      "link": {
+        "all": 537,
+        "byVisibility": {
+          "VISIBLE": 413,
+          "OFFSCREEN": 109,
+          "CLIPPED": 15
+        },
+        "w": {
+          "n": 428,
+          "min": 64.36,
+          "p50": 112.48,
+          "max": 219.92
+        },
+        "h": {
+          "n": 428,
+          "min": 17.55,
+          "p50": 20.25,
+          "max": 40.5
+        },
+        "aspect": {
+          "n": 428,
+          "min": 3.67,
+          "p50": 5.73,
+          "max": 10.19
+        },
+        "shorterSideModelPx": {
+          "n": 428,
+          "min": 8.77,
+          "p50": 11.7,
+          "max": 25.31
+        }
+      },
+      "textbox": {
+        "all": 404,
+        "byVisibility": {
+          "VISIBLE": 404
+        },
+        "w": {
+          "n": 404,
+          "min": 180,
+          "p50": 281,
+          "max": 380
+        },
+        "h": {
+          "n": 404,
+          "min": 26,
+          "p50": 31,
+          "max": 36
+        },
+        "aspect": {
+          "n": 404,
+          "min": 5.14,
+          "p50": 8.83,
+          "max": 14.38
+        },
+        "shorterSideModelPx": {
+          "n": 404,
+          "min": 13,
+          "p50": 18,
+          "max": 24
+        }
+      },
+      "checkbox": {
+        "all": 120,
+        "byVisibility": {
+          "VISIBLE": 118,
+          "CLIPPED": 2
+        },
+        "w": {
+          "n": 120,
+          "min": 13,
+          "p50": 17,
+          "max": 20
+        },
+        "h": {
+          "n": 120,
+          "min": 13,
+          "p50": 17,
+          "max": 20
+        },
+        "aspect": {
+          "n": 120,
+          "min": 1,
+          "p50": 1,
+          "max": 1
+        },
+        "shorterSideModelPx": {
+          "n": 120,
+          "min": 6.5,
+          "p50": 10,
+          "max": 13.33
+        }
+      },
+      "radio": {
+        "all": 120,
+        "byVisibility": {
+          "VISIBLE": 118,
+          "CLIPPED": 2
+        },
+        "w": {
+          "n": 120,
+          "min": 13,
+          "p50": 17,
+          "max": 20
+        },
+        "h": {
+          "n": 120,
+          "min": 13,
+          "p50": 17,
+          "max": 20
+        },
+        "aspect": {
+          "n": 120,
+          "min": 1,
+          "p50": 1,
+          "max": 1
+        },
+        "shorterSideModelPx": {
+          "n": 120,
+          "min": 6.5,
+          "p50": 10,
+          "max": 13.33
+        }
+      },
+      "select": {
+        "all": 120,
+        "byVisibility": {
+          "VISIBLE": 116,
+          "CLIPPED": 4
+        },
+        "w": {
+          "n": 120,
+          "min": 140,
+          "p50": 179,
+          "max": 219
+        },
+        "h": {
+          "n": 120,
+          "min": 26,
+          "p50": 29,
+          "max": 32
+        },
+        "aspect": {
+          "n": 120,
+          "min": 4.52,
+          "p50": 6.04,
+          "max": 8.42
+        },
+        "shorterSideModelPx": {
+          "n": 120,
+          "min": 13,
+          "p50": 17.22,
+          "max": 21.33
+        }
+      },
+      "tab": {
+        "all": 360,
+        "byVisibility": {
+          "VISIBLE": 315,
+          "OFFSCREEN": 24,
+          "CLIPPED": 21
+        },
+        "w": {
+          "n": 336,
+          "min": 70,
+          "p50": 89,
+          "max": 109
+        },
+        "h": {
+          "n": 336,
+          "min": 26,
+          "p50": 29,
+          "max": 32
+        },
+        "aspect": {
+          "n": 336,
+          "min": 2.22,
+          "p50": 3.1,
+          "max": 4.08
+        },
+        "shorterSideModelPx": {
+          "n": 336,
+          "min": 13,
+          "p50": 16.88,
+          "max": 21.33
+        }
+      },
+      "icon": {
+        "all": 120,
+        "byVisibility": {
+          "VISIBLE": 120
+        },
+        "w": {
+          "n": 120,
+          "min": 22,
+          "p50": 22,
+          "max": 22
+        },
+        "h": {
+          "n": 120,
+          "min": 22,
+          "p50": 22,
+          "max": 22
+        },
+        "aspect": {
+          "n": 120,
+          "min": 1,
+          "p50": 1,
+          "max": 1
+        },
+        "shorterSideModelPx": {
+          "n": 120,
+          "min": 11,
+          "p50": 13.75,
+          "max": 14.67
+        }
+      }
+    },
+    "dev": {
+      "button": {
+        "all": 249,
+        "byVisibility": {
+          "VISIBLE": 154,
+          "CLIPPED": 40,
+          "OFFSCREEN": 55
+        },
+        "w": {
+          "n": 194,
+          "min": 84,
+          "p50": 121,
+          "max": 230
+        },
+        "h": {
+          "n": 194,
+          "min": 26,
+          "p50": 32,
+          "max": 45
+        },
+        "aspect": {
+          "n": 194,
+          "min": 2.62,
+          "p50": 3.78,
+          "max": 6.53
+        },
+        "shorterSideModelPx": {
+          "n": 194,
+          "min": 13.5,
+          "p50": 19.38,
+          "max": 30
+        }
+      },
+      "link": {
+        "all": 169,
+        "byVisibility": {
+          "VISIBLE": 143,
+          "OFFSCREEN": 21,
+          "CLIPPED": 5
+        },
+        "w": {
+          "n": 148,
+          "min": 64.36,
+          "p50": 116.02,
+          "max": 219.92
+        },
+        "h": {
+          "n": 148,
+          "min": 17.55,
+          "p50": 20.25,
+          "max": 21.59
+        },
+        "aspect": {
+          "n": 148,
+          "min": 3.67,
+          "p50": 6.52,
+          "max": 10.19
+        },
+        "shorterSideModelPx": {
+          "n": 148,
+          "min": 8.77,
+          "p50": 11.25,
+          "max": 14.4
+        }
+      },
+      "textbox": {
+        "all": 125,
+        "byVisibility": {
+          "VISIBLE": 125
+        },
+        "w": {
+          "n": 125,
+          "min": 181,
+          "p50": 279,
+          "max": 379
+        },
+        "h": {
+          "n": 125,
+          "min": 26,
+          "p50": 32,
+          "max": 36
+        },
+        "aspect": {
+          "n": 125,
+          "min": 5.35,
+          "p50": 8.76,
+          "max": 14.19
+        },
+        "shorterSideModelPx": {
+          "n": 125,
+          "min": 13,
+          "p50": 18,
+          "max": 24
+        }
+      },
+      "checkbox": {
+        "all": 40,
+        "byVisibility": {
+          "VISIBLE": 40
+        },
+        "w": {
+          "n": 40,
+          "min": 13,
+          "p50": 16,
+          "max": 20
+        },
+        "h": {
+          "n": 40,
+          "min": 13,
+          "p50": 16,
+          "max": 20
+        },
+        "aspect": {
+          "n": 40,
+          "min": 1,
+          "p50": 1,
+          "max": 1
+        },
+        "shorterSideModelPx": {
+          "n": 40,
+          "min": 6.5,
+          "p50": 10,
+          "max": 13.33
+        }
+      },
+      "radio": {
+        "all": 40,
+        "byVisibility": {
+          "VISIBLE": 40
+        },
+        "w": {
+          "n": 40,
+          "min": 13,
+          "p50": 16,
+          "max": 20
+        },
+        "h": {
+          "n": 40,
+          "min": 13,
+          "p50": 16,
+          "max": 20
+        },
+        "aspect": {
+          "n": 40,
+          "min": 1,
+          "p50": 1,
+          "max": 1
+        },
+        "shorterSideModelPx": {
+          "n": 40,
+          "min": 6.5,
+          "p50": 10,
+          "max": 13.33
+        }
+      },
+      "select": {
+        "all": 40,
+        "byVisibility": {
+          "VISIBLE": 40
+        },
+        "w": {
+          "n": 40,
+          "min": 141,
+          "p50": 187,
+          "max": 219
+        },
+        "h": {
+          "n": 40,
+          "min": 26,
+          "p50": 30,
+          "max": 32
+        },
+        "aspect": {
+          "n": 40,
+          "min": 4.7,
+          "p50": 6.26,
+          "max": 8.27
+        },
+        "shorterSideModelPx": {
+          "n": 40,
+          "min": 13.5,
+          "p50": 17.22,
+          "max": 21.33
+        }
+      },
+      "tab": {
+        "all": 120,
+        "byVisibility": {
+          "VISIBLE": 111,
+          "CLIPPED": 6,
+          "OFFSCREEN": 3
+        },
+        "w": {
+          "n": 117,
+          "min": 71,
+          "p50": 95,
+          "max": 109
+        },
+        "h": {
+          "n": 117,
+          "min": 26,
+          "p50": 29,
+          "max": 32
+        },
+        "aspect": {
+          "n": 117,
+          "min": 2.22,
+          "p50": 3.24,
+          "max": 4.15
+        },
+        "shorterSideModelPx": {
+          "n": 117,
+          "min": 13,
+          "p50": 16.88,
+          "max": 21.33
+        }
+      },
+      "icon": {
+        "all": 40,
+        "byVisibility": {
+          "VISIBLE": 40
+        },
+        "w": {
+          "n": 40,
+          "min": 22,
+          "p50": 22,
+          "max": 22
+        },
+        "h": {
+          "n": 40,
+          "min": 22,
+          "p50": 22,
+          "max": 22
+        },
+        "aspect": {
+          "n": 40,
+          "min": 1,
+          "p50": 1,
+          "max": 1
+        },
+        "shorterSideModelPx": {
+          "n": 40,
+          "min": 11,
+          "p50": 13.75,
+          "max": 14.67
+        }
+      }
+    }
+  },
+  "recordedAt": "2026-11-01T17:00:41.529Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H"
+  }
+}

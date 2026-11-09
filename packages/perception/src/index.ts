@@ -86,7 +86,7 @@ export {
 
 export {
   type UiClass, type HeadTensorContract, type HeadOutput, type HeadRuntime,
-  type DecodedDetection, type HeadDecodeAccounting, type ProjectionAccounting, type HeadAccounting,
+  type DecodedDetection, type DecodeThresholds, type HeadDecodeAccounting, type ProjectionAccounting, type HeadAccounting,
   UI_CLASSES, HEAD_CONTRACT, PROVISIONAL_THRESHOLDS, UI_DETECTOR_ROLE,
   decodeHeadOutput, decodeHeadOutputAccounted, projectToCapture, projectToCaptureAccounted, createUiElementDetector,
 } from "./uiDetectorHead.js";

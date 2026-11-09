@@ -1,0 +1,87 @@
+{
+  "what": "M22.10 phase 1: checkpoint verification before any planning. Read-only; nothing was trained, built, stepped or predicted.",
+  "machine": "W1 (LAPTOP-6E14K34L), Windows 11 10.0.26300, Python 3.13.14, torch 2.14.0+cpu, Node v24.22.1",
+  "date": "2026-11-03",
+  "label": "FACT (commands run on W1)",
+  "git": {
+    "branch": "spike/m22-small-target-recall",
+    "head": "579bea6f32cfac2279287f2665a5be31cb4d750f",
+    "base": "077f139",
+    "commitsOnBase": 50,
+    "upstream": "none (never pushed)",
+    "trackedChanges": false,
+    "untrackedKept": [
+      "artifacts/experiments/M20-runnable-measured-product/logs/w1-cft-product-sidepanel-smoke-20261024T005918Z.json",
+      "artifacts/experiments/M20-runnable-measured-product/logs/w1-cft-product-sidepanel-smoke-20261024T205120Z.json"
+    ],
+    "subjectsOver90Characters": ["a7e905c (93)", "12ac35f (92)", "579bea6 (93)"]
+  },
+  "candidates": {
+    "method": "SHA-256 of BUILD-STATUS.json, build-record.json and both manifests; frames as one SHA-256 over the sorted, newline-joined name:sha256 list; same method as M22.9's w1-preservation.json",
+    "candidate1": {
+      "BUILD-STATUS.json": "542673cd68cfa1eb8cbbf305b6b4f797bdc485f9c8f2cb84310fbcda1f16b2ae",
+      "build-record.json": "404f4154efb73f5cdf3937553c838b39cce21ef632cfc13606dd1a19a262ba93",
+      "manifest-train.json": "0ded4c8fd31d916694d7e91cd81fe2991553468b894ac20364a3011c0af7dd66",
+      "manifest-dev.json": "72038dca8d4c92c05d52a8c5a257a170c8be4f9e7ce1a942e74fdf004ff44502",
+      "frames-train": {"files": 600, "listSha256": "dfde47fcf7866be03bc1095b02d9dc6705f582aaf6c554b8e5dcf2dd3ac384cf"},
+      "frames-dev": {"files": 160, "listSha256": "05e74176b9689f8b1e3c539bfb2d6c4f7d910f5c3e541f1f938720063c33f597"},
+      "equalToM22.9Record": true
+    },
+    "candidate2": {
+      "BUILD-STATUS.json": "3f7c9f29bae40cfc8c813dea9e4414abc611eab8a434656c280cd7e9bf3ae701",
+      "build-record.json": "badf14bf0b7784d44d01d032b4065608a871f66bc8a12a8d61948870c3bd70b5",
+      "manifest-train.json": "663df327d71ef42d7d4136b8fe9d50fbdcdea9e7de1284dbb2b148e473d229ca",
+      "manifest-dev.json": "11599e053c7bb3dc32c08f429d4d649492c8a9b024c00dd0219f3ad3b74d6868",
+      "frames-train": {"files": 600, "listSha256": "5d3e63b4e903785c7827a25055faa39f9ee01d6f72195233fa10aa0f8d465acf"},
+      "frames-dev": {"files": 160, "listSha256": "9dd3d8c3453fe610e06f95afdf8eff27df6cbf3cd63e7b803646037926afa812"},
+      "equalToM22.9Record": true
+    }
+  },
+  "g10": {
+    "configuration": "tools/dataset/v2/configs/g10-approved-candidate-2.json",
+    "version": "g10-approved-1",
+    "status": "APPROVED",
+    "approval": {"approved": true, "approvedBy": "project owner", "approvedOn": "2026-11-02"},
+    "bindingManifestHashes": {
+      "train": "f283720fab3ef6086becf51ec47f383b8a20344f9abe1e102c6ec6172c2427f8",
+      "dev": "f072507a47ce087ef79b236d769b7d860c27ef536534d9490116d0145034ede1"
+    },
+    "thresholdsSha256": "fcce918a5341dc97350bbe3b85c9c21de95a04e32d85f23cf1a3f64b7dce78b1",
+    "configSha256": "5cbb059fff57304c36a4ae47d54012ebda2defc9db7154786e2944f7fedbbddf",
+    "evidence": "artifacts/experiments/M22.9-training-pipeline/logs/w1-candidate-2-g10-evidence-approved.json",
+    "evidenceCanonicalSha256": "404e0b286a8efdd4a76c389e7e0b2babd07e39303417f62002d55a8b5c29b533",
+    "evidenceFileSha256": "d5be72d7f489868711a1a094ba4788b6b20e26f11b57a7f6a960c5ac0c749378",
+    "evidenceBindsSameConfigThresholdsAndManifests": true,
+    "note": "evidenceSha256 in the adapter and the pre-flight record is the canonical-JSON hash; the raw file hash is listed separately"
+  },
+  "runConfigProposal": {
+    "file": "tools/detector/configs/train-v2-first-experiment.PROPOSED.json",
+    "canonicalSha256": "1d9057eadbe36b030cae0902932d31672211a435c58878549457cabe81141c3d",
+    "fileSha256": "276706822f285ee65d494acc995ca6dbee819c06dff06d2c59ec86d27fe5ce22",
+    "approved": false,
+    "unchangedSinceM22.9": true
+  },
+  "t1": {
+    "artifact": "artifacts/models/t1-ui-head/t1-ui-head.onnx",
+    "bytes": 302960,
+    "sha256": "ba6d9e93695b22d17d9dc2b8193966132af85a6a031b08eb453d1d20a05179d0",
+    "recordedInADR0003": "ba6d9e93695b22d17d9dc2b8193966132af85a6a031b08eb453d1d20a05179d0",
+    "equal": true,
+    "otherFilesInModelDirectory": "none (no model card is present)"
+  },
+  "protectedCode": {
+    "unchangedSinceBase077f139": ["tools/detector/train.py", "tools/detector/data.py", "tools/detector/head.py", "tools/detector/targets.py", "docs/adr", "agentos/gates", "docs/architecture", "docs/security"],
+    "productionDetectorChangesOnBranch": "packages/perception/src/uiDetectorHead.ts and index.ts by 840517f (2026-11-01, earlier M22 work): decode thresholds made an explicit parameter defaulting to PROVISIONAL_THRESHOLDS; no change since"
+  },
+  "architecture": {
+    "model": "head.UiHead, widths 16/32/64, stride 8, input 640, 80x80 grid, 6,400 anchors, 8 classes",
+    "parameters": 61468,
+    "parametersSource": "arithmetic over head.py layer shapes; equal to the 61,468 recorded in W1-QG03-t1-detector-runtime/decision.md"
+  },
+  "npmRunVerify": {
+    "result": "PASS",
+    "repositoryCheck": "0 failure(s), 0 warning(s)",
+    "javascript": {"passed": 3159, "skipped": 22, "files": "143 passed, 2 skipped"},
+    "python": {"passed": 100}
+  }
+}

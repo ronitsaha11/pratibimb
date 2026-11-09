@@ -1,0 +1,81 @@
+{
+ "what": "Whether candidate 2 carries the docs/architecture/preprocessing-contract.md section 6 defect (data.letterbox_image places pixels by the raster rule; targets labels by the continuous rule). Per capture size: the largest raster-minus-continuous offset of the content edges, in model px. Data only: capture sizes from the approved adapter; no image decoded, no model, no TEST.",
+ "machine": "W1 (LAPTOP-6E14K34L), Windows 11 10.0.26300, Python 3.13.14",
+ "date": "2026-11-03",
+ "label": "FACT (measured on W1)",
+ "methodCheck": "the same function gives 0.667 model px for 960x640, the contract section 6 worst case",
+ "train": {
+  "captureSizes": [
+   {
+    "capture": "800x1280",
+    "samples": 99,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "960x600",
+    "samples": 95,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1024x640",
+    "samples": 104,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1024x1024",
+    "samples": 100,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1280x720",
+    "samples": 105,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1280x800",
+    "samples": 97,
+    "maxOffsetModelPx": 0.0
+   }
+  ],
+  "samplesWithOffset": 0,
+  "samples": 600,
+  "maxOffsetModelPx": 0.0
+ },
+ "dev": {
+  "captureSizes": [
+   {
+    "capture": "800x1280",
+    "samples": 26,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "960x600",
+    "samples": 29,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1024x640",
+    "samples": 23,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1024x1024",
+    "samples": 32,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1280x720",
+    "samples": 26,
+    "maxOffsetModelPx": 0.0
+   },
+   {
+    "capture": "1280x800",
+    "samples": 24,
+    "maxOffsetModelPx": 0.0
+   }
+  ],
+  "samplesWithOffset": 0,
+  "samples": 160,
+  "maxOffsetModelPx": 0.0
+ }
+}

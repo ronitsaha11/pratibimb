@@ -1,0 +1,456 @@
+{
+  "run": "M22.6 — rendered fixture evidence for the visual fixes (not a dataset; no TRAIN, DEV or TEST sample)",
+  "environment": {
+    "browser": "Chromium 153.0.8010.12, headless, Playwright 1.63.0",
+    "node": "v24.22.1"
+  },
+  "renderRevision": "r2-m22.6-visual-fixes",
+  "pages": 36,
+  "elements": 1908,
+  "fixtureFloor": {
+    "salience": 1.5,
+    "coverageAt": 1.25,
+    "coverage": 0.02,
+    "note": "a development check of these fixtures only; NOT a G10 acceptance threshold"
+  },
+  "pass": true,
+  "failures": [],
+  "summary": {
+    "textbox": {
+      "slate-light / outlined": {
+        "minSalience": 2.135,
+        "minFieldOrEdge": 2.135,
+        "minCoverage125": 0.032
+      },
+      "slate-light / filled": {
+        "minSalience": 11.895,
+        "minFieldOrEdge": 11.895,
+        "minCoverage125": 0.999
+      },
+      "slate-light / flat": {
+        "minSalience": 3.158,
+        "minFieldOrEdge": 3.158,
+        "minCoverage125": 1
+      },
+      "slate-light / heavy-outline": {
+        "minSalience": 2.135,
+        "minFieldOrEdge": 2.135,
+        "minCoverage125": 0.064
+      },
+      "slate-light / underlined": {
+        "minSalience": 11.895,
+        "minFieldOrEdge": 11.895,
+        "minCoverage125": 1
+      },
+      "slate-light / raised": {
+        "minSalience": 3.158,
+        "minFieldOrEdge": 3.158,
+        "minCoverage125": 0.033
+      },
+      "sand-light / outlined": {
+        "minSalience": 2.122,
+        "minFieldOrEdge": 2.122,
+        "minCoverage125": 0.032
+      },
+      "sand-light / filled": {
+        "minSalience": 5.005,
+        "minFieldOrEdge": 5.005,
+        "minCoverage125": 0.998
+      },
+      "sand-light / flat": {
+        "minSalience": 2.981,
+        "minFieldOrEdge": 2.981,
+        "minCoverage125": 1
+      },
+      "sand-light / heavy-outline": {
+        "minSalience": 2.122,
+        "minFieldOrEdge": 2.122,
+        "minCoverage125": 0.064
+      },
+      "sand-light / underlined": {
+        "minSalience": 5.005,
+        "minFieldOrEdge": 5.005,
+        "minCoverage125": 1
+      },
+      "sand-light / raised": {
+        "minSalience": 2.981,
+        "minFieldOrEdge": 2.981,
+        "minCoverage125": 0.033
+      },
+      "mint-light / outlined": {
+        "minSalience": 1.913,
+        "minFieldOrEdge": 1.913,
+        "minCoverage125": 0.032
+      },
+      "mint-light / filled": {
+        "minSalience": 6.142,
+        "minFieldOrEdge": 6.142,
+        "minCoverage125": 0.998
+      },
+      "mint-light / flat": {
+        "minSalience": 2.692,
+        "minFieldOrEdge": 2.692,
+        "minCoverage125": 1
+      },
+      "mint-light / heavy-outline": {
+        "minSalience": 1.913,
+        "minFieldOrEdge": 1.913,
+        "minCoverage125": 0.064
+      },
+      "mint-light / underlined": {
+        "minSalience": 6.142,
+        "minFieldOrEdge": 6.142,
+        "minCoverage125": 1
+      },
+      "mint-light / raised": {
+        "minSalience": 2.692,
+        "minFieldOrEdge": 2.692,
+        "minCoverage125": 0.033
+      },
+      "graphite-dark / outlined": {
+        "minSalience": 2.7,
+        "minFieldOrEdge": 2.7,
+        "minCoverage125": 0.033
+      },
+      "graphite-dark / filled": {
+        "minSalience": 7.68,
+        "minFieldOrEdge": 7.68,
+        "minCoverage125": 0.999
+      },
+      "graphite-dark / flat": {
+        "minSalience": 4.465,
+        "minFieldOrEdge": 4.465,
+        "minCoverage125": 1
+      },
+      "graphite-dark / heavy-outline": {
+        "minSalience": 2.7,
+        "minFieldOrEdge": 2.7,
+        "minCoverage125": 0.065
+      },
+      "graphite-dark / underlined": {
+        "minSalience": 7.68,
+        "minFieldOrEdge": 7.68,
+        "minCoverage125": 1
+      },
+      "graphite-dark / raised": {
+        "minSalience": 4.465,
+        "minFieldOrEdge": 4.465,
+        "minCoverage125": 0.033
+      },
+      "navy-dark / outlined": {
+        "minSalience": 2.879,
+        "minFieldOrEdge": 2.879,
+        "minCoverage125": 0.033
+      },
+      "navy-dark / filled": {
+        "minSalience": 9.754,
+        "minFieldOrEdge": 9.754,
+        "minCoverage125": 0.999
+      },
+      "navy-dark / flat": {
+        "minSalience": 4.677,
+        "minFieldOrEdge": 4.677,
+        "minCoverage125": 1
+      },
+      "navy-dark / heavy-outline": {
+        "minSalience": 2.879,
+        "minFieldOrEdge": 2.879,
+        "minCoverage125": 0.065
+      },
+      "navy-dark / underlined": {
+        "minSalience": 9.754,
+        "minFieldOrEdge": 9.754,
+        "minCoverage125": 1
+      },
+      "navy-dark / raised": {
+        "minSalience": 4.677,
+        "minFieldOrEdge": 4.677,
+        "minCoverage125": 0.033
+      },
+      "high-contrast / outlined": {
+        "minSalience": 21,
+        "minFieldOrEdge": 21,
+        "minCoverage125": 0.033
+      },
+      "high-contrast / filled": {
+        "minSalience": 21,
+        "minFieldOrEdge": 21,
+        "minCoverage125": 0.999
+      },
+      "high-contrast / flat": {
+        "minSalience": 21,
+        "minFieldOrEdge": 21,
+        "minCoverage125": 1
+      },
+      "high-contrast / heavy-outline": {
+        "minSalience": 21,
+        "minFieldOrEdge": 21,
+        "minCoverage125": 0.065
+      },
+      "high-contrast / underlined": {
+        "minSalience": 11.45,
+        "minFieldOrEdge": 11.45,
+        "minCoverage125": 1
+      },
+      "high-contrast / raised": {
+        "minSalience": 21,
+        "minFieldOrEdge": 21,
+        "minCoverage125": 0.033
+      }
+    },
+    "iconByGlyphAndPlate": {
+      "disc / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.24
+      },
+      "ring / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.148
+      },
+      "square / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.303
+      },
+      "bars / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.293
+      },
+      "cross / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.46
+      },
+      "plus / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.165
+      },
+      "slash / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.291
+      },
+      "dots / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.13
+      },
+      "chevron / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.27
+      },
+      "frame / none": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.425
+      },
+      "disc / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.24,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "ring / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.148,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "square / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.303,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "bars / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.293,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "cross / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.46,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "plus / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.165,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "slash / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.291,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "dots / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.13,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "chevron / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.27,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "frame / surface": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.426,
+        "minPlateVsPage": 1.141,
+        "minGlyphVsPlate": 4.289
+      },
+      "disc / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.75,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "ring / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.848,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "square / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.683,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "bars / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.751,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "cross / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.525,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "plus / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.82,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "slash / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.694,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "dots / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.855,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "chevron / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.715,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      },
+      "frame / accent": {
+        "n": 36,
+        "minSalience": 5.005,
+        "minCoverage125": 0.563,
+        "minPlateVsPage": 5.005,
+        "minGlyphVsPlate": 5.395
+      }
+    },
+    "nativeControls": {
+      "checkbox 16x16 unchecked": {
+        "minSalience": 4.214,
+        "hitTestable": true
+      },
+      "checkbox 16x16 checked": {
+        "minSalience": 5.005,
+        "hitTestable": true
+      },
+      "radio 16x16 unchecked": {
+        "minSalience": 4.214,
+        "hitTestable": true
+      },
+      "radio 16x16 checked": {
+        "minSalience": 5.005,
+        "hitTestable": true
+      },
+      "checkbox 64x64 checked": {
+        "minSalience": 5.005,
+        "hitTestable": true
+      },
+      "radio 64x64 checked": {
+        "minSalience": 5.005,
+        "hitTestable": true
+      },
+      "checkbox 64x64 unchecked": {
+        "minSalience": 4.214,
+        "hitTestable": true
+      }
+    },
+    "textControls": {
+      "button": {
+        "minSalience": 5.005,
+        "overflowing": 0,
+        "of": 36
+      },
+      "select": {
+        "minSalience": 5.005,
+        "overflowing": 0,
+        "of": 36
+      },
+      "tab": {
+        "minSalience": 5.005,
+        "overflowing": 0,
+        "of": 36
+      },
+      "link": {
+        "minSalience": 5.005,
+        "overflowing": 0,
+        "of": 36
+      }
+    },
+    "occlusion": {
+      "occlusion-partial": {
+        "n": 144,
+        "matched": 144
+      },
+      "occlusion-full": {
+        "n": 144,
+        "matched": 144
+      }
+    }
+  }
+}

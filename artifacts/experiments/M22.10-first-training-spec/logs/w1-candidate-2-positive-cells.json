@@ -1,0 +1,616 @@
+{
+ "what": "Positive-cell ownership after the unchanged v1 targets.assign_targets, per class x size bucket, on candidate 2 TRAIN and DEV (approved-G10 positives, loaded through train_v2.load_train / load_dev). Data only: no model, no optimizer, no image decoded, no TEST.",
+ "machine": "W1 (LAPTOP-6E14K34L), Windows 11 10.0.26300, Python 3.13.14, numpy 2.5.1, torch 2.14.0+cpu (imported for targets.py only)",
+ "date": "2026-11-03",
+ "label": "FACT (measured on W1)",
+ "method": "For every kept positive: the box half of data.sample_to_tensors (CSS -> capture -> model px, clipped to the letterbox), then targets.assign_targets. A mirror of its loop records which object finally owns each cell; it agrees with assign_targets on every cell (mirrorMismatches). zeroOwned = objects left with no positive cell; lostSomeCells = objects whose claimed cells were overwritten by another object; nearestCellFallback = objects containing no cell centre, given the nearest cell.",
+ "train": {
+  "objects": {
+   "button": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   },
+   "link": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   },
+   "textbox": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   },
+   "checkbox": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   },
+   "radio": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   },
+   "select": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   },
+   "tab": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   },
+   "icon": {
+    "very-small": 165,
+    "small": 165,
+    "medium": 165,
+    "large": 165
+   }
+  },
+  "ownedCells": {
+   "button": {
+    "very-small": 333,
+    "small": 1132,
+    "medium": 4734,
+    "large": 12640
+   },
+   "link": {
+    "very-small": 527,
+    "small": 1866,
+    "medium": 6931,
+    "large": 21333
+   },
+   "textbox": {
+    "very-small": 792,
+    "small": 2926,
+    "medium": 11927,
+    "large": 31458
+   },
+   "checkbox": {
+    "very-small": 165,
+    "small": 380,
+    "medium": 1613,
+    "large": 4281
+   },
+   "radio": {
+    "very-small": 165,
+    "small": 397,
+    "medium": 1682,
+    "large": 4341
+   },
+   "select": {
+    "very-small": 509,
+    "small": 2067,
+    "medium": 8779,
+    "large": 23027
+   },
+   "tab": {
+    "very-small": 332,
+    "small": 938,
+    "medium": 3996,
+    "large": 11510
+   },
+   "icon": {
+    "very-small": 171,
+    "small": 448,
+    "medium": 1908,
+    "large": 4942
+   }
+  },
+  "claimedCells": {
+   "button": {
+    "very-small": 333,
+    "small": 1132,
+    "medium": 4734,
+    "large": 12640
+   },
+   "link": {
+    "very-small": 527,
+    "small": 1866,
+    "medium": 6931,
+    "large": 21333
+   },
+   "textbox": {
+    "very-small": 792,
+    "small": 2926,
+    "medium": 11927,
+    "large": 31458
+   },
+   "checkbox": {
+    "very-small": 165,
+    "small": 380,
+    "medium": 1613,
+    "large": 4281
+   },
+   "radio": {
+    "very-small": 165,
+    "small": 397,
+    "medium": 1682,
+    "large": 4341
+   },
+   "select": {
+    "very-small": 509,
+    "small": 2067,
+    "medium": 8779,
+    "large": 23027
+   },
+   "tab": {
+    "very-small": 332,
+    "small": 938,
+    "medium": 3996,
+    "large": 11510
+   },
+   "icon": {
+    "very-small": 171,
+    "small": 448,
+    "medium": 1908,
+    "large": 4942
+   }
+  },
+  "zeroOwned": {
+   "button": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "link": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "textbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "checkbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "radio": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "select": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "tab": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "icon": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   }
+  },
+  "lostSomeCells": {
+   "button": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "link": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "textbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "checkbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "radio": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "select": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "tab": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "icon": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   }
+  },
+  "nearestCellFallback": {
+   "button": {
+    "very-small": 34,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "link": {
+    "very-small": 41,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "textbox": {
+    "very-small": 35,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "checkbox": {
+    "very-small": 64,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "radio": {
+    "very-small": 54,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "select": {
+    "very-small": 33,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "tab": {
+    "very-small": 35,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "icon": {
+    "very-small": 46,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   }
+  },
+  "totalPositiveCells": 168250,
+  "mirrorMismatches": 0
+ },
+ "dev": {
+  "objects": {
+   "button": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   },
+   "link": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   },
+   "textbox": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   },
+   "checkbox": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   },
+   "radio": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   },
+   "select": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   },
+   "tab": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   },
+   "icon": {
+    "very-small": 44,
+    "small": 44,
+    "medium": 44,
+    "large": 44
+   }
+  },
+  "ownedCells": {
+   "button": {
+    "very-small": 81,
+    "small": 320,
+    "medium": 1133,
+    "large": 3118
+   },
+   "link": {
+    "very-small": 116,
+    "small": 458,
+    "medium": 2043,
+    "large": 5831
+   },
+   "textbox": {
+    "very-small": 208,
+    "small": 794,
+    "medium": 2788,
+    "large": 8076
+   },
+   "checkbox": {
+    "very-small": 44,
+    "small": 108,
+    "medium": 420,
+    "large": 1156
+   },
+   "radio": {
+    "very-small": 44,
+    "small": 104,
+    "medium": 425,
+    "large": 1205
+   },
+   "select": {
+    "very-small": 160,
+    "small": 687,
+    "medium": 2311,
+    "large": 6026
+   },
+   "tab": {
+    "very-small": 79,
+    "small": 251,
+    "medium": 1131,
+    "large": 3184
+   },
+   "icon": {
+    "very-small": 47,
+    "small": 111,
+    "medium": 510,
+    "large": 1339
+   }
+  },
+  "claimedCells": {
+   "button": {
+    "very-small": 81,
+    "small": 320,
+    "medium": 1133,
+    "large": 3118
+   },
+   "link": {
+    "very-small": 116,
+    "small": 458,
+    "medium": 2043,
+    "large": 5831
+   },
+   "textbox": {
+    "very-small": 208,
+    "small": 794,
+    "medium": 2788,
+    "large": 8076
+   },
+   "checkbox": {
+    "very-small": 44,
+    "small": 108,
+    "medium": 420,
+    "large": 1156
+   },
+   "radio": {
+    "very-small": 44,
+    "small": 104,
+    "medium": 425,
+    "large": 1205
+   },
+   "select": {
+    "very-small": 160,
+    "small": 687,
+    "medium": 2311,
+    "large": 6026
+   },
+   "tab": {
+    "very-small": 79,
+    "small": 251,
+    "medium": 1131,
+    "large": 3184
+   },
+   "icon": {
+    "very-small": 47,
+    "small": 111,
+    "medium": 510,
+    "large": 1339
+   }
+  },
+  "zeroOwned": {
+   "button": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "link": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "textbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "checkbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "radio": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "select": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "tab": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "icon": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   }
+  },
+  "lostSomeCells": {
+   "button": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "link": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "textbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "checkbox": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "radio": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "select": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "tab": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "icon": {
+    "very-small": 0,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   }
+  },
+  "nearestCellFallback": {
+   "button": {
+    "very-small": 13,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "link": {
+    "very-small": 12,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "textbox": {
+    "very-small": 9,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "checkbox": {
+    "very-small": 14,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "radio": {
+    "very-small": 14,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "select": {
+    "very-small": 14,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "tab": {
+    "very-small": 9,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   },
+   "icon": {
+    "very-small": 8,
+    "small": 0,
+    "medium": 0,
+    "large": 0
+   }
+  },
+  "totalPositiveCells": 44308,
+  "mirrorMismatches": 0
+ },
+ "wallSeconds": 5.2
+}

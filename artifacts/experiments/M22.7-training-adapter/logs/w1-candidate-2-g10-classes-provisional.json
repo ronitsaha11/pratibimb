@@ -1,0 +1,35 @@
+{
+  "what": "G10 class of every positive of one candidate (VISIBLE unless listed in nonVisible)",
+  "g10Version": "g10-dev-1",
+  "candidate": "artifacts/datasets/t1-ui-synthetic-2.1.0-draft-candidate-2",
+  "configStatus": "PROVISIONAL - NOT APPROVED BY THE OWNER",
+  "approval": {
+    "approved": false,
+    "approvedBy": null,
+    "approvedOn": null,
+    "note": "Only the project owner may set approved to true, with approvedBy and approvedOn. A file with approved: false is provisional; the training adapter reports its G10 results as diagnostic and claims no acceptance."
+  },
+  "thresholds": {
+    "salienceInvisibleBelow": 1.25,
+    "salienceVisibleAtLeast": 1.5,
+    "coverageContrast": 1.25,
+    "coverageInvisibleBelow": 0.005,
+    "coverageVisibleAtLeast": 0.01
+  },
+  "manifestHashes": {
+    "train": "f283720fab3ef6086becf51ec47f383b8a20344f9abe1e102c6ec6172c2427f8",
+    "dev": "f072507a47ce087ef79b236d769b7d860c27ef536534d9490116d0145034ede1"
+  },
+  "splits": {
+    "train": {
+      "positivesClassified": 5280,
+      "positiveIdsSha256": "3f6ea59400fb643d9d7072de190d5668f74964d737d606f792e78384366dc68b",
+      "nonVisible": {}
+    },
+    "dev": {
+      "positivesClassified": 1408,
+      "positiveIdsSha256": "826eab89889aa4a297588936fac71a55386bc5aca973560dd493f39fe9053236",
+      "nonVisible": {}
+    }
+  }
+}

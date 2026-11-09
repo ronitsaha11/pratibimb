@@ -1,0 +1,895 @@
+{
+  "experiment": "M22.4 — v2 TRAIN/DEV candidate build (no detector, no training, no TEST)",
+  "dataset": "t1-ui-synthetic@2.1.0-draft",
+  "destination": "artifacts/datasets/t1-ui-synthetic-2.1.0-draft-candidate-1",
+  "status": "PASS",
+  "startedAt": "2026-11-01T21:17:35.110Z",
+  "finishedAt": "2026-11-01T21:18:26.324Z",
+  "environment": {
+    "browser": "Chromium 153.0.8010.12, headless, launched by Playwright 1.63.0",
+    "context": "deviceScaleFactor 1, offline, every request aborted, colorScheme light, reducedMotion reduce, locale en-US, timezone UTC",
+    "node": "v24.22.1",
+    "os": "win32 10.0.26300"
+  },
+  "hashes": {
+    "generatorConfigSha256": "456d5bdf2b3efcdec1b68bd07c0ad93c4eab1690cf78ca0e6d52e16b1ee5703a",
+    "buildConfigSha256": "8db43d9d8c1cbf8b0ad9f82031491ecc9df2a232b1ad26473ce2208cf46a3d22",
+    "scheduleSha256": "5af3df649eec291f1ceafd5539ecf35a7375ae34dfc007595ea88f6a2abddece",
+    "sourceSha256": {
+      "tools/dataset/v2/annotate.mjs": "cf04949c5e2d2bfbf18787def3530e2b4ee0adde9b3aa6b7bb9e0ce2076f04d1",
+      "tools/dataset/v2/appearance.mjs": "1ae1743bdb8930f4242966265cb0d3082f1509dcc9b3c1877f4bd547f7cc131a",
+      "tools/dataset/v2/build-candidate.mjs": "063c8a2ee3726a14d6e626aa695552c2076c6b1cbc6b704fb6964cf0efb6112d",
+      "tools/dataset/v2/build-v2.mjs": "f59391a6d252c8d50e9b81aa78f44575771ec5bdd84306d761afa4b8bb908a8c",
+      "tools/dataset/v2/compare-builds.mjs": "13223b0c0ade098a1e107068d967ed4f3958c81b181fd608dbe2a79d9f4b6df3",
+      "tools/dataset/v2/config.mjs": "142ed331e1e71ceb8d1a0df1a1b63596b3196dbdba4bcce4002c30e6ebb15f74",
+      "tools/dataset/v2/html.mjs": "a9c46dada93faa7bac7f6b5106db414b9e58330f182d63cbc8eb1863c3ca3e41",
+      "tools/dataset/v2/layout.mjs": "0fc0702e24bd484f4821e5a11a2e335c9d75c3a4674ee3e9d98a02eedbda5f3e",
+      "tools/dataset/v2/plan.mjs": "a0b7f68d884a4c350a63c8d9095bfdf9a2a5a6e0a7e049e1e6a35f0c58566f1e",
+      "tools/dataset/v2/prng.mjs": "f2c320ebfdcbc8cc3dc6f18f19632e73b107a21d7155c477f560492f6cef8eae",
+      "tools/dataset/v2/render.mjs": "b2a382a6f4c8499316bf8a3bf13e862b1bf653fd385e0a99b93feee439192b03",
+      "tools/dataset/v2/schedule.mjs": "a7ea0b228c440a667220369bded070e8755854f28d9fae540ce34e0e398b9ee5",
+      "tools/dataset/v2/splits.mjs": "a9fab7107892f0317c658cd5e18b8753970c33871a0ed06838bf8fe37f800944",
+      "tests/browser/support/fixture-validity.mjs": "1eaad83c42e4a26679e894d121922993456d1981618785db60c0f3f44c542950",
+      "tests/browser/support/dataset-quality-gate.mjs": "57df35494382de7ca2f9117dfd8263bbacd181e9a86b10dca39a730f3209a879"
+    }
+  },
+  "leakage": {
+    "crossSplit": 0,
+    "sameSplit": {
+      "seeds": 0,
+      "exactLayouts": 0,
+      "nearLayouts": 0
+    },
+    "emptyLayouts": 0,
+    "comparedPairs": 288420,
+    "options": {
+      "elementIou": 0.5,
+      "layoutShare": 0.5
+    }
+  },
+  "splits": {
+    "train": {
+      "requestedSamples": 600,
+      "overflowSamples": 0,
+      "plannedSamples": 600,
+      "renderedSamples": 600,
+      "framesWritten": 600,
+      "failedRenders": 0,
+      "annotations": 6240,
+      "planned": {
+        "positives": 5280,
+        "occlusionPartial": 480,
+        "occlusionFull": 480
+      },
+      "observedValidityByIntent": {
+        "positive": {
+          "HIT_TESTABLE": 5280
+        },
+        "occlusion-full": {
+          "FULLY_OCCLUDED": 480
+        },
+        "occlusion-partial": {
+          "PARTIALLY_OCCLUDED": 480
+        }
+      },
+      "validPositivesByCell": {
+        "select": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "link": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "checkbox": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "radio": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "textbox": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "icon": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "button": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        },
+        "tab": {
+          "very-small": 165,
+          "small": 165,
+          "medium": 165,
+          "large": 165
+        }
+      },
+      "positivesExcludedForSource": 0,
+      "occlusionByCell": {
+        "select/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "select/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "radio/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "icon/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "tab/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "link/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "select/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "link/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "icon/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "link/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "radio/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "radio/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "button/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "textbox/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "button/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "link/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "textbox/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "radio/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "checkbox/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "textbox/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "icon/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "checkbox/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "button/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "icon/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "button/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "textbox/small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "tab/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "checkbox/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "select/large": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "checkbox/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "tab/medium": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        },
+        "tab/very-small": {
+          "partialPlanned": 15,
+          "partialObserved": 15,
+          "fullPlanned": 15,
+          "fullObserved": 15
+        }
+      },
+      "viewports": {
+        "1280x800": 97,
+        "800x1280": 99,
+        "960x600": 95,
+        "1280x720": 105,
+        "1024x1024": 100,
+        "1024x640": 104
+      },
+      "hashes": {
+        "planSha256": "eb122aeefcffe2107abb5c994beedcd76c1423dc9f90bd30738dbe7ec30719dd",
+        "manifestSha256": "95db7b6fb939743cf97402179f87ad980e1e4c0f72ea5ce387aadf7d1a571f0e",
+        "specHashesSha256": "2558017929532c685298bac6c666cb91027202d1b31035725fa2e811c81b2fbb",
+        "htmlSha256": "1572d6ea58a82f4c7da695931f597bb7eae239daaabb8bdf3508ffe5d22a3a73",
+        "annotationsSha256": "96f4f218938bc7fd7da717a90da943dfa1799303fe69b73197ac42dcd36352f6",
+        "framesSha256": "798680b5f4b3a4fffc88c3ef6ac2e2a31e8b9ff5c974518c418c4529db265014"
+      }
+    },
+    "dev": {
+      "requestedSamples": 160,
+      "overflowSamples": 0,
+      "plannedSamples": 160,
+      "renderedSamples": 160,
+      "framesWritten": 160,
+      "failedRenders": 0,
+      "annotations": 1664,
+      "planned": {
+        "positives": 1408,
+        "occlusionPartial": 128,
+        "occlusionFull": 128
+      },
+      "observedValidityByIntent": {
+        "positive": {
+          "HIT_TESTABLE": 1408
+        },
+        "occlusion-full": {
+          "FULLY_OCCLUDED": 128
+        },
+        "occlusion-partial": {
+          "PARTIALLY_OCCLUDED": 128
+        }
+      },
+      "validPositivesByCell": {
+        "checkbox": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "icon": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "button": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "link": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "tab": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "select": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "textbox": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        },
+        "radio": {
+          "very-small": 44,
+          "small": 44,
+          "medium": 44,
+          "large": 44
+        }
+      },
+      "positivesExcludedForSource": 0,
+      "occlusionByCell": {
+        "textbox/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "select/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "textbox/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "button/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "checkbox/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "textbox/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "button/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "select/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "tab/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "checkbox/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "link/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "link/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "icon/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "icon/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "radio/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "button/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "tab/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "icon/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "icon/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "radio/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "tab/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "tab/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "select/large": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "link/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "select/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "radio/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "textbox/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "link/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "checkbox/small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "checkbox/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "radio/medium": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        },
+        "button/very-small": {
+          "partialPlanned": 4,
+          "partialObserved": 4,
+          "fullPlanned": 4,
+          "fullObserved": 4
+        }
+      },
+      "viewports": {
+        "1280x720": 26,
+        "1024x1024": 32,
+        "960x600": 29,
+        "800x1280": 26,
+        "1280x800": 24,
+        "1024x640": 23
+      },
+      "hashes": {
+        "planSha256": "7b850e6a7ea8f789b3eb318ca0e11c15722912637f6f3ce540ba2210a25492be",
+        "manifestSha256": "f0cb43d12b4b62a93ff9c04cfa3ac84749482e5c425eb4ac720b08b8fb3172e1",
+        "specHashesSha256": "9fc88bd19f42dab32920884ed8d120032e71a8caf65d7109653ace8bb435413a",
+        "htmlSha256": "a8c5e7f2232716cf275b5d07639bcbd76dc2be11de3e6281573a4bae8b9c7b5f",
+        "annotationsSha256": "1e69f6c9d07162b0fd2f1fd6a66a7dc297a6db80fb77bdfcf9724221fb001266",
+        "framesSha256": "e1ab8857d718fadc5af2eb37d0737a1ddc8bfdb1ae0cf32988ed41158bfd0140"
+      }
+    }
+  },
+  "gate": {
+    "train": {
+      "pass": true,
+      "requiredNotApplicable": [],
+      "expectedSplits": [
+        "train"
+      ],
+      "checks": [
+        {
+          "id": "G1_NON_DEGENERATE",
+          "status": "PASS",
+          "failing": 0
+        },
+        {
+          "id": "G2_VISIBILITY_MATCHES_GEOMETRY",
+          "status": "PASS",
+          "failing": 0
+        },
+        {
+          "id": "G3_LABEL_OBSERVABLE",
+          "status": "PASS",
+          "visibleNotHitTestable": 0,
+          "visibleFullyOccluded": 0,
+          "byValidity": {
+            "HIT_TESTABLE": 5280
+          }
+        },
+        {
+          "id": "G4_CLASS_SIZE_COVERAGE",
+          "status": "PASS",
+          "minPerClassBucket": {
+            "train": 150
+          },
+          "gaps": 0,
+          "positivesExcludedForSource": 0
+        },
+        {
+          "id": "G5_DUPLICATES",
+          "status": "PASS",
+          "exactPairs": 0,
+          "nearPairs": 0,
+          "nearDuplicateIou": 0.9
+        },
+        {
+          "id": "G6_SUSPICIOUS_REPETITION",
+          "status": "PASS",
+          "repetitionShare": 0.02,
+          "repeated": []
+        },
+        {
+          "id": "G7_SPLIT_INTEGRITY",
+          "status": "PASS",
+          "duplicateIds": 0,
+          "seedsAcrossSplits": 0,
+          "layoutsAcrossSplits": 0,
+          "missingSplits": [],
+          "unexpectedSplits": [],
+          "splits": {
+            "train": 600
+          }
+        },
+        {
+          "id": "G8_SOURCE_RENDER_CONSISTENCY",
+          "status": "PASS",
+          "sourceTolerancePx": 0.5,
+          "checked": 6240,
+          "displaced": 0,
+          "positionIgnored": 0,
+          "worstEdgeDeltaPx": 0
+        },
+        {
+          "id": "G9_OCCLUSION_LABELS",
+          "status": "PASS",
+          "positives": 5280,
+          "positiveNotHitTestable": 0,
+          "positiveOcclusionCase": 0,
+          "intendedPositiveNotHitTestable": 0,
+          "declaredOcclusionNotObserved": 0,
+          "unknownIntent": 0,
+          "positiveFlagInconsistent": 0,
+          "byIntent": {
+            "positive": 5280,
+            "occlusion-full": 480,
+            "occlusion-partial": 480
+          }
+        }
+      ]
+    },
+    "dev": {
+      "pass": true,
+      "requiredNotApplicable": [],
+      "expectedSplits": [
+        "dev"
+      ],
+      "checks": [
+        {
+          "id": "G1_NON_DEGENERATE",
+          "status": "PASS",
+          "failing": 0
+        },
+        {
+          "id": "G2_VISIBILITY_MATCHES_GEOMETRY",
+          "status": "PASS",
+          "failing": 0
+        },
+        {
+          "id": "G3_LABEL_OBSERVABLE",
+          "status": "PASS",
+          "visibleNotHitTestable": 0,
+          "visibleFullyOccluded": 0,
+          "byValidity": {
+            "HIT_TESTABLE": 1408
+          }
+        },
+        {
+          "id": "G4_CLASS_SIZE_COVERAGE",
+          "status": "PASS",
+          "minPerClassBucket": {
+            "dev": 40
+          },
+          "gaps": 0,
+          "positivesExcludedForSource": 0
+        },
+        {
+          "id": "G5_DUPLICATES",
+          "status": "PASS",
+          "exactPairs": 0,
+          "nearPairs": 0,
+          "nearDuplicateIou": 0.9
+        },
+        {
+          "id": "G6_SUSPICIOUS_REPETITION",
+          "status": "PASS",
+          "repetitionShare": 0.02,
+          "repeated": []
+        },
+        {
+          "id": "G7_SPLIT_INTEGRITY",
+          "status": "PASS",
+          "duplicateIds": 0,
+          "seedsAcrossSplits": 0,
+          "layoutsAcrossSplits": 0,
+          "missingSplits": [],
+          "unexpectedSplits": [],
+          "splits": {
+            "dev": 160
+          }
+        },
+        {
+          "id": "G8_SOURCE_RENDER_CONSISTENCY",
+          "status": "PASS",
+          "sourceTolerancePx": 0.5,
+          "checked": 1664,
+          "displaced": 0,
+          "positionIgnored": 0,
+          "worstEdgeDeltaPx": 0
+        },
+        {
+          "id": "G9_OCCLUSION_LABELS",
+          "status": "PASS",
+          "positives": 1408,
+          "positiveNotHitTestable": 0,
+          "positiveOcclusionCase": 0,
+          "intendedPositiveNotHitTestable": 0,
+          "declaredOcclusionNotObserved": 0,
+          "unknownIntent": 0,
+          "positiveFlagInconsistent": 0,
+          "byIntent": {
+            "positive": 1408,
+            "occlusion-full": 128,
+            "occlusion-partial": 128
+          }
+        }
+      ]
+    },
+    "trainAndDev": {
+      "pass": true,
+      "requiredNotApplicable": [],
+      "expectedSplits": [
+        "train",
+        "dev"
+      ],
+      "checks": [
+        {
+          "id": "G1_NON_DEGENERATE",
+          "status": "PASS",
+          "failing": 0
+        },
+        {
+          "id": "G2_VISIBILITY_MATCHES_GEOMETRY",
+          "status": "PASS",
+          "failing": 0
+        },
+        {
+          "id": "G3_LABEL_OBSERVABLE",
+          "status": "PASS",
+          "visibleNotHitTestable": 0,
+          "visibleFullyOccluded": 0,
+          "byValidity": {
+            "HIT_TESTABLE": 6688
+          }
+        },
+        {
+          "id": "G4_CLASS_SIZE_COVERAGE",
+          "status": "PASS",
+          "minPerClassBucket": {
+            "train": 150,
+            "dev": 40
+          },
+          "gaps": 0,
+          "positivesExcludedForSource": 0
+        },
+        {
+          "id": "G5_DUPLICATES",
+          "status": "PASS",
+          "exactPairs": 0,
+          "nearPairs": 0,
+          "nearDuplicateIou": 0.9
+        },
+        {
+          "id": "G6_SUSPICIOUS_REPETITION",
+          "status": "PASS",
+          "repetitionShare": 0.02,
+          "repeated": []
+        },
+        {
+          "id": "G7_SPLIT_INTEGRITY",
+          "status": "PASS",
+          "duplicateIds": 0,
+          "seedsAcrossSplits": 0,
+          "layoutsAcrossSplits": 0,
+          "missingSplits": [],
+          "unexpectedSplits": [],
+          "splits": {
+            "train": 600,
+            "dev": 160
+          }
+        },
+        {
+          "id": "G8_SOURCE_RENDER_CONSISTENCY",
+          "status": "PASS",
+          "sourceTolerancePx": 0.5,
+          "checked": 7904,
+          "displaced": 0,
+          "positionIgnored": 0,
+          "worstEdgeDeltaPx": 0
+        },
+        {
+          "id": "G9_OCCLUSION_LABELS",
+          "status": "PASS",
+          "positives": 6688,
+          "positiveNotHitTestable": 0,
+          "positiveOcclusionCase": 0,
+          "intendedPositiveNotHitTestable": 0,
+          "declaredOcclusionNotObserved": 0,
+          "unknownIntent": 0,
+          "positiveFlagInconsistent": 0,
+          "byIntent": {
+            "positive": 6688,
+            "occlusion-full": 608,
+            "occlusion-partial": 608
+          }
+        }
+      ]
+    }
+  },
+  "notAClaim": [
+    "hit-test validity is the browser's hit test at grid points, not pixel-level visibility",
+    "no detector was loaded or run, no model was trained; nothing here is a recall or precision figure",
+    "TRAIN and DEV only; no TEST sample was planned, seeded, rendered or read"
+  ]
+}

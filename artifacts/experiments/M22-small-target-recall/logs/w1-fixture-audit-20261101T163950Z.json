@@ -1,0 +1,1517 @@
+{
+  "experiment": "M22 — fixture audit by design amendment 2 (no detector, no recall)",
+  "classification": "FIXTURE VALIDITY AUDIT. Hit-test based; not pixel visibility; no IoU guarantee. DEV synthetic screens only.",
+  "runId": "20261101T163950Z",
+  "rule": {
+    "grids": {
+      "primary": "5x5 cell centres",
+      "sensitivity": "9x9 cell centres",
+      "region": "element box ∩ viewport"
+    },
+    "hit": "elementFromPoint returns the element, a descendant, or a LABEL whose control is the element",
+    "categories": [
+      "HIT_TESTABLE",
+      "PARTIALLY_OCCLUDED",
+      "FULLY_OCCLUDED",
+      "SAMPLING_SENSITIVE",
+      "PARTIALLY_CLIPPED",
+      "OFFSCREEN"
+    ],
+    "primaryPopulation": "HIT_TESTABLE only (wholly inside, 25/25 and 81/81 hit)"
+  },
+  "fixtures": {
+    "generator": "@pratibimb/evaluation makeSpec/specToHtml (generator 1.0.0)",
+    "specs": "W1/Track B DEV specs: specIdFor(i), seedFor(i) = 20260913 + i, i = 0..19",
+    "split": "dev only; no TEST sample generated, rendered or read",
+    "buckets": [
+      {
+        "id": "very-small",
+        "shorterSideModelPx": [
+          0,
+          8
+        ]
+      },
+      {
+        "id": "small",
+        "shorterSideModelPx": [
+          8,
+          16
+        ]
+      },
+      {
+        "id": "medium",
+        "shorterSideModelPx": [
+          16,
+          32
+        ]
+      },
+      {
+        "id": "large",
+        "shorterSideModelPx": [
+          32,
+          null
+        ]
+      }
+    ],
+    "modelPxPerCssPx": "640 / max(viewport w, h) = 0.5 in every cell"
+  },
+  "environment": {
+    "browser": "Chromium 153.0.8010.12 (headless; renders and hit-tests only)",
+    "node": "v24.22.1"
+  },
+  "totals": {
+    "elements": 4691,
+    "byCategory": {
+      "HIT_TESTABLE": 3196,
+      "PARTIALLY_OCCLUDED": 49,
+      "FULLY_OCCLUDED": 229,
+      "SAMPLING_SENSITIVE": 2,
+      "PARTIALLY_CLIPPED": 216,
+      "OFFSCREEN": 999
+    },
+    "samplingSensitive": 2
+  },
+  "cells": [
+    {
+      "id": "landscape-16x9",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "contentZoom": 1,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 387,
+      "primaryPopulation": 333,
+      "byCategory": {
+        "HIT_TESTABLE": 333,
+        "PARTIALLY_OCCLUDED": 9,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 25,
+        "OFFSCREEN": 44
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 80,
+          "PARTIALLY_OCCLUDED": 9,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 22,
+          "OFFSCREEN": 20
+        },
+        "link": {
+          "HIT_TESTABLE": 64,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 3,
+          "OFFSCREEN": 24
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 60,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "medium": {
+          "HIT_TESTABLE": 86,
+          "PARTIALLY_OCCLUDED": 8,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 22,
+          "OFFSCREEN": 20
+        },
+        "small": {
+          "HIT_TESTABLE": 235,
+          "PARTIALLY_OCCLUDED": 1,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 3,
+          "OFFSCREEN": 24
+        },
+        "very-small": {
+          "HIT_TESTABLE": 12,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 25,
+          "p10": 0,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 25,
+          "p10": 0,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500,
+        "link at a point returning button": 70,
+        "button at a point returning button": 56,
+        "link at a point returning none": 5
+      }
+    },
+    {
+      "id": "landscape-16x10",
+      "viewport": {
+        "w": 1280,
+        "h": 800
+      },
+      "contentZoom": 1,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 411,
+      "primaryPopulation": 359,
+      "byCategory": {
+        "HIT_TESTABLE": 359,
+        "PARTIALLY_OCCLUDED": 4,
+        "FULLY_OCCLUDED": 21,
+        "SAMPLING_SENSITIVE": 2,
+        "PARTIALLY_CLIPPED": 25,
+        "OFFSCREEN": 20
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 90,
+          "PARTIALLY_OCCLUDED": 1,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "link": {
+          "HIT_TESTABLE": 80,
+          "PARTIALLY_OCCLUDED": 3,
+          "FULLY_OCCLUDED": 1,
+          "SAMPLING_SENSITIVE": 2,
+          "PARTIALLY_CLIPPED": 5,
+          "OFFSCREEN": 0
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 60,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "medium": {
+          "HIT_TESTABLE": 95,
+          "PARTIALLY_OCCLUDED": 1,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "small": {
+          "HIT_TESTABLE": 252,
+          "PARTIALLY_OCCLUDED": 3,
+          "FULLY_OCCLUDED": 21,
+          "SAMPLING_SENSITIVE": 2,
+          "PARTIALLY_CLIPPED": 5,
+          "OFFSCREEN": 0
+        },
+        "very-small": {
+          "HIT_TESTABLE": 12,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 2,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 25,
+          "p10": 0,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 25,
+          "p10": 0,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500,
+        "link at a point returning button": 155,
+        "link at a point returning none": 20,
+        "button at a point returning button": 5
+      }
+    },
+    {
+      "id": "landscape-2x1",
+      "viewport": {
+        "w": 1280,
+        "h": 640
+      },
+      "contentZoom": 1,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 357,
+      "primaryPopulation": 293,
+      "byCategory": {
+        "HIT_TESTABLE": 293,
+        "PARTIALLY_OCCLUDED": 5,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 39,
+        "OFFSCREEN": 74
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 64,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 47
+        },
+        "link": {
+          "HIT_TESTABLE": 63,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 1,
+          "OFFSCREEN": 27
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 37,
+          "PARTIALLY_OCCLUDED": 5,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 18,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "medium": {
+          "HIT_TESTABLE": 67,
+          "PARTIALLY_OCCLUDED": 2,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 24,
+          "OFFSCREEN": 43
+        },
+        "small": {
+          "HIT_TESTABLE": 214,
+          "PARTIALLY_OCCLUDED": 3,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 15,
+          "OFFSCREEN": 31
+        },
+        "very-small": {
+          "HIT_TESTABLE": 12,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 39,
+          "p10": 0,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 39,
+          "p10": 0,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500,
+        "tab at a point returning button": 341,
+        "link at a point returning button": 20
+      }
+    },
+    {
+      "id": "square",
+      "viewport": {
+        "w": 1280,
+        "h": 1280
+      },
+      "contentZoom": 1,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 411,
+      "primaryPopulation": 370,
+      "byCategory": {
+        "HIT_TESTABLE": 370,
+        "PARTIALLY_OCCLUDED": 1,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 20,
+        "OFFSCREEN": 20
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 90,
+          "PARTIALLY_OCCLUDED": 1,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "link": {
+          "HIT_TESTABLE": 91,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 60,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "medium": {
+          "HIT_TESTABLE": 95,
+          "PARTIALLY_OCCLUDED": 1,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "small": {
+          "HIT_TESTABLE": 263,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "very-small": {
+          "HIT_TESTABLE": 12,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 20,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 20,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500,
+        "button at a point returning button": 5
+      }
+    },
+    {
+      "id": "portrait-3x4",
+      "viewport": {
+        "w": 960,
+        "h": 1280
+      },
+      "contentZoom": 1,
+      "screens": 20,
+      "elements": 417,
+      "evaluatedByTheEvaluator": 397,
+      "primaryPopulation": 357,
+      "byCategory": {
+        "HIT_TESTABLE": 357,
+        "PARTIALLY_OCCLUDED": 0,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 20,
+        "OFFSCREEN": 20
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 84,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "link": {
+          "HIT_TESTABLE": 84,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 60,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "medium": {
+          "HIT_TESTABLE": 94,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "small": {
+          "HIT_TESTABLE": 251,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "very-small": {
+          "HIT_TESTABLE": 12,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 20,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 20,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500
+      }
+    },
+    {
+      "id": "portrait-9x16",
+      "viewport": {
+        "w": 720,
+        "h": 1280
+      },
+      "contentZoom": 1,
+      "screens": 20,
+      "elements": 395,
+      "evaluatedByTheEvaluator": 375,
+      "primaryPopulation": 335,
+      "byCategory": {
+        "HIT_TESTABLE": 335,
+        "PARTIALLY_OCCLUDED": 0,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 20,
+        "OFFSCREEN": 20
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 73,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "link": {
+          "HIT_TESTABLE": 73,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 60,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "medium": {
+          "HIT_TESTABLE": 77,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 20,
+          "OFFSCREEN": 20
+        },
+        "small": {
+          "HIT_TESTABLE": 240,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "very-small": {
+          "HIT_TESTABLE": 18,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 20,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 20,
+          "p10": 0.889,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500
+      }
+    },
+    {
+      "id": "zoom-0.5",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "contentZoom": 0.5,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 431,
+      "primaryPopulation": 392,
+      "byCategory": {
+        "HIT_TESTABLE": 392,
+        "PARTIALLY_OCCLUDED": 15,
+        "FULLY_OCCLUDED": 24,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 0,
+        "OFFSCREEN": 0
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 121,
+          "PARTIALLY_OCCLUDED": 10,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "link": {
+          "HIT_TESTABLE": 82,
+          "PARTIALLY_OCCLUDED": 5,
+          "FULLY_OCCLUDED": 4,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 60,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "small": {
+          "HIT_TESTABLE": 127,
+          "PARTIALLY_OCCLUDED": 9,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "very-small": {
+          "HIT_TESTABLE": 265,
+          "PARTIALLY_OCCLUDED": 6,
+          "FULLY_OCCLUDED": 24,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 0,
+          "p10": null,
+          "p50": null,
+          "p90": null
+        },
+        "grid9": {
+          "n": 0,
+          "p10": null,
+          "p50": null,
+          "p90": null
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500,
+        "link at a point returning button": 155,
+        "button at a point returning button": 61,
+        "link at a point returning a": 5
+      }
+    },
+    {
+      "id": "zoom-0.75",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "contentZoom": 0.75,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 411,
+      "primaryPopulation": 372,
+      "byCategory": {
+        "HIT_TESTABLE": 372,
+        "PARTIALLY_OCCLUDED": 15,
+        "FULLY_OCCLUDED": 24,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 0,
+        "OFFSCREEN": 20
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 101,
+          "PARTIALLY_OCCLUDED": 10,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 20
+        },
+        "link": {
+          "HIT_TESTABLE": 82,
+          "PARTIALLY_OCCLUDED": 5,
+          "FULLY_OCCLUDED": 4,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "textbox": {
+          "HIT_TESTABLE": 69,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "radio": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "select": {
+          "HIT_TESTABLE": 20,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "tab": {
+          "HIT_TESTABLE": 60,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "small": {
+          "HIT_TESTABLE": 260,
+          "PARTIALLY_OCCLUDED": 12,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 20
+        },
+        "very-small": {
+          "HIT_TESTABLE": 108,
+          "PARTIALLY_OCCLUDED": 3,
+          "FULLY_OCCLUDED": 4,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        },
+        "medium": {
+          "HIT_TESTABLE": 4,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 0,
+          "p10": null,
+          "p50": null,
+          "p90": null
+        },
+        "grid9": {
+          "n": 0,
+          "p10": null,
+          "p50": null,
+          "p90": null
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500,
+        "link at a point returning button": 155,
+        "button at a point returning button": 61
+      }
+    },
+    {
+      "id": "zoom-1.5",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "contentZoom": 1.5,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 245,
+      "primaryPopulation": 210,
+      "byCategory": {
+        "HIT_TESTABLE": 210,
+        "PARTIALLY_OCCLUDED": 0,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 15,
+        "OFFSCREEN": 186
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 49,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 6,
+          "OFFSCREEN": 76
+        },
+        "link": {
+          "HIT_TESTABLE": 44,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 3,
+          "OFFSCREEN": 44
+        },
+        "textbox": {
+          "HIT_TESTABLE": 57,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 3,
+          "OFFSCREEN": 9
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 11,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 9
+        },
+        "radio": {
+          "HIT_TESTABLE": 11,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 9
+        },
+        "select": {
+          "HIT_TESTABLE": 11,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 9
+        },
+        "tab": {
+          "HIT_TESTABLE": 27,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 3,
+          "OFFSCREEN": 30
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "medium": {
+          "HIT_TESTABLE": 151,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 12,
+          "OFFSCREEN": 129
+        },
+        "small": {
+          "HIT_TESTABLE": 59,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 3,
+          "OFFSCREEN": 53
+        },
+        "large": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 4
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 15,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 15,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500
+      }
+    },
+    {
+      "id": "zoom-2",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "contentZoom": 2,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 169,
+      "primaryPopulation": 123,
+      "byCategory": {
+        "HIT_TESTABLE": 123,
+        "PARTIALLY_OCCLUDED": 0,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 26,
+        "OFFSCREEN": 262
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 36,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 6,
+          "OFFSCREEN": 89
+        },
+        "link": {
+          "HIT_TESTABLE": 36,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 6,
+          "OFFSCREEN": 49
+        },
+        "textbox": {
+          "HIT_TESTABLE": 40,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 29
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 4,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 4,
+          "OFFSCREEN": 12
+        },
+        "radio": {
+          "HIT_TESTABLE": 4,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 4,
+          "OFFSCREEN": 12
+        },
+        "select": {
+          "HIT_TESTABLE": 3,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 6,
+          "OFFSCREEN": 11
+        },
+        "tab": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 60
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "large": {
+          "HIT_TESTABLE": 32,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 3,
+          "OFFSCREEN": 101
+        },
+        "medium": {
+          "HIT_TESTABLE": 89,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 21,
+          "OFFSCREEN": 153
+        },
+        "small": {
+          "HIT_TESTABLE": 2,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 2,
+          "OFFSCREEN": 8
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 26,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 26,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500
+      }
+    },
+    {
+      "id": "zoom-3",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "contentZoom": 3,
+      "screens": 20,
+      "elements": 431,
+      "evaluatedByTheEvaluator": 98,
+      "primaryPopulation": 52,
+      "byCategory": {
+        "HIT_TESTABLE": 52,
+        "PARTIALLY_OCCLUDED": 0,
+        "FULLY_OCCLUDED": 20,
+        "SAMPLING_SENSITIVE": 0,
+        "PARTIALLY_CLIPPED": 26,
+        "OFFSCREEN": 333
+      },
+      "byClass": {
+        "button": {
+          "HIT_TESTABLE": 27,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 4,
+          "OFFSCREEN": 100
+        },
+        "link": {
+          "HIT_TESTABLE": 25,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 6,
+          "OFFSCREEN": 60
+        },
+        "textbox": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 16,
+          "OFFSCREEN": 53
+        },
+        "checkbox": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 20
+        },
+        "radio": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 20
+        },
+        "select": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 20
+        },
+        "tab": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 60
+        },
+        "icon": {
+          "HIT_TESTABLE": 0,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 0,
+          "OFFSCREEN": 0
+        }
+      },
+      "byBucket": {
+        "large": {
+          "HIT_TESTABLE": 31,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 20,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 21,
+          "OFFSCREEN": 244
+        },
+        "medium": {
+          "HIT_TESTABLE": 21,
+          "PARTIALLY_OCCLUDED": 0,
+          "FULLY_OCCLUDED": 0,
+          "SAMPLING_SENSITIVE": 0,
+          "PARTIALLY_CLIPPED": 5,
+          "OFFSCREEN": 89
+        }
+      },
+      "samplingSensitive": 0,
+      "partiallyClippedHitFraction": {
+        "grid5": {
+          "n": 26,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        },
+        "grid9": {
+          "n": 26,
+          "p10": 1,
+          "p50": 1,
+          "p90": 1
+        }
+      },
+      "failingPointsReturned": {
+        "icon at a point returning header": 500
+      }
+    }
+  ],
+  "notAClaim": [
+    "a hit-test classification, not a measurement of visible pixels",
+    "no detector was loaded or run; nothing here is a recall or precision figure",
+    "synthetic DEV screens from this project's own generator"
+  ],
+  "recordedAt": "2026-11-01T16:40:09.283Z",
+  "provenance": {
+    "workstation": "W1",
+    "host": "LAPTOP-6E14K34L",
+    "workstationSource": "registry",
+    "os": "win32 10.0.26300",
+    "cpu": "Intel(R) Core(TM) 7 240H"
+  }
+}

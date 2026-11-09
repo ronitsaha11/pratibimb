@@ -6,6 +6,175 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 
 ## [Unreleased]
 
+### Found
+- **M22.1 — the T1 dataset recipe cannot teach the icon class.** Regenerating its TRAIN and DEV
+  splits (the pinned manifest also holds TEST and was not opened): every icon label is fully
+  occluded, because `specToHtml` gives `[role=img]` no `position` rule, so the icon renders at the
+  origin under the masthead. No class has an element of 32 model px or more. Boxes are well formed
+  and TRAIN/DEV share no seed or layout. `t1-ui-v1` is unchanged
+  (`artifacts/experiments/M22.1-dataset-quality/`).
+
+### Added
+- **M22.2 — an isolated v2 generator for a future T1 dataset (`tools/dataset/v2/`). No dataset was
+  generated, nothing was rendered, no model was trained.**
+  - Every labelled element, icons included, absolutely positioned at its declared box.
+  - An owner-stated class × size schedule covering all four M22 buckets.
+  - Explicit, labelled occlusion cases, never positives.
+  - One manifest per split; TEST planned only by a sealed build and refused by audits.
+  - Leakage checks, deterministic seeds, ids, ordering and hashes; plan-only CLI.
+  - Gate checks G8 (source-to-render consistency) and G9 (occlusion labels).
+  - The v1 builder and `t1-ui-v1` are unchanged.
+- **M22.2 hardening, after a read-only architecture review (still plan-only; no dataset generated).**
+  - Stratified 3 × 3 placement instead of top-left shelf packing: on the tested seeds every region
+    of every viewport shape holds 7.2–14.4% of element centres (sparse) and 9.4–12.5% (dense), where
+    the review measured 100% in the top quarter on sparse pages.
+  - Separate positive and occlusion-case quotas (occlusion added on top); deferred targets
+    rescheduled to bounded overflow samples; exact reconciliation, or refusal.
+  - The dataset gate now requires `requiredChecks` and `expectedSplits`, fails incomplete annotation
+    sets, checks declared occlusion against observed validity, requires `absolute` in G8 and
+    `minPerClassBucket ≥ 1`. The review's six false passes now fail.
+  - Near-identical cross-split layouts detected at owner-supplied thresholds.
+  - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M22.19 — M22 scope amended (owner Option B) and engineering scope closed.** The objective is now
+  M22's engineering foundation (the v2 dataset pipeline, candidate 2, approved G10, the adapter,
+  occlusion-aware training, the v2 pipeline, one verified training run, telemetry and resume). The
+  original detector-performance question, H1–H5 and any T1 vs T1-v2 comparison are deferred to
+  **FR-01, not authorised for execution**. No detection result exists, nothing is adopted, and the
+  evaluation restriction is registered unchanged as **B-07**. An outstanding register carries 17
+  items. Not an evaluation approval.
+- **M22.18 — M22 status and closure audit (read-only; recorded in M22.19).** Found the original
+  question unanswered and the runner block unregistered. Corrected an earlier claim: no commit
+  subject exceeds the limit counted after the `: `.
+- **M22.17 — per-step timing and multi-session resume telemetry.** `StepTimer` records failed reads
+  as untimed and never substitutes a duration; sessions are append-only and epochs name their
+  session; run duration is only a sum of session-local times. Verified with fakes. No training.
+- **M22.16 — telemetry integration assurance.** A fake-only harness found that telemetry exceptions
+  could escape `run_training` or replace a failure code; fixed with `observe`. No training.
+- **M22.15 — training telemetry.** Fixed the M22.13 null memory reading (a missing ctypes
+  prototype hidden by a catch-all); monotonic, phase-resolved timing; every value tagged measured,
+  derived or unavailable. No training.
+- **M22.14 — DEV evaluation design (design only; recorded in M22.19).** Never executed or approved;
+  deferred to FR-01.
+- **M22.13 — the first v2 T1 retraining run (owner-authorised, one run; no detection evaluation, no
+  export, no TEST).**
+  - `tools/detector/loss_v2.py`: the legacy loss with ignored classification entries set to zero; bitwise
+    equal in value and gradients to `detector_loss` under an empty mask. 24 tests.
+  - `train_v2 --train`: the authorised loop. It needs an approved configuration, a clean tree and one
+    run, and repeats the full pre-flight. Per epoch: all TRAIN, the full DEV loss (eval, no grad, same mask),
+    an atomic verified checkpoint and a T1 re-check. Fail-closed conditions; resume only of an interrupted
+    run. 10 loop tests, including bitwise interrupt-and-resume equivalence.
+  - `train-v2-first-run.APPROVED.json`: the M22.12 proposal with the owner's approval only.
+  - The run: COMPLETED, 40 epochs, 6,000 steps; DEV loss 3.983 → 2.893, best epoch 39; 185 of 6,000 steps
+    clipped; no non-finite value. Weights stay in the git-ignored run directory. Candidate UNADOPTED.
+- **M22.12 — partial-occlusion ignore mask and first-run configuration hardening (no training, no
+  optimizer, no inference, no weights, no TEST).**
+  - `tools/detector/occlusion_mask_v2.py`: a pure classification ignore mask. For each partial-occlusion
+    case it ignores that class's channel at cells whose receptive field (31 px, jump 8, checked against
+    `UiHead` on the meta device) sees the visible part. Positives always win; full occlusion ignores
+    nothing; box targets are untouched. 35 tests. Candidate 2: 26,953 TRAIN / 6,999 DEV entries.
+  - The adapter carries each occlusion case with its rendered occluder; a foreign occluder is refused.
+  - Run configuration schema 2 (`train-v2-first-run.PROPOSED.json`, pending approval): exact steps,
+    record-only early stopping, DEV frequency and aggregation, checkpoint retention and best rule,
+    determinism, threads and non-finite-gradient policy. Pre-flight checks the counts against the data.
+    41 + 7 tests. The M22.9 schema-1 file is kept and refused.
+  - ADR proposal for the shared-cell assignment order; `targets.py` unchanged.
+- **M22.11 — target-assignment and loss-semantics audit (read-only).** 0 collisions on candidate 2;
+  larger-wins ordering contradicts the comment; 25.9 % of very-small objects are nearest-cell only;
+  7,405 visible partial-occlusion cells were negatively supervised, with no ignore path.
+- **M22.10 — first T1 retraining experiment: specification review (read-only planning; no training,
+  no optimizer, no inference, no weights, no code change, no TEST).**
+  - Checkpoint re-verified: candidates 1 and 2, the approved-G10 hashes and T1 (ADR-0003) unchanged;
+    `npm run verify` PASS.
+  - Hyper-parameter review: inherited vs new values separated. Weight decay is not an effective
+    regulariser at these values; early stopping interacts with the cosine schedule; checkpoint every epoch.
+  - Experiment specification (success definition, failure conditions F1–F15, recovery, T1 protection),
+    evaluation plan (frozen F1 threshold rule; DEV figures selection-biased), risks and an analytic
+    resource estimate (duration UNKNOWN).
+  - Data-only measurement on candidate 2: positive cells skewed to large objects (very-small 1.8 %,
+    large 67.5 %); no positives overlap, so a latent `assign_targets` ordering defect has no effect.
+  - Final configuration proposed, every field marked, pending owner approval.
+- **M22.9 — approved G10, conditional acceptance of candidate 2, and a pre-flight-only training
+  pipeline (owner-authorised; no training, no optimizer step, no inference, no TEST).**
+  - G10 thresholds approved by the project owner (2026-11-02) for candidate 2 only, in a separately
+    versioned configuration bound to its manifest hashes; the provisional file is kept.
+  - Audit evidence format 2: every positive's category and metrics, hash-bound to the configuration
+    and thresholds. Candidate 2: 6,688 VISIBLE, 0 BORDERLINE, 0 INVISIBLE; 165 / 44 per cell.
+  - Adapter: approved G10 enforced fail-closed (bindings, recomputed categories, missing, duplicate
+    or unexpected ids refused); exclusions by category, class and size bucket.
+  - `tools/detector/train_v2.py`: pre-flight only. It checks T1 against ADR-0003, validates the config
+    and loads accepted TRAIN and DEV separately. Its output guard refuses T1, links and existing runs.
+    It assembles the provenance plan and has no training step. 37 static and behavioural safety tests.
+  - First-experiment hyper-parameters proposed, pending owner review.
+- **M22.8 — the v2 adapter tests in canonical verification (no training, no inference, no TEST).**
+  - `npm run verify` now ends with `npm run test:py` (`scripts/verify-python.py`): Python >= 3.12 and
+    every pin in `tools/detector/requirements-test.txt` checked, then `pytest tools/detector/tests`.
+    It fails, never skips, on a missing dependency or an empty collection; strict pins in CI.
+  - CI: new `detector-adapter` job (Python 3.13, pinned CPU torch).
+  - 13 adapter regression tests (split isolation, trapped-filesystem TEST refusal, separation on every
+    identity, class order, bucket edges, DEV-side G10 binding, both-split tensor checks) and runner tests.
+  - G10 acceptance review and train_v2 design review prepared for the owner; nothing approved.
+- **M22.7 — an isolated v2 TRAIN/DEV training adapter and data dry run (no training, no inference,
+  no TEST; candidates unmodified).**
+  - `tools/detector/data_v2.py`: TRAIN and DEV only (others refused before file access); per-split
+    manifests; frame SHA-256, size and set checks; captureSize from the frame; positives only, with
+    occlusion cases excluded and counted; an explicit G10 policy that records approval and claims no
+    acceptance while provisional. `data.py` and `train.py` unchanged.
+  - `tools/detector/dry_run_v2.py`: counts, exclusions, separation and a tensor check through the
+    unchanged v1 input path; no model. Candidate 2 passes; 31 Python adapter tests pass.
+  - `audit-candidate.mjs --g10-out`: per-positive G10 classes for the adapter. `train_v2.py` is
+    designed, not implemented.
+- **M22.6 — visual defect remediation, the G10 pixel diagnostic, and TRAIN/DEV candidate 2
+  (owner-authorised; no training, no detector, no TEST; candidate 1 preserved).**
+  - Fixed: page-on-page textboxes (each style now draws a field or a full edge) and icon plates lost to
+    the `background` shorthand (plate and glyph now separate longhand layers).
+  - Improved: dashed dividers and banded panels (unlike fields), width-fitted labels with measured
+    overflow, scaled native checkboxes and radios, varied occluder looks. No box moved.
+  - Added: G10 pixel-visibility metrics (`visibility.mjs`) with no default thresholds, a browser
+    fixture matrix (`render-fixtures.mjs`), and G10 in the candidate audit.
+  - Candidate 2: G1–G9 PASS on TRAIN, DEV and both; 165 / 44 valid positives per cell; every
+    positive measures visible (G10 diagnostic only, thresholds unapproved); reproduced byte for byte.
+    A draft pending owner acceptance.
+- **M22.5 — acceptance review of TRAIN/DEV candidate 1 (read-only; no training, no detector, no
+  TEST; candidate unmodified).**
+  - `tools/dataset/v2/audit-candidate.mjs` and `png.mjs`: independent integrity audit, recount,
+    distributions, and per-element pixel contrast (WCAG 2.x ratio formula; no conformance claim).
+  - Found: candidate 1 is structurally correct, but 282 textboxes and 92 icons are effectively
+    invisible (borderless page-on-page textboxes; icon plate lost to the `background` shorthand), and
+    hit-testing cannot see that. Not recommended for training as built; fixes and a pixel-salience
+    check proposed. A v2 trainer adapter is designed, not implemented.
+- **M22.4 — v2 TRAIN/DEV renderer and a validated candidate dataset (owner-authorised; TRAIN and
+  DEV only; no training, no detector, no TEST).**
+  - `tools/dataset/v2/render.mjs`, `build-candidate.mjs`, `compare-builds.mjs`: headless Chromium at
+    DPR 1, offline; measured geometry and 5×5/9×9 hit-test validity; PNG frames; per-split
+    manifests; fail-closed render checks; never overwrites a candidate.
+  - Gate: G4 counts a positive only when its rendered box matches its declared source.
+  - Candidate 1 (git-ignored): 600 TRAIN and 160 DEV frames; 165 / 44 valid positives in each of
+    32 cells; every occlusion case observed as declared; G1–G9 PASS on TRAIN, DEV and both;
+    reproduced byte for byte on W1.
+- **M22.3 — TRAIN/DEV build specification and pre-build generator improvements (still plan-only;
+  no dataset generated, nothing rendered, nothing trained).** Generator version `2.1.0-draft`.
+  - Provenance per sample, element and occluder: seed derivation, spec hash, declared box and
+    positioning, size draw, appearance, occluder identity and covered share, decor.
+  - Appearance drawn from the seed: 6 palettes, 7 local font stacks, 6 control styles, 10 icon
+    glyphs, 3 density levels, wider log-uniform aspects. No external asset.
+  - Labelled boxes kept hit-safe (corner radius ≤ 0.15 of the shorter side); M22.2's circle and
+    rounded icon radii would have put validity-grid corner points outside the shape.
+  - SHA-256 seeds over an unambiguous identity, xoshiro128** streams, fixed-width ids, strict
+    canonical JSON, golden hashes. The old 32-bit seeds showed no collision on the real identities
+    (measured); the change removes the bound.
+  - Gate: G4 may take one minimum per expected split.
+  - A TRAIN 600 / DEV 160 configuration proposed for the owner, not approved.
+  - TEST authorisation unchanged and still weak; TEST refused.
+- **M22 (in progress) and M22.1 tooling, no detector run.**
+  - `tests/browser/support/fixture-validity.mjs`: hit-test validity categories on 5×5 and 9×9 grids;
+    `matchValidPopulation`: valid ground truth matched first.
+  - `tests/browser/support/dataset-quality-gate.mjs`: a dataset gate (G1–G7) with required,
+    stated thresholds.
+  - `tests/browser/perception/audit-m22-fixtures.mjs` and `tools/dataset/audit-recipe-splits.mjs`
+    (TRAIN/DEV only, never TEST).
+  - `decodeHeadOutputAccounted` takes optional thresholds for evaluation; it defaults to the
+    shipped values and no product code passes others.
+
 ### Fixed
 - **M21 — the T1 letterbox inverse could end an edge box past the frame.** `clipToContent` then
   `modelToCapture` left 25% of edge-touching boxes outside the frame by a rounding error (≤ 6.8e-13
