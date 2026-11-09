@@ -14,6 +14,7 @@
 | `docs/operations/` | Git workflow, this file | Repository governance is itself engineering |
 | `docs/adr/` | Architecture decision records and index | Decisions precede code |
 | `docs/handoff/` | Machine-to-machine engineering handoffs | Work must survive the machine it was done on |
+| `docs/acceptance/` | Core-product acceptance definition, traceability, gate mapping, owner decisions, release checklist (**PROPOSED — AWAITING OWNER APPROVAL**, M23.1) | A gate cannot be signed against an undefined target |
 | `agentos/` | Development-time engineering OS: agents, workflows, gates, registries, state | Governs how we build. **Never part of the product.** |
 | `artifacts/experiments/` | Reproducible spike evidence | Week-1 output; promotes UNKNOWN to FACT |
 | `artifacts/environment/` | **Per-workstation environment audits**, one file per machine | More than one workstation is now in use, and no capability result transfers between them |

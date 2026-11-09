@@ -35,6 +35,44 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.6 — OD-R recorded: APPROVED — OPTION A, DOM-only Phase 1 (implementation not authorised).** Normal Phase 1
+  task execution is to capture no browser frames and run neither T1 nor TR-01; DOM observation and the structural
+  handoff remain. Updates the proposed ADR-0015 (new §3.6; still PROPOSED), marks the exclusions in the acceptance
+  documents, records that the brief's visual requirements are not fulfilled by Phase 1 (P2-08), and adds a
+  dependency-ordered implementation outline (design only). The runtime is unchanged; no existing ADR, gate, CSP,
+  permission or model asset changed.
+- **M23.5 — Phase 1 perception boundary: OD-R prepared (documentation only).** Maps the capture chain and every
+  known frame consumer from source, inventories the existing fallback test evidence (the M20 benchmark already
+  completed 6 tasks with no frame), and compares a DOM-only Phase 1 (A), capture kept with T1 off (B) and capture
+  for a named consumer (C). Recommends A for the owner's consideration; drafts ADR-0015 clauses for each outcome
+  (not applied). No code, capture, model, test, schema, CSP, permission or ADR changed.
+- **M23.4 — OD-P selected: T1 to be disabled from active Phase 1 execution (not implemented).** Records the
+  owner's policy and its impact (`artifacts/experiments/M23.4-t1-disablement-impact/`). A tested no-T1 fallback
+  already exists (`MODEL_ASSET_UNAVAILABLE` → `NO_DETECTOR` → structural-floor handoff). Adds the OD-O integrity
+  policy proposal, the TR-01 acceptance assessment (OD-F), an M20 limitation note, ADR-0015 changes C-1 to
+  C-10 (not applied) and a design-only readiness plan. Corrects M23.3: T1 inference runs only on frame-capturing
+  passes, and the M20 benchmark ran none. No code, packaging, model, CSP, permission, egress or ADR changed.
+- **M23.3 — Phase 1 architecture reconciliation; ADR-0015 proposed.** A static source trace
+  (`docs/acceptance/phase-1-data-flow-and-components.md`) finds that the T1 UI head is loaded and run on every
+  perception pass, unadopted and with no build-time or runtime integrity check. Its output can relabel DOM
+  `source` and set handoff capability metadata, but adds no element and never reaches the reasoner request.
+  TR-01 masks the local frame only, and the only product egress is `sendVerified`. Adds ADR-0015 (PROPOSED —
+  AWAITING OWNER APPROVAL), the RC-01 to RC-12 matrix, draft amendment language A-1 to A-9 (not applied) and
+  owner decisions OD-N to OD-Q. No code, existing ADR, frozen text, gate, invariant or blocker changed.
+- **M23.2 — owner decision: phased architecture.** Recorded in
+  `artifacts/experiments/M23.2-phased-architecture-decision/`. Phase 1 is the current local, loopback,
+  structure-only product; Phase 2 (vision-language and frame-based reasoning) is not authorised. Adds
+  `docs/acceptance/phase-1-architecture-scope.md` and `phase-2-future-capability-register.md`; the M23.1
+  proposal becomes the Phase 1 scope (still PROPOSED); the owner-decision register separates resolved,
+  awaiting and blocked items; ten reconciliation items are listed. Corrects M23.1's "DOM-only floor"
+  wording: the unadopted T1 head runs in the perception pass, and clicks stay DOM-only. No ADR,
+  constitution text, gate, invariant, blocker, CSP or permission changed. FR-01 deferred; B-07 blocked.
+- **M23.1 — core-product acceptance definition (PROPOSED — AWAITING OWNER APPROVAL).** `docs/acceptance/`
+  proposes what core-product acceptance means for the shipped architecture: 59 criteria in 12
+  categories with eight separate evidence types, traceability of the brief's deliverables and the
+  12-stage pipeline, a QG-01–QG-06 mapping with a structure-only QG-04-S proposal, owner decisions
+  OD-A–OD-L and a release checklist. Approves nothing, signs no gate, changes no ADR, invariant,
+  blocker or threshold. FR-01 stays deferred and B-07 blocked.
 - **M22.19 — M22 scope amended (owner Option B) and engineering scope closed.** The objective is now
   M22's engineering foundation (the v2 dataset pipeline, candidate 2, approved G10, the adapter,
   occlusion-aware training, the v2 pipeline, one verified training run, telemetry and resume). The
