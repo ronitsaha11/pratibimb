@@ -25,7 +25,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { evidenceReferenceFlags } from "../../../tests/browser/support/build-separation.mjs";
 import { evidencePermissionProblems, EVIDENCE_ONLY_PERMISSIONS, EVIDENCE_PERMISSIONS, parseCsp, permissionDeltaProblems, PRODUCT_CSP, PRODUCT_HOST_PERMISSIONS, PRODUCT_PERMISSIONS, productManifestProblems, productPackageProblems } from "../../../tests/browser/support/csp-product-phase.mjs";
-import { APPROVED_UI_COPY, EXPECTED_PRODUCT_FILES, OFFSCREEN_JUSTIFICATION, STALE_UI_WORDING } from "../../../tests/browser/support/product-build-inspection.mjs";
+import { APPROVED_TOOLBAR_SHORTCUT, APPROVED_UI_COPY, EXPECTED_PRODUCT_FILES, OFFSCREEN_JUSTIFICATION, STALE_UI_WORDING } from "../../../tests/browser/support/product-build-inspection.mjs";
+import { registerCommands } from "../../../tests/browser/support/chrome-commands.mjs";
 import { DEVELOPMENT_BUILD_NAME, PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION, STATUS_UNAVAILABLE_MESSAGE, TOOLBAR_TITLE } from "../host-lib/product-copy";
 import { ORT_PIN } from "../../../packages/security/src/generated/ortPin";
 import { TR01_PACKAGE } from "../host-lib/tr01-pin";
@@ -358,8 +359,15 @@ describe("M23.12 (OD-T) — the product's wording, in the real manifest and in a
     const manifest = (await loadConfig()).manifest as Manifest;
     expect(manifest.action.default_title).toBe("PratiBimb — Page Assistant");
     expect(manifest.commands._execute_action.description).toBe("PratiBimb — Page Assistant");
-    expect(manifest.commands._execute_action.suggested_key).toEqual({ default: "Alt+Shift+P" });
+    expect(manifest.commands._execute_action.suggested_key).toEqual({ default: "Ctrl+Shift+Y" });
     expect(productManifestProblems(manifest)).toEqual([]);
+  });
+
+  it("M23.21 (DEF-M23.19-01): the real manifest's shortcut is the inspection tool's, and Chrome 153 would assign it", async () => {
+    const manifest = (await loadConfig()).manifest as Manifest;
+    expect(Object.keys(manifest.commands)).toEqual(["_execute_action"]);
+    expect(manifest.commands._execute_action.suggested_key).toEqual({ default: APPROVED_TOOLBAR_SHORTCUT });
+    expect(registerCommands(manifest.commands)).toEqual([{ name: "_execute_action", description: TOOLBAR_TITLE, shortcut: APPROVED_TOOLBAR_SHORTCUT, refusedBecause: null }]);
   });
 
   it("no build's manifest carries stale wording, and the wording does not vary by flag, since the manifests are compared", async () => {

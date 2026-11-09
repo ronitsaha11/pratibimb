@@ -41,6 +41,8 @@ function write({ name = "m2311-build-", worker, offscreen, content = CONTENT, co
       host_permissions: ["http://127.0.0.1/*"],
       name: "PratiBimb — Page Assistant (Development build)",
       action: { default_title: "PratiBimb — Page Assistant" },
+      // M23.21: the product manifest's one command, as `wxt.config.ts` declares it.
+      commands: { _execute_action: { suggested_key: { default: "Ctrl+Shift+Y" }, description: "PratiBimb — Page Assistant" } },
       content_security_policy: { extension_pages: csp ?? policy(connectSrc) },
       content_scripts: [{ matches: ["http://127.0.0.1/*"], js: ["content-scripts/content.js"] }],
       ...manifest,

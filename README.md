@@ -136,7 +136,8 @@ do, press **Start task**, and answer the consent request. **Allow once** restore
 **Deny** restores nothing. The panel then shows each turn's outcome and its measured stage timings.
 Records go to `artifacts/experiments/M20-runnable-measured-product/logs/`, one new file per run.
 
-The toolbar button only opens the panel: `Alt+Shift+P` does the same. Normal tasks do
+The toolbar button only opens the panel: `Ctrl+Shift+Y` does the same (M23.21; it was `Alt+Shift+P`, which Chrome keeps for
+its own "create new tab group" on Windows and Linux, so Chrome never assigned it). Normal tasks do
 not capture browser screenshots or send page images to the reasoning model. Visual-only PII protection is not
 operational.
 

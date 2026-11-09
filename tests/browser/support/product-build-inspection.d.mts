@@ -13,3 +13,4 @@ export function inspectProductBuild(
   readonly bundle: Readonly<Record<string, unknown>>;
 };
 export const OFFSCREEN_JUSTIFICATION: string;
+export const APPROVED_TOOLBAR_SHORTCUT: string;
