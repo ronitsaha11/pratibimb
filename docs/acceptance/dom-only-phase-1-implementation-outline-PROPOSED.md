@@ -2,6 +2,7 @@
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.6, 2026-11-03).**
 > - **The owner selected:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1**, together with OD-P. Both are **SELECTED BY OWNER — IMPLEMENTATION NOT AUTHORISED.**
+> - **Since then:** M23.7 implemented OD-P and OD-R in product builds, and M23.8 tested the boundary under a simulated extension. Not browser-verified, not accepted. This document's statements about what the runtime does describe the source when it was written, and still describe evidence builds.
 > - **What this is:** an **outline** for future, separately authorised milestones. It is not a patch, branch or script. **Nothing here is implemented;** the runtime still captures frames on gesture-granted passes and runs T1 and TR-01 on them.
 
 ## 1. Implications (recorded)

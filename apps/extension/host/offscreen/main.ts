@@ -13,7 +13,7 @@ import { checkTurnBudget, prepareDeclarationForm, type GrantDecision, type Grant
 
 import { bootstrapOrtRealm, createPinnedInferenceSession, resolvePackagedAsset } from "../../entrypoints/ortRuntime";
 import { type BoundaryReply, type BoundaryRequest, type CapabilityPayload } from "../../host-lib/boundary-protocol";
-import { runExtensionTask, type ExtensionRunRequest, type ExtensionRunResult } from "../../host-lib/extension-run";
+import { runExtensionTask, type ExtensionRunDeps, type ExtensionRunRequest, type ExtensionRunResult } from "../../host-lib/extension-run";
 import { identityOf, isFromExtensionUi, isFromSidePanel, isFromThisExtension, type ToOffscreen } from "../../host-lib/messages";
 import { createConsentDesk } from "../../host-lib/consent-desk";
 import { createClarificationDesk } from "../../host-lib/clarification-desk";
@@ -23,6 +23,7 @@ import { installTransportControlPlane } from "../../host-lib/transport-control-p
 import { type CaptureTicket } from "../../host-lib/capture-authority";
 import { browserWebpCodec, createPerceptionRealm, type PerceptionOptions, type PerceptionRealm } from "../../host-lib/perception-realm";
 import { createTr01Host, spawnTr01Worker, type Tr01Host } from "../../host-lib/tr01-host";
+import { loadsUiHead, taskPerception } from "../../host-lib/task-perception";
 import { createReleaseAuthority, type AttestedAsker } from "../../host-lib/value-release";
 
 const instanceId = crypto.randomUUID();
@@ -40,6 +41,17 @@ async function ortSmoke() {
   try {
     const realm = await bootstrapOrtRealm("offscreen", ort as never);
     const tBoot = performance.now() - t0;
+    // M23.7 (OD-P): a product build does not package the UI head, so the smoke stops at the runtime.
+    if (!loadsUiHead(__EVIDENCE_BUILD__)) {
+      return {
+        ok: false,
+        stage: "UI_HEAD_NOT_IN_PRODUCT_BUILD",
+        ortBootstrapped: true,
+        pinnedArtifact: realm.pin,
+        wasmCompilationAllowed: realm.capability,
+        ms: { bootstrap: Math.round(tBoot) },
+      };
+    }
     const modelBytes = new Uint8Array(await (await fetch(resolvePackagedAsset("t1-ui-head.onnx"))).arrayBuffer());
     const t1 = performance.now();
     const session = (await createPinnedInferenceSession(ort as never, modelBytes, { executionProviders: ["wasm"] })) as {
@@ -119,6 +131,9 @@ async function ensurePerception(): Promise<PerceptionRealm> {
     if (!ort) throw new Error("ort global missing");
     const realm = await bootstrapOrtRealm("offscreen", ort as never);
     pin = realm.pin;
+    // M23.7 (OD-P): the UI head is packaged only in an evidence build. A product build's realm has
+    // no session, so its detector refuses MODEL_ASSET_UNAVAILABLE rather than running unverified bytes.
+    if (!loadsUiHead(__EVIDENCE_BUILD__)) throw new Error("UI_HEAD_NOT_IN_PRODUCT_BUILD: the UI head is not packaged in a product build (OD-P)");
     const modelBytes = new Uint8Array(await (await fetch(resolvePackagedAsset("t1-ui-head.onnx"))).arrayBuffer());
     session = await createPinnedInferenceSession(ort as never, modelBytes, { executionProviders: ["wasm"] });
   } catch (e) {
@@ -312,7 +327,15 @@ async function runTask(request: ExtensionRunRequest, startedInThePanel = false):
       relay: chromeRelay,
       capabilities,
       sendToBoundary,
-      perceive: async (graph, measurement, visualRegions, options) => (await ensurePerception()).perceive(graph, measurement, visualRegions, options),
+      // M23.7 (OD-R): a product task takes no perception pass, so it captures no frame and starts
+      // neither the UI head nor TR-01. An evidence build keeps the pass. See task-perception.ts.
+      // M23.9 (OD-S): the build's flag, in place, so a product bundler drops this closure and with it
+      // the realm only the closure and the hooks reach. A product task gets `{}`, as it already did.
+      ...(__EVIDENCE_BUILD__
+        ? taskPerception<NonNullable<ExtensionRunDeps["perceive"]>>(__EVIDENCE_BUILD__, async (graph, measurement, visualRegions, options) =>
+            (await ensurePerception()).perceive(graph, measurement, visualRegions, options)
+          )
+        : {}),
       perceptionBoot: () => perceptionBoot,
       askHuman: (grantRequest) =>
         new Promise<GrantDecision>((resolve) => {
@@ -390,6 +413,10 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
   /**
    * M10.4: `#tr01-probe` resolves to `probe/tr01-absent.ts` unless `TR01_PROBE=1` is set, so a
    * product build answers a `TR01_PROBE` exactly as it answers a kind that was never defined.
+   *
+   * M23.9 (OD-S): the flag is checked here as well because this call's argument names `perceiveTab`.
+   * The stub would answer `false` regardless, but a reference is enough to keep the capture path in a
+   * product bundle. It is absent now, not merely unused.
    */
   /**
    * M12: `CSP_PROBE` and `E4_EMIT` performed a `fetch` outside `@pratibimb/egress` (QG-04 item 1).
@@ -399,6 +426,7 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
    */
   if (serveEgressEvidence(msg as ToOffscreen, sender, sendResponse)) return true;
   if (
+    __EVIDENCE_BUILD__ &&
     serveTr01Probe(msg, sender, sendResponse, {
       perceiveTab,
       sanitizedFrame: () => perceptionRealm?.sanitizedFrame() ?? null,
@@ -435,8 +463,11 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
    * The same capture authority, the same session, the same head and the same fusion the run loop
    * drives -- so what an evaluation measures is the shipped configuration rather than a bench rig
    * that resembles it. `collect` asks for the boxes, which an ordinary pass never carries.
+   *
+   * M23.9 (OD-S, Option B): this and the handler below exist only in an evidence build. A product build
+   * has neither, and answers both kinds `UNKNOWN_KIND`, as it answers any kind it never defined.
    */
-  if (msg.kind === "PERCEIVE_ONCE") {
+  if (__EVIDENCE_BUILD__ && msg.kind === "PERCEIVE_ONCE") {
     void (async () => {
       try {
         const { observed, summary } = await perceiveTab(msg.tabId, msg.frameId);
@@ -462,7 +493,7 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
     })();
     return true;
   }
-  if (msg.kind === "STREAM_CONSUME") {
+  if (__EVIDENCE_BUILD__ && msg.kind === "STREAM_CONSUME") {
     void (async () => {
       const t0 = performance.now();
       try {

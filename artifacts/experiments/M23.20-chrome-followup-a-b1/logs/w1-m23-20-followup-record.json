@@ -1,0 +1,88 @@
+{
+  "milestone": "M23.20",
+  "recordStatus": "COMPLETE — all planned A1–A6 and B1 checks observed; side panel never opened",
+  "relatesTo": "M23.19 interim record at 38b24bf, unchanged; its B1 stays NOT RUN and its B6 stays FAIL (DEF-M23.19-01)",
+  "authorisation": "owner's M23.20 instruction in chat, 2026-11-08T09:47:11.618Z (15:17:11 IST), session transcript",
+  "date": "2026-11-08",
+  "operator": "the project owner",
+  "operatedBy": "the operator, by hand; Claude does not control Chrome",
+  "workstation": "W1",
+  "commit": "38b24bf",
+  "productBuild": {
+    "path": "apps/extension/.output/chrome-mv3",
+    "sourceCommit": "8d3ce5f",
+    "hashCheck": "9 of 9 OK at 15:17 IST",
+    "inspectionProblems": []
+  },
+  "chrome": {
+    "binaryVersionResource": "153.0.8010.12",
+    "productName": "Google Chrome for Testing",
+    "runtimeVersion": "153.0.8010.12 (operator confirmation and visible browser banner)",
+    "profile": "pratibimb-m23-20-profile-20261108T152035, created 15:20:35 IST; Last Version stamp 153.0.8010.12; M23.19 profile still present, not deleted",
+    "launchFlags": "at 15:33 IST, 9 Chrome for Testing processes, all on the M23.20 profile; none with --incognito, --load-extension or --remote-debugging"
+  },
+  "services": {
+    "reasoner": "not started",
+    "fixtureServer": "not started",
+    "ports8975_8977_8995": "free at 15:17 IST"
+  },
+  "results": [
+    {
+      "id": "S2",
+      "state": "PASS",
+      "observed": "Chrome for Testing 153.0.8010.12, operator confirmation and visible browser banner"
+    },
+    {
+      "id": "A1",
+      "state": "PASS",
+      "observed": "extension name tooltip shows 'PratiBimb — Page Assistant (Development build)'; no extension error (A5)"
+    },
+    {
+      "id": "A2",
+      "state": "PASS",
+      "observed": "no permission entries visibly listed; site access http://127.0.0.1/*; no all-sites access"
+    },
+    {
+      "id": "A3",
+      "state": "PASS",
+      "observed": "toolbar tooltip displays 'PratiBimb — Page Assistant'"
+    },
+    {
+      "id": "A4",
+      "state": "PASS",
+      "observed": "all four prohibited identity phrases returned 0/0 on the extension card and Details page"
+    },
+    {
+      "id": "A5",
+      "state": "RECORDED — NO STATE ASSIGNED (owner's decision)",
+      "observed": "no extension-specific warning or error; browser notices: Chrome for Testing automated-testing banner, a standard Chromium Incognito warning (exact wording and location not recorded), orange badge tooltip 'Unpacked extension'; none attributed to the extension"
+    },
+    {
+      "id": "A6",
+      "state": "NOT FOUND",
+      "observed": "the exact justification sentence returned 0/0; not seen does not prove it is never shown; not a failure"
+    },
+    {
+      "id": "B1",
+      "state": "PASS",
+      "observed": "before the panel opened, Inspect views showed only 'service worker'; offscreen.html absent"
+    },
+    {
+      "id": "B1-recheck",
+      "state": "PASS",
+      "observed": "after refreshing chrome://extensions, Inspect views displayed only 'service worker'; no offscreen.html appeared"
+    }
+  ],
+  "screenshots": [],
+  "stopConditionsFired": [],
+  "deviations": [
+    "observation times and order not reported"
+  ],
+  "observationsReceived": "2026-11-08 15:33 IST (S2, A1–A6, B1); B1-recheck in the operator's final update; individual observation times and order not reported",
+  "sessionEnd": {
+    "chrome": "the operator stated they would close the Chrome for Testing window by hand",
+    "profilesDeleted": false,
+    "servicesStarted": false,
+    "sidePanelOpened": false
+  }
+}

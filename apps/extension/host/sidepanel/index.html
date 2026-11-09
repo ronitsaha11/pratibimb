@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>PratiBimb — minimal host</title>
+  <title>PratiBimb — Page Assistant (Development build)</title>
   <style>
     body { font: 13px/1.4 system-ui, sans-serif; margin: 12px; color: #111; }
     h1 { font-size: 15px; margin: 0 0 8px; }
@@ -18,7 +18,10 @@
   </style>
 </head>
 <body>
-  <h1>PratiBimb minimal host</h1>
+  <h1>PratiBimb — Page Assistant (Development build)</h1>
+  <!-- M23.12 (OD-T): filled in a product build only. See main.ts. -->
+  <p id="about" hidden></p>
+  <p id="privacy" hidden></p>
   <p class="warn">Development build. Use synthetic pages only. A request to use a stored value, or to choose between two, appears directly below.</p>
   <!-- M19: the two questions a run can wait on come first, so a person sees them without scrolling. -->
   <fieldset id="consent" hidden>
@@ -55,8 +58,10 @@
     <!-- M20: measured per-stage timings of the finished task, per turn. Value-free; textContent only. -->
     <div id="task-timings"></div>
   </fieldset>
-  <fieldset><legend>Capture</legend><div id="capture">…</div></fieldset>
-  <fieldset><legend>Status</legend><pre id="status">…</pre><div id="needs-user">NEEDS_USER: none</div></fieldset>
+  <!-- M23.12 (OD-T): an evidence build's capture field goes here. A product build has none. See main.ts. -->
+  <div id="capture-slot"></div>
+  <!-- M23.18 (RD-2): a product hides this unless something failed. An evidence build adds its fixed status line. See main.ts. -->
+  <fieldset id="status-box"><legend>Status</legend><pre id="status">…</pre></fieldset>
   <script type="module" src="./main.ts"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@
  */
 import { panelAnswer, panelViewOf } from "../../host-lib/clarification-panel";
 import { consentAnswer, consentViewOf } from "../../host-lib/consent-panel";
+import { PRIVACY_EXPLANATION, SIDE_PANEL_DESCRIPTION } from "../../host-lib/product-copy";
 import {
   OFFER_TEXT,
   addExpectation,
@@ -19,34 +20,90 @@ import {
   type Expectation,
   type PanelForm,
 } from "../../host-lib/task-panel";
+import { STATUS_UNAVAILABLE_MESSAGE } from "../../host-lib/product-copy";
 
 // NOT `status`: `window.status` is a DOM global of type `string`, so a module-scope `const status`
 // collides with it. The build never noticed because nothing type-checked this file.
 const statusEl = document.getElementById("status");
-const captureEl = document.getElementById("capture");
 
 /**
- * What a person has to do, in one line.
+ * M23.12 (OD-T) — WHAT THE PANEL SAYS DEPENDS ON WHICH BUILD IT IS IN, BECAUSE WHAT IS TRUE DOES.
+ *
+ * A product task captures nothing, so a product panel says so and has no capture field to contradict it. An
+ * evidence build's tasks do capture under a grant, so it must not say that, and it keeps its capture field, whose
+ * wording is accurate there. `__EVIDENCE_BUILD__` is substituted at build time, so each bundle carries one side.
+ */
+const showText = (id: string, text: string): void => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.hidden = false;
+};
+if (!__EVIDENCE_BUILD__) {
+  showText("about", SIDE_PANEL_DESCRIPTION);
+  showText("privacy", PRIVACY_EXPLANATION);
+}
+
+/** An evidence build's capture field, built where it has always been shown. */
+function evidenceCaptureField(): HTMLElement {
+  const fieldset = document.createElement("fieldset");
+  const legend = document.createElement("legend");
+  legend.textContent = "Capture";
+  const field = document.createElement("div");
+  field.id = "capture";
+  field.textContent = "…";
+  fieldset.append(legend, field);
+  document.getElementById("capture-slot")?.append(fieldset);
+  return field;
+}
+const captureEl = __EVIDENCE_BUILD__ ? evidenceCaptureField() : null;
+
+/**
+ * What a person has to do, in one line, in an evidence build.
  *
  * ADR-0009 accepts that a fresh toolbar invocation is required after navigation, and is explicit
  * that this is "a deliberate fail-closed behavior, not a defect to be hidden". Hiding it would mean
  * a capture refusing somewhere nobody can see; this is the smallest place to say it out loud.
  */
-const CAPTURE_TEXT: Record<string, string> = {
-  NO_GRANT: "Not authorised. Click the toolbar button to let PratiBimb look at this tab.",
-  GRANTED: "Authorised. No frame taken yet.",
-  STREAM_AVAILABLE: "Authorised for the page currently open.",
-  DOCUMENT_CHANGED: "The page changed. Click the toolbar button again to re-authorise.",
-  REVOKED: "Authorisation ended when the tab navigated. Click the toolbar button again.",
-};
+const CAPTURE_TEXT: Record<string, string> = __EVIDENCE_BUILD__
+  ? {
+      NO_GRANT: "Not authorised. Click the toolbar button to let PratiBimb look at this tab.",
+      GRANTED: "Authorised. No frame taken yet.",
+      STREAM_AVAILABLE: "Authorised for the page currently open.",
+      DOCUMENT_CHANGED: "The page changed. Click the toolbar button again to re-authorise.",
+      REVOKED: "Authorisation ended when the tab navigated. Click the toolbar button again.",
+    }
+  : {};
+
+/**
+ * M23.18 (RD-2, option S-C): A PRODUCT'S STATUS BOX SAYS NOTHING WHILE THE PANEL WORKS, AND ONE PLAIN SENTENCE IF IT DOES NOT.
+ *
+ * THE REQUEST IS NOT PRESENTATION. `HOST_STATUS` is what creates the offscreen document every task needs (M23.16 §3), so it is
+ * sent in every build, exactly as before, and the worker's reply is unchanged. Only what a product prints changes: no worker
+ * identifiers, counters or timestamps, and on failure no raw error. The error goes to the console, for a developer.
+ *
+ * An evidence build prints the worker's whole reply, its Capture field and its NEEDS_USER line, as it always has. That line is
+ * a fixed string, so a product no longer carries it: it said "none" while a request for consent was on screen.
+ */
+const statusBox = document.getElementById("status-box");
+if (statusBox) {
+  if (__EVIDENCE_BUILD__) {
+    const needsUser = document.createElement("div");
+    needsUser.id = "needs-user";
+    needsUser.textContent = "NEEDS_USER: none";
+    statusBox.append(needsUser);
+  } else {
+    statusBox.hidden = true;
+  }
+}
 
 async function refresh() {
   try {
     const s = (await chrome.runtime.sendMessage({ kind: "HOST_STATUS" })) as {
       captureStatus?: { lifecycle: string; requiresReauth: boolean } | null;
     };
-    if (statusEl) statusEl.textContent = JSON.stringify(s, null, 2);
-    if (captureEl) {
+    if (statusEl) statusEl.textContent = __EVIDENCE_BUILD__ ? JSON.stringify(s, null, 2) : "";
+    if (__EVIDENCE_BUILD__ && captureEl) {
       const lifecycle = s?.captureStatus?.lifecycle ?? "NO_GRANT";
       captureEl.textContent = CAPTURE_TEXT[lifecycle] ?? lifecycle;
       captureEl.dataset.lifecycle = lifecycle;
@@ -54,7 +111,14 @@ async function refresh() {
     }
     document.documentElement.dataset.hostStatus = "ok";
   } catch (e) {
-    if (statusEl) statusEl.textContent = `status unavailable: ${e instanceof Error ? e.message : String(e)}`;
+    const detail = e instanceof Error ? e.message : String(e);
+    if (__EVIDENCE_BUILD__) {
+      if (statusEl) statusEl.textContent = `status unavailable: ${detail}`;
+    } else {
+      if (statusEl) statusEl.textContent = STATUS_UNAVAILABLE_MESSAGE;
+      if (statusBox) statusBox.hidden = false;
+      console.warn(`PratiBimb: the side panel could not reach the service worker: ${detail}`);
+    }
     document.documentElement.dataset.hostStatus = "error";
   }
 }

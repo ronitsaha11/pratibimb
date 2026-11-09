@@ -1,0 +1,68 @@
+{
+  "what": "static inspection of an existing product build: manifest, file names and JavaScript text. No model file was opened, nothing was built, and no browser was started",
+  "workstation": "W1",
+  "gitHead": "41806a178bee82c87d1309aed91d86eac8faae63",
+  "buildManifestWrittenAt": "2026-11-04T12:28:38.307Z",
+  "recordedAt": "2026-11-04T15:21:15.870Z",
+  "problems": [
+    "TOOLBAR_TITLE_NOT_THE_APPROVED_WORDING",
+    "SIDE_PANEL_DESCRIPTION_NOT_THE_APPROVED_WORDING",
+    "PRIVACY_EXPLANATION_NOT_THE_APPROVED_WORDING",
+    "STALE_UI_WORDING:perceive this tab",
+    "STALE_UI_WORDING:look at this tab",
+    "STALE_UI_WORDING:No frame taken",
+    "STALE_UI_WORDING:Click the toolbar button"
+  ],
+  "files": [
+    "background.js",
+    "content-scripts/content.js",
+    "manifest.json",
+    "offscreen.html",
+    "ort-wasm-simd-threaded.jsep.mjs",
+    "ort-wasm-simd-threaded.jsep.wasm",
+    "ort.all.min.js",
+    "sidepanel.html",
+    "tr01-ppocrv4-mobile-det.onnx",
+    "tr01-worker.js"
+  ],
+  "manifest": {
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ],
+    "host_permissions": [
+      "http://127.0.0.1/*"
+    ],
+    "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+    "actionTitle": "PratiBimb: perceive this tab"
+  },
+  "bundle": {
+    "namesEachHookMarker": {
+      "PERCEIVE_ONCE": false,
+      "STREAM_CONSUME": false,
+      "perceiveOnce": false,
+      "consumeProbe": false,
+      "mintStreamId": false,
+      "ticketProbe": false,
+      "CAPTURE_FRAME": false,
+      "CAPTURE_TICKET": false,
+      "chromeMediaSourceId": false,
+      "grabFrame": false
+    },
+    "callsGetUserMedia": false,
+    "offscreenCanStartTr01": false,
+    "offscreenHandlesPerceiveOnce": false,
+    "offscreenHandlesStreamConsume": false,
+    "offscreenHasTheProductRefusal": true,
+    "offscreenStillNamesT1": true,
+    "workerControlPlaneHasPerceiveOnce": false,
+    "workerControlPlaneHasConsumeProbe": false,
+    "workerControlPlaneHasMintStreamId": false,
+    "workerMintsCaptureHandles": true,
+    "contentScriptNamesEitherHook": false,
+    "sidePanelNamesEitherHook": false,
+    "sidePanelStillAsksForTheToolbarGesture": true
+  }
+}

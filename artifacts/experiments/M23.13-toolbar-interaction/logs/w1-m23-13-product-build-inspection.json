@@ -1,0 +1,62 @@
+{
+  "what": "static inspection of an existing product build: manifest, file names and JavaScript text. No model file was opened, nothing was built, and no browser was started",
+  "workstation": "W1",
+  "gitHead": "59f428245ededa75cad399ad97aab168ea29d7ff",
+  "buildManifestWrittenAt": "2026-11-06T15:48:53.981Z",
+  "recordedAt": "2026-11-06T15:48:54.426Z",
+  "problems": [],
+  "files": [
+    "background.js",
+    "content-scripts/content.js",
+    "manifest.json",
+    "offscreen.html",
+    "ort-wasm-simd-threaded.jsep.mjs",
+    "ort-wasm-simd-threaded.jsep.wasm",
+    "ort.all.min.js",
+    "sidepanel.html",
+    "tr01-ppocrv4-mobile-det.onnx",
+    "tr01-worker.js"
+  ],
+  "manifest": {
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ],
+    "host_permissions": [
+      "http://127.0.0.1/*"
+    ],
+    "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+    "actionTitle": "PratiBimb — Page Assistant"
+  },
+  "bundle": {
+    "namesEachHookMarker": {
+      "PERCEIVE_ONCE": false,
+      "STREAM_CONSUME": false,
+      "perceiveOnce": false,
+      "consumeProbe": false,
+      "mintStreamId": false,
+      "ticketProbe": false,
+      "CAPTURE_FRAME": false,
+      "CAPTURE_TICKET": false,
+      "chromeMediaSourceId": false,
+      "grabFrame": false
+    },
+    "callsGetUserMedia": false,
+    "toolbarOpensTheSidePanel": true,
+    "toolbarIssuesACaptureGrant": false,
+    "offscreenCanStartTr01": false,
+    "offscreenHandlesPerceiveOnce": false,
+    "offscreenHandlesStreamConsume": false,
+    "offscreenHasTheProductRefusal": true,
+    "offscreenStillNamesT1": true,
+    "workerControlPlaneHasPerceiveOnce": false,
+    "workerControlPlaneHasConsumeProbe": false,
+    "workerControlPlaneHasMintStreamId": false,
+    "workerMintsCaptureHandles": true,
+    "contentScriptNamesEitherHook": false,
+    "sidePanelNamesEitherHook": false,
+    "sidePanelStillAsksForTheToolbarGesture": false
+  }
+}

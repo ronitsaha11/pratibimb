@@ -1,0 +1,130 @@
+{
+  "what": "each mutation was applied to one working-tree file, three test files were run, and the file was restored. A non-zero exit means the mutation was caught. No build, browser or model was involved.",
+  "tests": [
+    "apps/extension/test/toolbarInteraction.test.ts",
+    "apps/extension/test/buildSeparation.test.ts",
+    "tests/browser/support/product-build-inspection.test.mjs"
+  ],
+  "results": [
+    {
+      "mutation": "the product grants too: the flag removed from the grant",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence opens the panel too",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence grants nothing",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the product does nothing",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the handler awaits first, losing the gesture",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a failure falls back to a grant",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a click starts offscreen work",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a click sends a message",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a click mints a stream id",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a second listener added, for the shortcut",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "failure is swallowed silently",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a thrown open escapes",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a rejected open is not caught",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the missing-tab case is not reported",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the window fallback removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the window preferred over the tab",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the helper opens asynchronously",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a popup added to the toolbar",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "setPanelBehavior used instead",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a permission dropped",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the side panel's registration moved",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: the open not checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: the grant not checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: a popup not checked",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}

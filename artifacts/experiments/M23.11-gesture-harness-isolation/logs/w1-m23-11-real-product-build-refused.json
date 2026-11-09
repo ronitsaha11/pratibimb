@@ -1,0 +1,19 @@
+{
+  "what": "the gesture harnesses' gate, called directly on the real product build already on disk. Neither harness was executed. Nothing was built, no browser or server started, and no model file was opened.",
+  "workstation": "w1",
+  "gitHead": "20914f1",
+  "productSourceLastChangedAt": "712465e",
+  "buildManifestWrittenAt": "2026-11-04T12:28:38.307Z",
+  "identity": {
+    "identity": "PRODUCT",
+    "reasons": [],
+    "workerFrameRoute": false,
+    "e6Probe": false
+  },
+  "selection": {
+    "accepted": false,
+    "identity": "PRODUCT",
+    "reasons": [],
+    "refusal": "this is a product build. OD-U: this harness is evidence-build-only, because a DOM-only product has no capture route and no diagnostic hooks. These harnesses never build one. An evidence build and a run each need the owner's authorisation."
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "milestone": "M23.19",
+  "recordStatus": "INTERIM — paused after section B at the owner's instruction; section C not started; reasoner and fixture server stopped at the owner's instruction",
+  "authorisation": "owner approval of F1 to F5 in chat, message timestamped 2026-11-07T20:43:56.859Z (2026-11-08 02:13:56 IST) in the session transcript, against artifacts/experiments/M23.19A-chrome-smoke-readiness/final-authorisation-M23.19B-PROPOSED.md as finalised in M23.19C (3e0c40c); that file's section 8 still reads PENDING and was not edited; an append-only addendum is PROPOSED, not applied",
+  "date": "2026-11-08",
+  "localTimeStart": "02:15:36 IST (reasoner ready, startedAt 2026-11-07T20:45:36.777Z, genuine UTC: set by Date.toISOString)",
+  "localTimeRecorded": "04:50 IST (first written); revised 14:02 IST",
+  "localTimeEnd": null,
+  "operator": "the project owner",
+  "operatedBy": "the operator, by hand; Claude did not control Chrome",
+  "workstation": "W1",
+  "commit": "3e0c40c",
+  "productBuild": {
+    "path": "apps/extension/.output/chrome-mv3",
+    "sourceCommit": "8d3ce5f",
+    "hashCheck": "9 of 9 OK before the test; 9 of 9 OK again at 04:48 IST",
+    "inspectionProblems": [],
+    "declaredShortcut": "commands._execute_action.suggested_key.default = Alt+Shift+P"
+  },
+  "chrome": {
+    "version": "PENDING — chrome://version not yet reported",
+    "binaryVersionResource": "153.0.8010.12",
+    "channel": "Chrome for Testing",
+    "profile": "temporary profile directory pratibimb-m23-19-profile-20261108T043254 under %TEMP%, created 04:32:55 IST; its Last Version stamp reads 153.0.8010.12; only that file was read; use by the test is INFERENCE (corrected: earlier labelled as operator-reported)",
+    "laterState": "no Chrome for Testing process at 14:02:16 IST; not closed by Claude; closure time UNKNOWN"
+  },
+  "manifestAsChromeShowsIt": "PENDING — A1 to A2 not yet reported",
+  "justificationSeen": "PENDING — A6 not yet reported",
+  "reasoner": {
+    "model": "qwen2.5-0.5b-instruct-q4_k_m.gguf, revision 9217f5db79a2, 491400032 bytes, sha256 prefix 74a4da8c9fdb matches the pin",
+    "runtime": "llama.cpp b10956, 50 files match the pinned release",
+    "coldStartMeasuredMs": {
+      "verify": 919,
+      "modelLoad": 1942,
+      "total": 2883
+    },
+    "health": "ok",
+    "modelServerLocked": "401 on /slots and on POST without the key",
+    "webOriginRefused": "403",
+    "requestsFromExtensionThroughB6": 0,
+    "stopped": "npm run reasoner:stop at 14:01:55 IST, exit 0: stopped llama-server; the launcher saw it exit (code 1), stopped the front and exited 1",
+    "requestsFromExtensionWholeSession": 0
+  },
+  "results": [
+    {
+      "id": "A1",
+      "state": "PENDING",
+      "observed": "not reported"
+    },
+    {
+      "id": "A2",
+      "state": "PENDING",
+      "observed": "not reported"
+    },
+    {
+      "id": "A3",
+      "state": "PENDING",
+      "observed": "not reported"
+    },
+    {
+      "id": "A4",
+      "state": "PENDING",
+      "observed": "not reported"
+    },
+    {
+      "id": "A5",
+      "state": "PENDING",
+      "observed": "not reported"
+    },
+    {
+      "id": "A6",
+      "state": "PENDING",
+      "observed": "not reported"
+    },
+    {
+      "id": "B1",
+      "state": "NOT RUN",
+      "observed": "not recorded before the side panel was first opened; unverified"
+    },
+    {
+      "id": "B2",
+      "state": "PASS",
+      "observed": "/fixture/ opened and the PratiBimb side panel opened successfully; heading, description and privacy sentence not separately reported"
+    },
+    {
+      "id": "B3",
+      "state": "PASS",
+      "observed": "after opening the panel and refreshing chrome://extensions, Inspect views showed service worker, offscreen.html and sidepanel.html; without B1 the before state is unobserved"
+    },
+    {
+      "id": "B4",
+      "state": "PASS",
+      "observed": "no Status box; none of NEEDS_USER, captureStatus, NO_GRANT"
+    },
+    {
+      "id": "B5",
+      "state": "PASS",
+      "observed": "__host.captureState().grants returned []"
+    },
+    {
+      "id": "B6",
+      "state": "FAIL",
+      "observed": "toolbar part as expected: the panel opened or stayed accessible across three interactions, no task started. Shortcut part FAIL: Alt+Shift+P did not open PratiBimb; it opened Chrome's tab-group menu. Grants unchanged at [] afterwards",
+      "defect": "DEF-M23.19-01"
+    },
+    {
+      "id": "B7",
+      "state": "PASS",
+      "scope": "B2 to B6 interactions only",
+      "observed": "no permission prompt, capture indicator, screen-sharing bar or extension error"
+    },
+    {
+      "id": "C1-C9",
+      "state": "PENDING",
+      "observed": "section C not started, at the owner's instruction"
+    },
+    {
+      "id": "D1-D4",
+      "state": "PENDING",
+      "observed": "not started"
+    },
+    {
+      "id": "E1-E4",
+      "state": "PENDING",
+      "observed": "not started"
+    },
+    {
+      "id": "F1s-F3s",
+      "state": "PENDING",
+      "observed": "not started"
+    },
+    {
+      "id": "G1",
+      "state": "EXCLUDED",
+      "observed": "outside the approved fixture (owner, M23.19C); not executed"
+    },
+    {
+      "id": "G2",
+      "state": "PENDING",
+      "observed": "not started"
+    },
+    {
+      "id": "G3",
+      "state": "EXCLUDED",
+      "observed": "outside the approved fixture (owner, M23.19C); not executed"
+    },
+    {
+      "id": "G4",
+      "state": "NOT RUN",
+      "observed": "requires prohibited manipulation (owner, M23.19C); not executed"
+    },
+    {
+      "id": "G5",
+      "state": "PENDING",
+      "observed": "runs last; the reasoner is still running"
+    },
+    {
+      "id": "H1-H5",
+      "state": "PENDING",
+      "observed": "not started"
+    }
+  ],
+  "defects": [
+    {
+      "id": "DEF-M23.19-01",
+      "summary": "Alt+Shift+P does not open the side panel; it opened Chrome's tab-group menu",
+      "cause": "UNKNOWN — not investigated, per the owner's instruction",
+      "safetyEffect": "none observed",
+      "stopCondition": false,
+      "changesMade": "none"
+    }
+  ],
+  "consoleErrors": [],
+  "consoleErrorsNote": "none reported",
+  "screenshots": [],
+  "stopConditionsFired": [],
+  "deviations": [
+    "B1 not recorded before the side panel was first opened",
+    "test paused after section B at the owner's instruction",
+    "setup: Get-NetTCPConnection exited 1; ports confirmed by netstat, owning processes and an HTTP request instead",
+    "setup: a POST to /fixture/ returned 200; the static server ignores the method and has no write route",
+    "paused shutdown at the owner's instruction, before G5; G5 needs the reasoner restarted, an owner decision",
+    "fixture server ended through the session's task control (terminates the process), since a background task cannot receive Ctrl+C; static server, no state",
+    "Chrome for Testing was no longer running when the shutdown was verified; the owner had asked for it to be left open; Claude did not close it"
+  ],
+  "shutdown": {
+    "chromeClosed": "not closed by Claude; no Chrome for Testing process at 14:02:16 IST",
+    "fixtureServerStopped": true,
+    "reasonerStopped": true,
+    "portsFree": true,
+    "portsCheckedAt": "14:02:16 IST: netstat lists nothing on 8975, 8977, 8995; HTTP connections refused",
+    "reasonerStateFileRemoved": true,
+    "extensionTaskRunning": false,
+    "profileDeleted": false,
+    "profileDeletedNote": "not deleted, at the owner's instruction"
+  },
+  "timezone": {
+    "windows": "India Standard Time, UTC+05:30, no daylight saving",
+    "TZ": "unset",
+    "node": "Asia/Calcutta, offset -330 min"
+  },
+  "timeline": [
+    {
+      "event": "owner approval message",
+      "utc": "2026-11-07T20:43:56.859Z",
+      "source": "session transcript"
+    },
+    {
+      "event": "fixture server process start",
+      "utc": "2026-11-07T20:44:30.295Z",
+      "source": "OS process start"
+    },
+    {
+      "event": "reasoner launcher process start",
+      "utc": "2026-11-07T20:45:33.840Z",
+      "source": "OS process start"
+    },
+    {
+      "event": "llama-server process start",
+      "utc": "2026-11-07T20:45:34.889Z",
+      "source": "OS process start"
+    },
+    {
+      "event": "PRATIBIMB_REASONER_READY startedAt",
+      "utc": "2026-11-07T20:45:36.777Z",
+      "source": "launcher log"
+    },
+    {
+      "event": "temporary profile created",
+      "utc": "2026-11-07T23:02:55Z",
+      "source": "file system"
+    },
+    {
+      "event": "section B observations received",
+      "utc": "2026-11-07T23:17:32Z",
+      "source": "session transcript"
+    },
+    {
+      "event": "record first written",
+      "utc": "2026-11-07T23:20:29Z to 23:20:57Z",
+      "source": "file system"
+    },
+    {
+      "event": "test profile last written",
+      "utc": "2026-11-08T08:26:18Z",
+      "source": "file system"
+    },
+    {
+      "event": "reasoner stopped",
+      "utc": "2026-11-08T08:31:55Z to 08:31:57Z",
+      "source": "shell clock"
+    },
+    {
+      "event": "ports verified free",
+      "utc": "2026-11-08T08:32:16Z",
+      "source": "PowerShell clock"
+    },
+    {
+      "event": "section B observation times",
+      "utc": "UNKNOWN — not reported; between 23:02:55Z and 23:17:32Z",
+      "source": "bounds from the rows above"
+    }
+  ],
+  "processScreenshotRuntime": "operator reports about 11h43m at about 08:28; consistent with a UTC reading (11h42m34s at 08:28:08Z), inconsistent with an IST reading; the screenshot's clock basis is UNKNOWN; Claude has not seen it",
+  "screenshotsNote": "the operator reports supplying screenshots in chat; none archived here; none copied or committed; no image attachment appears in the session transcript for the M23.19 messages, so Claude has not seen them"
+}

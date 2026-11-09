@@ -282,7 +282,7 @@ const record = {
     "one synthetic page, one run per scenario; no reliability claim",
     "the side panel page was opened in a tab, because a harness cannot open Chrome's side panel; the page, its code and its messages are the shipped ones",
     "the harness clicked the panel's controls and answered the value-use grant as the operator; no person was in the loop",
-    "perception ran the product's no-gesture DOM floor; no frame was captured and none left the client",
+    "a product task takes no perception pass (M23.7): no frame was captured or asked for, and none left the client",
   ],
   recordedAt: new Date().toISOString(),
   provenance: { ...provenanceOf(WS), os: `${process.platform} ${osRelease()}`, cpu: cpus()[0]?.model ?? "unknown", node: process.version, playwright: require2("playwright/package.json").version, headless: false },

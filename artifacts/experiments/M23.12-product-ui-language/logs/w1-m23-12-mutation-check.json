@@ -1,0 +1,125 @@
+{
+  "what": "each mutation was applied to one working-tree file, three test files were run, and the file was restored. A non-zero exit means the mutation was caught. No build, browser or model was involved.",
+  "tests": [
+    "apps/extension/test/productUiCopy.test.ts",
+    "apps/extension/test/buildSeparation.test.ts",
+    "tests/browser/support/product-build-inspection.test.mjs"
+  ],
+  "results": [
+    {
+      "mutation": "the toolbar title reworded",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the description reworded",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the privacy explanation strengthened",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the privacy explanation claims protection",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the old toolbar title back",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the old shortcut text back",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the toolbar title varies by build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the capture field back in the page",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the page's <style> changed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a control removed from the page",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the privacy sentence shown in evidence builds too",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the approved sentences shown in no build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the capture field in every build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the capture field in no build",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the evidence wording changed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the panel asks for something new",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the toolbar opens the panel",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the toolbar no longer grants",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: the title not checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: the description not checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: the privacy sentence not checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: stale wording not checked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "inspection: its copy drifts from the module",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}

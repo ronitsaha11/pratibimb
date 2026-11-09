@@ -3,6 +3,7 @@
 > **Status:** an inventory of **existing** tests and records, by file and test name (read as text, M23.5, 2026-11-03).
 > - **Nothing run or changed:** no test was run or modified for this inventory.
 > - **"Existing" means present, not passing now.** Whether these tests pass at `a165c7a` was not established in this milestone.
+> - **Since then (M23.8):** the gaps in the last column now have tests: `apps/extension/test/domOnlyTaskPath.test.ts` covers the `visual()` floor wiring, a run with no `perceive` dependency, and vision-only exclusion; `sourceById` is covered there and in `domOnlyPhase1.test.ts`. See `dom-only-regression-matrix.md`.
 
 | Behaviour | Existing evidence (FACT: present) | Type | Gap: a future regression test is needed |
 |---|---|---|---|

@@ -3,6 +3,7 @@
 > **Status:** static source analysis, M23.4, 2026-11-03, at `8767428`.
 > - **Owner policy:** **OD-P is SELECTED:** T1 is to be disabled from active Phase 1 execution. **Implementation is pending a separate authorisation. T1 is NOT disabled;** the source still loads and runs it.
 > - **Method:** no model was loaded, read or hashed. No code was changed.
+> - **Since then:** M23.7 implemented OD-P and OD-R in product builds, and M23.8 tested the boundary under a simulated extension. Not browser-verified, not accepted. This document's statements about what the runtime does describe the source when it was written, and still describe evidence builds.
 > - **Labels:** FACT (source, cited), INFERENCE, or UNKNOWN.
 
 ## 1. Current runtime behaviour (FACT)

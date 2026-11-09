@@ -20,6 +20,12 @@
  * UNMASKED screenshot of the fixture (never through the extension) must BLOCK, so a PASS means
  * something.
  *
+ * BUILDS (M23.10, OD-V): the product build, a reference evidence build (STRUCTURAL_PROBE=1), then the evidence
+ * build under test (TR01_PROBE=1). `tests/browser/support/build-separation.mjs` is the contract: the product has no
+ * diagnostic hook, the evidence build has them all, the two evidence builds' workers match, and the product's and
+ * the evidence build's workers differ. Their content scripts and manifest routes must still be byte-identical. A
+ * product build has no capture route (OD-R, OD-S), so this measures the evidence build's, and says nothing of a product's.
+ *
  * Usage: CHROME_PATH="<chrome for testing>" [M108_DPRS=1,1.25,1.5,2] [M108_RUN=n] node tests/browser/extension/run-artifact-verifier.mjs
  *        M108_DRY_RUN=1 for the degraded-route rehearsal (never gesture evidence).
  */
@@ -35,7 +41,8 @@ import { startFrameSink } from "../support/frame-sink.mjs";
 import { readWebpRiff } from "../support/webp-riff.mjs";
 import { NOT_RUN, mayHandOff, verifyArtifact } from "../support/artifact-verifier.mjs";
 import { VERIFIER_CONFIG, startVerifierRuntime } from "../support/verifier-runtime.mjs";
-import { connectSrcOf, manifestRouteSha } from "../support/build-route.mjs";
+import { connectSrcOf, crossBuildManifestRouteSha } from "../support/build-route.mjs";
+import { evidenceReferenceFlags, judgeBuildSeparation, snapshotEvidenceBuild, snapshotProductBuild } from "../support/build-separation.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
 const WS = resolveWorkstation();
@@ -95,22 +102,32 @@ const machineState = (() => {
 // ── builds ──────────────────────────────────────────────────────────────────────────────────────
 const shaFile = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
 const sha = (b) => createHash("sha256").update(b).digest("hex");
-const routeFiles = () => ({ background: shaFile(join(EXT, "background.js")), content: shaFile(join(EXT, "content-scripts", "content.js")), manifest: manifestRouteSha(EXT), connectSrc: connectSrcOf(EXT) });
+const routeFiles = () => ({ background: shaFile(join(EXT, "background.js")), content: shaFile(join(EXT, "content-scripts", "content.js")), manifest: crossBuildManifestRouteSha(EXT), connectSrc: connectSrcOf(EXT) });
 const bundleText = () => [join(EXT, "background.js"), join(EXT, "content-scripts", "content.js"), ...readdirSync(join(EXT, "chunks")).map((f) => join(EXT, "chunks", f))].map((f) => readFileSync(f, "utf8")).join("\n");
 const build = (env) => execSync("npm run build", { cwd: APP, env: { ...process.env, TR01_PROBE: "", M3_WORKER_FRAME: "", STRUCTURAL_PROBE: "", E6_PROBE: "", ...env }, stdio: "pipe" });
 console.log("building the PRODUCT extension…");
 build({});
 const productRoute = routeFiles();
+const productBuild = snapshotProductBuild(EXT);
 const productBundle = bundleText();
 const productManifest = JSON.parse(readFileSync(join(EXT, "manifest.json"), "utf8"));
+console.log("building the REFERENCE evidence extension (another evidence flag, to compare workers)…");
+build(evidenceReferenceFlags({ dryRun: DRY }));
+const referenceBuild = snapshotEvidenceBuild(EXT);
 console.log(`building the EVIDENCE extension (TR01_PROBE=1${DRY ? ", M3_WORKER_FRAME=1 — DRY RUN" : ""})…`);
 build(DRY ? { TR01_PROBE: "1", M3_WORKER_FRAME: "1" } : { TR01_PROBE: "1" });
 const evidenceRoute = routeFiles();
+const evidenceBuild = snapshotEvidenceBuild(EXT);
+const separation = judgeBuildSeparation({ product: productBuild, reference: referenceBuild, evidence: evidenceBuild, dryRun: DRY });
 const evidenceBundle = bundleText();
 const buildFacts = {
   productRoute,
   evidenceRoute,
-  routeIdenticalToProduct: JSON.stringify({ ...productRoute, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, connectSrc: null }),
+  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical, with M23.17's two permissions
+  // set aside by name and judged exactly in `separation`. The worker does not: since
+  // OD-S it must differ, and `separation` requires that, along with everything that replaced the comparison.
+  sharedRouteIdenticalToProduct: JSON.stringify({ ...productRoute, background: null, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, background: null, connectSrc: null }),
+  separation,
   // ADR-0013: the one permitted difference — the evidence build widens the reasoner endpoint to the collector origin.
   connectSrcDiffersOnlyByCollector: productRoute.connectSrc === "'self' http://127.0.0.1:8995/v1/chat/completions" && evidenceRoute.connectSrc === "'self' http://127.0.0.1:8995",
   permissions: productManifest.permissions ?? [],
@@ -122,8 +139,9 @@ const buildFacts = {
   noCaptureVisibleTab: !readFileSync(join(EXT, "background.js"), "utf8").includes("captureVisibleTab"),
 };
 if (!DRY && !buildFacts.connectSrcDiffersOnlyByCollector) refuse(`the evidence build's connect-src is not the product's widened to the collector origin: ${JSON.stringify(buildFacts)}`);
-if (!DRY && !buildFacts.routeIdenticalToProduct) refuse(`the evidence build's capture route differs from the product's: ${JSON.stringify(buildFacts)}`);
-if (!DRY && !buildFacts.noCaptureVisibleTab) refuse("this is not the product capture route");
+if (!DRY && !buildFacts.sharedRouteIdenticalToProduct) refuse(`the evidence build's content script or manifest route differs from the product's: ${JSON.stringify(buildFacts)}`);
+if (separation.problems.length > 0) refuse(`the build-separation contract failed (${separation.problems.join(", ")}): ${JSON.stringify(buildFacts)}`);
+if (!DRY && !buildFacts.noCaptureVisibleTab) refuse("this is not the gesture capture route");
 if (buildFacts.productBundleCarriesFrameEgress || buildFacts.productBundleCarriesSinkPath) refuse("the PRODUCT bundle carries frame egress");
 if (!buildFacts.evidenceBundleCarriesFrameEgress) refuse("the evidence build carries no frame egress probe");
 

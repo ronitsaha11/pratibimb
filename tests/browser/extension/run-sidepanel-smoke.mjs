@@ -17,7 +17,7 @@
  *   clarify — on the two-numbers page: choose "Mobile number", then "Allow once"
  *
  * WHAT IT NEVER RECORDS: a stored value, the preview's text. Synthetic pages only. Not a J7
- * experiment; no frame is captured unless the person also clicks the toolbar button, and none leaves.
+ * experiment; a product task captures no frame (M23.7), whether or not the person clicks the toolbar button.
  *
  * Usage: CHROME_PATH="<chrome for testing>" node tests/browser/extension/run-sidepanel-smoke.mjs
  */

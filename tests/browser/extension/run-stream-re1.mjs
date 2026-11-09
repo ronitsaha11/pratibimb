@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * M12 Part Q — RE-1 ON REAL PRODUCT STREAM FRAMES (ADR-0012 §9, BLOCKER B5, M9 J7). **HUMAN-IN-THE-LOOP.**
+ * M12 Part Q — RE-1 ON REAL STREAM FRAMES, IN AN EVIDENCE BUILD (ADR-0012 §9, BLOCKER B5, M9 J7). **HUMAN-IN-THE-LOOP.**
  *
  *   a person's toolbar click → activeTab → getMediaStreamId → offscreen getUserMedia → stream frame
  *     → UI head → TR-01 (full frame, the frozen pin) → fail-closed plan → canonical geometry
@@ -24,6 +24,12 @@
  * DRY RUN (M12_DRY_RUN=1): the degraded `M3_WORKER_FRAME` route, no click; mechanics only, written under
  * its own name, never stream evidence and never a closure.
  *
+ * BUILDS (M23.10, OD-V): the product build, a reference evidence build (STRUCTURAL_PROBE=1), then the evidence
+ * build under test (TR01_PROBE=1). `tests/browser/support/build-separation.mjs` is the contract: the product has no
+ * diagnostic hook, the evidence build has them all, the two evidence builds' workers match, and the product's and
+ * the evidence build's workers differ. Their content scripts and manifest routes must still be byte-identical. A
+ * product build has no capture route (OD-R, OD-S), so this measures the evidence build's, and says nothing of a product's.
+ *
  * Usage: CHROME_PATH="<chrome for testing>" [M12_DPRS=1,1.25,1.5,2] node tests/browser/extension/run-stream-re1.mjs
  */
 import { execSync } from "node:child_process";
@@ -36,7 +42,8 @@ import { isDeepStrictEqual } from "node:util";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { scoreImage } from "../support/redaction-metrics.mjs";
-import { connectSrcOf, manifestRouteSha } from "../support/build-route.mjs";
+import { connectSrcOf, crossBuildManifestRouteSha } from "../support/build-route.mjs";
+import { evidenceReferenceFlags, judgeBuildSeparation, snapshotEvidenceBuild, snapshotProductBuild } from "../support/build-separation.mjs";
 import { baselinePath, fixturesDir, loadBaseline } from "../support/m82-baseline.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
@@ -70,28 +77,39 @@ const TARGET = assertOwnEvidencePath(join(OUT, evidenceFileName(WS, DRY ? "cft-s
 if (!DRY && existsSync(TARGET)) refuse(`${TARGET} already exists; a formal run does not overwrite an earlier record`);
 const heldOutSha = Object.fromEntries(HELD_OUT.images.map((i) => [i.image, createHash("sha256").update(readFileSync(join(HELD_OUT_DIR, `${i.image}.png`))).digest("hex")]));
 
-// ── builds: the evidence build's capture route must be the product's, byte for byte ────────────
+// ── builds: the contract is `build-separation.mjs` (M23.10, OD-V; ADR-0013 connect-src aside) ───────
 const shaFile = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
-const routeFiles = () => ({ background: shaFile(join(EXT, "background.js")), content: shaFile(join(EXT, "content-scripts", "content.js")), manifest: manifestRouteSha(EXT), connectSrc: connectSrcOf(EXT) });
+const routeFiles = () => ({ background: shaFile(join(EXT, "background.js")), content: shaFile(join(EXT, "content-scripts", "content.js")), manifest: crossBuildManifestRouteSha(EXT), connectSrc: connectSrcOf(EXT) });
 const build = (env) => execSync("npm run build", { cwd: APP, env: { ...process.env, TR01_PROBE: "", M3_WORKER_FRAME: "", STRUCTURAL_PROBE: "", E6_PROBE: "", EGRESS_EVIDENCE_PROBE: "", ...env }, stdio: "pipe" });
 console.log("building the PRODUCT extension…");
 build({});
 const productRoute = routeFiles();
+const productBuild = snapshotProductBuild(EXT);
+console.log("building the REFERENCE evidence extension (another evidence flag, to compare workers)…");
+build(evidenceReferenceFlags({ dryRun: DRY }));
+const referenceBuild = snapshotEvidenceBuild(EXT);
 console.log(`building the EVIDENCE extension (TR01_PROBE=1${DRY ? ", M3_WORKER_FRAME=1 — DRY RUN" : ""})…`);
 build(DRY ? { TR01_PROBE: "1", M3_WORKER_FRAME: "1" } : { TR01_PROBE: "1" });
 const evidenceRoute = routeFiles();
+const evidenceBuild = snapshotEvidenceBuild(EXT);
+const separation = judgeBuildSeparation({ product: productBuild, reference: referenceBuild, evidence: evidenceBuild, dryRun: DRY });
 const buildFacts = {
   productRoute,
   evidenceRoute,
-  routeIdenticalToProduct: JSON.stringify({ ...productRoute, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, connectSrc: null }),
+  // M23.10 (OD-V): the content script and the manifest's route stay byte-identical, with M23.17's two permissions
+  // set aside by name and judged exactly in `separation`. The worker does not: since
+  // OD-S it must differ, and `separation` requires that, along with everything that replaced the comparison.
+  sharedRouteIdenticalToProduct: JSON.stringify({ ...productRoute, background: null, connectSrc: null }) === JSON.stringify({ ...evidenceRoute, background: null, connectSrc: null }),
+  separation,
   // ADR-0013: the one permitted difference — the evidence build widens the reasoner endpoint to the collector origin.
   connectSrcDiffersOnlyByCollector: productRoute.connectSrc === "'self' http://127.0.0.1:8995/v1/chat/completions" && evidenceRoute.connectSrc === "'self' http://127.0.0.1:8995",
   noCaptureVisibleTab: !readFileSync(join(EXT, "background.js"), "utf8").includes("captureVisibleTab"),
   tr01Sha256: TR01_SHA256,
 };
 if (!DRY && !buildFacts.connectSrcDiffersOnlyByCollector) refuse(`the evidence build's connect-src is not the product's widened to the collector origin: ${JSON.stringify(buildFacts)}`);
-if (!DRY && !buildFacts.routeIdenticalToProduct) refuse(`the evidence build's capture route differs from the product's: ${JSON.stringify(buildFacts)}`);
-if (!DRY && !buildFacts.noCaptureVisibleTab) refuse("this is not the product capture route");
+if (!DRY && !buildFacts.sharedRouteIdenticalToProduct) refuse(`the evidence build's content script or manifest route differs from the product's: ${JSON.stringify(buildFacts)}`);
+if (separation.problems.length > 0) refuse(`the build-separation contract failed (${separation.problems.join(", ")}): ${JSON.stringify(buildFacts)}`);
+if (!DRY && !buildFacts.noCaptureVisibleTab) refuse("this is not the gesture capture route");
 
 const wait = (ms) => new Promise((ok) => setTimeout(ok, ms));
 const banner = (page, text) =>
@@ -295,7 +313,7 @@ const acrossWindows = HELD_OUT.images.map(({ image }) => {
 });
 const scaleToCssSeen = [...new Set(cells.flatMap((c) => c.stream?.scaleToCss ?? []))];
 const record = {
-  experiment: DRY ? "M12 Part Q — DRY RUN of the stream RE-1 harness on the DEGRADED route (not stream evidence)" : "M12 Part Q — RE-1 on real product gesture-stream frames, four device scales, three passes each",
+  experiment: DRY ? "M12 Part Q — DRY RUN of the stream RE-1 harness on the DEGRADED route (not stream evidence)" : "M12 Part Q — RE-1 on real gesture-stream frames in an evidence build, four device scales, three passes each",
   verdict: allPass ? "PASS" : "FAIL",
   j7: DRY ? "NOT ASSESSED (dry run)" : allPass ? "RE-1 CRITERIA MET ON STREAM FRAMES" : "OPEN",
   dryRun: DRY,
@@ -308,7 +326,8 @@ const record = {
   scaleToCssObserved: scaleToCssSeen,
   notAClaim: [
     "six images, one workstation, one operator; RE-1 bounds exposure on this set only, no recall claim beyond it",
-    "the product route caps the stream to CSS size, so scaleToCss was observed, not chosen; a frame with scaleToCss ≠ 1 is not produced by this route",
+    "the gesture route caps the stream to CSS size, so scaleToCss was observed, not chosen; a frame with scaleToCss ≠ 1 is not produced by this route",
+    "measured on the evidence build's capture route; a product build has none (OD-R, OD-S)",
   ],
   build: buildFacts,
   cells,

@@ -14,8 +14,9 @@
  *
  * PHASE A — PRODUCT BUILD. Every channel to 8996 must produce 0 arrivals; the sink path on 8995 must
  *   produce 0 (ADR-0013 pins the product to the reasoner endpoint exactly). Positive controls: the
- *   reasoner endpoint itself IS reachable; the offscreen document reloads with no CSP violation; ORT
- *   and the packaged model load (ORT_SMOKE); the side panel renders with its hashed style applied.
+ *   reasoner endpoint itself IS reachable; the offscreen document reloads with no CSP violation; the
+ *   pinned ORT runtime bootstraps and ORT_SMOKE reports the UI head as not packaged (M23.7: a product
+ *   build does not carry it); the side panel renders with its hashed style applied.
  * PHASE B — EVIDENCE BUILD (TR01_PROBE=1 M3_WORKER_FRAME=1). The test sink IS reachable; every
  *   channel to 8996 still produces 0; one degraded perception pass runs (TR-01 worker, ORT, UI head)
  *   with no CSP violation. The two built policies must differ in one connect-src source only.
@@ -35,6 +36,7 @@ import { cpus, release as osRelease, tmpdir } from "node:os";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { Cdp } from "../support/cdp-offscreen.mjs";
+import { ortSmokeCheck } from "../support/csp-product-phase.mjs";
 import { startFrameSink } from "../support/frame-sink.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
@@ -289,7 +291,10 @@ async function attackPhase({ name, expectSinkReachable }) {
       ? Object.values(P.attacks).some((v) => v.sinkArrivals.some((a) => a.path === "/m10/frame"))
       : Object.values(P.attacks).every((v) => v.sinkArrivals.length === 0),
     offscreenReloadsWithoutViolation: P.legitimate.offscreenReloadViolations.length === 0,
-    ortAndModelLoad: P.legitimate.ortSmoke?.ok === true || P.legitimate.ortSmoke?.status === "OK" || P.legitimate.ortSmoke?.sessionCreated === true,
+    // M23.7 (OD-P): only an evidence build packages the UI head. A product build must still bootstrap the
+    // pinned ORT runtime under this CSP, and must say the UI head is absent rather than load it. M23.8: the
+    // condition lives in `csp-product-phase.mjs`, so it can be tested without running this harness.
+    ...ortSmokeCheck(name, P.legitimate.ortSmoke),
     sidePanelStyledAndRunning: P.legitimate.sidePanel.bodyMargin === "12px" && P.legitimate.sidePanel.hostStatus === "ok" && P.legitimate.sidePanel.violations.length === 0,
     ...(name === "evidence" ? { perceptionPassUnderNewCsp: P.legitimate.perceptionPass.error === null && P.legitimate.perceptionPass.detectorRan === true && P.legitimate.perceptionPass.violationsDuringPass.length === 0, tr01WorkerAttacked: P.tr01WorkerAttached === true } : {}),
   };

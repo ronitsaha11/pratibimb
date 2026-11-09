@@ -1,8 +1,8 @@
 /**
  * M14 — stage 12 in the extension's product run path, held in place by reading the source.
  *
- * `extension-run.ts` is exercised only in a browser (coverageBoundary.test.ts), so its wiring is
- * pinned here the way the other boundary tests pin theirs. The loop's behaviour itself — every turn
+ * `extension-run.ts` is exercised for real only in a browser (coverageBoundary.test.ts), so its wiring
+ * is pinned here the way the other boundary tests pin theirs. The loop's behaviour itself — every turn
  * through every gate, and every way it stops — is tested against the real gates in
  * `packages/orchestrator/test/loop.test.ts`.
  */

@@ -239,7 +239,7 @@ const record = {
   runs,
   notAClaim: [
     "a handful of runs of one synthetic page; no claim about other pages, longer tasks or the model's reliability beyond these runs",
-    "perception ran the product's no-gesture DOM floor; no frame was captured and none left the client",
+    "a product task takes no perception pass (M23.7): no frame was captured or asked for, and none left the client",
     "the harness answered approvals on the operator's behalf (none was expected: the page holds no values)",
   ],
   recordedAt: new Date().toISOString(),

@@ -1,0 +1,75 @@
+{
+  "milestone": "M23.15",
+  "sourceCommit": "13d0447",
+  "comparedWith": "the product build of M23.14 (b8c59a3's source, 09a8754's code)",
+  "what": "SHA-256 of each file a person's browser would run, before and after. A product build reads and hashes TR-01 for its integrity check. No model was loaded or run.",
+  "filesCompared": 9,
+  "filesChanged": [
+    "manifest.json",
+    "offscreen.html",
+    "sidepanel.html"
+  ],
+  "filesIdentical": 6,
+  "manifestKeysThatChanged": {
+    "name": {
+      "before": "PratiBimb minimal MV3 host (experiment — not the product)",
+      "after": "PratiBimb — Page Assistant (Development build)"
+    }
+  },
+  "rows": [
+    {
+      "file": "background.js",
+      "same": true,
+      "before": "c566d9b2e02532e5a9f1fcfc279f6d596bdebaff6fbff33f40518c6f9d5c666d",
+      "after": "c566d9b2e02532e5a9f1fcfc279f6d596bdebaff6fbff33f40518c6f9d5c666d"
+    },
+    {
+      "file": "chunks/_virtual_wxt-html-plugins-DPbbfBKe.js",
+      "same": true,
+      "before": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74",
+      "after": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74"
+    },
+    {
+      "file": "chunks/offscreen-DajYm2zT.js",
+      "same": true,
+      "before": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8",
+      "after": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8"
+    },
+    {
+      "file": "chunks/sidepanel-Cale8Bwh.js",
+      "same": true,
+      "before": "218f4f90af1d41d57787a4aa3aded20e0788d620bad2fe86cbea24d38e937255",
+      "after": "218f4f90af1d41d57787a4aa3aded20e0788d620bad2fe86cbea24d38e937255"
+    },
+    {
+      "file": "content-scripts/content.js",
+      "same": true,
+      "before": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+      "after": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2"
+    },
+    {
+      "file": "manifest.json",
+      "same": false,
+      "before": "2a7c9e0c3de7c310a705aa11f9300cf9a0b9f0acd0802c7354a108b8c2efb5c3",
+      "after": "b53714a036523a0f085caf27a250a3af27770eac36e8fe85156884914ad84d72"
+    },
+    {
+      "file": "offscreen.html",
+      "same": false,
+      "before": "129797b5d694ca484c5db667e2f7340bb65fa81a3e0f535b9520839f067a6a81",
+      "after": "5e46eda30cfc8da9cb3ebd44b7b1ea4a8f6bbed15c333f2f5a0528d1badfffac"
+    },
+    {
+      "file": "sidepanel.html",
+      "same": false,
+      "before": "db1681092050d05ee0a42c7ef02989c8160e670b7db10da5f9fd262e7274bb90",
+      "after": "6a7595d9b14f57151ef8ca565d0d7ae799c71cd53d26e4f530fcfb760b0f190a"
+    },
+    {
+      "file": "tr01-worker.js",
+      "same": true,
+      "before": "e1f77fe9d65dceb89eab5f396e4cbc21a6ab8336f394a3ab338989da3ce47464",
+      "after": "e1f77fe9d65dceb89eab5f396e4cbc21a6ab8336f394a3ab338989da3ce47464"
+    }
+  ]
+}

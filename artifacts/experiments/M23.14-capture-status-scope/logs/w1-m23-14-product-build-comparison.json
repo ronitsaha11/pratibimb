@@ -1,0 +1,56 @@
+{
+  "what": "sha256 of the product build's own text files, before and after this milestone. No model or wasm file was opened for this comparison. Chunk names have their content hash removed.",
+  "before": {
+    "gitHead": "59f4282"
+  },
+  "after": {
+    "gitHead": "09a8754"
+  },
+  "files": {
+    "background.js": {
+      "before": "c566d9b2e02532e5a9f1fcfc279f6d596bdebaff6fbff33f40518c6f9d5c666d",
+      "after": "c566d9b2e02532e5a9f1fcfc279f6d596bdebaff6fbff33f40518c6f9d5c666d",
+      "identical": true
+    },
+    "chunks/_virtual_wxt-html-plugins.js": {
+      "before": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74",
+      "after": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74",
+      "identical": true
+    },
+    "chunks/offscreen.js": {
+      "before": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8",
+      "after": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8",
+      "identical": true
+    },
+    "chunks/sidepanel.js": {
+      "before": "340a523b25526a0b12000c7d8ffb07da9b80964c3b55052051ba9ea084ca497c",
+      "after": "218f4f90af1d41d57787a4aa3aded20e0788d620bad2fe86cbea24d38e937255",
+      "identical": false
+    },
+    "content-scripts/content.js": {
+      "before": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+      "after": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+      "identical": true
+    },
+    "manifest.json": {
+      "before": "2a7c9e0c3de7c310a705aa11f9300cf9a0b9f0acd0802c7354a108b8c2efb5c3",
+      "after": "2a7c9e0c3de7c310a705aa11f9300cf9a0b9f0acd0802c7354a108b8c2efb5c3",
+      "identical": true
+    },
+    "offscreen.html": {
+      "before": "129797b5d694ca484c5db667e2f7340bb65fa81a3e0f535b9520839f067a6a81",
+      "after": "129797b5d694ca484c5db667e2f7340bb65fa81a3e0f535b9520839f067a6a81",
+      "identical": true
+    },
+    "sidepanel.html": {
+      "before": "d75a585fa0a3b0659885069e1ce9318a036b1338dadedf9a24ef8728f5e68416",
+      "after": "db1681092050d05ee0a42c7ef02989c8160e670b7db10da5f9fd262e7274bb90",
+      "identical": false
+    },
+    "tr01-worker.js": {
+      "before": "e1f77fe9d65dceb89eab5f396e4cbc21a6ab8336f394a3ab338989da3ce47464",
+      "after": "e1f77fe9d65dceb89eab5f396e4cbc21a6ab8336f394a3ab338989da3ce47464",
+      "identical": true
+    }
+  }
+}

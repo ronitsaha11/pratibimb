@@ -6,6 +6,16 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
 
 ## [Unreleased]
 
+### Fixed
+- **M23.21 — DEF-M23.19-01: the toolbar's keyboard shortcut is `Ctrl+Shift+Y`.** `Alt+Shift+P` is
+  Chrome's own "create new tab group" on Windows and Linux (`kTabGroupAcceleratorMap`, Chromium
+  153.0.8010.12). Chrome does not auto-assign a suggested key that matches one of its accelerators
+  (`CommandService::CanAutoAssign`), so the old key was never the extension's, and pressing it opened
+  Chrome's tab-group editor. The command is still `_execute_action`: the toolbar's own click event. No
+  permission, host, CSP, listener or lifecycle change; the built JavaScript is byte-identical, and only
+  `manifest.json` differs. Verified by the operator on W1 in Chrome for Testing 153.0.8010.12: `Ctrl+Shift+Y` and
+  the toolbar button both open the side panel (`artifacts/experiments/M23.21-product-reliability/`).
+
 ### Found
 - **M22.1 — the T1 dataset recipe cannot teach the icon class.** Regenerating its TRAIN and DEV
   splits (the pinned manifest also holds TEST and was not opened): every icon label is fully
@@ -35,6 +45,72 @@ Versions correspond to the milestone tags in `docs/operations/git-workflow.md` �
     `minPerClassBucket ≥ 1`. The review's six false passes now fail.
   - Near-identical cross-split layouts detected at owner-supplied thresholds.
   - Known and not fixed: the TEST seal is weak; plan and build refuse TEST.
+- **M23.18 — Product surface and acceptance alignment (RD-1 to RD-4, RD-7, RD-8).** The worker's offscreen justification now says
+  "Run PratiBimb's offscreen runtime for DOM-based browser assistance." A product's Status box is hidden while the panel works and
+  shows one plain sentence if it cannot reach the worker; the fixed `NEEDS_USER: none` line is gone from a product. `HOST_STATUS`,
+  which creates the offscreen document, is unchanged, and so is an evidence panel. BRW-05 and REL-03 are re-scoped for Phase 1 with
+  their original wording kept; QG-06's WASM-only item stays unresolved. ADR-0015's permission description matches M23.17, and it stays
+  PROPOSED. In the real build the manifest and the offscreen runtime are byte-identical.
+  - **Correction, dated M23.18:** the M23.9 entry below says a real product build "has no capture call". It had no **reachable**
+    capture call; an unreachable minting wrapper remained in the worker. The entry is left as written.
+  - Not run in a browser. No evidence build or harness ran. Not product acceptance, and no authority for a smoke test.
+- **M23.17 — A product declares neither `tabCapture` nor `activeTab` (RD-5, RD-6; build configuration only).** A normal product's
+  permissions are now `offscreen` and `sidePanel`. Evidence builds keep all four: the real config's generated manifests are
+  byte-identical for all five flags. The build-separation contract allows exactly that difference and refuses any other. In the real
+  build only the manifest's `permissions` changed; all JavaScript is byte-identical.
+  - Not run in a browser. No evidence build or harness ran. Not product acceptance, and no authority for a smoke test.
+- **M23.15 — Product identity and acceptance reconciliation (OD-Y, OD-Z; wording only).** The extension and its panel are named
+  **PratiBimb — Page Assistant (Development build)**, and the toolbar title is unchanged. `BRW-04` is now a DOM-only browser-task
+  requirement, and the acceptance documents state that normal tasks capture no browser frame, need no gesture grant and run no T1
+  or TR-01, with evidence-build diagnostics described separately. The brief's deliverables are mapped to what Phase 1 does and does
+  not fulfil. In the real build all JavaScript is byte-identical to the previous build, and the manifest changes in `name` alone.
+  - All 59 criteria keep their class and status. GOV-01 and the 51 proposed-mandatory classifications stay unapproved.
+  - Not seen in a browser. No evidence build or harness ran. Not release-ready.
+- **M23.14 — A product's panel does not show `captureStatus` (OD-X; presentation only).** Its Status box prints a named list of
+  the worker's fields. An evidence panel prints the whole reply, as before. The worker still reports the status: in the real
+  product build, the worker, offscreen chunk, content script and manifest are byte-identical to the build before. Not seen in a
+  browser. OD-Y and OD-Z await the owner.
+- **M23.13 — A product's toolbar button opens the side panel (OD-W).** It issues no capture grant, ticket or frame, and sends no
+  message. A failure or a missing tab is reported, with no fallback to capture. An evidence build's click is unchanged, and
+  `Alt+Shift+P` is the same event. Permissions, hosts and CSP are identical to the previous real build, which this build
+  replaces. Not tried in a browser. OD-X, OD-Y and OD-Z await the owner.
+- **M23.12 — The product's UI says what a product task does (OD-T; UI copy, tests and documentation only).** Toolbar title
+  `PratiBimb — Page Assistant`, plus the approved side-panel description and privacy explanation. Those two sentences appear
+  in product builds only, because the privacy one is false in an evidence build, and the Capture field is now
+  evidence-build-only with its original words. No claim about visual PII, whose protection is not operational. No task,
+  permission, CSP, packaging or hook change. Not rebuilt or seen in a browser.
+- **M23.11 — Gesture harnesses are evidence-build-only (OD-U, Option B; harnesses, tests and documentation only).**
+  `run-gesture-capture.mjs` and `run-gesture-acts.mjs` call one fail-closed gate first, which identifies a build from
+  `connect-src`, the hooks' names and T1's presence by file name. A product, missing or unidentifiable build is refused before
+  Chrome can start, and neither harness can build. All 41 checks are byte-identical to before. 47 of 47 deliberate
+  regressions caught. Neither harness or any build ran; evidence-build runtime validation is outstanding; OD-T awaits the owner.
+- **M23.10 — Evidence harnesses judge a build-separation contract (OD-V; harnesses, tests and documentation only).** Six
+  harnesses no longer require product and evidence `background.js` to be byte-identical, which OD-S made impossible.
+  `tests/browser/support/build-separation.mjs` requires product hooks absent, evidence hooks present, two evidence builds'
+  workers the same, and product and evidence workers different. Their `content.js`, manifest, permission and CSP
+  comparisons and their own checks are retained. A missing build can never read as checked. 58 of 58 deliberate regressions
+  caught. No harness or build ran; evidence-build runtime stays unverified; OD-U and OD-T await the owner.
+- **M23.9 — Diagnostic hooks removed from product builds (OD-S, Option B).** `PERCEIVE_ONCE`, `STREAM_CONSUME`, their
+  four worker drivers, the worker's `CAPTURE_FRAME` handler and the references that kept the capture path alive now sit
+  behind the existing evidence flag. A real product build names none of them and has no capture call; its manifest,
+  content script and side panel are byte-identical to before. An evidence build keeps the same behaviour under test
+  doubles; its runtime is unverified. Corrects M23.8: six evidence harnesses now refuse, because their byte-identity guard
+  on `background.js` cannot hold (OD-V, not changed). No browser ran; no permission, CSP, egress, authority, TR-01 or ADR
+  changed.
+- **M23.8 — DOM-only boundary assurance and regression hardening (tests and documentation only).** A rig runs the real
+  worker, offscreen document, task run, gates and egress guard under a fake `chrome`, counting every capture, model and
+  worker request: an ordinary task leaves them all at zero, and a regression double fails the checks. Audits
+  `PERCEIVE_ONCE` and `STREAM_CONSUME`: both ship in the product bundle and accept any context of this extension,
+  correcting M23.7's "DevTools-only". Replaces the vacuous checks in two harnesses, extracts and tests M13's
+  product-phase condition, and adds a read-only build inspection. Prepares OD-S, OD-T and OD-U and a person-run smoke
+  procedure (not run). Finds that two M4 and M5 harnesses depend on the product build, which M23.7 did not report. No
+  browser ran; no product source, model, CSP, permission or ADR changed.
+- **M23.7 — DOM-only Phase 1 implemented in product builds (OD-P, OD-R).** `runTask` no longer wires a perception
+  pass in a product build (`host-lib/task-perception.ts`, build-time `__EVIDENCE_BUILD__`), so a product task captures
+  no frame and runs neither the UI head (T1) nor TR-01; the handoff always declares the structural floor. The UI head
+  is packaged only in evidence builds; `ORT_SMOKE` reports it absent in a product build. Evidence builds, TR-01's
+  packaging and hash checks, permissions (including `tabCapture`), CSP and egress are unchanged. Adds 18 regression
+  tests; adjusts the M13 CSP harness's product-phase model-load check accordingly. Not browser-verified; not accepted.
 - **M23.6 — OD-R recorded: APPROVED — OPTION A, DOM-only Phase 1 (implementation not authorised).** Normal Phase 1
   task execution is to capture no browser frames and run neither T1 nor TR-01; DOM observation and the structural
   handoff remain. Updates the proposed ADR-0015 (new §3.6; still PROPOSED), marks the exclusions in the acceptance

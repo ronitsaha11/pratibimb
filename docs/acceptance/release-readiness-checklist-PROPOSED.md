@@ -2,6 +2,7 @@
 
 > **Status: PROPOSED — AWAITING OWNER APPROVAL (M23.1, 2026-11-03).**
 > - **Unchecked:** every box is unchecked. Nothing here is signed, and ticking a box needs the evidence its criterion names.
+> - **Not a release (M23.15):** the current build is **PratiBimb — Page Assistant (Development build)**. Nothing here declares it release-ready.
 > - **Classifications:** they follow `core-product-acceptance-PROPOSED.md` §5, and are proposals.
 > - **Release workflow:** `agentos/workflows/release.md` is unchanged and still governs. This checklist proposes how it would read for the shipped architecture.
 > - **Phase 1 only (M23.2):** following the owner's phased direction, this is the proposed **Phase 1** release checklist for the current structure-only product. Phase 2 capabilities (`phase-2-future-capability-register.md`) are outside it unless separately approved. **Selecting the direction does not tick any box.**
@@ -24,7 +25,7 @@
 - [ ] **SEC-06:** B-02 decided by ADR (OD-E3).
 - [ ] **SEC-04:** production frame egress still impossible (three locks), re-checked on the candidate.
 - [ ] **SEC-01, SEC-08:** CSP v2, one endpoint, no new permission, origin or action type; diffed against the baseline.
-- [ ] **SEC-05, REL-03:** fail-closed and the failure path demonstrated on the product build.
+- [ ] **SEC-05, REL-03:** fail-closed and the failure path demonstrated on the product build. REL-03 is re-scoped (RD-4, M23.18): a verification failure blocks on the first failure, with no outbound request. Its detector half is deferred. SEC-05's detector half is still for the owner to re-scope (`core-product-acceptance-PROPOSED.md` §5.14).
 - [ ] **SEC-07:** adversarial-page case: observed, not obeyed.
 
 ### Privacy
@@ -53,7 +54,10 @@
 - [ ] **REL-01:** bounded task set repeated N times. **N and the pass criterion TBD (owner).**
 - [ ] **REL-02:** reasoner lifecycle on each accepted machine.
 - [ ] **PRF-01, PRF-02:** latency and resources reported, labelled with machine, backend and browser. **Reporting, not a target** unless OD-H says otherwise.
-- [ ] **BRW-01, BRW-04, BRW-05:** the Chrome product build; gesture capture; a benchmarked WASM path for TR-01.
+- [ ] **BRW-01:** the Chrome product build runs the bounded task set.
+- [ ] **BRW-04:** the extension opens and operates in each browser accepted for Phase 1, and supported tasks complete through DOM-based observation, with structural grounding and click safety. **No browser-frame capture is required.**
+- [ ] **BRW-05:** re-scoped (RD-3, M23.18): a normal task performs no in-extension model inference, shown in a real browser. The original benchmark is deferred (§5.14).
+- [ ] **QG-06, "A separate WASM-only build, benchmarked":** **unresolved, and a separate owner decision.** RD-3 re-scoped BRW-05 and did not decide this item.
 - [ ] **CI-01:** hosted CI green on the candidate, every job.
 - [ ] **CI-02:** pins and a reproducibility manifest recorded.
 - [ ] **CI-03:** line endings (B-06) resolved.
@@ -61,7 +65,7 @@
 
 ## 1.1 Perception scope (OD-R, M23.6)
 
-- [ ] **Implementation:** the separately authorised implementation of OD-P and OD-R is complete. In normal Phase 1 tasks there is no frame capture, no T1 and no TR-01, with the regression evidence in `dom-only-phase-1-implementation-outline-PROPOSED.md`.
+- [ ] **Implementation:** the separately authorised implementation of OD-P and OD-R is complete. In normal Phase 1 tasks there is no frame capture, no T1 and no TR-01, with the regression evidence in `dom-only-phase-1-implementation-outline-PROPOSED.md`. *Implemented in product builds (M23.7 to M23.14) and tested under a simulated extension. **Unticked:** it has not been run in a browser, and nothing is accepted.*
 
 ## 2. Owner-approved optional (classification depends on the decision named)
 
@@ -75,11 +79,12 @@
 
 ## 3. Phase 2 and other future capabilities (outside Phase 1; NOT AUTHORISED)
 
-Each Phase 2 entry is `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` (P2-01 to P2-07).
+Each Phase 2 entry is `FUTURE — NOT AUTHORISED FOR IMPLEMENTATION OR EXECUTION` (P2-01 to P2-08).
 
 - Frame egress to a server (QG-04-F): B1, B2, B4, B5 and B6 in ADR-0012 §13. **Stays blocked.**
 - A server VLM per the dossier (constitution §2; B-03).
 - The offline-mode sequence with a local VLM (constitution §10 v1.1).
+- Frame-based local perception in task runs: frame capture, T1, TR-01 masking (P2-08). **Evidence-build diagnostics are not this, and are not part of a Phase 1 release.**
 - Visual-only PII beyond TR-01 masking: signature and ID-card classes (§10 v1.1). **The Phase 1 visual-only PII and face-detection gaps are not moved here;** they remain under OD-F in §1 and §2.
 
 ## 4. Deferred: FR-01

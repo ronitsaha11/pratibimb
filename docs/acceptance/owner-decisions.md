@@ -1,9 +1,20 @@
 # Owner-decision register — core-product acceptance
 
-> **Status (updated M23.2, 2026-11-03):**
+> **Status (updated M23.18, 2026-11-08):**
 > - **Resolved:** the owner resolved the **phased architecture direction** (P-1 to P-3 below).
 > - **Selected in M23.4:** **OD-P** (disable T1 from active Phase 1 execution), with implementation pending a separate authorisation.
-> - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03). **Implementation not authorised; runtime unchanged.**
+> - **Selected in M23.6:** **OD-R: APPROVED — OPTION A: DOM-ONLY PHASE 1** (2026-11-03).
+> - **Implemented in M23.7 (owner-authorised), product builds only:** OD-P and OD-R. M23.8 tested the boundary under a simulated extension. **Neither is browser-verified or accepted.**
+> - **Prepared in M23.8:** OD-S, OD-T and OD-U.
+> - **Selected and implemented in M23.9:** **OD-S: APPROVED — OPTION B** (2026-11-04), implemented in product builds. **Not browser-verified.**
+> - **Selected and implemented in M23.10:** **OD-V** (2026-11-04), in the six harness contracts. **No harness was run.**
+> - **Selected and implemented in M23.11:** **OD-U: OPTION B** (2026-11-04), in the two gesture harnesses. **Neither was run.**
+> - **Selected and implemented in M23.12:** **OD-T** (2026-11-04), the approved wording. Not seen in a browser. Its first real build was M23.13's.
+> - **Selected and implemented in M23.13:** **OD-W**, the product's toolbar opens the side panel. **Not tried in a browser.**
+> - **Selected and implemented in M23.14:** **OD-X**, a product's panel does not show `captureStatus`. **Not seen in a browser.**
+> - **Approved and implemented in M23.18:** **RD-1, RD-2, RD-3, RD-4, RD-7 and RD-8**, from the M23.16 report. ADR-0015's permission description is reconciled with M23.17, and ADR-0015 stays PROPOSED. **Nothing is accepted.**
+> - **Approved and implemented in M23.17:** **RD-5** and **RD-6**, from the M23.16 report: a normal product declares neither `tabCapture` nor `activeTab`; evidence builds keep both. **Not run in a browser.** No other M23.16 recommendation is adopted.
+> - **Implemented in M23.15, as far as existing approvals permit:** **OD-Y**, the product's identity, and **OD-Z**, the acceptance wording including `BRW-04`. **No classification is approved by this.**
 > - **Not resolved by it:** every other OD-A to OD-Q decision (OD-N to OD-Q added in M23.3) stays **AWAITING OWNER APPROVAL**, unless it is marked BLOCKED or NOT AUTHORISED. Selecting the direction does not complete any of them.
 > - **Not decided here:** this register frames choices; it decides none of them.
 > - **Recommendations:** where a recommendation is given, it is labelled **PROPOSED — AWAITING OWNER APPROVAL**.
@@ -19,7 +30,9 @@
 | P-2 | **Phase 1 target architecture:** the current local, loopback, structure-only product | `phase-1-architecture-scope.md` | the *intended* architecture; **not** a claim of acceptance |
 | P-3 | **Original VLM and frame-based functionality deferred to Phase 2** | `phase-2-future-capability-register.md` | Phase 2 is **NOT AUTHORISED** for implementation or execution |
 
-## Selected by the owner, implementation not authorised (M23.4, M23.6)
+## Selected by the owner; implemented in product builds (M23.4, M23.6, M23.7)
+
+The table's Status and Limits columns are as recorded at selection. **Current status of both: implemented in product builds (M23.7); boundary tested under a simulated extension (M23.8); not browser-verified, not accepted.** See the M23.7 and M23.8 sections below.
 
 | ID | Decision | Status | Limits |
 |---|---|---|---|
@@ -312,7 +325,7 @@ Each sub-decision is separate.
 | GOV-01 | Phase 1 acceptance framework | — |
 | OD-E1 | QG-04-S scope | — |
 | OD-K / OD-L | formal document reconciliation | RC-01 to RC-12 |
-| **OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled** | **SELECTED (M23.6): Option A, DOM-only Phase 1.** Implementation not authorised (see the M23.6 section below) |
+| **OD-R** | **whether Phase 1 keeps capturing frames after T1 is disabled** | **SELECTED (M23.6): Option A, DOM-only Phase 1.** *(M23.4 status, superseded:)* implementation not authorised. **M23.7: implemented in product builds** (see the sections below) |
 
 ## M23.5 — OD-R prepared
 
@@ -327,6 +340,8 @@ Each sub-decision is separate.
 - OD-K2 must record that no local vision model executes in task runs.
 
 ## M23.6 — status after OD-R
+
+*(M23.6 status, superseded by M23.7 below.)*
 
 **Selected by the owner** (each one: **implementation not authorised**; runtime not implemented):
 - **OD-P:** T1 out of active Phase 1 execution.
@@ -355,3 +370,276 @@ Each sub-decision is separate.
 - FR-01;
 - Phase 2.
 
+## M23.7 — implementation status of OD-P and OD-R
+
+| ID | Decision | Implementation |
+|---|---|---|
+| OD-P | T1 out of active Phase 1 execution | **M23.7: IMPLEMENTED IN PRODUCT BUILDS** (owner-authorised): a product task takes no perception pass, so it captures no frame and runs neither T1 nor TR-01. T1 is not packaged in product builds. Evidence builds are unchanged. Verified by unit, static, mutation and build checks on W1; **not browser-verified, not accepted** (`artifacts/experiments/M23.7-dom-only-implementation/`) |
+| OD-R | Option A, DOM-only Phase 1 | same |
+
+**Not changed by the implementation:** OD-O, OD-Q, OD-F, OD-N (ADR-0015 stays PROPOSED), GOV-01, OD-E1, OD-K, OD-L, OD-M, and the browser, cross-machine, independent-human, real-site, performance and security decisions all remain **AWAITING OWNER APPROVAL**.
+
+## M23.8 — status after the assurance milestone
+
+**Selected by the owner, and implemented in product builds:** OD-P and OD-R. Tested under a simulated extension (`dom-only-regression-matrix.md`). **Not browser-verified, not accepted.**
+
+**New; awaiting the owner:**
+
+| ID | Decision | M23.8 input | Status |
+|---|---|---|---|
+| OD-S | **Diagnostic capture hooks** (`PERCEIVE_ONCE`, `STREAM_CONSUME`, the `__host` drivers): (A) retain in product builds, (B) move to evidence builds only, (C) remove | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `diagnostic-hook-boundary-map.md` | *(M23.8 status, superseded by M23.9 below:)* awaiting the owner |
+| OD-T | **The product's visible capture wording:** the side panel's "Click the toolbar button to let PratiBimb look at this tab" and the toolbar title "perceive this tab", neither true of a product task | same comparison document | *(M23.8 status, superseded by M23.12 below:)* awaiting the owner |
+| OD-U | **`run-gesture-capture.mjs` and `run-gesture-acts.mjs`:** re-scope to an evidence build, or retire the four checks a product build can no longer pass | `evidence-build-preservation-assessment.md` §3 | *(M23.8 status, superseded by M23.11 below:)* awaiting the owner |
+
+**Still awaiting the owner, unchanged:**
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**Needs a separate authorisation, not a decision between options:** the human browser smoke run (`dom-only-browser-smoke-procedure-PROPOSED.md`), and any evidence-build run.
+
+**Not authorised:** detector evaluation, FR-01, Phase 2, frame egress.
+
+## M23.9 — status after OD-S
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-S | **APPROVED — OPTION B (owner, 2026-11-04):** `PERCEIVE_ONCE` and `STREAM_CONSUME` exist only in evidence builds; absent, not refused, in a product build | **M23.9: IMPLEMENTED IN PRODUCT BUILDS, after verification.** A real product build was inspected and contains neither hook, no driver, no capture ticket and no capture call *(corrected M23.18: no **reachable** capture call. An unreachable minting wrapper remained in the worker, and M23.17 later removed the permission)*. Evidence-build behaviour is preserved in source and under test doubles | **Not browser-verified. Evidence-build runtime UNVERIFIED: none was built.** It costs six evidence harnesses their ability to run (OD-V) |
+
+**New; awaiting the owner:**
+
+| ID | Decision | Input | Status |
+|---|---|---|---|
+| OD-V | **The byte-identity guard in six evidence harnesses** (`run-gesture-redaction`, `run-webp-loopback`, `run-artifact-verifier`, `run-capture-determinism`, `run-stream-j7`, `run-stream-re1`). They refuse unless both builds' `background.js` match, which OD-S makes impossible. How should the guard change, and what may those records claim? | `od-s-diagnostic-hooks-comparison-PROPOSED.md`; `evidence-build-preservation-assessment.md` §5. **PROPOSED — AWAITING OWNER APPROVAL: option A there** | *(M23.9 status, superseded by M23.10 below:)* awaiting the owner; until then the six refuse, fail-closed |
+
+**Still awaiting the owner, unchanged by M23.9:**
+- **OD-T:** the product's visible capture wording.
+- **OD-U:** `run-gesture-capture.mjs` and `run-gesture-acts.mjs`. M23.9 adds a fact to it: `run-gesture-capture.mjs` now throws on a product build.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**Also the owner's, and raised only as a question:** a product build no longer uses `tabCapture`. M23.9 leaves it in place, as instructed.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 is unchanged.**
+
+## M23.10 — status after OD-V
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-V | **SELECTED (owner, 2026-11-04):** replace only the six harnesses' cross-build worker equality. Keep the `content.js`, manifest, permission, host-permission and CSP comparisons. Require product hooks absent, evidence hooks present, evidence workers consistent, and product and evidence workers different | **M23.10: IMPLEMENTED in the harness contracts,** `tests/browser/support/build-separation.mjs`. 58 of 58 deliberate regressions caught | **No harness was run; no evidence build was made. Evidence-build runtime UNVERIFIED.** Two parts of the contract rest on inference until a real run (`artifacts/experiments/M23.10-evidence-harness-reconciliation/`) |
+
+**Remains implemented:** OD-P, OD-R and OD-S, in product builds. Not browser-verified, not accepted.
+
+**Still awaiting the owner, unchanged by M23.10:**
+- **OD-T:** the product's visible capture wording.
+- **OD-U:** *(M23.10 status, superseded by M23.11 below.)* `run-gesture-capture.mjs` and `run-gesture-acts.mjs`, their build scope, and the four checks that cannot pass on a DOM-only product build. Not moved, retired, weakened or rewritten.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.11 — status after OD-U
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-U | **OPTION B (owner, 2026-11-04):** `run-gesture-capture.mjs` and `run-gesture-acts.mjs` belong exclusively to the evidence-build workflow, with their assertions and purpose preserved | **M23.11: IMPLEMENTED in the harnesses, after the static and synthetic tests passed.** One fail-closed gate, called first. The real product build is refused. All 41 checks are byte-identical to `20914f1`. 47 of 47 deliberate regressions caught | **Neither harness was run; no evidence build was made. Evidence-build runtime validation is outstanding.** A real run would overwrite their tracked records (`artifacts/experiments/M23.11-gesture-harness-isolation/`) |
+
+**Remains implemented:** OD-P, OD-R, OD-S and OD-V. Not browser-verified, not accepted.
+
+**Still awaiting the owner, unchanged by M23.11:**
+- **OD-T:** *(M23.11 status, superseded by M23.12 below.)* the product's visible capture wording. Nothing changed.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+
+**For the owner's next review of the PROPOSED criteria, not changed here:** `BRW-04` and the scope's "Capture: gesture-authorised" still read as product capability. See the M23.11 decision record.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.12 — status after OD-T
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-T | **SELECTED (owner, 2026-11-04):** toolbar title `PratiBimb — Page Assistant`; side-panel description `PratiBimb uses page structure to identify elements and assist with browser tasks.`; privacy explanation `Normal tasks do not capture browser screenshots or send page images to the reasoning model.` | **M23.12: IMPLEMENTED, after verification.** The panel's two sentences appear in product builds only, because the privacy one is false in an evidence build. The Capture field is evidence-build-only, with its original words. The shortcut text reuses the approved title | **Not rebuilt and not seen in a browser.** It says nothing about visual PII, whose protection is not operational (`artifacts/experiments/M23.12-product-ui-language/`) |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-U and OD-V. Not browser-verified, not accepted.
+
+**Still awaiting the owner, unchanged:**
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**For the owner's attention, raised and not decided:**
+- *(Toolbar: resolved by OD-W, M23.13.)* In a product build the toolbar button now has no visible effect. It records a grant that nothing uses, and `tabCapture` has no product user.
+- `BRW-04` and the scope's "Capture: gesture-authorised" still read as product capability (M23.11).
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.13 — status after OD-W
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-W | **SELECTED (owner):** in a normal Phase 1 product, clicking the toolbar button opens or focuses the side panel, and issues no capture grant. Evidence builds keep their toolbar gesture-capture behaviour unchanged | **M23.13: IMPLEMENTED IN PRODUCT BUILDS, after the tests and the product build passed.** One handler, behind the existing flag. The real product build's listener opens the panel and has no grant in it. Permissions, hosts and CSP are identical to the previous real build. 24 of 24 deliberate regressions caught | **Not tried in a browser.** Evidence-build runtime UNVERIFIED (`artifacts/experiments/M23.13-toolbar-interaction/`) |
+
+**The keyboard shortcut needs no further decision.** `Alt+Shift+P` is `_execute_action`, with no command listener in the source, so it is the same event as the click and issues no unused grant. Whether Chrome treats it as a user gesture is unknown until a browser run.
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U and OD-V. Not browser-verified, not accepted.
+
+**New; awaiting the owner:**
+
+| ID | Decision | Status |
+|---|---|---|
+| OD-X | The treatment of the visible `captureStatus` field in the side panel's Status box. In a product it now always reads `NO_GRANT` | *(M23.13 status, superseded by M23.14 below:)* awaiting the owner |
+| OD-Y | Branding terminology such as "PratiBimb minimal host" and "Development build" | **AWAITING OWNER APPROVAL** *(as of M23.13; see M23.15)* |
+| OD-Z | Remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description | **AWAITING OWNER APPROVAL** *(as of M23.13; see M23.15)* |
+
+**Still awaiting the owner, unchanged:**
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**Raised, not decided:** `tabCapture` and `activeTab` have no product user now, and the capture authority is idle in a product. Both stay, as instructed. While `activeTab` stays, Chrome itself gives the extension temporary tab access on a click, which nothing in a product build uses.
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.14 — status after OD-X
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-X | **SELECTED (owner):** in a product build `captureStatus` does not appear in the side panel. In an evidence build it stays exactly, as a diagnostic. Presentation only | **M23.14: IMPLEMENTED IN PRODUCT BUILDS, after verification.** A product panel prints a named list of the worker's fields. An evidence panel prints the whole reply, as before. In the real build the worker, offscreen chunk, content script and manifest are byte-identical to the previous build. 14 of 14 deliberate regressions caught | **Not seen in a browser.** Evidence-build runtime UNVERIFIED. The worker still sends the field to the panel, which does not display it (`artifacts/experiments/M23.14-capture-status-scope/`) |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V and OD-W. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **OD-Y:** branding terminology such as "PratiBimb minimal host" and "Development build". The Status box's place in a product overlaps this. *(As of M23.14; see M23.15.)*
+- **OD-Z:** remaining acceptance-document wording, including `BRW-04` and the Phase 1 capture description. *(As of M23.14; see M23.15.)*
+- **Permission review:** `activeTab` and `tabCapture`, which have no product user.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.15 — status after OD-Y and OD-Z
+
+**Selected by the owner, and implemented as far as existing approvals permit:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| OD-Y | **SELECTED (owner):** the product is **PratiBimb — Page Assistant**. Keep truthful environment qualifiers; a development build must not read as a release. Internal names, evidence-build wording and historical records stay | **M23.15: IMPLEMENTED.** The extension and its panel are named **PratiBimb — Page Assistant (Development build)**. The toolbar title stays the OD-T wording exactly. The "Development build" warning and synthetic-goal text stay | Wording only. Not seen in a browser. The worker's `justification` argument to Chrome keeps its old text, to keep the worker byte-identical (technical; the record classifies it) |
+| OD-Z | **SELECTED (owner):** `BRW-04` becomes a DOM-only browser-task requirement; Phase 1 capture wording says what a normal task does; evidence diagnostics are described separately; the brief's deliverables stay, with what Phase 1 does and does not fulfil | **M23.15: IMPLEMENTED** in the core proposal (`BRW-04`, §2, §5.14), the traceability matrix (§1.6), the Phase 1 scope and the release checklist | **No classification is approved by this.** All 59 criteria keep their class and status. No cross-browser claim is made |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W and OD-X. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **Permission review:** `activeTab` and `tabCapture`, which have no product user.
+- **The Status box's place in a product,** which is a developer readout. OD-Y did not decide it.
+- Re-scoping `BRW-05` and the detector half of `REL-03`, if the owner wishes (`core-product-acceptance-PROPOSED.md` §5.14).
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**QG-04-S and QG-04-F are not signed.**
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.17 — status after RD-5 and RD-6
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| RD-5 | **APPROVED (owner):** remove `tabCapture` from normal product builds only; evidence builds keep it | **M23.17: IMPLEMENTED IN PRODUCT BUILDS.** One manifest key changes in the real build; all JavaScript is byte-identical (`artifacts/experiments/M23.17-product-permission-isolation/`) | Not run in a browser. Evidence-build runtime stays UNVERIFIED |
+| RD-6 | **APPROVED (owner):** remove `activeTab` from normal product builds only; evidence builds keep it | **M23.17: IMPLEMENTED IN PRODUCT BUILDS,** in the same change | same |
+
+**This resolves the permission review** raised in M23.13. The build-separation contract now allows exactly that difference, and refuses any other.
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W, OD-X, OD-Y and OD-Z. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **From the M23.16 report, none adopted:** RD-1 (worker `justification`), RD-2 (Status box), RD-3 (BRW-05), RD-4 (REL-03), RD-7 (three document corrections), RD-8 (panel turn budget), RD-9 (order of work), RD-10 (Chrome smoke test).
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED; its permission list still names both, and needs updating before approval);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.**
+
+**QG-04-S and QG-04-F are not signed.**
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**
+
+## M23.18 — status after RD-1 to RD-4, RD-7 and RD-8
+
+**Selected by the owner, and implemented:**
+
+| ID | Decision | Implementation | Limits |
+|---|---|---|---|
+| RD-1 | **APPROVED (owner):** a truthful justification for the offscreen document | **M23.18: IMPLEMENTED.** `"Run PratiBimb's offscreen runtime for DOM-based browser assistance."` Only the value changed | **Whether Chrome shows it to a person is UNVERIFIED** until an authorised browser run |
+| RD-2 | **APPROVED (owner), option S-C:** no running fields in a product panel; one plain sentence on failure; `HOST_STATUS` kept | **M23.18: IMPLEMENTED IN PRODUCT BUILDS.** The fixed `NEEDS_USER: none` line is gone from a product. `HOST_STATUS`, the worker's reply and the offscreen lifecycle are unchanged. An evidence panel is as it was | Not seen in a browser |
+| RD-3 | **APPROVED (owner):** re-scope `BRW-05` for Phase 1, preserving the original | **M23.18: IMPLEMENTED** in the core proposal (§5, §5.14) and the release checklist | Class and status unchanged. **QG-06's WASM-only item is a separate decision, still unresolved** |
+| RD-4 | **APPROVED (owner):** re-scope `REL-03` around the actual fail-closed behaviour; defer its detector half | **M23.18: IMPLEMENTED** in the same places | Class and status unchanged. No counter added. FR-01 DEFERRED — NOT AUTHORISED; B-07 BLOCKED |
+| RD-7 | **APPROVED (owner):** three corrections | **M23.18: IMPLEMENTED,** each marked *(corrected M23.18)*. Historical records are left as written, and listed in `artifacts/experiments/M23.18-product-surface-acceptance-alignment/` | — |
+| RD-8 | **APPROVED (owner):** keep the 3-turn panel budget, and state the 5-turn ceiling separately | **M23.18: IMPLEMENTED** in the core proposal, the traceability matrix and the Phase 1 scope. No code changes | — |
+| ADR-0015 permissions | the description, reconciled with M23.17 | **M23.18: CORRECTED** in §3.1, with dated notes in §3.6 and §5 | **ADR-0015 stays PROPOSED — AWAITING OWNER APPROVAL (OD-N).** A corrected description is not an approval |
+
+**Remain completed:** OD-P, OD-R, OD-S, OD-T, OD-U, OD-V, OD-W, OD-X, OD-Y, OD-Z, RD-5 and RD-6. Not browser-verified, not accepted.
+
+**Still awaiting the owner:**
+- **RD-9** (the order of work) and **RD-10** (the Chrome smoke test). **No smoke test is authorised.**
+- **QG-06's "A separate WASM-only build, benchmarked" item:** unresolved. RD-3 did not decide it.
+- SEC-05's detector half, if the owner wishes to re-scope it.
+- OD-O, OD-Q, OD-F, OD-N (ADR-0015, still PROPOSED);
+- GOV-01, OD-E1, OD-K, OD-L, OD-M;
+- OD-A to OD-D, OD-G;
+- OD-H, OD-E2 to OD-E8.
+- **All Phase 1 acceptance criteria.** GOV-01 and the 51 proposed-mandatory classifications are not approved.
+
+**Unchanged:** F-M13-1, J7/B5 and B-02 stay open.
+
+**QG-04-S and QG-04-F are not signed.**
+
+**Needs a separate authorisation:** the human browser smoke run, and any evidence-build or harness run.
+
+**Not authorised:** detector evaluation, FR-01 (DEFERRED), Phase 2, frame egress. **B-07 remains blocked.**

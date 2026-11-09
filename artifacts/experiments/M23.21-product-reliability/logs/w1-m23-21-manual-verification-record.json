@@ -1,0 +1,76 @@
+{
+  "milestone": "M23.21",
+  "recordStatus": "COMPLETE AS REPORTED — the operator reported the checklist V1–V14 completed and both entry points working; per-row values were not reported and are not invented here",
+  "relatesTo": "M23.19 (38b24bf) and M23.20 (cbced35) records, unchanged; DEF-M23.19-01 (M23.19 B6 FAIL)",
+  "authorisation": "owner's M23.21 instruction in chat, 2026-11-08, session transcript",
+  "date": "2026-11-08",
+  "operator": "the project owner",
+  "operatedBy": "the operator, by hand; Claude did not launch, control or type into Chrome",
+  "workstation": "W1",
+  "commit": "cbced35 plus the uncommitted M23.21 working tree",
+  "operatorReport": {
+    "received": "in chat, 2026-11-08, before 22:11:42 IST",
+    "statements": [
+      "Chrome for Testing 153.0.8010.12 manual verification completed",
+      "Ctrl+Shift+Y successfully opens the PratiBimb side panel",
+      "the toolbar button successfully opens the side panel",
+      "both entry points behave as expected",
+      "offscreen lifecycle checks were completed",
+      "the M23.21 manual verification checklist V1–V14 was completed"
+    ]
+  },
+  "productBuild": {
+    "path": "apps/extension/.output/chrome-mv3",
+    "builtAt": "2026-11-08 16:11:28 IST (manifest.json mtime); not rebuilt since",
+    "hashCheckBeforeSession": "not reported by the operator",
+    "hashCheckAfterSession": "9 of 9 OK against logs/expected-product-build.sha256, run by Claude at 22:11 IST",
+    "againstM23_19A": "manifest.json FAILED, the other 8 OK, as expected",
+    "inspectionProblems": []
+  },
+  "chrome": {
+    "version": "153.0.8010.12 (operator report)",
+    "profile": "pratibimb-m23-21-profile in %TEMP%, created 22:07:20 IST; Last Version stamp 153.0.8010.12 (read by Claude). Its name has no timestamp suffix, unlike the S1 command; it is a new profile",
+    "extensionInProfile": "one unpacked extension (location 4) whose path ends in chrome-mv3, first installed 22:08:48 IST, no disable reasons (read by Claude from Secure Preferences)",
+    "assignedCommands": "Preferences extensions.commands holds exactly one entry: key \"windows:Ctrl+Shift+Y\" -> command_name \"_execute_action\", global false, for that extension (read by Claude). This is Chrome's own record that it assigned the key",
+    "otherProfiles": "pratibimb-m23-19-profile-20261108T043254, pratibimb-m23-20-profile-20261108T152035 and pratibimb-m23-20-profile-20261108T154350 present, not deleted"
+  },
+  "services": {
+    "reasoner": "not started by Claude; the checklist does not use it",
+    "fixtureServer": "not started by Claude; the checklist does not use it",
+    "ports8975_8977_8995": "free at 22:14 IST (Claude's check, after the session)"
+  },
+  "results": [
+    { "id": "S1", "state": "DONE", "observed": "a new profile exists, created 22:07:20 IST (Claude's read); operator's launch time not reported" },
+    { "id": "S2", "state": "PASS", "observed": "153.0.8010.12 (operator report; profile stamp agrees)" },
+    { "id": "S3", "state": "DONE", "observed": "the build was loaded unpacked (profile record); load errors not separately reported" },
+    { "id": "V1", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "Inspect views entries before the panel opened not reported" },
+    { "id": "V2", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "shortcut row text not reported; Chrome's profile assigns Ctrl+Shift+Y to _execute_action (Claude's read)" },
+    { "id": "V3", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "commands.getAll() output not reported; the profile's assignment above is consistent with shortcut \"Ctrl+Shift+Y\" (INFERENCE)" },
+    { "id": "V4", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "grants value not reported" },
+    { "id": "V5", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "offscreen context count before the panel not reported" },
+    { "id": "V6", "state": "PASS", "observed": "Ctrl+Shift+Y opens the PratiBimb side panel (operator report); whether one or two attempts, and on which page, not reported" },
+    { "id": "V7", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "offscreen context count after the panel not reported" },
+    { "id": "V8", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "TASK_STATUS result not reported" },
+    { "id": "V9", "state": "PASS", "observed": "the toolbar button opens the side panel (operator report)" },
+    { "id": "V10", "state": "PASS", "observed": "both entry points behave as expected (operator report); repetition count not reported" },
+    { "id": "V11", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "the three repeated values not reported" },
+    { "id": "V12", "state": "COMPLETED — VALUE NOT REPORTED", "observed": "Inspect views entries with the panel open not reported" },
+    { "id": "V13", "state": "NOT REPORTED", "observed": "optional; whether it was run, and what opened, not reported" },
+    { "id": "V14", "state": "NONE REPORTED", "observed": "no unexpected event reported" }
+  ],
+  "screenshots": [],
+  "stopConditionsFired": "none reported",
+  "deviations": [
+    "per-row values, times and order not reported; recorded as COMPLETED — VALUE NOT REPORTED, not as PASS",
+    "the pre-session hash check was not reported; Claude's post-session check passed and the build was not rebuilt in between",
+    "the profile name lacks the timestamp suffix of the S1 command"
+  ],
+  "verdict": {
+    "DEF-M23.19-01": "FIXED — VERIFIED IN CHROME FOR TESTING 153.0.8010.12 ON W1: the operator saw Ctrl+Shift+Y open the panel, and Chrome's profile records the key as assigned to _execute_action",
+    "A6 offscreen lifecycle": "checks completed by the operator; their individual values were not reported, so the expected 0 / 1 / { ok: true, task: null } are not recorded as observed"
+  },
+  "sessionEnd": {
+    "profilesDeleted": false,
+    "screenshotsTaken": false
+  }
+}

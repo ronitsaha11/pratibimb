@@ -35,6 +35,7 @@ import { cpus, release as osRelease, tmpdir } from "node:os";
 
 import { ROOT, startDemoServer } from "../demo/server.mjs";
 import { startReasonerService } from "../demo/reasoner-service.mjs";
+import { domOnlyTaskChecks, summariseHandoff } from "../support/dom-only-checks.mjs";
 import { assertOwnEvidencePath, evidenceFileName, provenanceOf, resolveWorkstation } from "../support/workstation.mjs";
 
 const WS = resolveWorkstation();
@@ -222,11 +223,14 @@ try {
         rehydrated: t.rehydrated,
         verification: t.act?.verification ?? null,
         declaredDone: t.declaredDone,
+        handoff: summariseHandoff(t.handoff),
       })),
       modelProposals: exchanges.map((e) => e.modelContent),
       modelRequestTripwire: exchanges.map((e) => e.tripwire),
       egress: (result?.egress ?? []).map((e) => (e.record ? { sent: true, destination: e.record.destination } : { sent: false, cause: e.refusal?.cause ?? null })),
       perception: (result?.ports?.perception ?? []).map((p) => ({ ran: p.ran, refusal: p.refusal?.code ?? null })),
+      perceptionBoot: result?.perceptionBoot ?? null,
+      modelRequestBodies: service.captures.slice(capturesBefore).map((c) => c.body),
       grantViaControlPlane: result?.grant ?? null,
       page: truth,
     });
@@ -261,7 +265,8 @@ const judge = (r) => {
     noValueShapedTextReachedTheModel: r.modelRequestTripwire.every((w) => Array.isArray(w) && w.length === 0),
     noStoredValueOrPreviewInTheRecord: leaks({ turns: r.turns, panelSays: r.panelSays, consentScreen: r.consentScreen }).length === 0,
     allEgressLoopbackReasoner: r.egress.every((e) => !e.sent || e.destination === REASONER_URL),
-    productBuildCapturedNoFrame: r.perception.every((p) => p.ran === false && p.refusal === "NO_ACTIVE_TAB_GRANT"),
+    // M23.8: replaces a check that held for any run once a product task's perception array became empty.
+    ...domOnlyTaskChecks({ perception: r.perception, perceptionBoot: r.perceptionBoot, handoffs: r.turns.map((t) => t.handoff), modelRequests: r.modelRequestBodies }),
   };
   if (r.scenario === "allow" || r.scenario === "clarify-allow") {
     return {
@@ -286,7 +291,11 @@ const judge = (r) => {
     nothingRestoredNothingSubmitted: r.page.confirmHolds === "EMPTY" && r.page.submitClicks === 0 && (first?.rehydrated ?? []).length === 0,
   };
 };
-for (const r of runs) r.judged = judge(r);
+for (const r of runs) {
+  r.judged = judge(r);
+  // Judged, and now gone: the record keeps what the model was shown out of itself.
+  delete r.modelRequestBodies;
+}
 const allHeld = failure === null && runs.length === RUN.length && runs.every((r) => Object.values(r.judged).every(Boolean));
 const record = {
   experiment: "M19 — just-in-time, one-time consent in the extension's panel, with a masked preview (not a J7 experiment)",
@@ -304,7 +313,7 @@ const record = {
     "the harness pressed the panel's controls and, in the stale scenario, sent two crafted answers from the panel page; no person was in the loop",
     "one run per scenario on synthetic pages; no reliability claim",
     "the preview's text and every stored value are deliberately absent from this record; only the preview's shape is kept",
-    "perception ran the product's no-gesture floor; no frame was captured and none left the client",
+    "a product task takes no perception pass (M23.7): no frame was captured or asked for, and none left the client",
   ],
   recordedAt: new Date().toISOString(),
   provenance: { ...provenanceOf(WS), os: `${process.platform} ${osRelease()}`, cpu: cpus()[0]?.model ?? "unknown", node: process.version, playwright: require2("playwright/package.json").version, headless: false },

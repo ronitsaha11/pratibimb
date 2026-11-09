@@ -9,6 +9,7 @@ import { createServiceWorkerRouter, relayRefused, TRANSPORT_CHANNEL, TRANSPORT_P
 
 import { createCaptureAuthority } from "../host-lib/capture-authority";
 import { identityOf, isFromContentScript, isFromExtensionPage, type SenderIdentity, type ToSw } from "../host-lib/messages";
+import { openSidePanelForToolbarClick } from "../host-lib/toolbar-action";
 import { adaptPort, isFromOffscreenDocument } from "../host-lib/transport-chrome";
 
 export default defineBackground(() => {
@@ -49,8 +50,18 @@ export default defineBackground(() => {
     },
     grantTtlMs: 5 * 60_000,
   });
+  /**
+   * M23.13 (OD-W): WHAT THE TOOLBAR BUTTON DOES DEPENDS ON THE BUILD. In an evidence build it is the gesture a capture
+   * needs, as above. In a product build nothing captures, so it opens the side panel and asks the authority for
+   * nothing. The keyboard shortcut (`Ctrl+Shift+Y` since M23.21) is `_execute_action`, which fires this same event. `__EVIDENCE_BUILD__` is substituted at
+   * build time, so a product bundle has no grant on this route, rather than one that goes unused.
+   */
   chrome.action?.onClicked.addListener((tab) => {
-    if (typeof tab.id === "number") capture.grant(tab.id);
+    if (__EVIDENCE_BUILD__) {
+      if (typeof tab.id === "number") capture.grant(tab.id);
+      return;
+    }
+    openSidePanelForToolbarClick(tab, (target) => chrome.sidePanel.open(target), (problem) => console.warn(`PratiBimb: ${problem}`));
   });
   /**
    * A GRANT BELONGS TO A DOCUMENT, NOT TO A TAB NUMBER.
@@ -92,7 +103,8 @@ export default defineBackground(() => {
       await chrome.offscreen.createDocument({
         url: "offscreen.html",
         reasons: [chrome.offscreen.Reason.WORKERS],
-        justification: "PratiBimb minimal host: ORT inference and the synthetic vault stub",
+        // M23.18 (RD-1): what the document is for in a normal task. Chrome may show this to a person; whether it does is unverified.
+        justification: "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",
       });
     }
     return (await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT] })).length;
@@ -163,47 +175,71 @@ export default defineBackground(() => {
     pageAudit: (tabId: number, frameId: number) =>
       chrome.tabs.sendMessage(tabId, { kind: "DISPATCH_AUDIT" }, { frameId }),
     /**
-     * TEST-ONLY: what the authority would answer for this tab, with the handle withheld.
+     * M23.9 (OD-S, Option B): THE CAPTURE DRIVERS EXIST ONLY IN AN EVIDENCE BUILD.
      *
-     * The handle is an opaque id and carries nothing, but a harness has no reason to hold one, so
-     * what comes back is its LENGTH. A probe that returned the handle would be the one place in
-     * this system where a capture credential left the extension.
-     */
-    ticketProbe: async (tabId: number, documentId?: string) => {
-      const ticket = await capture.ticketFor(tabId, documentId ?? null);
-      if (!ticket.ok) return { ok: false, refused: ticket.refused, detail: ticket.detail };
-      return ticket.route === "GESTURE_STREAM"
-        ? { ok: true, route: ticket.route, handleLength: ticket.handle.length }
-        : { ok: true, route: ticket.route, dataUrlLength: ticket.dataUrl.length };
-    },
-    /**
-     * TEST-ONLY: drive the product route end to end for the most recent grant.
+     * `__EVIDENCE_BUILD__` is substituted at build time, so a product build's bundler drops this whole
+     * object and every name in it: these are absent from the artifact, rather than in it and refused,
+     * the rule `#e6-probe` and the other probes follow. Moved, not changed: an evidence build's four
+     * drivers are the code they were, with the same grant and stream authority behind them.
      *
-     * Mints a handle here and hands the STRING to the offscreen document, which turns it into an
-     * `ImageBitmap` itself. This is the step M3.1 implemented and could not run, so it is exercised
-     * on its own before the full loop, in order that a failure names which half broke.
+     * `toOffscreen` above is a forwarder that names no kind, and stays. A product build answers a
+     * forwarded hook kind `UNKNOWN_KIND`, because the handlers are gone too.
      */
-    consumeProbe: async () => {
-      const latest = capture.grants().at(-1);
-      if (!latest) return { ok: false, error: "NO_GRANT" };
-      const ticket = await capture.ticketFor(latest.tabId);
-      if (!ticket.ok) return { ok: false, error: ticket.refused, detail: ticket.detail };
-      if (ticket.route !== "GESTURE_STREAM") return { ok: false, error: "NOT_THE_STREAM_ROUTE", route: ticket.route };
-      await ensureOffscreen();
-      // The tab's own CSS size, so the probe asks for the frame shape the product asks for.
-      const tab = await chrome.tabs.get(latest.tabId).catch(() => null);
-      return chrome.runtime.sendMessage({
-        target: "offscreen",
-        kind: "STREAM_CONSUME",
-        streamId: ticket.handle,
-        ...(tab?.width && tab?.height ? { maxWidth: tab.width, maxHeight: tab.height } : {}),
-      });
-    },
-    /** TEST AND EVALUATION ONLY: one perception pass through the product realm. */
-    perceiveOnce: async (tabId: number, frameId: number) => {
-      await ensureOffscreen();
-      return chrome.runtime.sendMessage({ target: "offscreen", kind: "PERCEIVE_ONCE", tabId, frameId });
-    },
+    ...(__EVIDENCE_BUILD__
+      ? {
+        /**
+         * TEST-ONLY: what the authority would answer for this tab, with the handle withheld.
+         *
+         * The handle is an opaque id and carries nothing, but a harness has no reason to hold one, so
+         * what comes back is its LENGTH. A probe that returned the handle would be the one place in
+         * this system where a capture credential left the extension.
+         */
+        ticketProbe: async (tabId: number, documentId?: string) => {
+          const ticket = await capture.ticketFor(tabId, documentId ?? null);
+          if (!ticket.ok) return { ok: false, refused: ticket.refused, detail: ticket.detail };
+          return ticket.route === "GESTURE_STREAM"
+            ? { ok: true, route: ticket.route, handleLength: ticket.handle.length }
+            : { ok: true, route: ticket.route, dataUrlLength: ticket.dataUrl.length };
+        },
+        /**
+         * TEST-ONLY: drive the product route end to end for the most recent grant.
+         *
+         * Mints a handle here and hands the STRING to the offscreen document, which turns it into an
+         * `ImageBitmap` itself. This is the step M3.1 implemented and could not run, so it is exercised
+         * on its own before the full loop, in order that a failure names which half broke.
+         */
+        consumeProbe: async () => {
+          const latest = capture.grants().at(-1);
+          if (!latest) return { ok: false, error: "NO_GRANT" };
+          const ticket = await capture.ticketFor(latest.tabId);
+          if (!ticket.ok) return { ok: false, error: ticket.refused, detail: ticket.detail };
+          if (ticket.route !== "GESTURE_STREAM") return { ok: false, error: "NOT_THE_STREAM_ROUTE", route: ticket.route };
+          await ensureOffscreen();
+          // The tab's own CSS size, so the probe asks for the frame shape the product asks for.
+          const tab = await chrome.tabs.get(latest.tabId).catch(() => null);
+          return chrome.runtime.sendMessage({
+            target: "offscreen",
+            kind: "STREAM_CONSUME",
+            streamId: ticket.handle,
+            ...(tab?.width && tab?.height ? { maxWidth: tab.width, maxHeight: tab.height } : {}),
+          });
+        },
+        /** TEST AND EVALUATION ONLY: one perception pass through the product realm. */
+        perceiveOnce: async (tabId: number, frameId: number) => {
+          await ensureOffscreen();
+          return chrome.runtime.sendMessage({ target: "offscreen", kind: "PERCEIVE_ONCE", tabId, frameId });
+        },
+        /** TEST-ONLY: mint a stream id for a tab the action was invoked on. */
+        mintStreamId: async (tabId: number) => {
+          try {
+            const streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tabId });
+            return { ok: true, length: streamId.length };
+          } catch (e) {
+            return { ok: false, error: e instanceof Error ? e.message : String(e) };
+          }
+        },
+        }
+      : {}),
     /** TEST-ONLY: the grants a human produced, and whether the degraded path is compiled in. */
     captureState: () => ({ grants: capture.grants(), workerFrameEnabled: __M3_WORKER_FRAME__ }),
     /** TEST-ONLY: the lifecycle this tab is in, and whether a person has to act. */
@@ -236,15 +272,6 @@ export default defineBackground(() => {
     }),
     /** TEST-ONLY: what an invocation recorded, if a human ever produced one. */
     activeTabGrants: () => capture.grants(),
-    /** TEST-ONLY: mint a stream id for a tab the action was invoked on. */
-    mintStreamId: async (tabId: number) => {
-      try {
-        const streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tabId });
-        return { ok: true, length: streamId.length };
-      } catch (e) {
-        return { ok: false, error: e instanceof Error ? e.message : String(e) };
-      }
-    },
     /** TEST-ONLY: present a capability to a tab exactly as the core realm would. */
     presentCapability: (tabId: number, frameId: number, nonce: string, target: string) =>
       chrome.tabs.sendMessage(tabId, { kind: "BOUNDARY", body: { kind: "CAPABILITY", nonce, target } }, { frameId }),
@@ -342,8 +369,12 @@ export default defineBackground(() => {
      * context and this context holds the frame. That path is named `WORKER_FRAME` in every record
      * that mentions it, and the recorder below notes its SHAPE and never its payload, because a
      * diagnostic that stored every frame would be the leak it exists to detect.
+     *
+     * M23.9 (OD-S): only an evidence build has this handler. A product build has no perception realm to
+     * ask (`host/offscreen/main.ts`), so it issues no ticket to anyone. The grant authority itself is
+     * unchanged in both, because an evidence build's toolbar and every build's status report use it.
      */
-    if (msg?.kind === "CAPTURE_FRAME") {
+    if (__EVIDENCE_BUILD__ && msg?.kind === "CAPTURE_FRAME") {
       if (!isFromOffscreenDocument(sender)) {
         sendResponse({ ok: false, refused: "SENDER_NOT_ACCEPTED" });
         return false;

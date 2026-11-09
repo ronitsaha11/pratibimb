@@ -185,12 +185,12 @@ describe("the visual tier cannot carry pixels out of its realm", () => {
     expect(config).toMatch(/STRUCTURAL_PROBE\s*\?\s*"probe\/structural\.ts"\s*:\s*"probe\/structural-absent\.ts"/);
   });
 
-  it("the default build asks for activeTab and not for every origin", () => {
+  it("no build but the degraded one asks for every origin, and only an evidence build asks for activeTab (M23.17)", () => {
     // `<all_urls>` arriving quietly in a privacy milestone is exactly the thing to have a test for.
     // The evidence harness sets M3_WORKER_FRAME because no harness can produce the invocation the
     // gesture route needs; this asserts what a build without that flag declares.
     const config = readFileSync(join(APP, "wxt.config.ts"), "utf8");
-    expect(config).toContain('"activeTab"');
+    expect(config).toContain('const EVIDENCE_ONLY_PERMISSIONS = ["activeTab", "tabCapture"];');
     expect(config).toContain("M3_WORKER_FRAME");
     const defaultBranch = /: \["http:\/\/127\.0\.0\.1\/\*"\];/.test(config);
     expect(defaultBranch, "the default host_permissions branch is loopback only").toBe(true);

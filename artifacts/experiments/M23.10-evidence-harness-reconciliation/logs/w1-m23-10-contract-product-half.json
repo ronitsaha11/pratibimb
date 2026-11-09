@@ -1,0 +1,36 @@
+{
+  "what": "the build-separation contract's product half, run against the real product build already on disk. Nothing was built. No model file was opened. No evidence build exists for it to compare, so the contract must report NOT_EXAMINED.",
+  "workstation": "w1",
+  "gitHead": "a2faefd",
+  "productSourceLastChangedAt": "712465e",
+  "buildManifestWrittenAt": "2026-11-04T12:28:38.307Z",
+  "product": {
+    "boundaryProblems": [],
+    "worker": "71ffaeef84972db79b14f120963413f6abf20e6f694fefe9877543ac2aff6059",
+    "content": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+    "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+    "permissions": [
+      "offscreen",
+      "sidePanel",
+      "activeTab",
+      "tabCapture"
+    ],
+    "hostPermissions": [
+      "http://127.0.0.1/*"
+    ],
+    "namesFoundFromEvidenceList": {
+      "worker": [],
+      "offscreen": []
+    }
+  },
+  "verdict": {
+    "problems": [
+      "EVIDENCE_BUILD_NOT_EXAMINED",
+      "REFERENCE_EVIDENCE_BUILD_NOT_EXAMINED"
+    ],
+    "notEnforcedInDryRun": [],
+    "status": "NOT_EXAMINED",
+    "measuredRoute": "the evidence build's",
+    "establishes": "what the built files contain; not that either build runs"
+  }
+}

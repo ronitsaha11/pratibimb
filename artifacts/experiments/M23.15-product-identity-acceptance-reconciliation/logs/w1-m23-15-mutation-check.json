@@ -1,0 +1,215 @@
+{
+  "milestone": "M23.15",
+  "what": "Each mutation breaks one identity string, inspection check or acceptance statement. Static and component tests only: no browser, no model, no frame.",
+  "tests": [
+    "apps/extension/test/productIdentity.test.ts",
+    "apps/extension/test/acceptanceDocuments.test.ts",
+    "apps/extension/test/buildSeparation.test.ts",
+    "tests/browser/support/product-build-inspection.test.mjs"
+  ],
+  "total": 40,
+  "caught": 40,
+  "missed": [],
+  "results": [
+    {
+      "mutation": "the manifest takes the old name",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the name loses its development qualifier",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a new brand replaces the toolbar title",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the panel's title is the old one",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the panel's heading is the old one",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the offscreen title is the old one",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the heading adds a tagline",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the development warning is removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the panel claims a release",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "synthetic goal text is removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the inspection stops checking the name",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the inspection stops refusing the old identity",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence diagnostic wording is changed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "an internal argument is renamed for consistency",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "BRW-04 goes back to gesture capture",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "BRW-04 drops its no-cross-browser statement",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "BRW-04 counts gesture evidence again",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "BRW-04 is declared evidenced",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a criterion is removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "BRW-05 is reclassified",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "PRV-03 becomes mandatory",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "BRW-04's original wording is lost",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "an affected criterion loses its interpretation",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a Phase 2 entry is removed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "GOV-01 is marked approved",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the scope claims gesture capture again",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "evidence diagnostics claim verification",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the core proposal says frames are captured",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the traceability row is the old one",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the mapping says visual-only PII is protected",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the mapping stops saying it is not a VLM",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a document calls T1 adopted",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a document says masked frames are consumed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a document says Phase 1 fulfils the brief",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the mapping loses a deliverable",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "a checklist box is ticked",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the checklist claims release-readiness",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the register approves classifications",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the register says a gate is signed",
+      "testsExit": 1,
+      "caught": true
+    },
+    {
+      "mutation": "the register drops B-07",
+      "testsExit": 1,
+      "caught": true
+    }
+  ]
+}

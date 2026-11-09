@@ -19,6 +19,7 @@ import { readFileSync } from "node:fs";
 import { extensionPagesCsp } from "./host-lib/extension-csp";
 import { ORT_PIN } from "../../packages/security/src/generated/ortPin";
 import { TR01_PACKAGE } from "./host-lib/tr01-pin";
+import { DEVELOPMENT_BUILD_NAME, TOOLBAR_TITLE } from "./host-lib/product-copy";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..", "..");
@@ -67,8 +68,8 @@ const STRUCTURAL_PROBE = process.env.STRUCTURAL_PROBE === "1";
  * off a doc page: with only `http://127.0.0.1/*` the call refuses with
  * "Either the '<all_urls>' or 'activeTab' permission is required."
  *
- * `activeTab` is the right product permission and the one the default build declares: an agent acts
- * on the tab a person invoked it on, and the grant arrives with that invocation. But `activeTab` is
+ * `activeTab` is the right permission for the gesture route, and M3's default build declared it: an agent
+ * acts on the tab a person invoked it on, and the grant arrives with that invocation. But `activeTab` is
  * granted by a USER GESTURE — a toolbar click, a context menu, a command — and a Playwright harness
  * cannot produce one. So the evidence harness builds with `M3_CAPTURE_WITHOUT_GESTURE=1`, which
  * substitutes `<all_urls>` for the gesture and changes nothing else: the same capture call, the same
@@ -81,7 +82,7 @@ const STRUCTURAL_PROBE = process.env.STRUCTURAL_PROBE === "1";
 /**
  * THE DEGRADED CAPTURE PATH, off unless a build asks for it by name.
  *
- * The product path is `getMediaStreamId` under an `activeTab` grant a person produced: the worker
+ * The gesture path is `getMediaStreamId` under an `activeTab` grant a person produced: the worker
  * mints an opaque handle and the offscreen document redeems it for pixels itself. No automated
  * harness can produce that invocation -- measured on W1, `<all_urls>` does not substitute for it,
  * a click inside an extension page does not, and a CDP keyboard command does not reach Chrome's
@@ -121,6 +122,14 @@ const EGRESS_EVIDENCE_PROBE = process.env.EGRESS_EVIDENCE_PROBE === "1";
  */
 const EVIDENCE_BUILD = E6_PROBE || STRUCTURAL_PROBE || TR01_PROBE || EGRESS_EVIDENCE_PROBE || WORKER_FRAME;
 /**
+ * M23.7 (OD-P, OD-R) — THE SAME FLAG DECIDES WHETHER A TASK LOOKS AT PIXELS.
+ *
+ * A product build runs DOM-only tasks: no frame capture, no UI head (T1), no TR-01 in a task run
+ * (`host-lib/task-perception.ts`), and the UI head is not packaged. An evidence build is unchanged:
+ * its tasks keep the perception pass and the UI head is packaged as before. TR-01's packaging and its
+ * hash check below are unchanged in both.
+ */
+/**
  * The side panel's one inline <style>, admitted by its SHA-256 rather than by 'unsafe-inline'. Line
  * endings are normalised because the bundler emits LF whatever the checkout has; the M13 harness
  * re-hashes the BUILT page's <style> and fails if it is not this hash.
@@ -129,6 +138,15 @@ const SIDEPANEL_STYLE = /<style>([\s\S]*?)<\/style>/.exec(readFileSync(join(HERE
 if (SIDEPANEL_STYLE === undefined) throw new Error("host/sidepanel/index.html: no <style> to hash");
 const STYLE_HASHES = [`'sha256-${createHash("sha256").update(SIDEPANEL_STYLE, "utf8").digest("base64")}'`];
 const HOST_PERMISSIONS = WORKER_FRAME ? ["http://127.0.0.1/*", "<all_urls>"] : ["http://127.0.0.1/*"];
+/**
+ * M23.17 (RD-5, RD-6) — A PRODUCT DECLARES NEITHER CAPTURE PERMISSION.
+ *
+ * A DOM-only product has no reachable capture path, so it asks for neither `tabCapture` nor `activeTab`. An evidence
+ * build's gesture route needs both, so it keeps them, in the order it has always declared them. The difference is these
+ * two names and nothing else: `tests/browser/support/build-separation.mjs` refuses any other.
+ */
+const PRODUCT_PERMISSIONS = ["offscreen", "sidePanel"];
+const EVIDENCE_ONLY_PERMISSIONS = ["activeTab", "tabCapture"];
 
 const ORT_DIST = join(ROOT, "node_modules", "onnxruntime-web", "dist");
 const MODEL = join(ROOT, "artifacts", "models", "t1-ui-head", "t1-ui-head.onnx");
@@ -153,7 +171,7 @@ export default defineConfig({
     // Substituted at build time so the degraded path is absent from a product bundle rather than
     // present behind a runtime check, the same rule `#e6-probe` follows.
     // M18: the endpoint a panel-started task reasons through — the same two constants the CSP pins.
-    define: { __M3_WORKER_FRAME__: JSON.stringify(WORKER_FRAME), __REASONER_ENDPOINT__: JSON.stringify(`${HOST_COLLECTOR_ORIGIN}${HOST_REASONER_PATH}`) },
+    define: { __M3_WORKER_FRAME__: JSON.stringify(WORKER_FRAME), __EVIDENCE_BUILD__: JSON.stringify(EVIDENCE_BUILD), __REASONER_ENDPOINT__: JSON.stringify(`${HOST_COLLECTOR_ORIGIN}${HOST_REASONER_PATH}`) },
     resolve: {
       alias: {
         "@pratibimb/agent": join(ROOT, "packages", "agent", "src", "index.ts"),
@@ -172,13 +190,19 @@ export default defineConfig({
     },
   }),
   manifest: {
-    name: "PratiBimb minimal MV3 host (experiment — not the product)",
+    name: DEVELOPMENT_BUILD_NAME,
     version: "0.0.0",
     minimum_chrome_version: "116",
-    permissions: ["offscreen", "sidePanel", "activeTab", "tabCapture"],
-    action: { default_title: "PratiBimb: perceive this tab" },
+    permissions: EVIDENCE_BUILD ? [...PRODUCT_PERMISSIONS, ...EVIDENCE_ONLY_PERMISSIONS] : PRODUCT_PERMISSIONS,
+    action: { default_title: TOOLBAR_TITLE },
+    /**
+     * M23.21 (DEF-M23.19-01): `Ctrl+Shift+Y`, not `Alt+Shift+P`. Chrome assigns a suggested key only if it is not one
+     * of its own accelerators, and on Windows and Linux `Alt+Shift+P` is Chrome's "create new tab group"
+     * (`kTabGroupAcceleratorMap`, Chromium 153.0.8010.12), so the old key was never assigned and the press went to
+     * Chrome. The command is still `_execute_action`: the same click event as the toolbar button, and nothing else.
+     */
     commands: {
-      _execute_action: { suggested_key: { default: "Alt+Shift+P" }, description: "Perceive this tab" },
+      _execute_action: { suggested_key: { default: "Ctrl+Shift+Y" }, description: TOOLBAR_TITLE },
     },
     host_permissions: HOST_PERMISSIONS,
     content_security_policy: {
@@ -195,8 +219,11 @@ export default defineConfig({
         if (!existsSync(src)) throw new Error(`missing ${src} (run: npm ci)`);
         assets.push({ absoluteSrc: src, relativeDest: name });
       }
-      if (!existsSync(MODEL)) throw new Error(`missing ${MODEL}`);
-      assets.push({ absoluteSrc: MODEL, relativeDest: "t1-ui-head.onnx" });
+      // M23.7 (OD-P): the UI head ships only in an evidence build. A product build neither needs nor carries it.
+      if (EVIDENCE_BUILD) {
+        if (!existsSync(MODEL)) throw new Error(`missing ${MODEL}`);
+        assets.push({ absoluteSrc: MODEL, relativeDest: "t1-ui-head.onnx" });
+      }
       // M10.4: TR-01, git-ignored like the UI head, and REFUSED at build time unless its bytes are
       // exactly the pinned artifact. The worker hashes it again at runtime before any session.
       if (!existsSync(TR01_MODEL)) {

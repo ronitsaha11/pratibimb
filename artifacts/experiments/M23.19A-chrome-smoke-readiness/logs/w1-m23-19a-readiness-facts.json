@@ -1,0 +1,181 @@
+{
+  "milestone": "M23.19A",
+  "what": "Readiness facts for a human-operated Chrome smoke test, read from files. Nothing was launched, started, built or loaded. No model was opened or hashed: model and runtime presence is from file metadata only.",
+  "gitHead": "db60807",
+  "productBuild": {
+    "sourceCommit": "8d3ce5f",
+    "nonDocumentationChangesSinceSourceCommit": [
+      "apps/extension/test/acceptanceDocuments.test.ts"
+    ],
+    "filesWithRecordedHashes": 9,
+    "filesMatchingTheM23_18Record": 9,
+    "differing": [],
+    "expectedSha256": {
+      "background.js": "6ba961f934365534c7839b2f57f1f272c79e1e980c504f274a29a6ebcd4f3b1b",
+      "chunks/_virtual_wxt-html-plugins-DPbbfBKe.js": "85219ee0069ecfbadb00dc6d4ca7713609e1327c191a5ebd3b2ff1e3bd0fcb74",
+      "chunks/offscreen-DajYm2zT.js": "7a0e070d522fff2f6dbb7e40096ade93924d6d804c83662bff0eeda7a58d2fc8",
+      "chunks/sidepanel-CtGBYmtZ.js": "a4147ac942dda28e8dc0cbb3fcfc96dd9a17a327171120b9abc69d59f1bbabc8",
+      "content-scripts/content.js": "a2d7b8b3d3f4808570784d036533df5cfeb4314a68d7333ba2b81293487110c2",
+      "manifest.json": "b07965cef1357c4769c1bb9be517a7aa2f8f2304312da1e9cf8c92fe971af3db",
+      "offscreen.html": "5e46eda30cfc8da9cb3ebd44b7b1ea4a8f6bbed15c333f2f5a0528d1badfffac",
+      "sidepanel.html": "e73a6ab1192b7501efbf78aa4a76b1e8307644fc25a211edb5c384416f978ef1",
+      "tr01-worker.js": "e1f77fe9d65dceb89eab5f396e4cbc21a6ab8336f394a3ab338989da3ce47464"
+    }
+  },
+  "inspection": {
+    "exitCode": 0,
+    "problems": [],
+    "manifest": {
+      "permissions": [
+        "offscreen",
+        "sidePanel"
+      ],
+      "host_permissions": [
+        "http://127.0.0.1/*"
+      ],
+      "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+      "actionTitle": "PratiBimb — Page Assistant"
+    },
+    "bundle": {
+      "namesEachHookMarker": {
+        "PERCEIVE_ONCE": false,
+        "STREAM_CONSUME": false,
+        "perceiveOnce": false,
+        "consumeProbe": false,
+        "mintStreamId": false,
+        "ticketProbe": false,
+        "CAPTURE_FRAME": false,
+        "CAPTURE_TICKET": false,
+        "chromeMediaSourceId": false,
+        "grabFrame": false
+      },
+      "callsGetUserMedia": false,
+      "toolbarOpensTheSidePanel": true,
+      "toolbarIssuesACaptureGrant": false,
+      "offscreenCanStartTr01": false,
+      "offscreenHandlesPerceiveOnce": false,
+      "offscreenHandlesStreamConsume": false,
+      "offscreenHasTheProductRefusal": true,
+      "offscreenStillNamesT1": true,
+      "workerControlPlaneHasPerceiveOnce": false,
+      "workerControlPlaneHasConsumeProbe": false,
+      "workerControlPlaneHasMintStreamId": false,
+      "workerMintsCaptureHandles": true,
+      "workerCallsForACaptureTicket": false,
+      "offscreenJustification": "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",
+      "contentScriptNamesEitherHook": false,
+      "sidePanelNamesEitherHook": false,
+      "sidePanelStillAsksForTheToolbarGesture": false
+    }
+  },
+  "manifest": {
+    "name": "PratiBimb — Page Assistant (Development build)",
+    "actionTitle": "PratiBimb — Page Assistant",
+    "permissions": [
+      "offscreen",
+      "sidePanel"
+    ],
+    "hostPermissions": [
+      "http://127.0.0.1/*"
+    ],
+    "contentScriptMatches": [
+      "http://127.0.0.1/*"
+    ],
+    "connectSrc": "'self' http://127.0.0.1:8995/v1/chat/completions",
+    "styleHashIsTheExpectedOne": true,
+    "shortcut": "Alt+Shift+P",
+    "minimumChromeVersion": "116"
+  },
+  "bundleFacts": {
+    "panelSendsHostStatus": true,
+    "workerHostStatusAwaitsEnsureOffscreen": true,
+    "panelTaskStartSendsNoMaxTurns": true,
+    "offscreenDefaultsTheBudgetToThree": true,
+    "offscreenHasTheCeilingRefusal": true,
+    "offscreenJustification": "Run PratiBimb's offscreen runtime for DOM-based browser assistance.",
+    "diagnosticHooksAbsent": true,
+    "noGetUserMediaCall": true,
+    "noCaptureVisibleTab": true,
+    "noCaptureTicketCall": true,
+    "offscreenCannotStartTr01": true,
+    "offscreenRefusesTheUiHead": true,
+    "refusalCodesPresent": {
+      "DECLARATION_STALE": true,
+      "DOCUMENT_CHANGED": true,
+      "STOPPED_UNVERIFIED": true,
+      "STOPPED_REFUSED": true,
+      "STOPPED_SINGLE_TURN_PLANNER": true,
+      "DETERMINISTIC_FALLBACK": true
+    },
+    "httpOriginsInExtensionCodeOtherThanLoopback": []
+  },
+  "chrome": {
+    "documentedPath": "%LOCALAPPDATA%/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+    "present": true,
+    "versionFrom": "the binary's version resource and Playwright's browsers.json; Chrome was not launched",
+    "playwright": "1.63.0",
+    "playwrightRegistry": [
+      {
+        "name": "chromium",
+        "revision": "1243",
+        "installByDefault": true,
+        "browserVersion": "153.0.8010.12",
+        "title": "Chrome for Testing"
+      }
+    ]
+  },
+  "fixture": {
+    "served": "tests/browser/demo/server.mjs, a static file server bound to 127.0.0.1, default port 8975, with no routes that write",
+    "routes": {
+      "/fixture/": "tests/browser/demo/fixture/application.html",
+      "/declared/": "tests/browser/extension/fixture/declared-task.html"
+    },
+    "externalReferences": {
+      "application.html": [],
+      "declared-task.html": []
+    },
+    "pageScriptsUseNetwork": {
+      "application.html": false,
+      "declared-task.html": false
+    },
+    "applicationControls": [
+      "name",
+      "mobile",
+      "aadhaar",
+      "dob",
+      "otp",
+      "mobile_confirm",
+      "submit"
+    ],
+    "declaredControls": [
+      "alerts",
+      "save",
+      "callback"
+    ]
+  },
+  "reasoner": {
+    "endpoint": "http://127.0.0.1:8995/v1/chat/completions",
+    "upstream": "127.0.0.1:8977",
+    "model": {
+      "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "pinnedBytes": 491400032,
+      "present": true,
+      "sizeMatchesThePinByStat": true,
+      "opened": false,
+      "hashed": false
+    },
+    "runtime": {
+      "build": "b10956",
+      "binaryPresent": true
+    },
+    "stateFilePresent": false,
+    "commands": {
+      "start": "npm run reasoner",
+      "check": "npm run reasoner:check",
+      "stop": "npm run reasoner:stop"
+    },
+    "startAndCheckBothHashTheModel": "scripts/reasoner/reasoner.mjs header, steps 1 and 2: both verify the pinned weights' full SHA-256",
+    "notRun": true
+  }
+}
